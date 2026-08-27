@@ -1,0 +1,7 @@
+FROM laravelsail/php84-composer:latest
+
+USER root
+RUN apt-get update && apt-get install -y default-mysql-client \
+    && docker-php-ext-install pdo_mysql pcntl
+
+CMD ["php", "artisan", "octane:start", "--server=frankenphp", "--host=0.0.0.0", "--port=80", "--admin-port=2019"]

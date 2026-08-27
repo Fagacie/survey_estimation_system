@@ -1,0 +1,538 @@
+/* ==============================================================
+   ISES — Global Design System
+   ============================================================== */
+
+:root {
+    /* Sidebar colors — light/professional theme */
+    --sb-bg:          #f8fafc;
+    --sb-surface:     #ffffff;
+    --sb-border:      #e8edf2;
+    --sb-text:        #374151;
+    --sb-heading:     #0f172a;
+    --sb-muted:       #9ca3af;
+    --sb-accent-bg:   #f0f4f8;
+
+    /* Brand accents */
+    --accent-blue:    #2563eb;
+    --accent-cyan:    #0891b2;
+    --accent-green:   #059669;
+    --accent-amber:   #d97706;
+    --accent-rose:    #e11d48;
+    --accent-purple:  #7c3aed;
+    --accent-orange:  #ea580c;
+
+    /* Map feature colors */
+    --boundary-color: #2563eb;
+    --main-line-color: #e11d48;
+    --cross-line-color: #d97706;
+
+    --radius-sm: 6px;
+    --radius-md: 8px;
+    --radius-lg: 14px;
+    --shadow-sm: 0 1px 4px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+/* ==============================================================
+   BASE
+   ============================================================== */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f1f5f9;
+    color: #334155;
+}
+
+/* ==============================================================
+   GENERAL CARD STYLING
+   ============================================================== */
+.card {
+    border: 1px solid var(--sb-border);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    background: #fff;
+}
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+.card-header {
+    background: #fff;
+    border-bottom: 1px solid var(--sb-border);
+    border-top-left-radius: var(--radius-lg) !important;
+    border-top-right-radius: var(--radius-lg) !important;
+    font-weight: 600;
+    padding: 16px 20px;
+    color: var(--sb-heading);
+}
+
+/* ==============================================================
+   BUTTONS
+   ============================================================== */
+.btn {
+    border-radius: var(--radius-md);
+    font-weight: 500;
+    padding: 8px 18px;
+    transition: all 0.2s;
+    font-size: 0.875rem;
+}
+.btn-primary {
+    background: var(--accent-blue);
+    border-color: var(--accent-blue);
+}
+.btn-primary:hover {
+    background: #1d4ed8;
+    border-color: #1d4ed8;
+    box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+    transform: translateY(-1px);
+}
+
+/* ==============================================================
+   FORMS
+   ============================================================== */
+.form-control, .form-select {
+    border-radius: var(--radius-md);
+    border: 1px solid #d1d5db;
+    padding: 9px 14px;
+    font-size: 0.875rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
+}
+
+/* ==============================================================
+   TABLES
+   ============================================================== */
+.table {
+    vertical-align: middle;
+}
+.table thead th {
+    border-bottom: 2px solid #f1f5f9;
+    color: #6b7280;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+    background: #f8fafc;
+}
+
+/* ==============================================================
+   WORKSPACE LAYOUT  (Map Planning Page)
+   ============================================================== */
+
+.workspace-container {
+    position: relative;
+    height: 100vh;
+    width: 100vw;
+    overflow: hidden;
+}
+
+/* ---- MAP AREA (Full Screen) ---- */
+.workspace-map {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+.workspace-map #map {
+    width: 100% !important;
+    height: 100% !important;
+    position: absolute !important;
+    top: 0;
+    left: 0;
+}
+
+/* ---- FLOATING SIDEBAR (Google Maps Style) ---- */
+.workspace-sidebar {
+    position: absolute;
+    top: 90px; /* space for the navbar */
+    left: 20px;
+    bottom: 20px;
+    width: 360px;
+    background: var(--sb-bg);
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,0,0,0.03);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 1000;
+}
+
+/* ---- MODERN METRIC STRIP (Google Maps Style) ---- */
+.metric-strip {
+    background: #ffffff;
+    padding: 16px 20px;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(0,0,0,0.06);
+}
+.metric-strip .metric-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+}
+.metric-strip .metric-item {
+    text-align: center;
+    background: #f8fafc;
+    border-radius: 12px;
+    padding: 10px 4px;
+    transition: background 0.2s;
+}
+.metric-strip .metric-item:hover {
+    background: #f1f5f9;
+}
+.metric-strip .metric-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: #64748b;
+    margin-bottom: 4px;
+    font-weight: 700;
+}
+.metric-strip .metric-value {
+    font-size: 0.95rem;
+    font-weight: 800;
+    line-height: 1.1;
+    color: #0f172a;
+}
+.metric-strip .metric-value.c-cyan   { color: #0284c7; }
+.metric-strip .metric-value.c-green  { color: #059669; }
+.metric-strip .metric-value.c-amber  { color: #d97706; }
+.metric-strip .metric-value.c-rose   { color: #e11d48; }
+
+/* ---- SCROLLABLE ACCORDION AREA ---- */
+.sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.sidebar-content::-webkit-scrollbar { width: 4px; }
+.sidebar-content::-webkit-scrollbar-track { background: transparent; }
+.sidebar-content::-webkit-scrollbar-thumb {
+    background-color: #d1d5db;
+    border-radius: 10px;
+}
+
+/* ---- INNOVATIVE ACCORDION SECTIONS ---- */
+.ws-accordion .accordion-item {
+    background: transparent;
+    border: none;
+    margin: 8px 12px;
+    border-radius: 14px;
+    overflow: hidden;
+}
+.ws-accordion .accordion-button {
+    background: #ffffff;
+    color: #1e293b;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 14px 16px;
+    border: none;
+    border-radius: 14px !important;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    transition: all 0.2s;
+}
+.ws-accordion .accordion-button:not(.collapsed) {
+    background: #f8fafc;
+    color: #0f172a;
+    box-shadow: none;
+    border-bottom-left-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+}
+.ws-accordion .accordion-button::after {
+    background-size: 14px;
+    width: 14px;
+    height: 14px;
+    opacity: 0.5;
+}
+.ws-accordion .accordion-collapse {
+    background: #f8fafc;
+}
+.ws-accordion .accordion-body {
+    padding: 0 16px 16px 16px;
+    color: #475569;
+    font-size: 0.82rem;
+}
+
+/* Elegant Panel Icons */
+.panel-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    margin-right: 12px;
+    flex-shrink: 0;
+}
+.panel-icon.bg-blue   { background: #eff6ff; color: #2563eb; }
+.panel-icon.bg-green  { background: #ecfdf5; color: #059669; }
+.panel-icon.bg-cyan   { background: #ecfeff; color: #0891b2; }
+.panel-icon.bg-amber  { background: #fffbeb; color: #d97706; }
+.panel-icon.bg-rose   { background: #fff1f2; color: #e11d48; }
+.panel-icon.bg-purple { background: #faf5ff; color: #7c3aed; }
+.panel-icon.bg-orange { background: #fff7ed; color: #ea580c; }
+
+/* ---- STAT ROWS ---- */
+.stat-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+    border-bottom: 1px solid #f1f5f9;
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-row .stat-label {
+    color: var(--sb-muted);
+    font-size: 0.77rem;
+}
+.stat-row .stat-value {
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: var(--sb-heading);
+}
+.stat-row .stat-value.highlight {
+    color: var(--accent-cyan);
+    font-size: 0.88rem;
+}
+
+/* ---- MODERN FORM INPUTS ---- */
+.form-control-panel {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    color: #1e293b;
+    font-size: 0.85rem;
+    font-weight: 500;
+    padding: 10px 14px;
+    border-radius: 20px;
+    width: 100%;
+    transition: all 0.2s;
+}
+.form-control-panel:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59,130,246,0.1);
+}
+.form-label-panel {
+    color: #64748b;
+    font-size: 0.72rem;
+    font-weight: 600;
+    display: block;
+    margin-bottom: 6px;
+    margin-left: 4px;
+}
+
+/* ---- SIDEBAR BUTTONS ---- */
+.btn-ws {
+    width: 100%;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    border-radius: 24px; /* pill buttons */
+    transition: all 0.2s;
+    cursor: pointer;
+    border: none;
+    display: block;
+    text-align: center;
+    text-decoration: none;
+}
+.btn-ws-primary {
+    background: #2563eb;
+    color: #fff;
+}
+.btn-ws-primary:hover {
+    background: #1d4ed8;
+    box-shadow: 0 4px 12px rgba(37,99,235,0.25);
+    transform: translateY(-1px);
+    color: #fff;
+}
+.btn-ws-secondary {
+    background: #f1f5f9;
+    color: #475569;
+}
+.btn-ws-secondary:hover {
+    background: #e2e8f0;
+    color: #0f172a;
+}
+.btn-ws-outline-danger {
+    background: transparent;
+    border: 1px solid #fda4af;
+    color: #e11d48;
+}
+.btn-ws-outline-danger:hover {
+    background: #fff1f2;
+    border-color: #e11d48;
+}
+.btn-ws-success {
+    background: #059669;
+    color: #fff;
+}
+.btn-ws-success:hover {
+    background: #047857;
+    box-shadow: 0 4px 12px rgba(5,150,105,0.25);
+    transform: translateY(-1px);
+    color: #fff;
+}
+.btn-ws-dark {
+    background: #1e293b;
+    color: #fff;
+}
+.btn-ws-dark:hover {
+    background: #0f172a;
+    box-shadow: 0 4px 12px rgba(15,23,42,0.25);
+    color: #fff;
+}
+
+/* Section label inside accordion body */
+.section-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 12px;
+    margin-top: 6px;
+    display: block;
+}
+
+/* ---- STICKY FOOTER ---- */
+.workspace-footer {
+    flex-shrink: 0;
+    background: var(--sb-surface);
+    border-top: 1px solid var(--sb-border);
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 0 -4px 12px rgba(0,0,0,0.04);
+}
+
+/* Stale warning */
+.stale-warning {
+    background: #fffbeb;
+    border: 1px solid #fde68a;
+    color: var(--accent-amber);
+    border-radius: var(--radius-sm);
+    padding: 6px 10px;
+    font-size: 0.75rem;
+}
+
+/* ==============================================================
+   MAP OVERLAY CONTROLS
+   ============================================================== */
+
+/* Adjust default leaflet controls to not hide behind sidebar */
+.leaflet-left .leaflet-control {
+    margin-left: 400px; /* push past sidebar */
+}
+.leaflet-top .leaflet-control {
+    margin-top: 90px;
+}
+
+/* Basemap selector */
+.map-basemap-control {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border-radius: var(--radius-md);
+    padding: 5px;
+    display: flex;
+    gap: 3px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(0,0,0,0.08);
+}
+.map-basemap-btn {
+    background: transparent;
+    border: 1px solid transparent;
+    color: #6b7280;
+    padding: 5px 11px;
+    border-radius: 6px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    font-family: 'Inter', sans-serif;
+}
+.map-basemap-btn:hover {
+    color: var(--accent-blue);
+    background: #eff6ff;
+}
+.map-basemap-btn.active {
+    background: var(--accent-blue);
+    color: #fff;
+    border-color: var(--accent-blue);
+}
+
+/* Layer control panel */
+.map-layer-control {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    min-width: 170px;
+    box-shadow: var(--shadow-md);
+    border: 1px solid rgba(0,0,0,0.08);
+}
+.map-layer-control .layer-title {
+    font-size: 0.64rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: #9ca3af;
+    margin-bottom: 9px;
+    font-weight: 700;
+    font-family: 'Inter', sans-serif;
+}
+.map-layer-control .form-check {
+    margin-bottom: 6px;
+}
+.map-layer-control .form-check-label {
+    color: #374151;
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    font-family: 'Inter', sans-serif;
+}
+.map-layer-control .form-check-input:checked {
+    background-color: var(--accent-blue);
+    border-color: var(--accent-blue);
+}
+.layer-color-dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+}
+
+/* Coordinate display */
+.map-coord-bar {
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    color: #374151;
+    font-size: 0.72rem;
+    font-family: 'Inter', monospace;
+    padding: 5px 12px;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(0,0,0,0.07);
+}
+.map-coord-bar span {
+    font-weight: 700;
+    color: var(--accent-blue);
+}
+
+/* Loading overlay */
+.map-loading-overlay {
+    background: rgba(248, 250, 252, 0.88);
+    backdrop-filter: blur(6px);
+}
+.map-loading-overlay .spinner-border {
+    color: var(--accent-blue) !important;
+}
+.map-loading-overlay h5 {
+    color: var(--sb-heading) !important;
+    font-size: 0.95rem;
+}
