@@ -132,35 +132,37 @@
         <thead>
             <tr>
                 <th style="width: 5%">No.</th>
-                <th style="width: 45%">Description</th>
-                <th style="width: 12%" class="text-right">Qty</th>
-                <th style="width: 18%" class="text-right">Unit Rate (RM)</th>
+                <th style="width: 40%">Description</th>
+                <th style="width: 10%" class="text-right">Days/Qty</th>
+                <th style="width: 10%" class="text-right">Units/Pax</th>
+                <th style="width: 15%" class="text-right">Unit Rate (RM)</th>
                 <th style="width: 20%" class="text-right">Total (RM)</th>
             </tr>
         </thead>
         <tbody>
             @php $itemNo = 1; $grandTotal = 0; @endphp
             @foreach($grouped_costs as $category => $items)
-                <tr class="cat-row"><td colspan="5">{{ $category }}</td></tr>
+                <tr class="cat-row"><td colspan="6">{{ $category }}</td></tr>
                 @php $catTotal = 0; @endphp
                 @foreach($items as $item)
                     <tr>
                         <td>{{ $itemNo++ }}</td>
                         <td>{{ $item->description }}</td>
                         <td class="text-right">{{ number_format($item->quantity, 2) }}</td>
+                        <td class="text-right">{{ $item->units ?? 1 }}</td>
                         <td class="text-right">{{ number_format($item->unit_rate, 2) }}</td>
                         <td class="text-right font-weight-bold">{{ number_format($item->total_price, 2) }}</td>
                     </tr>
                     @php $catTotal += $item->total_price; @endphp
                 @endforeach
                 <tr class="sub-row">
-                    <td colspan="4" class="text-right">{{ $category }} Subtotal</td>
+                    <td colspan="5" class="text-right">{{ $category }} Subtotal</td>
                     <td class="text-right">RM {{ number_format($catTotal, 2) }}</td>
                 </tr>
                 @php $grandTotal += $catTotal; @endphp
             @endforeach
             <tr class="grand-row">
-                <td colspan="4" class="text-right">GRAND TOTAL (MYR)</td>
+                <td colspan="5" class="text-right">GRAND TOTAL (MYR)</td>
                 <td class="text-right">RM {{ number_format($grandTotal, 2) }}</td>
             </tr>
         </tbody>

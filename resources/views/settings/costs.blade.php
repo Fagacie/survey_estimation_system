@@ -43,7 +43,8 @@
                         <th style="width: 15%">Category</th>
                         <th style="width: 35%">Item Name</th>
                         <th style="width: 15%">Unit Type</th>
-                        <th style="width: 20%">Default Rate (RM)</th>
+                        <th style="width: 15%">Base Multiplier</th>
+                        <th style="width: 15%">Default Rate (RM)</th>
                         <th style="width: 15%" class="text-end">Actions</th>
                     </tr>
                 </thead>
@@ -63,6 +64,13 @@
                             <td class="fw-bold text-slate-800">{{ $rate->name }}</td>
                             <td>
                                 <span class="badge bg-light text-dark border rounded-pill px-3 py-2 shadow-sm">{{ $rate->unit_type }}</span>
+                            </td>
+                            <td>
+                                @if($rate->unit_type == 'Per Day')
+                                    <span class="text-muted small fw-bold"><i class="fa-solid fa-xmark me-1"></i>{{ $rate->base_multiplier }}</span>
+                                @else
+                                    <span class="text-muted small">-</span>
+                                @endif
                             </td>
                             <td class="fw-bold text-slate-800">
                                 {{ number_format($rate->default_rate, 2) }}
@@ -108,9 +116,18 @@
                                                         </div>
                                                         <div class="col-md-6">
                                                             <label class="form-label fw-bold text-muted small">Unit Type</label>
-                                                            <select name="unit_type" class="form-select rounded-3" required>
+                                                            <select name="unit_type" class="form-select rounded-3" required onchange="toggleMultiplierEdit(this, {{ $rate->id }})">
                                                                 <option value="Per Day" {{ $rate->unit_type == 'Per Day' ? 'selected' : '' }}>Per Day</option>
                                                                 <option value="Lump Sum" {{ $rate->unit_type == 'Lump Sum' ? 'selected' : '' }}>Lump Sum</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="col-md-6 multiplier-group-edit-{{ $rate->id }}" style="display: {{ $rate->unit_type == 'Per Day' ? 'block' : 'none' }};">
+                                                            <label class="form-label fw-bold text-muted small">Base Multiplier</label>
+                                                            <select name="base_multiplier" class="form-select rounded-3">
+                                                                <option value="Total Duration" {{ $rate->base_multiplier == 'Total Duration' ? 'selected' : '' }}>Total Duration</option>
+                                                                <option value="Execution Days" {{ $rate->base_multiplier == 'Execution Days' ? 'selected' : '' }}>Execution Days</option>
+                                                                <option value="MOB/DEMOB Days" {{ $rate->base_multiplier == 'MOB/DEMOB Days' ? 'selected' : '' }}>MOB/DEMOB Days</option>
+                                                                <option value="Weather Days" {{ $rate->base_multiplier == 'Weather Days' ? 'selected' : '' }}>Weather Days</option>
                                                             </select>
                                                         </div>
                                                         <div class="col-md-6 mb-3">
@@ -170,9 +187,18 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold text-muted small">Unit Type</label>
-                                <select name="unit_type" class="form-select rounded-3" required>
+                                <select name="unit_type" id="add_unit_type" class="form-select rounded-3" required onchange="toggleMultiplierAdd(this)">
                                     <option value="Per Day">Per Day</option>
                                     <option value="Lump Sum">Lump Sum</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6" id="add_multiplier_group">
+                                <label class="form-label fw-bold text-muted small">Base Multiplier</label>
+                                <select name="base_multiplier" class="form-select rounded-3">
+                                    <option value="Total Duration">Total Duration</option>
+                                    <option value="Execution Days">Execution Days</option>
+                                    <option value="MOB/DEMOB Days">MOB/DEMOB Days</option>
+                                    <option value="Weather Days">Weather Days</option>
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
@@ -190,6 +216,20 @@
         </div>
     </div>
     <script>
+        function toggleMultiplierEdit(selectElement, id) {
+            const group = document.querySelector('.multiplier-group-edit-' + id);
+            if(group) {
+                group.style.display = selectElement.value === 'Per Day' ? 'block' : 'none';
+            }
+        }
+
+        function toggleMultiplierAdd(selectElement) {
+            const group = document.getElementById('add_multiplier_group');
+            if(group) {
+                group.style.display = selectElement.value === 'Per Day' ? 'block' : 'none';
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             const deleteButtons = document.querySelectorAll('.btn-delete-action');
             deleteButtons.forEach(btn => {

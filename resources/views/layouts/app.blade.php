@@ -170,7 +170,7 @@
             <div class="d-flex align-items-center gap-2">
                 @auth
                     @if(request()->routeIs('projects.map') || request()->routeIs('projects.show'))
-                        <button id="btn-save-planning" class="btn-island ms-3">Save Plan</button>
+                        <button class="btn-island ms-3 btn-save-planning-trigger">Save Plan</button>
                     @else
                         <a href="#" class="btn-island ms-3">Resume</a>
                     @endif

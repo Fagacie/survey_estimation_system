@@ -258,9 +258,12 @@
                 </div><!-- end accordion -->
 
                 <div class="p-3 mt-auto">
-                        <a href="{{ route('projects.cost.show', $project->id) }}" class="btn-ws btn-ws-primary" style="display: block; text-align: center; text-decoration: none;">
-                            Continue to Cost <i class="fa-solid fa-arrow-right"></i>
-                        </a>
+                    <button class="btn-ws btn-ws-success mb-2 btn-save-planning-trigger" style="display: block; width: 100%; border: none;">
+                        <i class="fa-solid fa-floppy-disk me-2"></i> Save Planning
+                    </button>
+                    <a href="{{ route('projects.cost.show', $project->id) }}" class="btn-ws btn-ws-primary" style="display: block; text-align: center; text-decoration: none;">
+                        Continue to Cost <i class="fa-solid fa-arrow-right"></i>
+                    </a>
                 </div>
             </div><!-- end sidebar-content -->
         </div>
@@ -566,7 +569,9 @@
 
 
             // 13. Save Planning
-            document.getElementById('btn-save-planning').addEventListener('click', saveSurveyPlanning);
+            document.querySelectorAll('.btn-save-planning-trigger').forEach(btn => {
+                btn.addEventListener('click', saveSurveyPlanning);
+            });
 
             // 14. Layer toggle listeners
             document.getElementById('layer-boundaries').addEventListener('change', function() {

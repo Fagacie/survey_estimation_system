@@ -36,7 +36,11 @@ class CostEstimationController extends Controller
             $lineItems = $estimation->items;
         } else {
             // Generate draft line items from the auto-calculation
-            $lineItems = collect($calcResult['cost_items'])->map(fn($item) => new CostItem($item));
+            $lineItems = collect($calcResult['cost_items'])->map(function($item) {
+                $costItem = new CostItem($item);
+                $costItem->setAttribute('unit_type', $item['unit_type'] ?? null);
+                return $costItem;
+            });
         }
 
         // Group items by category for the view
@@ -62,7 +66,8 @@ class CostEstimationController extends Controller
             'items'               => 'required|array',
             'items.*.category'    => 'required|string',
             'items.*.description' => 'required|string',
-            'items.*.quantity'    => 'required|numeric|min:0',
+            'items.*.days'        => 'required|numeric|min:0',
+            'items.*.units'       => 'required|integer|min:1',
             'items.*.unit_rate'   => 'required|numeric|min:0',
         ]);
 
@@ -71,16 +76,18 @@ class CostEstimationController extends Controller
         $totalCost = 0;
 
         foreach ($request->items as $itemData) {
-            $qty   = (float) $itemData['quantity'];
+            $days  = (float) $itemData['days'];
+            $units = (int) ($itemData['units'] ?? 1);
             $rate  = (float) $itemData['unit_rate'];
-            $price = $qty * $rate;
+            $price = $days * $units * $rate;
             $totalCost += $price;
 
             $items[] = [
                 'cost_rate_id' => $itemData['cost_rate_id'] ?? null,
                 'category'     => $itemData['category'],
                 'description'  => $itemData['description'],
-                'quantity'     => $qty,
+                'days'         => $days,
+                'units'        => $units,
                 'unit_rate'    => $rate,
                 'total_price'  => $price,
             ];

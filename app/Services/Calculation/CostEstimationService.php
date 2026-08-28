@@ -54,22 +54,37 @@ class CostEstimationService
         $costItems = [];
         $totalCost = 0;
 
-        foreach ($masterRates as $rate) {
-            $qty = $this->resolveQuantity($rate, $totalDays);
+        // Preserve existing units if they exist
+        $existingItems = [];
+        if ($project->costEstimation) {
+            foreach ($project->costEstimation->items as $item) {
+                if ($item->cost_rate_id) {
+                    $existingItems[$item->cost_rate_id] = $item->units;
+                }
+            }
+        }
 
-            if ($qty <= 0) {
+        foreach ($masterRates as $rate) {
+            $days = $this->resolveQuantity($rate, $duration);
+
+            if ($days <= 0) {
                 continue;
             }
 
+            // Preserve previously edited units, default to 1
+            $units = $existingItems[$rate->id] ?? 1;
+
             $unitRate   = (float) $rate->default_rate;
-            $totalPrice = $qty * $unitRate;
+            $totalPrice = $days * $units * $unitRate;
             $totalCost += $totalPrice;
 
             $costItems[] = [
                 'cost_rate_id' => $rate->id,
                 'category'     => $rate->category ?? 'General',
                 'description'  => $rate->name,
-                'quantity'     => $qty,
+                'unit_type'    => $rate->unit_type,
+                'days'         => $days,
+                'units'        => $units,
                 'unit_rate'    => $unitRate,
                 'total_price'  => $totalPrice,
             ];
@@ -108,13 +123,18 @@ class CostEstimationService
         $estimation->items()->delete();
 
         foreach ($items as $item) {
+            $calcDays = $item['days'] ?? 1;
+            $calcUnits = $item['units'] ?? 1;
+            $unitRate = (float) $item['unit_rate'];
+
             $estimation->items()->create([
                 'cost_rate_id' => $item['cost_rate_id'] ?? null,
                 'category'     => $item['category'],
                 'description'  => $item['description'],
-                'quantity'     => (float) $item['quantity'],
-                'unit_rate'    => (float) $item['unit_rate'],
-                'total_price'  => (float) $item['quantity'] * (float) $item['unit_rate'],
+                'days'         => (float) $item['days'],
+                'units'        => (int) $calcUnits,
+                'unit_rate'    => $unitRate,
+                'total_price'  => (float) $calcDays * (int) $calcUnits * $unitRate,
             ]);
         }
 
@@ -122,16 +142,32 @@ class CostEstimationService
     }
 
     /**
-     * Resolve the quantity for a cost rate item based on its unit type.
+     * Resolve the quantity for a cost rate item based on its unit type and base multiplier.
      */
-    protected function resolveQuantity(CostRate $rate, float $totalDays): float
+    protected function resolveQuantity(CostRate $rate, array $duration): float
     {
         if (strtolower($rate->unit_type) === 'lump sum') {
             return 1.0;
         }
 
         if (strtolower($rate->unit_type) === 'per day') {
-            return $totalDays > 0 ? ceil($totalDays) : 0;
+            $days = 0;
+            switch ($rate->base_multiplier) {
+                case 'Execution Days':
+                    $days = $duration['execution_days'] ?? 0;
+                    break;
+                case 'MOB/DEMOB Days':
+                    $days = $duration['mod_demod_days'] ?? 0;
+                    break;
+                case 'Weather Days':
+                    $days = $duration['weather_days'] ?? 0;
+                    break;
+                case 'Total Duration':
+                default:
+                    $days = $duration['total_days'] ?? 0;
+                    break;
+            }
+            return $days > 0 ? ceil($days) : 0;
         }
 
         return 1.0;

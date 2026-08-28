@@ -143,10 +143,11 @@
                                 <table class="cost-table">
                                     <thead>
                                         <tr>
-                                            <th style="width: 40%">Description</th>
-                                            <th style="width: 12%" class="text-end">Quantity</th>
-                                            <th style="width: 18%" class="text-end">Unit Rate (RM)</th>
-                                            <th style="width: 20%" class="text-end">Total (RM)</th>
+                                            <th style="width: 35%">Description</th>
+                                            <th style="width: 12%" class="text-end">Days (Duration)</th>
+                                            <th style="width: 12%" class="text-end">Qty/Pax</th>
+                                            <th style="width: 16%" class="text-end">Unit Rate (RM)</th>
+                                            <th style="width: 15%" class="text-end">Total (RM)</th>
                                             <th style="width: 10%"></th>
                                         </tr>
                                     </thead>
@@ -159,7 +160,10 @@
                                                     <input type="text" name="items[{{ $flatIndex }}][description]" class="form-control form-control-sm" value="{{ $item->description }}" required>
                                                 </td>
                                                 <td>
-                                                    <input type="number" step="0.01" name="items[{{ $flatIndex }}][quantity]" class="form-control form-control-sm item-qty text-end" value="{{ $item->quantity }}" required>
+                                                    <input type="number" step="0.01" name="items[{{ $flatIndex }}][days]" class="form-control form-control-sm item-days text-end @if(($item->unit_type ?? $item->costRate?->unit_type ?? '') === 'Lump Sum') bg-light text-muted @endif" value="{{ $item->days }}" required @if(($item->unit_type ?? $item->costRate?->unit_type ?? '') === 'Lump Sum') readonly tabindex="-1" title="Not applicable for Lump Sum" @endif>
+                                                </td>
+                                                <td>
+                                                    <input type="number" step="1" name="items[{{ $flatIndex }}][units]" class="form-control form-control-sm item-units text-end @if(($item->unit_type ?? $item->costRate?->unit_type ?? '') === 'Lump Sum') bg-light text-muted @endif" value="{{ $item->units ?? 1 }}" required @if(($item->unit_type ?? $item->costRate?->unit_type ?? '') === 'Lump Sum') readonly tabindex="-1" title="Not applicable for Lump Sum" @endif>
                                                 </td>
                                                 <td>
                                                     <input type="number" step="0.01" name="items[{{ $flatIndex }}][unit_rate]" class="form-control form-control-sm item-rate text-end" value="{{ $item->unit_rate }}" required>
@@ -254,7 +258,10 @@
                 <input type="text" name="items[__INDEX__][description]" class="form-control form-control-sm" placeholder="Custom item..." required>
             </td>
             <td>
-                <input type="number" step="0.01" name="items[__INDEX__][quantity]" class="form-control form-control-sm item-qty text-end" value="1" required>
+                <input type="number" step="0.01" name="items[__INDEX__][days]" class="form-control form-control-sm item-days text-end" value="1" required>
+            </td>
+            <td>
+                <input type="number" step="1" name="items[__INDEX__][units]" class="form-control form-control-sm item-units text-end" value="1" required>
             </td>
             <td>
                 <input type="number" step="0.01" name="items[__INDEX__][unit_rate]" class="form-control form-control-sm item-rate text-end" value="0.00" required>
@@ -285,9 +292,11 @@
                 let categoryTotals = {};
 
                 document.querySelectorAll('.cost-row').forEach(row => {
-                    const qty = parseFloat(row.querySelector('.item-qty')?.value) || 0;
+                    const days = parseFloat(row.querySelector('.item-days')?.value) || 0;
+                    const units = parseInt(row.querySelector('.item-units')?.value) || 1;
                     const rate = parseFloat(row.querySelector('.item-rate')?.value) || 0;
-                    const total = qty * rate;
+                    
+                    const total = days * units * rate;
                     const totalEl = row.querySelector('.item-total');
                     if (totalEl) totalEl.innerText = formatCurrency(total);
                     grandTotal += total;
@@ -314,7 +323,7 @@
 
             // Event delegation for inputs
             document.getElementById('cost-form').addEventListener('input', function(e) {
-                if (e.target.classList.contains('item-qty') || e.target.classList.contains('item-rate')) {
+                if (e.target.classList.contains('item-days') || e.target.classList.contains('item-units') || e.target.classList.contains('item-rate')) {
                     calculateTotals();
                 }
             });

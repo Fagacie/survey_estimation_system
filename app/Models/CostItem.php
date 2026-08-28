@@ -11,13 +11,15 @@ class CostItem extends Model
         'cost_rate_id',
         'category',
         'description',
-        'quantity',
+        'days',
+        'units',
         'unit_rate',
         'total_price',
     ];
 
     protected $casts = [
-        'quantity' => 'float',
+        'days' => 'float',
+        'units' => 'integer',
         'unit_rate' => 'float',
         'total_price' => 'float',
     ];
