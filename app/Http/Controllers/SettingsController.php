@@ -19,7 +19,7 @@ class SettingsController extends Controller
             'category' => 'required|string',
             'name' => 'required|string|max:255',
             'unit_type' => 'required|in:Per Day,Lump Sum',
-            'base_multiplier' => 'nullable|string',
+            'base_multiplier' => 'nullable|in:Total Duration,Execution Days,MOB/DEMOB Days,Weather Days',
             'default_rate' => 'required|numeric|min:0',
         ]);
 
@@ -34,7 +34,7 @@ class SettingsController extends Controller
             'category' => 'required|string',
             'name' => 'required|string|max:255',
             'unit_type' => 'required|in:Per Day,Lump Sum',
-            'base_multiplier' => 'nullable|string',
+            'base_multiplier' => 'nullable|in:Total Duration,Execution Days,MOB/DEMOB Days,Weather Days',
             'default_rate' => 'required|numeric|min:0',
         ]);
 

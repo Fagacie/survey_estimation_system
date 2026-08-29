@@ -1171,7 +1171,11 @@
             let lines = { type: 'FeatureCollection', features: [] };
             drawnItems.eachLayer(function(layer) {
                 if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
-                    lines.features.push(layer.toGeoJSON());
+                    let geojson = layer.toGeoJSON();
+                    geojson.properties = geojson.properties || {};
+                    geojson.properties.line_type = layer.lineType || 'main';
+                    geojson.properties.is_generated = !!layer.isGenerated;
+                    lines.features.push(geojson);
                 }
             });
 
@@ -1194,7 +1198,6 @@
                     orientation_angle: document.getElementById('gen-angle').value,
                     cross_spacing: document.getElementById('gen-cross-spacing').value || null
                 },
-                is_generated: true,
                 override_total_distance_meters: window.currentTotalLengthMeters || 0
             };
 

@@ -148,7 +148,7 @@
                     <tr>
                         <td>{{ $itemNo++ }}</td>
                         <td>{{ $item->description }}</td>
-                        <td class="text-right">{{ number_format($item->quantity, 2) }}</td>
+                        <td class="text-right">{{ number_format($item->days, 2) }}</td>
                         <td class="text-right">{{ $item->units ?? 1 }}</td>
                         <td class="text-right">{{ number_format($item->unit_rate, 2) }}</td>
                         <td class="text-right font-weight-bold">{{ number_format($item->total_price, 2) }}</td>

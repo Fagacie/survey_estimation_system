@@ -341,10 +341,29 @@
             btnAdd.addEventListener('click', function() {
                 let html = template.replace(/__INDEX__/g, itemIndex++);
 
-                // Find the last cost-table tbody, or append to the form
-                let lastTbody = document.querySelector('.cost-section:last-of-type .cost-table tbody');
-                if (lastTbody) {
-                    lastTbody.insertAdjacentHTML('beforeend', html);
+                // Try to find Miscellaneous section first
+                let miscSection = Array.from(document.querySelectorAll('.cost-section')).find(section => {
+                    let header = section.querySelector('.cost-section-header h6');
+                    return header && header.textContent.includes('Miscellaneous');
+                });
+
+                let targetTbody = null;
+                if (miscSection) {
+                    targetTbody = miscSection.querySelector('.cost-table tbody');
+                }
+
+                // Fallback: find any cost-table tbody
+                if (!targetTbody) {
+                    let allTbodies = document.querySelectorAll('.cost-table tbody');
+                    if (allTbodies.length > 0) {
+                        targetTbody = allTbodies[allTbodies.length - 1];
+                    }
+                }
+
+                if (targetTbody) {
+                    targetTbody.insertAdjacentHTML('beforeend', html);
+                } else {
+                    Swal.fire('No Section', 'Could not find a cost section to add item to.', 'warning');
                 }
                 calculateTotals();
             });
