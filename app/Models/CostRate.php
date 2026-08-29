@@ -10,10 +10,10 @@ class CostRate extends Model
     use HasFactory;
 
     protected $fillable = [
-
         'category',
         'name',
         'unit_type', // 'Per Day', 'Lump Sum'
+        'base_multiplier', // 'Total Duration', 'Execution Days', 'MOB/DEMOB Days', 'Weather Days'
         'default_rate',
         'is_active'
     ];

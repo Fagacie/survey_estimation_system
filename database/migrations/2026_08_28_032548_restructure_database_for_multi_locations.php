@@ -8,10 +8,15 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * 
+     * NOTE: This migration is intentionally empty. The multi-location database
+     * restructure is planned but not yet implemented. Once requirements are finalized,
+     * add the schema changes here (e.g., projects_locations table, foreign keys, etc.)
+     * to support multi-location survey projects.
      */
     public function up(): void
     {
-        //
+        // TODO: Implement multi-location schema when feature is ready
     }
 
     /**
@@ -19,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        //
+        // No schema to revert yet
     }
 };

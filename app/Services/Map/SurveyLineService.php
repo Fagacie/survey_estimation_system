@@ -13,12 +13,12 @@ class SurveyLineService
     public function saveLines(Project $project, array $geojson, bool $isGenerated = false, array $adcpMarkers = []): void
     {
         $project->surveyLines()->delete();
-        
-        $type = $isGenerated ? 'generated' : 'main';
 
         foreach ($geojson['features'] as $index => $feature) {
             $length = $feature['properties']['length'] ?? 0;
             $bearing = $feature['properties']['bearing'] ?? null;
+            // Read line_type from feature properties; fallback to $isGenerated for backward compatibility
+            $type = $feature['properties']['line_type'] ?? ($isGenerated ? 'generated' : 'main');
 
             $project->surveyLines()->create([
                 'type' => $type,
@@ -41,3 +41,4 @@ class SurveyLineService
         }
     }
 }
+
