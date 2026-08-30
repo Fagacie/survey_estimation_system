@@ -77,6 +77,47 @@ class ReportService
             $distNm = $location->sbesParameters->total_distance_nm ?? 0;
             $globalDistanceNm += $distNm;
 
+            // Map screenshot
+            $imagePath = storage_path('app/public/maps/' . $location->id . '.png');
+            if (!file_exists(storage_path('app/public/maps'))) {
+                mkdir(storage_path('app/public/maps'), 0755, true);
+            }
+
+            $screenshotUrl = null;
+            if (class_exists(\Spatie\Browsershot\Browsershot::class) && $hasLines) {
+                try {
+                    $boundaries = [
+                        'type' => 'FeatureCollection',
+                        'features' => $location->boundaries->map(fn($b) => $b->geometry)->toArray()
+                    ];
+                    
+                    $lines = [
+                        'type' => 'FeatureCollection',
+                        'features' => $location->surveyLines->map(fn($l) => $l->geometry)->toArray()
+                    ];
+
+                    $html = view('reports.map-capture', [
+                        'location' => $location,
+                        'boundaries' => json_encode($boundaries),
+                        'lines' => json_encode($lines)
+                    ])->render();
+
+                    \Spatie\Browsershot\Browsershot::html($html)
+                        ->setChromePath('/usr/bin/chromium')
+                        ->noSandbox()
+                        ->addChromiumArguments(['disable-gpu', 'disable-dev-shm-usage', 'disable-software-rasterizer'])
+                        ->windowSize(1200, 800)
+                        ->waitForSelector('#map-ready')
+                        ->save($imagePath);
+                    
+                    $screenshotUrl = public_path('storage/maps/' . $location->id . '.png');
+                } catch (\Throwable $e) {
+                    \Log::error('Browsershot error: ' . $e->getMessage());
+                }
+            } else if (file_exists($imagePath)) {
+                $screenshotUrl = public_path('storage/maps/' . $location->id . '.png');
+            }
+
             $locationsData[] = [
                 'name'               => $location->name,
                 'status'             => $status,
@@ -87,6 +128,7 @@ class ReportService
                 'cross_line_count'   => $crossLinesCount,
                 'total_length_nm'    => $distNm,
                 'survey_speed_knots' => $location->sbesParameters->survey_speed_knots ?? 'N/A',
+                'map_screenshot'     => $screenshotUrl,
             ];
         }
 

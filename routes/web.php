@@ -35,10 +35,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/projects/{project}/report/preview', [\App\Http\Controllers\ReportController::class, 'preview'])->name('projects.report.preview');
     Route::get('/projects/{project}/report/pdf', [\App\Http\Controllers\ReportController::class, 'downloadReport'])->name('projects.report.pdf');
-
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
+
+Route::get('/projects/{project}/surveys/{surveyLocation}/report-map', [\App\Http\Controllers\ReportController::class, 'captureMap'])->name('projects.surveys.report-map');
 
 require __DIR__.'/auth.php';

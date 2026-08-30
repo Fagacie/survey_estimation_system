@@ -135,6 +135,11 @@
                         <td>{{ number_format($loc['total_length_nm'], 4) }} NM</td>
                     </tr>
                 </table>
+                @if(!empty($loc['map_screenshot']))
+                    <div style="margin-top: 10px; text-align: center;">
+                        <img src="{{ $loc['map_screenshot'] }}" alt="Map for {{ $loc['name'] }}" style="max-width: 100%; max-height: 400px; border: 1px solid #cbd5e1; display: inline-block;">
+                    </div>
+                @endif
             </div>
         @endforeach
     @else
