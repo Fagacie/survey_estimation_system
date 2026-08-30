@@ -23,7 +23,7 @@ class ReportService
         $project->load([
             'boundaries',
             'surveyLines',
-            'sbesParameters',
+            'surveyLocations.sbesParameters',
             'costEstimation.items.costRate',
             'surveyGenerationSetting',
             'user',
@@ -40,8 +40,12 @@ class ReportService
         $groupedCostItems = $costItems->groupBy('category');
 
         // Survey line statistics
-        $mainLines  = $project->surveyLines->where('type', 'main');
-        $crossLines = $project->surveyLines->where('type', 'cross');
+        $mainLines = $project->surveyLines->filter(function ($line) {
+            return $this->canonicalLineType($line) === 'main';
+        });
+        $crossLines = $project->surveyLines->filter(function ($line) {
+            return $this->canonicalLineType($line) === 'cross';
+        });
 
         $totalLengthMeters = $project->surveyLines->sum('length_meters');
         $mainLengthMeters  = $mainLines->sum('length_meters');
@@ -55,6 +59,37 @@ class ReportService
         // Generation settings
         $genSettings = $project->surveyGenerationSetting;
 
+        // Per-location breakdown
+        $locationsData = [];
+        $globalDistanceNm = 0;
+        foreach ($project->surveyLocations as $location) {
+            $locLines = $project->surveyLines->where('survey_location_id', $location->id);
+            $locBoundaries = $project->boundaries->where('survey_location_id', $location->id);
+            
+            $mainLinesCount = $locLines->filter(fn($l) => $this->canonicalLineType($l) === 'main')->count();
+            $crossLinesCount = $locLines->filter(fn($l) => $this->canonicalLineType($l) === 'cross')->count();
+            
+            $hasLines = $locLines->count() > 0;
+            $hasBoundaries = $locBoundaries->count() > 0;
+            $status = ($hasLines && $hasBoundaries) ? 'Completed' : 'Pending';
+
+            $areaM2 = $locBoundaries->sum('area');
+            $distNm = $location->sbesParameters->total_distance_nm ?? 0;
+            $globalDistanceNm += $distNm;
+
+            $locationsData[] = [
+                'name'               => $location->name,
+                'status'             => $status,
+                'boundary_count'     => $locBoundaries->count(),
+                'area_m2'            => round($areaM2, 2),
+                'area_km2'           => round($areaM2 / 1_000_000, 4),
+                'main_line_count'    => $mainLinesCount,
+                'cross_line_count'   => $crossLinesCount,
+                'total_length_nm'    => $distNm,
+                'survey_speed_knots' => $location->sbesParameters->survey_speed_knots ?? 'N/A',
+            ];
+        }
+
         return [
             'project'          => $project,
             'duration'         => $calcResult['duration'],
@@ -62,8 +97,9 @@ class ReportService
             'cost_items'       => $costItems,
             'grouped_costs'    => $groupedCostItems,
             'total_cost'       => $estimation ? $estimation->total_cost : $calcResult['total_cost'],
+            'locations_data'   => $locationsData,
 
-            // Survey area
+            // Global Survey stats
             'boundary_count'   => $project->boundaries->count(),
             'total_area_m2'    => round($totalArea, 2),
             'total_area_km2'   => round($totalArea / 1_000_000, 4),
@@ -71,14 +107,11 @@ class ReportService
             'total_perimeter_km' => round($totalPerimeter / 1000, 2),
             'total_vertices'   => $totalVertices,
 
-            // Survey lines
+            // Global Survey lines
             'total_lines'       => $project->surveyLines->count(),
             'main_line_count'   => $mainLines->count(),
             'cross_line_count'  => $crossLines->count(),
-            'total_length_m'    => round($totalLengthMeters, 2),
-            'total_length_nm'   => round(($totalLengthMeters / 1000) / 1.852, 4),
-            'main_length_m'     => round($mainLengthMeters, 2),
-            'cross_length_m'    => round($crossLengthMeters, 2),
+            'total_length_nm'   => round($globalDistanceNm, 4),
             'line_spacing'      => $genSettings->line_spacing ?? 'N/A',
             'orientation_angle' => $genSettings->orientation_angle ?? 'N/A',
 
@@ -134,5 +167,20 @@ class ReportService
             'file_path'     => $filePath,
             'generated_at'  => now(),
         ]);
+    }
+
+    private function canonicalLineType($line): string
+    {
+        $geometryType = $line->geometry['properties']['line_type'] ?? null;
+
+        if (in_array($geometryType, ['main', 'cross', 'reference', 'adcp_marker'], true)) {
+            return $geometryType;
+        }
+
+        if (in_array($line->type, ['main', 'cross', 'reference', 'adcp_marker'], true)) {
+            return $line->type;
+        }
+
+        return 'main';
     }
 }

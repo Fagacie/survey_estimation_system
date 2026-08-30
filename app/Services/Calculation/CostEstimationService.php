@@ -16,32 +16,47 @@ class CostEstimationService
      */
     public function calculate(Project $project): array
     {
-        $params = $project->sbesParameters;
+        $project->load('surveyLocations.sbesParameters');
 
         // ─── TIME CALCULATIONS ───────────────────────────────────
-        $distanceNm  = (float) ($params->total_distance_nm ?? 0);
-        $speedKnots  = (float) ($params->survey_speed_knots ?? 5.0);
-        $hoursPerDay = (float) ($params->working_hours_per_day ?? 8.0);
+        
+        // Summing up execution times from all survey areas
+        $totalDistanceNm = 0;
+        $totalSurveyHours = 0;
+        $totalExecutionDays = 0;
 
-        $weatherDays  = (float) ($params->weather_days ?? 0);
-        $modDemodDays = (float) ($params->mod_demod_days ?? 0);
-        $patchDays    = (float) ($params->patch_test_days ?? 0);
+        foreach ($project->surveyLocations as $location) {
+            $params = $location->sbesParameters;
+            if (!$params) continue;
 
-        // FORMULA 1: Survey Hours = Distance (NM) / Speed (knots)
-        $surveyHours = $speedKnots > 0 ? $distanceNm / $speedKnots : 0;
+            $distance = (float) ($params->total_distance_nm ?? 0);
+            $speed = (float) ($params->survey_speed_knots ?? 5.0);
+            $hours = (float) ($params->working_hours_per_day ?? 8.0);
 
-        // FORMULA 2: Execution Days = Survey Hours / Working Hours Per Day
-        $executionDays = $hoursPerDay > 0 ? $surveyHours / $hoursPerDay : 0;
+            $surveyHours = $speed > 0 ? $distance / $speed : 0;
+            $executionDays = $hours > 0 ? $surveyHours / $hours : 0;
+
+            $totalDistanceNm += $distance;
+            $totalSurveyHours += $surveyHours;
+            $totalExecutionDays += $executionDays;
+        }
+
+        // Global Allowances from Project
+        $weatherDays  = (float) ($project->weather_days ?? 0);
+        $modDemodDays = (float) ($project->mod_demod_days ?? 0);
+        $patchDays    = (float) ($project->patch_test_days ?? 0);
 
         // FORMULA 3: Total Duration = Execution + Weather + MOB/DEMOB + Patch Test
-        $totalDays = $executionDays + $weatherDays + $modDemodDays + $patchDays;
+        $totalDays = $totalExecutionDays + $weatherDays + $modDemodDays + $patchDays;
+        
+        $avgSpeed = $totalSurveyHours > 0 ? $totalDistanceNm / $totalSurveyHours : 0;
 
         $duration = [
-            'distance_nm'        => round($distanceNm, 4),
-            'speed_knots'        => $speedKnots,
-            'hours_per_day'      => $hoursPerDay,
-            'survey_hours'       => round($surveyHours, 2),
-            'execution_days'     => round($executionDays, 2),
+            'distance_nm'        => round($totalDistanceNm, 4),
+            'speed_knots'        => round($avgSpeed, 1),
+            'hours_per_day'      => 0, // Varies by location, not applicable globally for display
+            'survey_hours'       => round($totalSurveyHours, 2),
+            'execution_days'     => round($totalExecutionDays, 2),
             'weather_days'       => $weatherDays,
             'mod_demod_days'     => $modDemodDays,
             'patch_test_days'    => $patchDays,

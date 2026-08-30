@@ -14,6 +14,7 @@ class CostRate extends Model
         'category',
         'name',
         'unit_type', // 'Per Day', 'Lump Sum'
+        'base_multiplier',
         'default_rate',
         'is_active'
     ];

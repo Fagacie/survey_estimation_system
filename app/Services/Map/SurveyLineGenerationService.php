@@ -2,7 +2,7 @@
 
 namespace App\Services\Map;
 
-use App\Models\Project;
+use App\Models\SurveyLocation;
 use App\Models\SurveyGenerationSetting;
 
 class SurveyLineGenerationService
@@ -10,14 +10,15 @@ class SurveyLineGenerationService
     /**
      * Save the settings used to generate the lines
      */
-    public function saveSettings(Project $project, array $settings): SurveyGenerationSetting
+    public function saveSettings(SurveyLocation $survey, array $settings): SurveyGenerationSetting
     {
-        return $project->surveyGenerationSetting()->updateOrCreate(
-            ['project_id' => $project->id],
+        return $survey->surveyGenerationSetting()->updateOrCreate(
+            ['survey_location_id' => $survey->id],
             [
-                'line_spacing' => $settings['line_spacing'],
-                'orientation_angle' => $settings['orientation_angle'],
-                'cross_line_spacing' => $settings['cross_line_spacing'] ?? 0,
+                'project_id' => $survey->project_id,
+                'line_spacing' => $settings['line_spacing'] ?? 0,
+                'orientation_angle' => $settings['orientation_angle'] ?? 0,
+                'cross_line_spacing' => $settings['cross_line_spacing'] ?? $settings['cross_spacing'] ?? 0,
                 'cross_line_angle' => $settings['cross_line_angle'] ?? 0,
             ]
         );

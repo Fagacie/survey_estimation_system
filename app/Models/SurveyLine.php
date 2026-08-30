@@ -19,4 +19,9 @@ class SurveyLine extends Model
     {
         return $this->belongsTo(Project::class);
     }
+
+    public function surveyLocation()
+    {
+        return $this->belongsTo(SurveyLocation::class);
+    }
 }

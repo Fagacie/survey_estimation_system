@@ -101,11 +101,11 @@
                                     <div class="row g-2 mb-2">
                                         <div class="col-6">
                                             <label class="form-label-panel">Spacing (m)</label>
-                                            <input type="number" id="gen-spacing" class="form-control-panel" value="100" min="1">
+                                            <input type="number" id="gen-spacing" class="form-control-panel" value="{{ $surveyLocation->surveyGenerationSetting->line_spacing ?? 100 }}" min="1">
                                         </div>
                                         <div class="col-6">
                                             <label class="form-label-panel">Angle (deg)</label>
-                                            <input type="number" id="gen-angle" class="form-control-panel" value="90" min="0" max="360">
+                                            <input type="number" id="gen-angle" class="form-control-panel" value="{{ $surveyLocation->surveyGenerationSetting->orientation_angle ?? 90 }}" min="0" max="360">
                                         </div>
                                     </div>
                                 </div>
@@ -141,7 +141,7 @@
                                 <div class="row g-2 mb-2">
                                     <div class="col-12">
                                         <label class="form-label-panel">Spacing (m)</label>
-                                        <input type="number" id="gen-cross-spacing" class="form-control-panel" placeholder="Optional" min="1">
+                                        <input type="number" id="gen-cross-spacing" class="form-control-panel" value="{{ $surveyLocation->surveyGenerationSetting->cross_line_spacing ?? '' }}" placeholder="Optional" min="1">
                                     </div>
                                 </div>
                                 <button id="btn-generate-cross" class="btn btn-ws btn-ws-secondary mb-2">
@@ -172,8 +172,8 @@
                                 
                                 <!-- SURVEY GEOMETRY -->
                                 <div class="mb-2 fw-bold text-uppercase" style="color: var(--sb-text-muted); font-size: 0.75rem; letter-spacing: 0.5px;">Survey Geometry</div>
-                                <div class="stat-row"><span class="stat-label">Survey Area</span><span class="stat-value" id="stat-boundary-area">0 m²</span></div>
-                                <div class="stat-row"><span class="stat-label">Boundary Perimeter</span><span class="stat-value" id="stat-boundary-perimeter">0 km</span></div>
+                                <div class="stat-row"><span class="stat-label">Survey Area</span><span class="stat-value" id="stat-eng-boundary-area">0 m²</span></div>
+                                <div class="stat-row"><span class="stat-label">Boundary Perimeter</span><span class="stat-value" id="stat-eng-boundary-perimeter">0 km</span></div>
                                 <div class="stat-row"><span class="stat-label">Survey Width</span><span class="stat-value" id="stat-survey-width">0.00 km</span></div>
                                 <div class="stat-row"><span class="stat-label">Survey Length</span><span class="stat-value" id="stat-survey-length">0.00 km</span></div>
                                 
@@ -216,11 +216,11 @@
                                 <div class="row g-2 mb-3">
                                     <div class="col-6">
                                         <label class="form-label-panel mb-0" title="Survey vessel speed">Survey Speed (knots)</label>
-                                        <input type="number" step="0.1" id="sbes-speed" class="form-control-panel mt-1" value="{{ $project->sbesParameters?->survey_speed_knots ?? '5.0' }}" onchange="calculateTimeEstimation()">
+                                        <input type="number" step="0.1" id="sbes-speed" class="form-control-panel mt-1" value="{{ $surveyLocation->sbesParameters?->survey_speed_knots ?? '5.0' }}" onchange="calculateTimeEstimation()">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label-panel mb-0" title="Operating hours per day">Working Hrs / Day</label>
-                                        <input type="number" step="0.1" id="sbes-workhrs" class="form-control-panel mt-1" value="{{ $project->sbesParameters?->working_hours_per_day ?? '8.0' }}" onchange="calculateTimeEstimation()">
+                                        <input type="number" step="0.1" id="sbes-workhrs" class="form-control-panel mt-1" value="{{ $surveyLocation->sbesParameters?->working_hours_per_day ?? '8.0' }}" onchange="calculateTimeEstimation()">
                                     </div>
                                 </div>
                                 
@@ -233,15 +233,15 @@
                                 <div class="row g-2 mb-3">
                                     <div class="col-6">
                                         <label class="form-label-panel mb-0" title="Mobilization and Demobilization Days">MOB/DEMOB (Days)</label>
-                                        <input type="number" step="0.1" id="sbes-mod" class="form-control-panel mt-1" value="{{ $project->sbesParameters?->mod_demod_days ?? '0' }}" onchange="calculateTimeEstimation()">
+                                        <input type="number" step="0.1" id="sbes-mod" class="form-control-panel mt-1" value="{{ $project->mod_demod_days ?? 0 }}" disabled title="Set in Project Overview">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label-panel mb-0" title="Expected weather standby days">Weather (Days)</label>
-                                        <input type="number" step="0.1" id="sbes-weather" class="form-control-panel mt-1" value="{{ $project->sbesParameters?->weather_days ?? '0' }}" onchange="calculateTimeEstimation()">
+                                        <input type="number" step="0.1" id="sbes-weather" class="form-control-panel mt-1" value="{{ $project->weather_days ?? 0 }}" disabled title="Set in Project Overview">
                                     </div>
                                     <div class="col-6">
                                         <label class="form-label-panel mb-0" title="Patch tests and other survey allowances">Other (Patch Test)</label>
-                                        <input type="number" step="0.1" id="sbes-patch" class="form-control-panel mt-1" value="{{ $project->sbesParameters?->patch_test_days ?? '0' }}" onchange="calculateTimeEstimation()">
+                                        <input type="number" step="0.1" id="sbes-patch" class="form-control-panel mt-1" value="{{ $project->patch_test_days ?? 0 }}" disabled title="Set in Project Overview">
                                     </div>
                                 </div>
 
@@ -261,8 +261,8 @@
                     <button class="btn-ws btn-ws-success mb-2 btn-save-planning-trigger" style="display: block; width: 100%; border: none;">
                         <i class="fa-solid fa-floppy-disk me-2"></i> Save Planning
                     </button>
-                    <a href="{{ route('projects.cost.show', $project->id) }}" class="btn-ws btn-ws-primary" style="display: block; text-align: center; text-decoration: none;">
-                        Continue to Cost <i class="fa-solid fa-arrow-right"></i>
+                    <a href="{{ route('projects.show', $project->id) }}" class="btn-ws btn-ws-primary" style="display: block; text-align: center; text-decoration: none;">
+                        &larr; Back to Overview
                     </a>
                 </div>
             </div><!-- end sidebar-content -->
@@ -592,8 +592,8 @@
         // LOAD EXISTING DATA
         // ============================================================
         function loadExistingData() {
-            @if($project->boundaries->count() > 0)
-                var boundaries = {!! $project->boundaries->map(fn($b) => $b->geometry)->toJson() !!};
+            @if($surveyLocation->boundaries->count() > 0)
+                var boundaries = {!! $surveyLocation->boundaries->map(fn($b) => $b->geometry)->toJson() !!};
                 boundaries.forEach(function(geoJsonFeature) {
                     var layer = L.geoJSON(geoJsonFeature, {
                         style: { color: '#3b82f6', weight: 3, fillOpacity: 0.15 }
@@ -607,11 +607,18 @@
                 });
             @endif
 
-            fetch("{{ route('projects.map.lines', $project->id) }}")
-                .then(response => response.json())
+            let ts = new Date().getTime();
+            console.log("DEBUG: Fetching lines on page load! URL=", `{{ route('projects.surveys.lines', [$project->id, $surveyLocation->id]) }}?t=${ts}`);
+            fetch(`{{ route('projects.surveys.lines', [$project->id, $surveyLocation->id]) }}?t=${ts}`)
+                .then(response => {
+                    console.log("DEBUG: Fetch lines response received", response);
+                    return response.json();
+                })
                 .then(existingLines => {
-                    if (existingLines && existingLines.length > 0) {
-                        existingLines.forEach(function(geoJsonFeature) {
+                    console.log("DEBUG: Fetch lines JSON parsed. Length=", existingLines?.features?.length || 0, existingLines);
+                    if (existingLines && existingLines.features && existingLines.features.length > 0) {
+                        try {
+                            existingLines.features.forEach(function(geoJsonFeature) {
                             var lineType = (geoJsonFeature.properties && geoJsonFeature.properties.line_type) || 'main';
                             var isMain = lineType === 'main';
 
@@ -634,7 +641,11 @@
                                     crossLineLayerGroup.addLayer(vizLayer);
                                 }
                             });
-                        });
+                            });
+                        } catch (err) {
+                            console.error("Error drawing existing lines:", err);
+                            Swal.fire('Drawing Error', 'An error occurred while drawing existing lines: ' + err.message, 'error');
+                        }
                     }
 
                     recalculateAllStats();
@@ -652,7 +663,10 @@
                             });
                     }
                 })
-                .catch(error => console.error('Error loading map lines:', error));
+                .catch(error => {
+                    console.error('Error loading map lines:', error);
+                    Swal.fire('Fetch Error', 'Failed to load lines from the server. Check console for details. Error: ' + error.message, 'error');
+                });
         }
 
         // ============================================================
@@ -706,7 +720,10 @@
         // RECALCULATE ALL STATISTICS
         // ============================================================
         function recalculateAllStats() {
-            let mainCount = 0, crossCount = 0;
+            console.log("DEBUG: --- recalculateAllStats() START ---");
+            console.log("DEBUG: drawnItems count before calculation:", drawnItems.getLayers().length);
+            try {
+                let mainCount = 0, crossCount = 0;
             let mainLength = 0, crossLength = 0;
             let boundaryArea = 0, boundaryPerimeter = 0, verticesCount = 0;
             boundaryFeatures = [];
@@ -721,7 +738,8 @@
                     boundaryFeatures.push(geojson);
                     
                     let pArea = turf.area(geojson);
-                    let pPerim = turf.length(geojson, {units: 'meters'});
+                    let polyLine = turf.polygonToLine(geojson);
+                    let pPerim = turf.length(polyLine, {units: 'meters'});
                     
                     boundaryArea += pArea;
                     boundaryPerimeter += pPerim;
@@ -837,7 +855,9 @@
 
             // Boundary
             updateIfExist('stat-boundary-area', boundaryArea.toLocaleString(undefined, {maximumFractionDigits:2}) + ' m²');
+            updateIfExist('stat-eng-boundary-area', boundaryArea.toLocaleString(undefined, {maximumFractionDigits:2}) + ' m²');
             updateIfExist('stat-boundary-perimeter', (boundaryPerimeter / 1000).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + ' km');
+            updateIfExist('stat-eng-boundary-perimeter', (boundaryPerimeter / 1000).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + ' km');
             updateIfExist('stat-survey-length', (coverageWidth / 1000).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + ' km');
 
             // Main Lines
@@ -858,6 +878,12 @@
             updateIfExist('ms-total-lines', (mainCount + crossCount));
 
             calculateTimeEstimation();
+            console.log("DEBUG: --- recalculateAllStats() END SUCCESS ---");
+            } catch (err) {
+                console.error("DEBUG: !!! FATAL ERROR IN recalculateAllStats !!!");
+                console.error(err);
+                Swal.fire('Calculation Error', 'An error occurred while calculating statistics: ' + err.message, 'error');
+            }
         }
 
         // ============================================================
@@ -1160,18 +1186,28 @@
         // SAVE PLANNING
         // ============================================================
         function saveSurveyPlanning() {
+            console.log("DEBUG: --- saveSurveyPlanning() INITIATED ---");
             if (isGeometryStale) {
+                console.log("DEBUG: isGeometryStale is TRUE, blocking save.");
                 Swal.fire('Stale Lines', 'Parameters have changed. Please regenerate lines before saving.', 'warning');
                 return;
             }
 
+            console.log("DEBUG: Calling recalculateAllStats() from saveSurveyPlanning...");
             recalculateAllStats();
+            console.log("DEBUG: Finished recalculateAllStats() without breaking.");
 
 
             let lines = { type: 'FeatureCollection', features: [] };
             drawnItems.eachLayer(function(layer) {
                 if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
-                    lines.features.push(layer.toGeoJSON());
+                      lines.features.push({
+                          type: 'Feature',
+                          geometry: layer.toGeoJSON().geometry,
+                          properties: {
+                              line_type: layer.lineType || 'main'
+                          }
+                      });
                 }
             });
 
@@ -1180,7 +1216,7 @@
                 return {
                     geometry: feat,
                     area: turf.area(feat),
-                    perimeter: turf.length(feat, {units: 'meters'}),
+                    perimeter: turf.length(turf.polygonToLine(feat), {units: 'meters'}),
                     vertex_count: coords.length > 0 ? coords.length - 1 : 0,
                     centroid: turf.centroid(feat).geometry
                 };
@@ -1215,7 +1251,8 @@
                 didOpen: () => { Swal.showLoading(); }
             });
 
-            fetch("{{ route('projects.map.save', $project->id) }}", {
+            console.log("DEBUG: POSTing to backend -> ", mapPayload);
+            fetch("{{ route('projects.surveys.map.save', [$project->id, $surveyLocation->id]) }}", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -1223,11 +1260,16 @@
                 },
                 body: JSON.stringify(mapPayload)
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log("DEBUG: Map POST Response received.", response);
+                return response.json();
+            })
             .then(mapResult => {
+                console.log("DEBUG: Map POST Result JSON parsed.", mapResult);
                 if (!mapResult.success) throw new Error("Map save failed: " + (mapResult.message || ''));
 
-                return fetch("{{ route('projects.parameters.store', $project->id) }}", {
+                console.log("DEBUG: POSTing Parameters to backend -> ", paramsPayload);
+                return fetch("{{ route('projects.surveys.parameters.store', [$project->id, $surveyLocation->id]) }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1244,7 +1286,7 @@
                     icon: 'success',
                     title: 'Saved',
                     text: 'Planning data saved successfully.'
-                }).then(() => window.location.reload());
+                }).then(() => window.location.href = window.location.pathname + '?t=' + new Date().getTime());
             })
             .catch(error => {
                 console.error(error);

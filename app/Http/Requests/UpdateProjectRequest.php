@@ -18,7 +18,6 @@ class UpdateProjectRequest extends FormRequest
             'name' => 'required|string|max:255',
             'client' => 'nullable|string|max:255',
             'location' => 'nullable|string|max:255',
-            'survey_type' => 'required|in:MBES,SBES,ADCP',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',
             'description' => 'nullable|string',

@@ -22,7 +22,7 @@ class CostEstimationController extends Controller
     public function show(string $id)
     {
         $project = auth()->user()->projects()->findOrFail($id);
-        $project->load('sbesParameters', 'boundaries', 'costEstimation.items.costRate');
+        $project->load('surveyLocations.sbesParameters', 'boundaries', 'costEstimation.items.costRate');
 
         // Always calculate the latest engineering figures from the centralized service
         $calcResult = $this->costService->calculate($project);

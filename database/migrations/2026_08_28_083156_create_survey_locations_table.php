@@ -11,13 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('cost_rates', function (Blueprint $table) {
+        Schema::create('survey_locations', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('project_id')->constrained()->cascadeOnDelete();
             $table->string('name');
-            $table->string('category')->default('General');
-            $table->string('unit_type')->default('Per Day'); // 'Per Day', 'Lump Sum'
-            $table->decimal('default_rate', 10, 2)->default(0.00);
-            $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
     }
@@ -27,6 +24,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('cost_rates');
+        Schema::dropIfExists('survey_locations');
     }
 };

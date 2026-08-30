@@ -12,8 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('sbes_parameters', function (Blueprint $table) {
-            $table->double('survey_speed_knots')->nullable()->after('total_distance_nm');
-            $table->double('working_hours_per_day')->nullable()->after('survey_speed_knots');
+            if (!Schema::hasColumn('sbes_parameters', 'survey_speed_knots')) {
+                $table->double('survey_speed_knots')->nullable()->after('total_distance_nm');
+            }
+
+            if (!Schema::hasColumn('sbes_parameters', 'working_hours_per_day')) {
+                $table->double('working_hours_per_day')->nullable()->after('survey_speed_knots');
+            }
         });
     }
 
@@ -23,7 +28,13 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('sbes_parameters', function (Blueprint $table) {
-            $table->dropColumn(['survey_speed_knots', 'working_hours_per_day']);
+            if (Schema::hasColumn('sbes_parameters', 'survey_speed_knots')) {
+                $table->dropColumn('survey_speed_knots');
+            }
+
+            if (Schema::hasColumn('sbes_parameters', 'working_hours_per_day')) {
+                $table->dropColumn('working_hours_per_day');
+            }
         });
     }
 };

@@ -17,6 +17,9 @@ class Project extends Model
         'start_date',
         'end_date',
         'description',
+        'weather_days',
+        'mod_demod_days',
+        'patch_test_days',
         'status',
         'user_id',
     ];
@@ -50,14 +53,20 @@ class Project extends Model
         return $this->hasMany(SurveyLine::class);
     }
 
-    public function surveyGenerationSetting()
+    public function surveyLocations()
     {
-        return $this->hasOne(SurveyGenerationSetting::class);
+        return $this->hasMany(SurveyLocation::class);
     }
 
     public function sbesParameters()
     {
         return $this->hasOne(SbesParameter::class);
+    }
+    
+    // We keep these helper methods because some views (like dashboard) might still reference them
+    public function surveyGenerationSetting()
+    {
+        return $this->hasOne(SurveyGenerationSetting::class);
     }
 
     public function costEstimation()

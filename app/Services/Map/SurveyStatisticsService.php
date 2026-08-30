@@ -9,10 +9,10 @@ class SurveyStatisticsService
     /**
      * Calculate core statistics based on current survey lines and boundary
      */
-    public function calculateStatistics(Project $project, array $data = []): array
+    public function calculateStatistics(\App\Models\Project $project, \App\Models\SurveyLocation $surveyLocation, array $data = []): array
     {
-        $lines = $project->surveyLines;
-        $boundaries = $project->boundaries;
+        $lines = $surveyLocation->surveyLines;
+        $boundaries = $surveyLocation->boundaries;
 
         // All individual line lengths are stored in METERS (from Turf.js in the browser)
         $totalLengthMeters = $lines->sum('length_meters');
@@ -32,12 +32,15 @@ class SurveyStatisticsService
         // Step 2: kilometers -> NM (divide by 1.852)
         $totalDistanceNM = ($totalLengthMeters / 1000) / 1.852;
 
-        $adcpCount = $project->surveyLines()->where('type', 'adcp_marker')->count();
+        $adcpCount = $surveyLocation->surveyLines()->where('type', 'adcp_marker')->count();
 
         // Save the total distance to sbes_parameters for cost calculation
-        $project->sbesParameters()->updateOrCreate(
-            ['project_id' => $project->id],
-            ['total_distance_nm' => round($totalDistanceNM, 4)]
+        $surveyLocation->sbesParameters()->updateOrCreate(
+            ['survey_location_id' => $surveyLocation->id],
+            [
+                'project_id' => $project->id,
+                'total_distance_nm' => round($totalDistanceNM, 4)
+            ]
         );
 
         return [

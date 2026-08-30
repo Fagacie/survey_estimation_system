@@ -15,9 +15,14 @@ Route::middleware(['auth', 'verified'])->group(function () {
     })->name('dashboard');
 
     Route::resource('projects', ProjectController::class);
-    Route::get('/projects/{project}/map-lines', [ProjectController::class, 'mapLines'])->name('projects.map.lines');
-    Route::post('/projects/{project}/map/save', [\App\Http\Controllers\MapController::class, 'save'])->name('projects.map.save');
-    Route::post('/projects/{project}/parameters', [\App\Http\Controllers\SurveyParameterController::class, 'store'])->name('projects.parameters.store');
+    Route::put('/projects/{project}/allowances', [\App\Http\Controllers\ProjectController::class, 'updateAllowances'])->name('projects.updateAllowances');
+    Route::get('/projects/{project}/surveys/{surveyLocation}/planning', [\App\Http\Controllers\SurveyLocationController::class, 'map'])->name('projects.surveys.map');
+    Route::get('/projects/{project}/surveys/{surveyLocation}/map-lines', [\App\Http\Controllers\SurveyLocationController::class, 'mapLines'])->name('projects.surveys.lines');
+    Route::post('/projects/{project}/surveys/{surveyLocation}/map/save', [\App\Http\Controllers\SurveyLocationController::class, 'saveMap'])->name('projects.surveys.map.save');
+    Route::post('/projects/{project}/surveys/{surveyLocation}/parameters', [\App\Http\Controllers\SurveyLocationController::class, 'saveParameters'])->name('projects.surveys.parameters.store');
+    
+    Route::post('/projects/{project}/surveys', [\App\Http\Controllers\SurveyLocationController::class, 'store'])->name('projects.surveys.store');
+    Route::delete('/projects/{project}/surveys/{surveyLocation}', [\App\Http\Controllers\SurveyLocationController::class, 'destroy'])->name('projects.surveys.destroy');
 
     Route::get('/settings/costs', [\App\Http\Controllers\SettingsController::class, 'costs'])->name('settings.costs');
     Route::post('/settings/costs', [\App\Http\Controllers\SettingsController::class, 'storeCost'])->name('settings.costs.store');

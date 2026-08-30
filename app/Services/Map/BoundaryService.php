@@ -2,7 +2,7 @@
 
 namespace App\Services\Map;
 
-use App\Models\Project;
+use App\Models\SurveyLocation;
 use App\Models\ProjectBoundary;
 
 class BoundaryService
@@ -10,14 +10,15 @@ class BoundaryService
     /**
      * Store or update a project's boundaries
      */
-    public function saveBoundaries(Project $project, array $boundariesData)
+    public function saveBoundaries(SurveyLocation $survey, array $boundariesData)
     {
         // Delete old boundaries to replace with new ones
-        $project->boundaries()->delete();
+        $survey->boundaries()->delete();
 
         $saved = [];
         foreach ($boundariesData as $boundaryData) {
-            $saved[] = $project->boundaries()->create([
+            $saved[] = $survey->boundaries()->create([
+                'project_id' => $survey->project_id,
                 'geometry' => $boundaryData['geometry'],
                 'area' => $boundaryData['area'] ?? 0,
                 'perimeter' => $boundaryData['perimeter'] ?? 0,

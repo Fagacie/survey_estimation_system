@@ -56,7 +56,7 @@ class ProjectController extends Controller
         // Projects that are active/draft but missing key steps
         $missingBoundariesCount = auth()->user()->projects()->where('status', '!=', 'completed')->doesntHave('boundaries')->count();
         $missingLinesCount = auth()->user()->projects()->where('status', '!=', 'completed')->has('boundaries')->doesntHave('surveyLines')->count();
-        $missingParamsCount = auth()->user()->projects()->where('status', '!=', 'completed')->doesntHave('sbesParameters')->count();
+        $missingParamsCount = 0; // Removed this metric for now
         $missingCostCount = auth()->user()->projects()->where('status', '!=', 'completed')->doesntHave('costEstimation')->count();
 
         $attention = [
@@ -109,28 +109,27 @@ class ProjectController extends Controller
     public function show(string $id)
     {
         $project = auth()->user()->projects()->findOrFail($id);
-        // Note: Intentionally NOT loading 'surveyLines' here for performance. They are fetched via mapLines AJAX.
-        $project->load('sbesParameters', 'boundaries', 'costEstimation.items');
-        return view('projects.show', compact('project'));
+        $project->load('surveyLocations');
+        return view('projects.overview', compact('project'));
     }
 
-    public function mapLines(string $id)
+    public function updateAllowances(Request $request, string $id)
     {
         $project = auth()->user()->projects()->findOrFail($id);
+        
+        $data = $request->validate([
+            'weather_days' => 'nullable|numeric|min:0',
+            'mod_demod_days' => 'nullable|numeric|min:0',
+            'patch_test_days' => 'nullable|numeric|min:0',
+        ]);
 
-        // Avoid eloquent hydration for performance when returning potentially thousands of lines
-        $lines = \Illuminate\Support\Facades\DB::table('survey_lines')
-            ->where('project_id', $project->id)
-            ->select('geometry', 'type')
-            ->get()
-            ->map(function ($line) {
-                $geom = is_string($line->geometry) ? json_decode($line->geometry, true) : $line->geometry;
-                $geom['properties'] = $geom['properties'] ?? [];
-                $geom['properties']['line_type'] = $line->type;
-                return $geom;
-            });
-            
-        return response()->json($lines);
+        $project->update([
+            'weather_days' => $data['weather_days'] ?? 0,
+            'mod_demod_days' => $data['mod_demod_days'] ?? 0,
+            'patch_test_days' => $data['patch_test_days'] ?? 0,
+        ]);
+
+        return redirect()->back()->with('success', 'Global allowances updated successfully.');
     }
 
     /**
