@@ -16,7 +16,7 @@ class StoreProjectRequest extends FormRequest
         return [
             'project_code' => 'nullable|string|max:50|unique:projects',
             'name' => 'required|string|max:255',
-            'client' => 'nullable|string|max:255',
+            'client_id' => 'nullable|exists:clients,id',
             'location' => 'nullable|string|max:255',
             'start_date' => 'nullable|date',
             'end_date' => 'nullable|date|after_or_equal:start_date',

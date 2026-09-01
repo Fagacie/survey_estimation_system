@@ -1,498 +1,579 @@
 <x-app-layout containerClass="px-0">
-    <!-- ISES Dashboard Custom Design System -->
     <style>
-        body {
-            background-color: #ffffff !important; 
-        }
-        
-        .ises-dashboard {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 32px 24px;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            color: #0f172a;
-        }
-
-        /* Surfaces & Cards */
-        .ises-surface {
-            background: #ffffff;
-            border-radius: 16px;
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px -1px rgba(0, 0, 0, 0.02);
-            transition: all 0.2s ease-in-out;
-        }
-
-        /* Typography */
-        .ises-text-primary { color: #0f172a; }
-        .ises-text-secondary { color: #475569; }
-        .ises-text-tertiary { color: #64748b; }
-        
-        /* Buttons */
-        .ises-btn-primary {
-            background-color: #0ea5e9;
-            color: white;
-            font-weight: 600;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 20px;
-            box-shadow: 0 2px 4px rgba(14, 165, 233, 0.2);
-            transition: all 0.2s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .ises-btn-primary:hover {
-            background-color: #0284c7;
-            color: white;
-            box-shadow: 0 4px 6px rgba(14, 165, 233, 0.25);
-            transform: translateY(-1px);
-        }
-        
-        .ises-btn-secondary {
+        .dashboard-wrapper {
             background-color: #f8fafc;
-            color: #334155;
-            font-weight: 600;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 8px 16px;
-            transition: all 0.2s;
-            text-decoration: none;
-        }
-        .ises-btn-secondary:hover {
-            background-color: #f1f5f9;
-            color: #0f172a;
+            min-height: calc(100vh - 64px);
         }
 
-        /* Action Buttons */
-        .ises-action-btn {
+        /* Top Dark Section */
+        .dashboard-hero {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            padding: 3rem 1.5rem 7rem;
+            position: relative;
+        }
+
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            color: #ffffff;
+            font-size: 1.85rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 0.25rem;
+        }
+        .page-subtitle {
+            color: #94a3b8;
+            font-size: 0.95rem;
+        }
+
+        .btn-premium {
+            background: #3b82f6;
+            color: #ffffff;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+            transition: all 0.2s;
+            text-decoration: none;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            color: #64748b;
-            transition: all 0.2s;
-            margin-left: 6px;
-            text-decoration: none;
+            gap: 0.5rem;
         }
-        .ises-action-btn:hover {
-            background: #f1f5f9;
-            color: #0ea5e9;
-            border-color: #cbd5e1;
-        }
-        .ises-action-btn.delete:hover {
-            color: #ef4444;
+        .btn-premium:hover {
+            background: #2563eb;
+            color: #ffffff;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
         }
 
-        /* KPI Cards */
-        .ises-kpi-card {
-            padding: 24px;
+        /* Floating KPI Cards */
+        .kpi-wrapper {
+            margin-top: -4.5rem;
+            padding: 0 1.5rem;
+            position: relative;
+            z-index: 10;
+        }
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+        .kpi-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+            border: 1px solid rgba(226, 232, 240, 0.8);
             display: flex;
             align-items: center;
-            gap: 20px;
+            gap: 1.25rem;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
-        .ises-kpi-icon {
-            width: 56px;
-            height: 56px;
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 20px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
+        }
+        .kpi-icon-box {
+            width: 52px;
+            height: 52px;
             border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            font-size: 1.25rem;
         }
-        .ises-kpi-icon.blue { background: #f0f9ff; color: #0ea5e9; }
-        .ises-kpi-icon.amber { background: #fffbeb; color: #f59e0b; }
-        .ises-kpi-icon.green { background: #f0fdf4; color: #10b981; }
-        .ises-kpi-icon.navy { background: #f8fafc; color: #334155; }
-        
-        .ises-kpi-value {
-            font-size: 2rem;
-            font-weight: 700;
-            line-height: 1.1;
-            color: #0f172a;
-        }
-        .ises-kpi-label {
-            font-size: 0.8rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .icon-blue { background: #eff6ff; color: #3b82f6; }
+        .icon-amber { background: #fffbeb; color: #f59e0b; }
+        .icon-indigo { background: #eef2ff; color: #6366f1; }
+        .icon-emerald { background: #ecfdf5; color: #10b981; }
+
+        .kpi-content h3 {
             color: #64748b;
-            margin-top: 4px;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+        .kpi-content .kpi-number {
+            color: #0f172a;
+            font-size: 1.75rem;
+            font-weight: 700;
+            line-height: 1;
         }
 
-        /* Overview Panel */
-        .ises-overview-panel {
-            background: #0f172a;
-            color: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 10px 15px -3px rgba(15, 23, 42, 0.2);
-        }
-        .ises-overview-stat {
-            border-left: 2px solid rgba(255,255,255,0.1);
-            padding-left: 16px;
-        }
-        .ises-overview-stat:first-child {
-            border-left: none;
-            padding-left: 0;
+        /* Main Content Area */
+        .content-area {
+            padding: 3rem 1.5rem 5rem;
         }
 
-        /* Requires Attention */
-        .ises-attention-alert {
-            background: #fff7ed;
-            border-left: 4px solid #ea580c;
-            border-radius: 8px;
-            padding: 16px 20px;
+        /* Secondary Stats (Estimation Overview) */
+        .stats-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 3rem;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .stat-item {
+            border-right: 1px solid #f1f5f9;
+            padding: 0 1rem;
+        }
+        .stat-item:last-child {
+            border-right: none;
+        }
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 0.25rem;
+        }
+        .stat-label {
+            font-size: 0.8rem;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* Attention Alerts */
+        .attention-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 1.25rem;
+            border-left: 4px solid #ef4444;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            border-top: 1px solid #e2e8f0;
+            border-right: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             align-items: flex-start;
-            gap: 16px;
+            gap: 1rem;
+            margin-bottom: 1rem;
         }
-        
-        /* Table */
-        .ises-table-container {
-            overflow-x: auto;
+        .attention-card.warning { border-left-color: #f59e0b; }
+        .attention-card.info { border-left-color: #3b82f6; }
+        .attention-icon {
+            font-size: 1.25rem;
+            margin-top: 2px;
         }
-        .ises-table {
+        .warning .attention-icon { color: #f59e0b; }
+        .info .attention-icon { color: #3b82f6; }
+        .attention-card h4 {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 0.25rem;
+        }
+        .attention-card p {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin: 0;
+        }
+
+        /* Projects Table */
+        .table-card {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            margin-top: 2rem;
+        }
+        .table-header-controls {
+            padding: 1.5rem;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .table-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin: 0;
+        }
+        .premium-input {
+            border: 1px solid #e2e8f0;
+            background: #f8fafc;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            font-size: 0.85rem;
+            color: #334155;
+            transition: all 0.2s;
+        }
+        .premium-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .premium-table {
             width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
+            border-collapse: collapse;
         }
-        .ises-table th {
-            text-align: left;
-            padding: 16px 24px;
+        .premium-table th {
+            padding: 1rem 1.5rem;
             font-size: 0.75rem;
             text-transform: uppercase;
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.05em;
             color: #64748b;
-            border-bottom: 1px solid #e2e8f0;
             background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: left;
         }
-        .ises-table th:first-child { border-top-left-radius: 16px; }
-        .ises-table th:last-child { border-top-right-radius: 16px; text-align: right; }
-        
-        .ises-table td {
-            padding: 16px 24px;
-            vertical-align: middle;
-            border-bottom: 1px solid #f1f5f9;
-            color: #334155;
+        .premium-table td {
+            padding: 1.25rem 1.5rem;
             font-size: 0.9rem;
+            color: #334155;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
         }
-        .ises-table tbody tr:hover td {
-            background-color: #f8fafc;
+        .premium-table tr:last-child td {
+            border-bottom: none;
+        }
+        .premium-table tr:hover td {
+            background: #fcfcfd;
         }
         
-        /* Badges */
-        .ises-badge {
-            padding: 4px 12px;
-            border-radius: 20px;
+        .badge-premium {
+            padding: 0.35rem 0.75rem;
+            border-radius: 999px;
             font-size: 0.75rem;
             font-weight: 600;
             display: inline-block;
         }
-        .ises-badge-draft { background: #fef3c7; color: #b45309; }
-        .ises-badge-planned { background: #e0f2fe; color: #0369a1; }
-        .ises-badge-completed { background: #dcfce7; color: #15803d; }
-        .ises-badge-neutral { background: #f1f5f9; color: #475569; }
+        .badge-draft { background: #f1f5f9; color: #475569; }
+        .badge-planned { background: #eff6ff; color: #2563eb; }
+        .badge-completed { background: #ecfdf5; color: #059669; }
 
-        /* Form Inputs */
-        .ises-input {
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 8px 16px;
-            font-size: 0.9rem;
-            color: #334155;
-            background: #ffffff;
+        .action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 34px;
+            height: 34px;
+            border-radius: 6px;
+            color: #64748b;
             transition: all 0.2s;
+            text-decoration: none;
+            margin-left: 0.25rem;
+            background: transparent;
         }
-        .ises-input:focus {
-            outline: none;
-            border-color: #0ea5e9;
-            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        .action-btn:hover {
+            background: #f1f5f9;
+            color: #0f172a;
         }
-        
-        .empty-state {
-            padding: 64px 24px;
+        .action-btn.delete:hover {
+            background: #fef2f2;
+            color: #dc2626;
+        }
+
+        /* Empty State */
+        .premium-empty {
             text-align: center;
+            padding: 4rem 2rem;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px dashed #cbd5e1;
+            margin-top: 2rem;
         }
-        .empty-state-icon {
+        .empty-icon {
             font-size: 3rem;
-            color: #cbd5e1;
-            margin-bottom: 24px;
+            color: #94a3b8;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 992px) {
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+            .stats-strip { grid-template-columns: repeat(2, 1fr); }
+            .stat-item:nth-child(2) { border-right: none; }
+            .kpi-wrapper { margin-top: -3rem; }
+        }
+        @media (max-width: 576px) {
+            .kpi-grid, .stats-strip { grid-template-columns: 1fr; }
+            .stat-item { border-right: none; border-bottom: 1px solid #f1f5f9; padding: 1rem 0; }
+            .stat-item:last-child { border-bottom: none; }
+            .kpi-wrapper { margin-top: -2rem; padding: 0 1rem; }
         }
     </style>
 
-    <div class="ises-dashboard">
-        
-        <!-- HEADER SECTION -->
-        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-5 mt-4">
-            <div class="mb-3 mb-md-0">
-                <h1 class="ises-text-primary mb-1 fw-bold" style="font-size: 1.8rem; letter-spacing: -0.5px;">ISES Dashboard</h1>
-                <p class="ises-text-secondary mb-0" style="font-size: 1rem;">SBES Survey Estimation Management</p>
-            </div>
-            <div>
-                <a href="{{ route('projects.create') }}" class="ises-btn-primary">
-                    <i class="fa-solid fa-plus"></i> New Project
-                </a>
-            </div>
-        </div>
-
-        @if(session('success'))
-            <div class="ises-surface mb-4" style="background: #f0fdf4; border-color: #bbf7d0; padding: 16px 24px; display: flex; align-items: center; gap: 12px; color: #15803d; font-weight: 500;">
-                <i class="fa-solid fa-circle-check fs-5"></i>
-                {{ session('success') }}
-            </div>
-        @endif
-
-        <!-- 1. KPI SUMMARY SECTION -->
-        <div class="row g-4 mb-4">
-            <div class="col-md-3 col-sm-6">
-                <div class="ises-surface ises-kpi-card">
-                    <div class="ises-kpi-icon navy"><i class="fa-solid fa-folder-tree"></i></div>
-                    <div>
-                        <div class="ises-kpi-value">{{ $metrics['total'] }}</div>
-                        <div class="ises-kpi-label">Total SBES</div>
-                    </div>
+    <div class="dashboard-wrapper">
+        <!-- 1. HERO SECTION -->
+        <div class="dashboard-hero">
+            <div class="dashboard-container d-flex flex-column flex-md-row justify-content-between align-items-md-center">
+                <div>
+                    <h1 class="page-title">Dashboard</h1>
+                    <div class="page-subtitle">SBES Survey Estimation Management</div>
                 </div>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <div class="ises-surface ises-kpi-card">
-                    <div class="ises-kpi-icon amber"><i class="fa-solid fa-file-pen"></i></div>
-                    <div>
-                        <div class="ises-kpi-value">{{ $metrics['draft'] }}</div>
-                        <div class="ises-kpi-label">Draft</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <div class="ises-surface ises-kpi-card">
-                    <div class="ises-kpi-icon blue"><i class="fa-solid fa-map"></i></div>
-                    <div>
-                        <div class="ises-kpi-value">{{ $metrics['planned'] }}</div>
-                        <div class="ises-kpi-label">In Progress</div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-3 col-sm-6">
-                <div class="ises-surface ises-kpi-card">
-                    <div class="ises-kpi-icon green"><i class="fa-solid fa-check-double"></i></div>
-                    <div>
-                        <div class="ises-kpi-value">{{ $metrics['completed'] }}</div>
-                        <div class="ises-kpi-label">Completed</div>
-                    </div>
+                <div class="mt-4 mt-md-0">
+                    <a href="{{ route('projects.create') }}" class="btn-premium">
+                        <i class="fa-solid fa-plus"></i> New Project
+                    </a>
                 </div>
             </div>
         </div>
 
-        @if($metrics['total'] > 0)
-            <!-- 2. ESTIMATION OVERVIEW -->
-            <div class="ises-overview-panel mb-5">
-                <h6 class="text-uppercase fw-bold mb-4" style="color: #94a3b8; letter-spacing: 1px; font-size: 0.75rem;">Estimation Overview</h6>
-                <div class="row g-4">
-                    <div class="col-md-3 ises-overview-stat">
-                        <div style="font-size: 1.8rem; font-weight: 700; color: #fff;">{{ $overview['total_distance'] }} <span style="font-size: 1rem; color: #94a3b8; font-weight: 500;">NM</span></div>
-                        <div style="color: #cbd5e1; font-size: 0.85rem; margin-top: 4px;">Total Survey Distance Planned</div>
-                    </div>
-                    <div class="col-md-3 ises-overview-stat">
-                        <div style="font-size: 1.8rem; font-weight: 700; color: #38bdf8;">{{ $overview['with_lines'] }}</div>
-                        <div style="color: #cbd5e1; font-size: 0.85rem; margin-top: 4px;">Projects w/ Survey Lines</div>
-                    </div>
-                    <div class="col-md-3 ises-overview-stat">
-                        <div style="font-size: 1.8rem; font-weight: 700; color: #f472b6;">{{ $overview['awaiting_planning'] }}</div>
-                        <div style="color: #cbd5e1; font-size: 0.85rem; margin-top: 4px;">Awaiting Map Planning</div>
-                    </div>
-                    <div class="col-md-3 ises-overview-stat">
-                        <div style="font-size: 1.8rem; font-weight: 700; color: #34d399;">{{ $overview['completed_estimation'] }}</div>
-                        <div style="color: #cbd5e1; font-size: 0.85rem; margin-top: 4px;">Completed Cost Estimations</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 3. PROJECT WORKFLOW / ATTENTION AREA -->
-            @if($attention['missing_boundaries'] > 0 || $attention['missing_lines'] > 0 || $attention['missing_parameters'] > 0 || $attention['missing_cost'] > 0)
-                <div class="mb-5">
-                    <h5 class="ises-text-primary fw-bold mb-3" style="font-size: 1.1rem;">Requires Attention</h5>
-                    <div class="row g-3">
-                        @if($attention['missing_boundaries'] > 0)
-                        <div class="col-md-6">
-                            <div class="ises-attention-alert">
-                                <i class="fa-solid fa-triangle-exclamation fs-4 text-warning"></i>
-                                <div>
-                                    <h6 class="fw-bold mb-1 ises-text-primary">Missing Boundaries</h6>
-                                    <p class="mb-0 text-muted" style="font-size: 0.85rem;"><strong>{{ $attention['missing_boundaries'] }}</strong> project(s) have no survey boundaries defined.</p>
-                                </div>
-                            </div>
-                        </div>
-                        @endif
-
-                        @if($attention['missing_lines'] > 0)
-                        <div class="col-md-6">
-                            <div class="ises-attention-alert">
-                                <i class="fa-solid fa-route fs-4 text-warning"></i>
-                                <div>
-                                    <h6 class="fw-bold mb-1 ises-text-primary">Survey Lines Pending</h6>
-                                    <p class="mb-0 text-muted" style="font-size: 0.85rem;"><strong>{{ $attention['missing_lines'] }}</strong> project(s) have boundaries but no generated survey lines.</p>
-                                </div>
-                            </div>
-                        </div>
-                        @endif
-
-                        @if($attention['missing_parameters'] > 0)
-                        <div class="col-md-6">
-                            <div class="ises-attention-alert">
-                                <i class="fa-solid fa-sliders fs-4 text-warning"></i>
-                                <div>
-                                    <h6 class="fw-bold mb-1 ises-text-primary">Missing Parameters</h6>
-                                    <p class="mb-0 text-muted" style="font-size: 0.85rem;"><strong>{{ $attention['missing_parameters'] }}</strong> project(s) need working hours and weather parameters.</p>
-                                </div>
-                            </div>
-                        </div>
-                        @endif
-                        
-                        @if($attention['missing_cost'] > 0)
-                        <div class="col-md-6">
-                            <div class="ises-attention-alert">
-                                <i class="fa-solid fa-file-invoice-dollar fs-4 text-warning"></i>
-                                <div>
-                                    <h6 class="fw-bold mb-1 ises-text-primary">Cost Estimation Pending</h6>
-                                    <p class="mb-0 text-muted" style="font-size: 0.85rem;"><strong>{{ $attention['missing_cost'] }}</strong> project(s) have not completed the cost estimation phase.</p>
-                                </div>
-                            </div>
-                        </div>
-                        @endif
-                    </div>
+        <!-- 2. FLOATING KPI CARDS -->
+        <div class="kpi-wrapper dashboard-container">
+            @if(session('success'))
+                <div class="alert alert-success rounded-3 border-0 mb-4" style="background: #ecfdf5; color: #059669; box-shadow: 0 2px 4px rgba(0,0,0,0.05); padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
+                    <i class="fa-solid fa-circle-check fs-5"></i>
+                    {{ session('success') }}
                 </div>
             @endif
 
-            <!-- 4. RECENT PROJECTS & FILTERING -->
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-3 mt-5">
-                <h5 class="ises-text-primary fw-bold mb-3 mb-md-0" style="font-size: 1.2rem;">Recent Projects</h5>
-                
-                <form method="GET" action="{{ route('projects.index') }}" class="d-flex gap-2">
-                    <input type="text" name="search" class="ises-input" placeholder="Search code, name, client..." value="{{ request('search') }}" style="width: 250px;">
-                    <select name="status" class="ises-input" onchange="this.form.submit()">
-                        <option value="">All Statuses</option>
-                        <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
-                        <option value="planned" {{ request('status') === 'planned' ? 'selected' : '' }}>In Progress</option>
-                        <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
-                    </select>
-                    @if(request('search') || request('status'))
-                        <a href="{{ route('projects.index') }}" class="ises-btn-secondary">Clear</a>
-                    @else
-                        <button type="submit" class="ises-btn-secondary"><i class="fa-solid fa-magnifying-glass"></i></button>
-                    @endif
-                </form>
-            </div>
-
-            <div class="ises-surface mb-4">
-                <div class="ises-table-container">
-                    <table class="ises-table">
-                        <thead>
-                            <tr>
-                                <th>Project Code</th>
-                                <th>Project Name</th>
-                                <th>Client</th>
-                                <th>Location</th>
-                                <th>Status</th>
-                                <th>Updated</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($projects as $project)
-                                <tr>
-                                    <td>
-                                        <span class="ises-badge ises-badge-neutral font-monospace">
-                                            {{ $project->project_code ?? 'PRJ-' . str_pad($project->id, 4, '0', STR_PAD_LEFT) }}
-                                        </span>
-                                    </td>
-                                    <td>
-                                        <div class="fw-bold ises-text-primary">{{ $project->name }}</div>
-                                    </td>
-                                    <td>{{ $project->client ?? '-' }}</td>
-                                    <td>{{ $project->location ?? '-' }}</td>
-                                    <td>
-                                        @if($project->status === 'draft')
-                                            <span class="ises-badge ises-badge-draft">Draft</span>
-                                        @elseif($project->status === 'planned')
-                                            <span class="ises-badge ises-badge-planned">In Progress</span>
-                                        @else
-                                            <span class="ises-badge ises-badge-completed">Completed</span>
-                                        @endif
-                                    </td>
-                                    <td class="ises-text-tertiary" style="font-size: 0.85rem;">
-                                        {{ $project->updated_at->diffForHumans() }}
-                                    </td>
-                                    <td class="text-end text-nowrap">
-                                        <a href="{{ route('projects.show', $project->id) }}" class="ises-action-btn" title="Map Planning">
-                                            <i class="fa-solid fa-map-location-dot"></i>
-                                        </a>
-                                        <a href="{{ route('projects.edit', $project->id) }}" class="ises-action-btn" title="Edit Project">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </a>
-                                        <form action="{{ route('projects.destroy', $project->id) }}" method="POST" class="d-inline form-delete">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="button" class="ises-action-btn delete btn-delete-action" title="Delete Project">
-                                                <i class="fa-solid fa-trash-can"></i>
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="7" class="text-center py-5 text-muted">
-                                        No projects match your search criteria.
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+            <div class="kpi-grid">
+                <div class="kpi-card">
+                    <div class="kpi-icon-box icon-indigo"><i class="fa-solid fa-folder-tree"></i></div>
+                    <div class="kpi-content">
+                        <h3>Total Projects</h3>
+                        <div class="kpi-number">{{ $metrics['total'] }}</div>
+                    </div>
                 </div>
-                
-                @if($projects->hasPages())
-                    <div class="p-3 border-top d-flex justify-content-center">
-                        {{ $projects->links('pagination::bootstrap-5') }}
+                <div class="kpi-card">
+                    <div class="kpi-icon-box icon-amber"><i class="fa-solid fa-file-pen"></i></div>
+                    <div class="kpi-content">
+                        <h3>Drafts</h3>
+                        <div class="kpi-number">{{ $metrics['draft'] }}</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon-box icon-blue"><i class="fa-solid fa-map"></i></div>
+                    <div class="kpi-content">
+                        <h3>In Progress</h3>
+                        <div class="kpi-number">{{ $metrics['planned'] }}</div>
+                    </div>
+                </div>
+                <div class="kpi-card">
+                    <div class="kpi-icon-box icon-emerald"><i class="fa-solid fa-check-double"></i></div>
+                    <div class="kpi-content">
+                        <h3>Completed</h3>
+                        <div class="kpi-number">{{ $metrics['completed'] }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. MAIN CONTENT AREA -->
+        <div class="content-area dashboard-container">
+            
+            @if($metrics['total'] > 0)
+                <!-- Estimation Overview Stats -->
+                <div class="stats-strip">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ $overview['total_distance'] }} <span style="font-size: 0.85rem; color: #94a3b8;">NM</span></div>
+                        <div class="stat-label">Planned Distance</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value text-primary">{{ $overview['with_lines'] }}</div>
+                        <div class="stat-label">Projects w/ Lines</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value text-warning">{{ $overview['awaiting_planning'] }}</div>
+                        <div class="stat-label">Awaiting Map</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value text-success">{{ $overview['completed_estimation'] }}</div>
+                        <div class="stat-label">Cost Estimated</div>
+                    </div>
+                </div>
+
+                <!-- Attention Area -->
+                @if($attention['missing_boundaries'] > 0 || $attention['missing_lines'] > 0 || $attention['missing_parameters'] > 0 || $attention['missing_cost'] > 0)
+                    <div class="mb-5">
+                        <h3 class="fw-bold mb-3" style="font-size: 1.1rem; color: #0f172a;">Requires Attention</h3>
+                        <div class="row g-3">
+                            @if($attention['missing_boundaries'] > 0)
+                                <div class="col-md-6">
+                                    <div class="attention-card warning">
+                                        <div class="attention-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
+                                        <div>
+                                            <h4>Missing Boundaries</h4>
+                                            <p><strong>{{ $attention['missing_boundaries'] }}</strong> project(s) have no boundaries defined.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                            @if($attention['missing_lines'] > 0)
+                                <div class="col-md-6">
+                                    <div class="attention-card info">
+                                        <div class="attention-icon"><i class="fa-solid fa-route"></i></div>
+                                        <div>
+                                            <h4>Survey Lines Pending</h4>
+                                            <p><strong>{{ $attention['missing_lines'] }}</strong> project(s) lack generated lines.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                            @if($attention['missing_parameters'] > 0)
+                                <div class="col-md-6">
+                                    <div class="attention-card warning">
+                                        <div class="attention-icon"><i class="fa-solid fa-sliders"></i></div>
+                                        <div>
+                                            <h4>Missing Parameters</h4>
+                                            <p><strong>{{ $attention['missing_parameters'] }}</strong> project(s) need working parameters.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                            @if($attention['missing_cost'] > 0)
+                                <div class="col-md-6">
+                                    <div class="attention-card info">
+                                        <div class="attention-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                                        <div>
+                                            <h4>Estimation Pending</h4>
+                                            <p><strong>{{ $attention['missing_cost'] }}</strong> project(s) haven't completed costing.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+                        </div>
                     </div>
                 @endif
-            </div>
 
-        @else
-            <!-- 5. EMPTY STATE -->
-            <div class="ises-surface empty-state mt-4">
-                <i class="fa-solid fa-folder-open empty-state-icon"></i>
-                <h3 class="ises-text-primary fw-bold mb-3">No SBES projects yet.</h3>
-                <p class="ises-text-secondary mb-4 mx-auto" style="max-width: 500px; font-size: 1.05rem; line-height: 1.6;">
-                    Create your first survey estimation project to begin planning survey boundaries, generating survey lines, and accurately estimating project durations and costs.
-                </p>
-                <a href="{{ route('projects.create') }}" class="ises-btn-primary" style="padding: 12px 28px; font-size: 1.05rem;">
-                    <i class="fa-solid fa-plus me-2"></i> Create New Project
-                </a>
-            </div>
-        @endif
+                <!-- Projects Table -->
+                <div class="table-card">
+                    <div class="table-header-controls">
+                        <h3 class="table-title">Recent Projects</h3>
+                        
+                        <form method="GET" action="{{ route('projects.index') }}" class="d-flex flex-wrap gap-2">
+                            <input type="text" name="search" class="premium-input" placeholder="Search projects..." value="{{ request('search') }}" style="width: 220px;">
+                            <select name="status" class="premium-input" style="width: 140px;" onchange="this.form.submit()">
+                                <option value="">All Statuses</option>
+                                <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
+                                <option value="planned" {{ request('status') === 'planned' ? 'selected' : '' }}>In Progress</option>
+                                <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
+                            </select>
+                            @if(request('search') || request('status'))
+                                <a href="{{ route('projects.index') }}" class="btn btn-light btn-sm px-3 align-self-center" style="border-radius: 6px;">Clear</a>
+                            @endif
+                            <button type="submit" class="d-none">Filter</button>
+                        </form>
+                    </div>
 
+                    <div class="table-responsive">
+                        <table class="premium-table">
+                            <thead>
+                                <tr>
+                                    <th>Code</th>
+                                    <th>Project Details</th>
+                                    <th>Client</th>
+                                    <th>Status</th>
+                                    <th>Last Updated</th>
+                                    <th class="text-end">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($projects as $project)
+                                    <tr>
+                                        <td>
+                                            <span style="font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: 600; color: #64748b; background: #f1f5f9; padding: 4px 8px; border-radius: 4px;">
+                                                {{ $project->project_code ?? 'PRJ-' . str_pad($project->id, 4, '0', STR_PAD_LEFT) }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div style="font-weight: 600; color: #0f172a; margin-bottom: 2px;">{{ $project->name }}</div>
+                                            <div style="font-size: 0.8rem; color: #64748b;">
+                                                <i class="fa-solid fa-location-dot me-1" style="color: #cbd5e1;"></i> {{ $project->location ?? 'No location specified' }}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span style="font-weight: 500;">{{ $project->client?->name ?? $project->getRawOriginal('client') ?? '-' }}</span>
+                                        </td>
+                                        <td>
+                                            @if($project->status === 'draft')
+                                                <span class="badge-premium badge-draft">Draft</span>
+                                            @elseif($project->status === 'planned')
+                                                <span class="badge-premium badge-planned">In Progress</span>
+                                            @else
+                                                <span class="badge-premium badge-completed">Completed</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <div style="font-size: 0.85rem; color: #475569;">{{ $project->updated_at->diffForHumans() }}</div>
+                                        </td>
+                                        <td class="text-end text-nowrap">
+                                            <a href="{{ route('projects.show', $project->id) }}" class="action-btn" title="View Overview">
+                                                <i class="fa-solid fa-arrow-right"></i>
+                                            </a>
+                                            <a href="{{ route('projects.edit', $project->id) }}" class="action-btn" title="Edit Details">
+                                                <i class="fa-solid fa-pen"></i>
+                                            </a>
+                                            <form action="{{ route('projects.destroy', $project->id) }}" method="POST" class="d-inline form-delete">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="button" class="action-btn delete btn-delete-action" title="Delete Project">
+                                                    <i class="fa-solid fa-trash-can"></i>
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="text-center py-5">
+                                            <div class="text-muted mb-2">No projects match your search criteria.</div>
+                                            <a href="{{ route('projects.index') }}" class="text-primary text-decoration-none" style="font-size: 0.9rem; font-weight: 500;">Clear Filters</a>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    @if($projects->hasPages())
+                        <div class="p-3 border-top bg-light d-flex justify-content-center">
+                            {{ $projects->links('pagination::bootstrap-5') }}
+                        </div>
+                    @endif
+                </div>
+
+            @else
+                <!-- Empty State -->
+                <div class="premium-empty">
+                    <i class="fa-solid fa-layer-group empty-icon"></i>
+                    <h3 class="fw-bold mb-3" style="color: #0f172a;">Your workspace is empty</h3>
+                    <p class="text-muted mb-4 mx-auto" style="max-width: 500px; font-size: 0.95rem;">
+                        Create your first survey estimation project to start plotting boundaries, calculating survey lines, and generating detailed cost analyses.
+                    </p>
+                    <a href="{{ route('projects.create') }}" class="btn-premium px-4">
+                        <i class="fa-solid fa-plus"></i> Create New Project
+                    </a>
+                </div>
+            @endif
+        </div>
     </div>
 
     <!-- Scripts -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // SweetAlert Delete Confirmation
             const deleteButtons = document.querySelectorAll('.btn-delete-action');
             deleteButtons.forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     const form = this.closest('form');
                     Swal.fire({
                         title: 'Delete this project?',
-                        text: "This will permanently delete all map data, parameter settings, and cost estimations. This action cannot be undone.",
+                        text: "All map data and cost estimations will be permanently removed.",
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#ef4444',
-                        cancelButtonColor: '#64748b',
-                        confirmButtonText: 'Yes, delete it!'
+                        cancelButtonColor: '#f1f5f9',
+                        customClass: {
+                            cancelButton: 'text-dark',
+                            confirmButton: 'text-white'
+                        },
+                        confirmButtonText: 'Yes, delete it'
                     }).then((result) => {
                         if (result.isConfirmed) {
                             form.submit();

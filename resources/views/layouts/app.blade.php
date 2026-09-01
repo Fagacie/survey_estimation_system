@@ -48,20 +48,27 @@
 
             .ises-navbar {
                 position: fixed;
-                top: 10px;
-                left: 50%;
-                transform: translateX(-50%);
+                top: 0;
+                left: 0;
                 z-index: 9999;
-                width: calc(100% - 48px);
-                max-width: 900px;
-                background: rgba(255, 255, 255, 0.95);
+                width: 100%;
+                background: rgba(255, 255, 255, 0.98);
                 backdrop-filter: blur(12px);
                 -webkit-backdrop-filter: blur(12px);
-                border: 1px solid rgba(0, 0, 0, 0.05);
-                border-radius: 40px;
-                padding: 10px 16px;
-                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0,0,0,0.02);
+                border-bottom: 1px solid rgba(226, 232, 240, 0.8);
+                padding: 0;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
                 transition: all 0.3s ease;
+                height: 64px;
+            }
+            .ises-navbar .container-fluid {
+                height: 100%;
+                padding: 0 1.5rem;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                max-width: 1400px;
+                margin: 0 auto;
             }
             .ises-navbar:hover {
                 box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0,0,0,0.03);
@@ -93,18 +100,21 @@
                 color: #64748b !important;
                 font-size: 0.85rem;
                 font-weight: 600;
-                padding: 6px 16px !important;
-                border-radius: 20px;
+                padding: 0 16px !important;
                 transition: all 0.2s;
                 text-decoration: none;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                border-bottom: 2px solid transparent;
             }
             .ises-navbar .nav-link:hover {
                 color: #0f172a !important;
-                background: rgba(0, 0, 0, 0.04);
+                border-bottom-color: #cbd5e1;
             }
             .ises-navbar .nav-link.active {
                 color: #0f172a !important;
-                background: rgba(0, 0, 0, 0.04);
+                border-bottom-color: #3b82f6;
             }
             .ises-navbar .nav-divider {
                 width: 1px;
@@ -113,23 +123,35 @@
                 margin: 0 8px;
             }
             .btn-island {
-                background: linear-gradient(135deg, #38bdf8 0%, #0284c7 100%);
-                color: #ffffff;
+                background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+                color: #ffffff !important;
                 font-size: 0.85rem;
-                font-weight: 700;
+                font-weight: 600;
                 border: none;
-                border-radius: 24px;
-                padding: 8px 24px;
-                transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+                border-radius: 99px;
+                padding: 8px 20px;
+                transition: all 0.2s ease;
                 text-decoration: none;
                 display: inline-flex;
                 align-items: center;
-                box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
             }
             .btn-island:hover {
-                color: #ffffff;
-                transform: translateY(-2px);
-                box-shadow: 0 6px 16px rgba(2, 132, 199, 0.4);
+                transform: translateY(-1px);
+                box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35);
+            }
+            .user-avatar {
+                width: 32px;
+                height: 32px;
+                border-radius: 50%;
+                background: #e2e8f0;
+                color: #475569;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.8rem;
+                font-weight: 700;
+                margin-left: 12px;
             }
 
             /* Page header below the navbar (non-workspace pages) */
@@ -149,32 +171,76 @@
     </head>
     <body class="{{ isset($containerClass) && str_contains((string) ($containerClass ?? ''), 'px-0') ? 'workspace-page' : '' }} bg-light">
 
-        <!-- DYNAMIC ISLAND NAVBAR -->
-        <nav class="ises-navbar d-flex align-items-center justify-content-between">
-            <!-- Brand -->
-            <a class="navbar-brand" href="{{ url('/') }}">
-                <div class="brand-icon">Λ</div>
-                <div>
-                    ISES
-                </div>
-            </a>
+        <!-- PREMIUM SAAS NAVBAR -->
+        <nav class="ises-navbar">
+            <div class="container-fluid">
+                <!-- Brand / Logo -->
+                <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}" style="height: 100%; padding: 0;">
+                    <x-application-logo style="height: 45px; width: auto; color: #0f172a;" />
+                </a>
 
-            <!-- Central Links -->
-            <div class="d-none d-md-flex align-items-center gap-2">
-                <a class="nav-link {{ request()->is('projects*') ? 'active' : '' }}" href="{{ route('projects.index') }}">Projects</a>
-                <a class="nav-link" href="#">Clients</a>
-                <a class="nav-link {{ request()->is('settings*') ? 'active' : '' }}" href="{{ route('settings.costs') }}">Settings</a>
-            </div>
-
-            <!-- Action Button / User -->
-            <div class="d-flex align-items-center gap-2">
-                @auth
-                    @if(request()->routeIs('projects.map') || request()->routeIs('projects.show'))
-                        <button class="btn-island ms-3 btn-save-planning-trigger">Save Plan</button>
+                <!-- Central Links -->
+                <div class="d-none d-md-flex align-items-center gap-2 h-100">
+                    @if(request()->route('project') && !request()->routeIs('projects.index'))
+                        @php
+                            $project = request()->route('project');
+                            $projectId = is_object($project) ? $project->id : $project;
+                        @endphp
+                        <a class="nav-link" href="{{ route('projects.index') }}">
+                            <i class="fa-solid fa-arrow-left me-2 opacity-75"></i> All Projects
+                        </a>
+                        <div style="width: 1px; height: 24px; background: #e2e8f0; margin: 0 8px;"></div>
+                        <a class="nav-link {{ request()->routeIs('projects.show') ? 'active' : '' }}" href="{{ route('projects.show', $projectId) }}">
+                            <i class="fa-solid fa-chart-pie me-2 opacity-75"></i> Overview
+                        </a>
+                        <a class="nav-link {{ request()->routeIs('projects.surveys.map') ? 'active' : '' }}" href="{{ route('projects.show', $projectId) }}#map">
+                            <i class="fa-solid fa-map-location-dot me-2 opacity-75"></i> Map
+                        </a>
+                        <a class="nav-link {{ request()->routeIs('projects.cost.show') ? 'active' : '' }}" href="{{ route('projects.cost.show', $projectId) }}">
+                            <i class="fa-solid fa-calculator me-2 opacity-75"></i> Costing
+                        </a>
+                        <a class="nav-link {{ request()->routeIs('projects.report.*') ? 'active' : '' }}" href="{{ route('projects.report.preview', $projectId) }}">
+                            <i class="fa-regular fa-file-pdf me-2 opacity-75"></i> Report
+                        </a>
                     @else
-                        <a href="#" class="btn-island ms-3">Resume</a>
+                        <a class="nav-link {{ request()->is('projects*') ? 'active' : '' }}" href="{{ route('projects.index') }}">
+                            <i class="fa-solid fa-layer-group me-2 opacity-75"></i> Projects
+                        </a>
+                        <a class="nav-link {{ request()->is('clients*') ? 'active' : '' }}" href="{{ route('clients.index') }}">
+                            <i class="fa-solid fa-users me-2 opacity-75"></i> Clients
+                        </a>
+                        <a class="nav-link {{ request()->is('settings*') ? 'active' : '' }}" href="{{ route('settings.costs') }}">
+                            <i class="fa-solid fa-gear me-2 opacity-75"></i> Settings
+                        </a>
                     @endif
-                @endauth
+                </div>
+
+                <!-- Action Button / User -->
+                <div class="d-flex align-items-center">
+                    @auth
+                        <div class="dropdown">
+                            <button class="btn d-flex align-items-center gap-2 p-1" style="border: none; background: transparent; transition: opacity 0.2s;" type="button" data-bs-toggle="dropdown" aria-expanded="false" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
+                                <div style="text-align: right; line-height: 1.2;" class="d-none d-sm-block">
+                                    <div style="font-size: 0.85rem; font-weight: 600; color: #0f172a;">{{ auth()->user()->name }}</div>
+                                    <div style="font-size: 0.7rem; color: #64748b;">Administrator</div>
+                                </div>
+                                <div class="user-avatar" style="box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
+                                    {{ substr(auth()->user()->name, 0, 1) }}
+                                </div>
+                            </button>
+                            <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border: 1px solid #e2e8f0; border-radius: 12px; margin-top: 12px; min-width: 200px; padding: 0.5rem;">
+                                <li><a class="dropdown-item py-2" href="{{ route('profile.edit') }}" style="border-radius: 6px;"><i class="fa-regular fa-user me-2 text-muted"></i> Profile</a></li>
+                                <li><hr class="dropdown-divider" style="margin: 0.5rem 0;"></li>
+                                <li>
+                                    <form method="POST" action="{{ route('logout') }}">
+                                        @csrf
+                                        <button type="submit" class="dropdown-item py-2 text-danger" style="border-radius: 6px;"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Logout</button>
+                                    </form>
+                                </li>
+                            </ul>
+                        </div>
+                    @endauth
+                </div>
             </div>
         </nav>
 

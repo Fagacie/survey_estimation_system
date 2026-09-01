@@ -19,24 +19,53 @@
         <!-- Custom CSS -->
         <link rel="stylesheet" href="{{ asset('css/style.css') }}">
     </head>
-    <body class="bg-light d-flex align-items-center" style="min-height: 100vh;">
-        <div class="container">
-            <div class="row justify-content-center">
-                <div class="col-md-5 col-lg-4">
-                    <div class="text-center mb-4">
-                        <i class="fa-solid fa-water fa-3x text-primary mb-3"></i>
-                        <h2 class="fw-bold text-primary">ISES</h2>
-                        <p class="text-muted">INOS Survey Estimation System</p>
-                    </div>
-
-                    <div class="card shadow border-0 rounded-4">
-                        <div class="card-body p-5">
-                            {{ $slot }}
+    <body class="bg-light d-flex align-items-center" style="min-height: 100vh; margin: 0; font-family: 'Inter', sans-serif;">
+        <div class="container-fluid p-0">
+            <div class="row g-0" style="min-height: 100vh;">
+                <!-- Left Side: Branding / Visual -->
+                <div class="col-lg-6 d-none d-lg-flex flex-column justify-content-between p-5" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); position: relative; overflow: hidden;">
+                    <!-- Decorative background elements -->
+                    <div style="position: absolute; top: -10%; left: -10%; width: 50%; height: 50%; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(0,0,0,0) 70%); border-radius: 50%;"></div>
+                    <div style="position: absolute; bottom: -10%; right: -10%; width: 60%; height: 60%; background: radial-gradient(circle, rgba(16,185,129,0.1) 0%, rgba(0,0,0,0) 70%); border-radius: 50%;"></div>
+                    
+                    <div style="position: relative; z-index: 1;">
+                        <div class="mb-5">
+                            <x-application-logo style="height: 50px; width: auto; color: #ffffff;" />
+                        </div>
+                        <div style="margin-top: 20vh;">
+                            <h1 class="fw-bold text-white display-5" style="letter-spacing: -0.02em; line-height: 1.2;">Advanced<br>Survey Estimation<br><span style="color: #38bdf8;">Simplified.</span></h1>
+                            <p class="text-white opacity-75 mt-4 fs-5" style="max-width: 80%;">
+                                Streamline your hydrographic project planning, cost calculation, and client management in one unified platform.
+                            </p>
                         </div>
                     </div>
                     
-                    <div class="text-center mt-4 text-muted small">
-                        &copy; {{ date('Y') }} Institute of Oceanography and Environment (INOS). All rights reserved.
+                    <div style="position: relative; z-index: 1;">
+                        <p class="text-white opacity-50 small mb-0">&copy; {{ date('Y') }} ECO HYDROTECH SOLUTIONS. All rights reserved.</p>
+                    </div>
+                </div>
+
+                <!-- Right Side: Form -->
+                <div class="col-12 col-lg-6 d-flex align-items-center justify-content-center p-4 p-sm-5" style="background-color: #f8fafc;">
+                    <div style="width: 100%; max-width: 420px;">
+                        
+                        <!-- Mobile Logo (Hidden on desktop) -->
+                        <div class="d-lg-none text-center mb-5">
+                            <x-application-logo style="height: 45px; width: auto; color: #0f172a;" />
+                        </div>
+
+                        <div class="mb-4">
+                            <h2 class="fw-bold" style="color: #0f172a; font-size: 1.75rem; letter-spacing: -0.02em;">Welcome back</h2>
+                            <p style="color: #64748b;">Please enter your details to sign in.</p>
+                        </div>
+
+                        <!-- Card for the form -->
+                        <div class="card shadow-sm border-0" style="border-radius: 16px; background: #ffffff;">
+                            <div class="card-body p-4 p-sm-5">
+                                {{ $slot }}
+                            </div>
+                        </div>
+                        
                     </div>
                 </div>
             </div>

@@ -46,7 +46,7 @@
                         <div id="panelProject" class="accordion-collapse collapse" data-bs-parent="#sidebarAccordion">
                             <div class="accordion-body">
                                 <div class="stat-row"><span class="stat-label">Name</span><span class="stat-value">{{ $project->name }}</span></div>
-                                <div class="stat-row"><span class="stat-label">Client</span><span class="stat-value">{{ $project->client ?? 'N/A' }}</span></div>
+                                <div class="stat-row"><span class="stat-label">Client</span><span class="stat-value">{{ $project->client?->name ?? $project->getRawOriginal('client') ?? 'N/A' }}</span></div>
                                 <div class="stat-row"><span class="stat-label">Location</span><span class="stat-value">{{ $project->location ?? 'N/A' }}</span></div>
                             </div>
                         </div>
@@ -257,14 +257,7 @@
 
                 </div><!-- end accordion -->
 
-                <div class="p-3 mt-auto">
-                    <button class="btn-ws btn-ws-success mb-2 btn-save-planning-trigger" style="display: block; width: 100%; border: none;">
-                        <i class="fa-solid fa-floppy-disk me-2"></i> Save Planning
-                    </button>
-                    <a href="{{ route('projects.show', $project->id) }}" class="btn-ws btn-ws-primary" style="display: block; text-align: center; text-decoration: none;">
-                        &larr; Back to Overview
-                    </a>
-                </div>
+
             </div><!-- end sidebar-content -->
         </div>
 
@@ -272,6 +265,18 @@
              MAP CONTAINER (Full Screen)
              ============================================================ -->
         <div class="workspace-map">
+
+            <!-- MAP FLOATING ACTIONS -->
+            <div class="position-absolute" style="z-index: 1000; top: 84px; left: 50%; transform: translateX(-50%);">
+                <div style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 99px; padding: 8px 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); display: flex; gap: 8px; border: 1px solid rgba(255,255,255,0.4); align-items: center;">
+                    <button class="btn-save-planning-trigger" style="background: #0f172a; color: white; border: none; border-radius: 99px; padding: 8px 20px; font-weight: 600; font-size: 0.9rem; transition: all 0.2s;">
+                        <i class="fa-solid fa-floppy-disk me-2"></i> Save Map
+                    </button>
+                    <a href="{{ route('projects.show', $project->id) }}" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; border-radius: 99px; padding: 8px 20px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 0.2s;">
+                        Exit
+                    </a>
+                </div>
+            </div>
 
             <!-- BASEMAP SELECTOR (top-right) -->
             <div class="position-absolute mt-2 me-2" style="z-index: 1000; top: 80px; right: 10px;">

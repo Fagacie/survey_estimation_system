@@ -106,6 +106,10 @@
                     <div class="eng-value rose">{{ number_format($duration['total_days'], 1) }} days</div>
                 </div>
             </div>
+            
+            <div class="mt-3 text-center" style="font-size: 0.75rem; color: #94a3b8;">
+                <i class="fa-solid fa-circle-info me-1"></i> Global Allowances (Weather, MOB/DEMOB, Patch Test) are configured in the <a href="{{ route('projects.show', $project->id) }}" style="color: #22d3ee; text-decoration: none; border-bottom: 1px dotted #22d3ee;">Project Overview</a> and automatically applied to the total duration.
+            </div>
         </div>
 
         <form action="{{ route('projects.cost.store', $project->id) }}" method="POST" id="cost-form">

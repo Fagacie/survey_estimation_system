@@ -40,9 +40,14 @@
 
                         <div class="row mb-3">
                             <div class="col-md-6">
-                                <label class="form-label fw-bold">Client / Department</label>
-                                <input type="text" name="client" class="form-control @error('client') is-invalid @enderror" value="{{ old('client', $project->client) }}">
-                                @error('client') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                <label class="form-label fw-bold">Client</label>
+                                <select name="client_id" class="form-select @error('client_id') is-invalid @enderror">
+                                    <option value="">Select a Client...</option>
+                                    @foreach($clients as $client)
+                                        <option value="{{ $client->id }}" {{ old('client_id', $project->client_id) == $client->id ? 'selected' : '' }}>{{ $client->name }} {{ $client->company ? '('.$client->company.')' : '' }}</option>
+                                    @endforeach
+                                </select>
+                                @error('client_id') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-bold">Location</label>

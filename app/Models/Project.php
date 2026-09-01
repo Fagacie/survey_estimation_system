@@ -12,7 +12,8 @@ class Project extends Model
     protected $fillable = [
         'project_code',
         'name',
-        'client',
+        'client', // Legacy field
+        'client_id',
         'location',
         'start_date',
         'end_date',
@@ -30,6 +31,14 @@ class Project extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the client that owns the project.
+     */
+    public function client()
+    {
+        return $this->belongsTo(Client::class, 'client_id');
     }
 
     /**

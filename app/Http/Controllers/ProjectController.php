@@ -74,7 +74,8 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        return view('projects.create');
+        $clients = \App\Models\Client::orderBy('name')->get();
+        return view('projects.create', compact('clients'));
     }
 
     /**
@@ -135,10 +136,11 @@ class ProjectController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(string $id)
+    public function edit($id)
     {
         $project = auth()->user()->projects()->findOrFail($id);
-        return view('projects.edit', compact('project'));
+        $clients = \App\Models\Client::orderBy('name')->get();
+        return view('projects.edit', compact('project', 'clients'));
     }
 
     /**
