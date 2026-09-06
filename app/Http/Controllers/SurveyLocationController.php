@@ -95,6 +95,40 @@ class SurveyLocationController extends Controller
         ]);
     }
 
+    public function saveScreenshot(Request $request, Project $project, SurveyLocation $surveyLocation)
+    {
+        $this->authorizeSurveyLocation($project, $surveyLocation);
+
+        $request->validate([
+            'image' => 'required|string',
+        ]);
+
+        $imageData = $request->input('image');
+        
+        // Strip the data URI prefix if present
+        if (str_contains($imageData, ',')) {
+            $imageData = explode(',', $imageData, 2)[1];
+        }
+
+        $decoded = base64_decode($imageData);
+        if ($decoded === false) {
+            return response()->json(['success' => false, 'message' => 'Invalid image data.'], 422);
+        }
+
+        $dir = storage_path('app/public/maps');
+        if (!is_dir($dir)) {
+            mkdir($dir, 0755, true);
+        }
+
+        $path = $dir . '/' . $surveyLocation->id . '.png';
+        file_put_contents($path, $decoded);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Map screenshot saved.',
+        ]);
+    }
+
     public function mapLines(Project $project, SurveyLocation $surveyLocation)
     {
         $this->authorizeSurveyLocation($project, $surveyLocation);

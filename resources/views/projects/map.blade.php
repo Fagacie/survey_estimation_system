@@ -1,9 +1,17 @@
-<x-app-layout>
+<x-app-layout hideSidebar="true" containerClass="container-fluid px-0 m-0 relative h-full">
     <x-slot name="header">{{ $project->name }} — Map Planning</x-slot>
 
-    <x-slot name="containerClass">container-fluid px-0 m-0</x-slot>
+    <style>
+        /* Override Tailwind's .collapse (visibility: collapse) which conflicts with Bootstrap */
+        .workspace-sidebar .collapse, 
+        .workspace-sidebar .collapse.show {
+            visibility: visible !important;
+        }
+    </style>
+    <!-- dom-to-image for map screenshot capture (better Leaflet support than html2canvas) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dom-to-image/2.6.0/dom-to-image.min.js"></script>
 
-    <div class="workspace-container">
+    <div class="workspace-container h-[calc(100vh-64px)] overflow-hidden">
         <!-- ============================================================
              SIDEBAR
              ============================================================ -->
@@ -43,10 +51,10 @@
                                 Project
                             </button>
                         </h2>
-                        <div id="panelProject" class="accordion-collapse collapse" data-bs-parent="#sidebarAccordion">
+                        <div id="panelProject" class="accordion-collapse collapse show">
                             <div class="accordion-body">
                                 <div class="stat-row"><span class="stat-label">Name</span><span class="stat-value">{{ $project->name }}</span></div>
-                                <div class="stat-row"><span class="stat-label">Client</span><span class="stat-value">{{ $project->client?->name ?? $project->getRawOriginal('client') ?? 'N/A' }}</span></div>
+                                <div class="stat-row"><span class="stat-label">Client</span><span class="stat-value">{{ $project->clientModel?->name ?? $project->getRawOriginal('client') ?? 'N/A' }}</span></div>
                                 <div class="stat-row"><span class="stat-label">Location</span><span class="stat-value">{{ $project->location ?? 'N/A' }}</span></div>
                             </div>
                         </div>
@@ -60,7 +68,7 @@
                                 Boundary
                             </button>
                         </h2>
-                        <div id="panelBoundary" class="accordion-collapse collapse show" data-bs-parent="#sidebarAccordion">
+                        <div id="panelBoundary" class="accordion-collapse collapse show">
                             <div class="accordion-body">
                                 <div class="stat-row">
                                     <span class="stat-label">Area</span>
@@ -85,7 +93,7 @@
                                 Line Generator
                             </button>
                         </h2>
-                        <div id="panelGenerator" class="accordion-collapse collapse" data-bs-parent="#sidebarAccordion">
+                        <div id="panelGenerator" class="accordion-collapse collapse show">
                             <div class="accordion-body">
                                 <div class="mb-3">
                                     <label class="form-label-panel">Generation Mode</label>
@@ -167,15 +175,15 @@
                                 Engineering Calculation
                             </button>
                         </h2>
-                        <div id="panelStats" class="accordion-collapse collapse show" data-bs-parent="#sidebarAccordion">
+                        <div id="panelStats" class="accordion-collapse collapse show">
                             <div class="accordion-body" style="font-size: 0.85rem; padding: 10px;">
                                 
                                 <!-- SURVEY GEOMETRY -->
                                 <div class="mb-2 fw-bold text-uppercase" style="color: var(--sb-text-muted); font-size: 0.75rem; letter-spacing: 0.5px;">Survey Geometry</div>
                                 <div class="stat-row"><span class="stat-label">Survey Area</span><span class="stat-value" id="stat-eng-boundary-area">0 m²</span></div>
                                 <div class="stat-row"><span class="stat-label">Boundary Perimeter</span><span class="stat-value" id="stat-eng-boundary-perimeter">0 km</span></div>
-                                <div class="stat-row"><span class="stat-label">Survey Width</span><span class="stat-value" id="stat-survey-width">0.00 km</span></div>
-                                <div class="stat-row"><span class="stat-label">Survey Length</span><span class="stat-value" id="stat-survey-length">0.00 km</span></div>
+                                <div class="stat-row"><span class="stat-label">Survey Width (Grid)</span><span class="stat-value" id="stat-survey-width">0.00 km</span></div>
+                                <div class="stat-row"><span class="stat-label">Survey Length (Grid)</span><span class="stat-value" id="stat-survey-length">0.00 km</span></div>
                                 
                                 <!-- MAIN SURVEY LINES -->
                                 <div class="mt-3 mb-2 fw-bold text-uppercase" style="color: var(--sb-text-muted); font-size: 0.75rem; letter-spacing: 0.5px;">Main Survey Lines</div>
@@ -208,7 +216,7 @@
                                 Survey Parameters & Time
                             </button>
                         </h2>
-                        <div id="panelTime" class="accordion-collapse collapse" data-bs-parent="#sidebarAccordion">
+                        <div id="panelTime" class="accordion-collapse collapse show">
                             <div class="accordion-body">
                                 
                                 <!-- SURVEY CALCULATION PARAMETERS -->
@@ -259,6 +267,16 @@
 
 
             </div><!-- end sidebar-content -->
+
+            <!-- STICKY BOTTOM ACTIONS -->
+            <div class="p-3 border-t border-slate-200 bg-slate-50 flex flex-col gap-2 flex-shrink-0" style="border-top: 1px solid var(--sb-border);">
+                <button class="btn-save-planning-trigger w-full flex justify-center items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded text-sm font-semibold transition-colors">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Map Planning
+                </button>
+                <a href="{{ route('projects.show', $project->id) }}" class="w-full flex justify-center items-center bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 px-4 py-2.5 rounded text-sm font-medium transition-colors no-underline">
+                    Exit Map
+                </a>
+            </div>
         </div>
 
         <!-- ============================================================
@@ -266,17 +284,7 @@
              ============================================================ -->
         <div class="workspace-map">
 
-            <!-- MAP FLOATING ACTIONS -->
-            <div class="position-absolute" style="z-index: 1000; top: 84px; left: 50%; transform: translateX(-50%);">
-                <div style="background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-radius: 99px; padding: 8px 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); display: flex; gap: 8px; border: 1px solid rgba(255,255,255,0.4); align-items: center;">
-                    <button class="btn-save-planning-trigger" style="background: #0f172a; color: white; border: none; border-radius: 99px; padding: 8px 20px; font-weight: 600; font-size: 0.9rem; transition: all 0.2s;">
-                        <i class="fa-solid fa-floppy-disk me-2"></i> Save Map
-                    </button>
-                    <a href="{{ route('projects.show', $project->id) }}" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0; border-radius: 99px; padding: 8px 20px; font-weight: 600; font-size: 0.9rem; text-decoration: none; transition: all 0.2s;">
-                        Exit
-                    </a>
-                </div>
-            </div>
+            <!-- MAP FLOATING ACTIONS REMOVED (Moved to sidebar) -->
 
             <!-- BASEMAP SELECTOR (top-right) -->
             <div class="position-absolute mt-2 me-2" style="z-index: 1000; top: 80px; right: 10px;">
@@ -343,6 +351,9 @@
     <!-- ============================================================
          MAP SCRIPT
          ============================================================ -->
+    <!-- DYNAMIC CACHE BUSTER FOR MATH ENGINE -->
+    <script src="{{ asset('js/survey-math.js') }}?v={{ time() }}"></script>
+
     <script>
         // ============================================================
         // DATA STORES
@@ -763,7 +774,14 @@
                         verticesCount += (coords.length > 0 ? coords.length - 1 : 0);
                     }
                 } else if (layer instanceof L.Polyline) {
-                    var len = turf.length(geojson, {units: 'meters'});
+                    let len = 0;
+                    let coords = geojson.geometry.coordinates;
+                    for (let i = 0; i < coords.length - 1; i++) {
+                        len += map.distance(
+                            L.latLng(coords[i][1], coords[i][0]),
+                            L.latLng(coords[i+1][1], coords[i+1][0])
+                        );
+                    }
                     let isCross = false;
                     let isMain = false;
 
@@ -804,11 +822,11 @@
                 let angle = parseFloat(document.getElementById('gen-angle').value) || 0;
                 let fc = turf.featureCollection(boundaryFeatures);
                 let center = turf.center(fc);
-                let rotatedFc = turf.transformRotate(fc, -angle, {pivot: center});
-                let rotBbox = turf.bbox(rotatedFc);
-
-                let widthX  = turf.distance(turf.point([rotBbox[0], rotBbox[1]]), turf.point([rotBbox[2], rotBbox[1]]), {units: 'meters'});
-                let heightY = turf.distance(turf.point([rotBbox[0], rotBbox[1]]), turf.point([rotBbox[0], rotBbox[3]]), {units: 'meters'});
+                
+                let bounds = window.calculateTrueMetricBounds(fc, angle, turf, map);
+                
+                let widthX = bounds.widthX;
+                let heightY = bounds.heightY;
 
                 // INOS Required Logic: Survey Width (line length) MUST be the shortest side
                 lineLength    = Math.min(widthX, heightY);
@@ -1287,10 +1305,94 @@
             .then(paramsResult => {
                 if (!paramsResult.success) throw new Error("Parameter save failed: " + (paramsResult.message || ''));
 
+                // Step 3: Capture map screenshot and upload
+                Swal.update({ text: 'Capturing map screenshot for report...' });
+                
+                let mapEl = document.getElementById('map');
+                
+                // 3a. Hide all Leaflet UI controls before capture
+                let controlContainer = mapEl.querySelector('.leaflet-control-container');
+                if (controlContainer) controlContainer.style.display = 'none';
+                
+                // Also hide any custom floating UI overlays on the map
+                let floatingOverlays = document.querySelectorAll('.workspace-map > .position-absolute');
+                floatingOverlays.forEach(el => el.style.display = 'none');
+                
+                // 3b. Fit map to survey data bounds with padding for a clean centered view
+                let allBounds = L.latLngBounds([]);
+                let hasBounds = false;
+                
+                boundaryLayerGroup.eachLayer(l => {
+                    if (l.getBounds) { allBounds.extend(l.getBounds()); hasBounds = true; }
+                });
+                mainLineLayerGroup.eachLayer(l => {
+                    if (l.getBounds) { allBounds.extend(l.getBounds()); hasBounds = true; }
+                });
+                crossLineLayerGroup.eachLayer(l => {
+                    if (l.getBounds) { allBounds.extend(l.getBounds()); hasBounds = true; }
+                });
+                drawnItems.eachLayer(l => {
+                    if (l.getBounds) { allBounds.extend(l.getBounds()); hasBounds = true; }
+                    else if (l.getLatLng) { allBounds.extend(l.getLatLng()); hasBounds = true; }
+                });
+                
+                if (hasBounds && allBounds.isValid()) {
+                    map.fitBounds(allBounds, { padding: [60, 60], animate: false });
+                }
+                
+                // 3c. Wait for tiles to fully load before capturing
+                return new Promise((resolve) => {
+                    let tileTimeout = setTimeout(resolve, 2000); // max wait 2s
+                    
+                    function onTilesLoaded() {
+                        clearTimeout(tileTimeout);
+                        // Small extra delay for final render
+                        setTimeout(resolve, 500);
+                    }
+                    
+                    if (activeBaseLayer && activeBaseLayer.isLoading && activeBaseLayer.isLoading()) {
+                        activeBaseLayer.once('load', onTilesLoaded);
+                    } else {
+                        // Tiles already loaded, just wait a beat
+                        clearTimeout(tileTimeout);
+                        setTimeout(resolve, 800);
+                    }
+                }).then(() => {
+                    // dom-to-image handles Leaflet's 3D transforms and SVG layers perfectly
+                    return domtoimage.toPng(mapEl, {
+                        width: mapEl.offsetWidth,
+                        height: mapEl.offsetHeight,
+                        style: {
+                            transform: 'none' // Ensure no parent scaling throws off the capture
+                        }
+                    });
+                }).then(dataUrl => {
+                    // 3d. Restore controls immediately after capture
+                    if (controlContainer) controlContainer.style.display = '';
+                    floatingOverlays.forEach(el => el.style.display = '');
+                    
+                    return fetch("{{ route('projects.surveys.map.screenshot', [$project->id, $surveyLocation->id]) }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
+                        body: JSON.stringify({ image: dataUrl })
+                    });
+                }).then(r => r.json()).then(screenshotResult => {
+                    console.log("DEBUG: Screenshot result:", screenshotResult);
+                }).catch(ssErr => {
+                    // Restore controls even on error
+                    if (controlContainer) controlContainer.style.display = '';
+                    floatingOverlays.forEach(el => el.style.display = '');
+                    console.warn("Screenshot capture failed (non-blocking):", ssErr);
+                });
+            })
+            .then(() => {
                 Swal.fire({
                     icon: 'success',
                     title: 'Saved',
-                    text: 'Planning data saved successfully.'
+                    text: 'Planning data and map screenshot saved successfully.'
                 }).then(() => window.location.href = window.location.pathname + '?t=' + new Date().getTime());
             })
             .catch(error => {

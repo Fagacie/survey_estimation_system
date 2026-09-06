@@ -77,45 +77,12 @@ class ReportService
             $distNm = $location->sbesParameters->total_distance_nm ?? 0;
             $globalDistanceNm += $distNm;
 
-            // Map screenshot
+            // Map screenshot — use pre-captured image saved from the Map page
             $imagePath = storage_path('app/public/maps/' . $location->id . '.png');
-            if (!file_exists(storage_path('app/public/maps'))) {
-                mkdir(storage_path('app/public/maps'), 0755, true);
-            }
-
             $screenshotUrl = null;
-            if (class_exists(\Spatie\Browsershot\Browsershot::class) && $hasLines) {
-                try {
-                    $boundaries = [
-                        'type' => 'FeatureCollection',
-                        'features' => $location->boundaries->map(fn($b) => $b->geometry)->toArray()
-                    ];
-                    
-                    $lines = [
-                        'type' => 'FeatureCollection',
-                        'features' => $location->surveyLines->map(fn($l) => $l->geometry)->toArray()
-                    ];
-
-                    $html = view('reports.map-capture', [
-                        'location' => $location,
-                        'boundaries' => json_encode($boundaries),
-                        'lines' => json_encode($lines)
-                    ])->render();
-
-                    \Spatie\Browsershot\Browsershot::html($html)
-                        ->setChromePath('/usr/bin/chromium')
-                        ->noSandbox()
-                        ->addChromiumArguments(['disable-gpu', 'disable-dev-shm-usage', 'disable-software-rasterizer'])
-                        ->windowSize(1200, 800)
-                        ->waitForSelector('#map-ready')
-                        ->save($imagePath);
-                    
-                    $screenshotUrl = public_path('storage/maps/' . $location->id . '.png');
-                } catch (\Throwable $e) {
-                    \Log::error('Browsershot error: ' . $e->getMessage());
-                }
-            } else if (file_exists($imagePath)) {
-                $screenshotUrl = public_path('storage/maps/' . $location->id . '.png');
+            if (file_exists($imagePath)) {
+                // DomPDF reads absolute filesystem paths directly
+                $screenshotUrl = $imagePath;
             }
 
             $locationsData[] = [

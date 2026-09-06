@@ -40,32 +40,48 @@ function generateLineSet(spacingMeters, angle, boundaryFeature, center, bbox, co
     if (spacingMeters <= 0) return [];
 
     let rawSegments = [];
-    
-    // 1. Rotate boundary backward so we can calculate a true perpendicular grid width
-    let rotatedBoundary = turf.transformRotate(boundaryFeature, -angle, {pivot: center});
-    let rotBbox = turf.bbox(rotatedBoundary);
-    
-    let minX = rotBbox[0];
-    let minY = rotBbox[1];
-    let maxX = rotBbox[2];
-    let maxY = rotBbox[3];
+    let minX = Infinity, maxX = -Infinity;
+    let minY = Infinity, maxY = -Infinity;
+
+    // 1. Create a local metric Cartesian grid using Azimuthal Equidistant projection
+    // This perfectly avoids the Lat/Lng aspect ratio distortion caused by turf.transformRotate
+    turf.coordEach(boundaryFeature, function (currentCoord) {
+        let pt = turf.point(currentCoord);
+        let d = turf.distance(center, pt, {units: 'meters'});
+        let b = turf.bearing(center, pt);
+        
+        let angleDiff = b - angle;
+        let rad = angleDiff * Math.PI / 180;
+        
+        let x = d * Math.sin(rad);
+        let y = d * Math.cos(rad);
+        
+        if (x < minX) minX = x;
+        if (x > maxX) maxX = x;
+        if (y < minY) minY = y;
+        if (y > maxY) maxY = y;
+    });
     
     // Distance across the polygon width
-    let distanceAcross = turf.distance(turf.point([minX, minY]), turf.point([maxX, minY]), {units: 'meters'});
+    let distanceAcross = Math.abs(maxX - minX);
     let numLines = Math.floor(distanceAcross / spacingMeters) + 1;
 
     for(let i=0; i<numLines; i++) {
-        let offset = (spacingMeters / 2) + (i * spacingMeters);
-        if (offset > distanceAcross) break;
+        let offsetX = minX + (spacingMeters / 2) + (i * spacingMeters);
+        if (offsetX > maxX) break;
 
-        // 2. Generate vertical lines from Left to Right
-        let topNode = turf.destination(turf.point([minX, maxY + 0.5]), offset, 90, {units: 'meters'});
-        let bottomNode = turf.destination(turf.point([minX, minY - 0.5]), offset, 90, {units: 'meters'});
+        // 2. Find the point on the local X-axis (which runs at bearing: angle + 90)
+        let bX = angle + (offsetX > 0 ? 90 : -90);
+        let pX = turf.destination(center, Math.abs(offsetX), bX, {units: 'meters'});
+
+        // 3. Generate vertical line from maxY to minY along local Y-axis (bearing: angle)
+        let bY_top = angle + (maxY > 0 ? 0 : 180);
+        let topNode = turf.destination(pX, Math.abs(maxY) + 10, bY_top, {units: 'meters'});
+
+        let bY_bottom = angle + (minY > 0 ? 0 : 180);
+        let bottomNode = turf.destination(pX, Math.abs(minY) + 10, bY_bottom, {units: 'meters'});
         
         let lineString = turf.lineString([topNode.geometry.coordinates, bottomNode.geometry.coordinates]);
-        
-        // 3. Rotate the line forward to the desired angle
-        lineString = turf.transformRotate(lineString, angle, {pivot: center});
 
         let segmentsForThisLine = [];
 

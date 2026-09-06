@@ -1,559 +1,204 @@
-<x-app-layout containerClass="px-0">
-    <style>
-        .dashboard-wrapper {
-            background-color: #f8fafc;
-            min-height: calc(100vh - 64px);
-        }
-
-        /* Top Dark Section */
-        .dashboard-hero {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            padding: 3rem 1.5rem 7rem;
-            position: relative;
-        }
-
-        .dashboard-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .page-title {
-            color: #ffffff;
-            font-size: 1.85rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-bottom: 0.25rem;
-        }
-        .page-subtitle {
-            color: #94a3b8;
-            font-size: 0.95rem;
-        }
-
-        .btn-premium {
-            background: #3b82f6;
-            color: #ffffff;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-            transition: all 0.2s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .btn-premium:hover {
-            background: #2563eb;
-            color: #ffffff;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
-        }
-
-        /* Floating KPI Cards */
-        .kpi-wrapper {
-            margin-top: -4.5rem;
-            padding: 0 1.5rem;
-            position: relative;
-            z-index: 10;
-        }
-        .kpi-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1.5rem;
-        }
-        .kpi-card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            display: flex;
-            align-items: center;
-            gap: 1.25rem;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-        }
-        .kpi-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 15px 20px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -2px rgba(0, 0, 0, 0.04);
-        }
-        .kpi-icon-box {
-            width: 52px;
-            height: 52px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-        }
-        .icon-blue { background: #eff6ff; color: #3b82f6; }
-        .icon-amber { background: #fffbeb; color: #f59e0b; }
-        .icon-indigo { background: #eef2ff; color: #6366f1; }
-        .icon-emerald { background: #ecfdf5; color: #10b981; }
-
-        .kpi-content h3 {
-            color: #64748b;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 600;
-            margin-bottom: 0.25rem;
-        }
-        .kpi-content .kpi-number {
-            color: #0f172a;
-            font-size: 1.75rem;
-            font-weight: 700;
-            line-height: 1;
-        }
-
-        /* Main Content Area */
-        .content-area {
-            padding: 3rem 1.5rem 5rem;
-        }
-
-        /* Secondary Stats (Estimation Overview) */
-        .stats-strip {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 1rem;
-            margin-bottom: 3rem;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 1.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-        }
-        .stat-item {
-            border-right: 1px solid #f1f5f9;
-            padding: 0 1rem;
-        }
-        .stat-item:last-child {
-            border-right: none;
-        }
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 0.25rem;
-        }
-        .stat-label {
-            font-size: 0.8rem;
-            color: #64748b;
-            font-weight: 500;
-        }
-
-        /* Attention Alerts */
-        .attention-card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 1.25rem;
-            border-left: 4px solid #ef4444;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
-            border-top: 1px solid #e2e8f0;
-            border-right: 1px solid #e2e8f0;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            align-items: flex-start;
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        .attention-card.warning { border-left-color: #f59e0b; }
-        .attention-card.info { border-left-color: #3b82f6; }
-        .attention-icon {
-            font-size: 1.25rem;
-            margin-top: 2px;
-        }
-        .warning .attention-icon { color: #f59e0b; }
-        .info .attention-icon { color: #3b82f6; }
-        .attention-card h4 {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: #0f172a;
-            margin-bottom: 0.25rem;
-        }
-        .attention-card p {
-            font-size: 0.85rem;
-            color: #64748b;
-            margin: 0;
-        }
-
-        /* Projects Table */
-        .table-card {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
-            margin-top: 2rem;
-        }
-        .table-header-controls {
-            padding: 1.5rem;
-            border-bottom: 1px solid #f1f5f9;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        .table-title {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin: 0;
-        }
-        .premium-input {
-            border: 1px solid #e2e8f0;
-            background: #f8fafc;
-            border-radius: 6px;
-            padding: 0.5rem 1rem;
-            font-size: 0.85rem;
-            color: #334155;
-            transition: all 0.2s;
-        }
-        .premium-input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            background: #ffffff;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .premium-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .premium-table th {
-            padding: 1rem 1.5rem;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            color: #64748b;
-            background: #f8fafc;
-            border-bottom: 1px solid #e2e8f0;
-            text-align: left;
-        }
-        .premium-table td {
-            padding: 1.25rem 1.5rem;
-            font-size: 0.9rem;
-            color: #334155;
-            border-bottom: 1px solid #f1f5f9;
-            vertical-align: middle;
-        }
-        .premium-table tr:last-child td {
-            border-bottom: none;
-        }
-        .premium-table tr:hover td {
-            background: #fcfcfd;
-        }
-        
-        .badge-premium {
-            padding: 0.35rem 0.75rem;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-block;
-        }
-        .badge-draft { background: #f1f5f9; color: #475569; }
-        .badge-planned { background: #eff6ff; color: #2563eb; }
-        .badge-completed { background: #ecfdf5; color: #059669; }
-
-        .action-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 34px;
-            height: 34px;
-            border-radius: 6px;
-            color: #64748b;
-            transition: all 0.2s;
-            text-decoration: none;
-            margin-left: 0.25rem;
-            background: transparent;
-        }
-        .action-btn:hover {
-            background: #f1f5f9;
-            color: #0f172a;
-        }
-        .action-btn.delete:hover {
-            background: #fef2f2;
-            color: #dc2626;
-        }
-
-        /* Empty State */
-        .premium-empty {
-            text-align: center;
-            padding: 4rem 2rem;
-            background: #ffffff;
-            border-radius: 12px;
-            border: 1px dashed #cbd5e1;
-            margin-top: 2rem;
-        }
-        .empty-icon {
-            font-size: 3rem;
-            color: #94a3b8;
-            margin-bottom: 1.5rem;
-        }
-
-        @media (max-width: 992px) {
-            .kpi-grid { grid-template-columns: repeat(2, 1fr); }
-            .stats-strip { grid-template-columns: repeat(2, 1fr); }
-            .stat-item:nth-child(2) { border-right: none; }
-            .kpi-wrapper { margin-top: -3rem; }
-        }
-        @media (max-width: 576px) {
-            .kpi-grid, .stats-strip { grid-template-columns: 1fr; }
-            .stat-item { border-right: none; border-bottom: 1px solid #f1f5f9; padding: 1rem 0; }
-            .stat-item:last-child { border-bottom: none; }
-            .kpi-wrapper { margin-top: -2rem; padding: 0 1rem; }
-        }
-    </style>
-
-    <div class="dashboard-wrapper">
-        <!-- 1. HERO SECTION -->
-        <div class="dashboard-hero">
-            <div class="dashboard-container d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-                <div>
-                    <h1 class="page-title">Dashboard</h1>
-                    <div class="page-subtitle">SBES Survey Estimation Management</div>
-                </div>
-                <div class="mt-4 mt-md-0">
-                    <a href="{{ route('projects.create') }}" class="btn-premium">
-                        <i class="fa-solid fa-plus"></i> New Project
-                    </a>
-                </div>
-            </div>
+<x-app-layout containerClass="w-full px-8 py-8">
+    
+    <!-- 1. PAGE HEADER -->
+    <div class="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900 mb-1 tracking-tight">Dashboard</h1>
+            <div class="text-sm font-medium text-slate-500">Your survey estimation projects</div>
         </div>
-
-        <!-- 2. FLOATING KPI CARDS -->
-        <div class="kpi-wrapper dashboard-container">
-            @if(session('success'))
-                <div class="alert alert-success rounded-3 border-0 mb-4" style="background: #ecfdf5; color: #059669; box-shadow: 0 2px 4px rgba(0,0,0,0.05); padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-                    <i class="fa-solid fa-circle-check fs-5"></i>
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            <div class="kpi-grid">
-                <div class="kpi-card">
-                    <div class="kpi-icon-box icon-indigo"><i class="fa-solid fa-folder-tree"></i></div>
-                    <div class="kpi-content">
-                        <h3>Total Projects</h3>
-                        <div class="kpi-number">{{ $metrics['total'] }}</div>
-                    </div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon-box icon-amber"><i class="fa-solid fa-file-pen"></i></div>
-                    <div class="kpi-content">
-                        <h3>Drafts</h3>
-                        <div class="kpi-number">{{ $metrics['draft'] }}</div>
-                    </div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon-box icon-blue"><i class="fa-solid fa-map"></i></div>
-                    <div class="kpi-content">
-                        <h3>In Progress</h3>
-                        <div class="kpi-number">{{ $metrics['planned'] }}</div>
-                    </div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon-box icon-emerald"><i class="fa-solid fa-check-double"></i></div>
-                    <div class="kpi-content">
-                        <h3>Completed</h3>
-                        <div class="kpi-number">{{ $metrics['completed'] }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- 3. MAIN CONTENT AREA -->
-        <div class="content-area dashboard-container">
-            
-            @if($metrics['total'] > 0)
-                <!-- Estimation Overview Stats -->
-                <div class="stats-strip">
-                    <div class="stat-item">
-                        <div class="stat-value">{{ $overview['total_distance'] }} <span style="font-size: 0.85rem; color: #94a3b8;">NM</span></div>
-                        <div class="stat-label">Planned Distance</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value text-primary">{{ $overview['with_lines'] }}</div>
-                        <div class="stat-label">Projects w/ Lines</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value text-warning">{{ $overview['awaiting_planning'] }}</div>
-                        <div class="stat-label">Awaiting Map</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value text-success">{{ $overview['completed_estimation'] }}</div>
-                        <div class="stat-label">Cost Estimated</div>
-                    </div>
-                </div>
-
-                <!-- Attention Area -->
-                @if($attention['missing_boundaries'] > 0 || $attention['missing_lines'] > 0 || $attention['missing_parameters'] > 0 || $attention['missing_cost'] > 0)
-                    <div class="mb-5">
-                        <h3 class="fw-bold mb-3" style="font-size: 1.1rem; color: #0f172a;">Requires Attention</h3>
-                        <div class="row g-3">
-                            @if($attention['missing_boundaries'] > 0)
-                                <div class="col-md-6">
-                                    <div class="attention-card warning">
-                                        <div class="attention-icon"><i class="fa-solid fa-triangle-exclamation"></i></div>
-                                        <div>
-                                            <h4>Missing Boundaries</h4>
-                                            <p><strong>{{ $attention['missing_boundaries'] }}</strong> project(s) have no boundaries defined.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-                            @if($attention['missing_lines'] > 0)
-                                <div class="col-md-6">
-                                    <div class="attention-card info">
-                                        <div class="attention-icon"><i class="fa-solid fa-route"></i></div>
-                                        <div>
-                                            <h4>Survey Lines Pending</h4>
-                                            <p><strong>{{ $attention['missing_lines'] }}</strong> project(s) lack generated lines.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-                            @if($attention['missing_parameters'] > 0)
-                                <div class="col-md-6">
-                                    <div class="attention-card warning">
-                                        <div class="attention-icon"><i class="fa-solid fa-sliders"></i></div>
-                                        <div>
-                                            <h4>Missing Parameters</h4>
-                                            <p><strong>{{ $attention['missing_parameters'] }}</strong> project(s) need working parameters.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-                            @if($attention['missing_cost'] > 0)
-                                <div class="col-md-6">
-                                    <div class="attention-card info">
-                                        <div class="attention-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
-                                        <div>
-                                            <h4>Estimation Pending</h4>
-                                            <p><strong>{{ $attention['missing_cost'] }}</strong> project(s) haven't completed costing.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                    </div>
-                @endif
-
-                <!-- Projects Table -->
-                <div class="table-card">
-                    <div class="table-header-controls">
-                        <h3 class="table-title">Recent Projects</h3>
-                        
-                        <form method="GET" action="{{ route('projects.index') }}" class="d-flex flex-wrap gap-2">
-                            <input type="text" name="search" class="premium-input" placeholder="Search projects..." value="{{ request('search') }}" style="width: 220px;">
-                            <select name="status" class="premium-input" style="width: 140px;" onchange="this.form.submit()">
-                                <option value="">All Statuses</option>
-                                <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
-                                <option value="planned" {{ request('status') === 'planned' ? 'selected' : '' }}>In Progress</option>
-                                <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
-                            </select>
-                            @if(request('search') || request('status'))
-                                <a href="{{ route('projects.index') }}" class="btn btn-light btn-sm px-3 align-self-center" style="border-radius: 6px;">Clear</a>
-                            @endif
-                            <button type="submit" class="d-none">Filter</button>
-                        </form>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table class="premium-table">
-                            <thead>
-                                <tr>
-                                    <th>Code</th>
-                                    <th>Project Details</th>
-                                    <th>Client</th>
-                                    <th>Status</th>
-                                    <th>Last Updated</th>
-                                    <th class="text-end">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse($projects as $project)
-                                    <tr>
-                                        <td>
-                                            <span style="font-family: 'Courier New', monospace; font-size: 0.8rem; font-weight: 600; color: #64748b; background: #f1f5f9; padding: 4px 8px; border-radius: 4px;">
-                                                {{ $project->project_code ?? 'PRJ-' . str_pad($project->id, 4, '0', STR_PAD_LEFT) }}
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div style="font-weight: 600; color: #0f172a; margin-bottom: 2px;">{{ $project->name }}</div>
-                                            <div style="font-size: 0.8rem; color: #64748b;">
-                                                <i class="fa-solid fa-location-dot me-1" style="color: #cbd5e1;"></i> {{ $project->location ?? 'No location specified' }}
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <span style="font-weight: 500;">{{ $project->client?->name ?? $project->getRawOriginal('client') ?? '-' }}</span>
-                                        </td>
-                                        <td>
-                                            @if($project->status === 'draft')
-                                                <span class="badge-premium badge-draft">Draft</span>
-                                            @elseif($project->status === 'planned')
-                                                <span class="badge-premium badge-planned">In Progress</span>
-                                            @else
-                                                <span class="badge-premium badge-completed">Completed</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <div style="font-size: 0.85rem; color: #475569;">{{ $project->updated_at->diffForHumans() }}</div>
-                                        </td>
-                                        <td class="text-end text-nowrap">
-                                            <a href="{{ route('projects.show', $project->id) }}" class="action-btn" title="View Overview">
-                                                <i class="fa-solid fa-arrow-right"></i>
-                                            </a>
-                                            <a href="{{ route('projects.edit', $project->id) }}" class="action-btn" title="Edit Details">
-                                                <i class="fa-solid fa-pen"></i>
-                                            </a>
-                                            <form action="{{ route('projects.destroy', $project->id) }}" method="POST" class="d-inline form-delete">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="button" class="action-btn delete btn-delete-action" title="Delete Project">
-                                                    <i class="fa-solid fa-trash-can"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
-                                        <td colspan="6" class="text-center py-5">
-                                            <div class="text-muted mb-2">No projects match your search criteria.</div>
-                                            <a href="{{ route('projects.index') }}" class="text-primary text-decoration-none" style="font-size: 0.9rem; font-weight: 500;">Clear Filters</a>
-                                        </td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
-                    </div>
-                    
-                    @if($projects->hasPages())
-                        <div class="p-3 border-top bg-light d-flex justify-content-center">
-                            {{ $projects->links('pagination::bootstrap-5') }}
-                        </div>
-                    @endif
-                </div>
-
-            @else
-                <!-- Empty State -->
-                <div class="premium-empty">
-                    <i class="fa-solid fa-layer-group empty-icon"></i>
-                    <h3 class="fw-bold mb-3" style="color: #0f172a;">Your workspace is empty</h3>
-                    <p class="text-muted mb-4 mx-auto" style="max-width: 500px; font-size: 0.95rem;">
-                        Create your first survey estimation project to start plotting boundaries, calculating survey lines, and generating detailed cost analyses.
-                    </p>
-                    <a href="{{ route('projects.create') }}" class="btn-premium px-4">
-                        <i class="fa-solid fa-plus"></i> Create New Project
-                    </a>
-                </div>
-            @endif
+        <div>
+            <a href="{{ route('projects.create') }}" class="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 text-sm font-medium transition-colors border border-transparent shadow-sm">
+                <i class="fa-solid fa-plus font-light"></i> New Project
+            </a>
         </div>
     </div>
+
+    @if(session('success'))
+        <div class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-4 mb-8 flex items-start gap-3 text-sm">
+            <i class="fa-solid fa-circle-check mt-0.5 text-emerald-600"></i>
+            <span class="font-medium">{{ session('success') }}</span>
+        </div>
+    @endif
+
+    <!-- 2. CORE METRICS (Reduced padding, strong typography, unified borders) -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white border border-slate-200 p-4 flex flex-col justify-between h-20 shadow-sm">
+            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Projects</div>
+            <div class="text-2xl font-semibold text-slate-800">{{ $metrics['total'] }}</div>
+        </div>
+        <div class="bg-white border border-slate-200 p-4 flex flex-col justify-between h-20 shadow-sm">
+            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Drafts</div>
+            <div class="text-2xl font-semibold text-slate-800">{{ $metrics['draft'] }}</div>
+        </div>
+        <div class="bg-white border border-slate-200 p-4 flex flex-col justify-between h-20 shadow-sm">
+            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">In Progress</div>
+            <div class="text-2xl font-semibold text-teal-700">{{ $metrics['planned'] }}</div>
+        </div>
+        <div class="bg-white border border-slate-200 p-4 flex flex-col justify-between h-20 shadow-sm">
+            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Completed</div>
+            <div class="text-2xl font-semibold text-emerald-700">{{ $metrics['completed'] }}</div>
+        </div>
+    </div>
+
+    @if($metrics['total'] > 0)
+        <!-- 3. ATTENTION REQUIRED (Operational Alerts - Scannable text list) -->
+        @if($attention['missing_boundaries'] > 0 || $attention['missing_lines'] > 0 || $attention['missing_parameters'] > 0 || $attention['missing_cost'] > 0)
+            <div class="bg-white border border-slate-200 mb-8 shadow-sm">
+                <div class="px-5 py-3 border-b border-slate-200 bg-amber-50/30 flex items-center gap-2">
+                    <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm"></i>
+                    <h3 class="text-sm font-bold text-slate-800">Action Required</h3>
+                </div>
+                <div class="p-0">
+                    <ul class="divide-y divide-slate-100 m-0">
+                        @if($attention['missing_boundaries'] > 0)
+                            <li class="px-5 py-2.5 flex justify-between items-center text-sm hover:bg-slate-50 transition-colors">
+                                <span class="text-slate-600">Projects missing boundaries</span>
+                                <span class="font-bold text-slate-900">{{ $attention['missing_boundaries'] }}</span>
+                            </li>
+                        @endif
+                        @if($attention['missing_lines'] > 0)
+                            <li class="px-5 py-2.5 flex justify-between items-center text-sm hover:bg-slate-50 transition-colors">
+                                <span class="text-slate-600">Projects pending survey line generation</span>
+                                <span class="font-bold text-slate-900">{{ $attention['missing_lines'] }}</span>
+                            </li>
+                        @endif
+                        @if($attention['missing_parameters'] > 0)
+                            <li class="px-5 py-2.5 flex justify-between items-center text-sm hover:bg-slate-50 transition-colors">
+                                <span class="text-slate-600">Projects with missing survey parameters</span>
+                                <span class="font-bold text-slate-900">{{ $attention['missing_parameters'] }}</span>
+                            </li>
+                        @endif
+                        @if($attention['missing_cost'] > 0)
+                            <li class="px-5 py-2.5 flex justify-between items-center text-sm hover:bg-slate-50 transition-colors">
+                                <span class="text-slate-600">Projects awaiting final cost estimation</span>
+                                <span class="font-bold text-slate-900">{{ $attention['missing_cost'] }}</span>
+                            </li>
+                        @endif
+                    </ul>
+                </div>
+            </div>
+        @endif
+
+        <!-- 4. PROJECTS TABLE WORKSPACE -->
+        <div class="bg-white border border-slate-200 mb-12 shadow-sm">
+            
+            <!-- Table Controls -->
+            <div class="px-5 py-3 border-b border-slate-200 flex flex-wrap justify-between items-center gap-4 bg-slate-50">
+                <h3 class="text-sm font-bold text-slate-800">Recent Projects</h3>
+                
+                <form method="GET" action="{{ route('projects.index') }}" class="flex flex-wrap gap-2">
+                    <input type="text" name="search" class="w-64 px-3 py-1.5 bg-white border border-slate-200 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500" placeholder="Search projects..." value="{{ request('search') }}">
+                    <select name="status" class="w-40 px-3 py-1.5 bg-white border border-slate-200 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500" onchange="this.form.submit()">
+                        <option value="">All Statuses</option>
+                        <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
+                        <option value="planned" {{ request('status') === 'planned' ? 'selected' : '' }}>In Progress</option>
+                        <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
+                    </select>
+                    @if(request('search') || request('status'))
+                        <a href="{{ route('projects.index') }}" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 text-xs font-bold uppercase tracking-wider transition-colors flex items-center">Clear</a>
+                    @endif
+                    <button type="submit" class="hidden">Filter</button>
+                </form>
+            </div>
+
+            <!-- Table Data (Dense) -->
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="bg-slate-50/50 border-b border-slate-200 text-slate-500">
+                            <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Code</th>
+                            <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Project Details</th>
+                            <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Client</th>
+                            <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Status</th>
+                            <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Updated</th>
+                            <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px] text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-slate-100">
+                        @forelse($projects as $project)
+                            <tr class="hover:bg-slate-50 transition-colors group">
+                                <td class="px-5 py-3 align-middle">
+                                    <span class="font-mono text-slate-500 text-xs">
+                                        {{ $project->project_code ?? 'PRJ-' . str_pad($project->id, 4, '0', STR_PAD_LEFT) }}
+                                    </span>
+                                </td>
+                                <td class="px-5 py-3 align-middle">
+                                    <div class="font-semibold text-slate-800">{{ $project->name }}</div>
+                                    <div class="text-[11px] text-slate-500 flex items-center mt-0.5">
+                                        <i class="fa-solid fa-location-dot mr-1 opacity-70"></i> {{ $project->location ?? 'Unspecified' }}
+                                    </div>
+                                </td>
+                                <td class="px-5 py-3 align-middle">
+                                    <span class="text-slate-700 font-medium text-xs">{{ $project->clientModel?->name ?? $project->getRawOriginal('client') ?? '-' }}</span>
+                                </td>
+                                <td class="px-5 py-3 align-middle">
+                                    @if($project->status === 'draft')
+                                        <div class="flex items-center gap-1.5 text-slate-600 text-xs font-medium">
+                                            <div class="w-1.5 h-1.5 rounded-full bg-slate-400"></div> Draft
+                                        </div>
+                                    @elseif($project->status === 'planned')
+                                        <div class="flex items-center gap-1.5 text-teal-700 text-xs font-medium">
+                                            <div class="w-1.5 h-1.5 rounded-full bg-teal-500"></div> In Progress
+                                        </div>
+                                    @else
+                                        <div class="flex items-center gap-1.5 text-emerald-700 text-xs font-medium">
+                                            <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Completed
+                                        </div>
+                                    @endif
+                                </td>
+                                <td class="px-5 py-3 align-middle text-slate-500 text-xs font-medium">
+                                    {{ $project->updated_at->format('Y-m-d') }}
+                                </td>
+                                <td class="px-5 py-3 align-middle text-right whitespace-nowrap">
+                                    <div class="flex items-center justify-end gap-1">
+                                        <a href="{{ route('projects.show', $project->id) }}" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-teal-600 hover:bg-teal-50 transition-all" title="View">
+                                            <i class="fa-solid fa-arrow-right font-light"></i>
+                                        </a>
+                                        <a href="{{ route('projects.edit', $project->id) }}" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-all" title="Edit">
+                                            <i class="fa-solid fa-pen font-light text-sm"></i>
+                                        </a>
+                                        <form action="{{ route('projects.destroy', $project->id) }}" method="POST" class="inline-block form-delete m-0">
+                                            @csrf
+                                            @method('DELETE')
+                                            <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all btn-delete-action" title="Delete">
+                                                <i class="fa-solid fa-trash-can font-light text-sm"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center py-10 bg-white">
+                                    <div class="text-slate-500 mb-2 font-medium">No projects found.</div>
+                                    <a href="{{ route('projects.index') }}" class="text-teal-600 hover:text-teal-700 text-sm font-medium">Clear Filters</a>
+                                </td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+            
+            @if($projects->hasPages())
+                <div class="px-5 py-3 border-t border-slate-200 bg-slate-50 flex justify-center">
+                    {{ $projects->links('pagination::tailwind') }}
+                </div>
+            @endif
+        </div>
+
+    @else
+        <!-- Empty State -->
+        <div class="text-center py-20 bg-white border border-slate-200 mt-8 shadow-sm">
+            <i class="fa-solid fa-layer-group text-3xl text-slate-300 mb-4 font-light"></i>
+            <h3 class="text-lg font-bold text-slate-800 mb-2">No projects yet</h3>
+            <p class="text-slate-500 mb-6 mx-auto max-w-md text-sm">
+                Create your first survey estimation project to begin tracking boundaries, lines, and costs.
+            </p>
+            <a href="{{ route('projects.create') }}" class="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 text-sm font-medium transition-colors border border-transparent shadow-sm">
+                <i class="fa-solid fa-plus font-light"></i> Create Project
+            </a>
+        </div>
+    @endif
 
     <!-- Scripts -->
     <script>
@@ -568,9 +213,9 @@
                         icon: 'warning',
                         showCancelButton: true,
                         confirmButtonColor: '#ef4444',
-                        cancelButtonColor: '#f1f5f9',
+                        cancelButtonColor: '#f8fafc',
                         customClass: {
-                            cancelButton: 'text-dark',
+                            cancelButton: 'text-slate-800 border-none shadow-sm',
                             confirmButton: 'text-white'
                         },
                         confirmButtonText: 'Yes, delete it'

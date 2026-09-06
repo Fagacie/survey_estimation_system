@@ -1,279 +1,224 @@
-<x-app-layout>
+<x-app-layout containerClass="w-full px-8 py-8">
     <x-slot name="header">
-        <div class="d-flex justify-content-between align-items-center">
-            <h2 class="h4 font-weight-bold text-dark mb-0">Cost Estimation: {{ $project->name }}</h2>
-            <a href="{{ route('projects.show', $project->id) }}" class="btn btn-outline-secondary btn-sm">
-                <i class="fa-solid fa-arrow-left me-2"></i> Back to Map
-            </a>
-        </div>
+        Cost Estimation: {{ $project->name }}
     </x-slot>
 
-    <style>
-        .eng-card { background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); border-radius: 16px; color: #fff; padding: 24px; margin-bottom: 24px; }
-        .eng-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; }
-        .eng-item { text-align: center; }
-        .eng-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; color: #94a3b8; font-weight: 700; margin-bottom: 4px; }
-        .eng-value { font-size: 1.3rem; font-weight: 800; }
-        .eng-value.cyan { color: #22d3ee; }
-        .eng-value.amber { color: #fbbf24; }
-        .eng-value.green { color: #34d399; }
-        .eng-value.rose { color: #fb7185; }
-        .eng-value.blue { color: #60a5fa; }
-        .eng-divider { width: 1px; background: rgba(255,255,255,0.15); margin: 0 8px; }
+    <div class="flex justify-between items-center mb-6 mt-2">
+        <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Cost Estimation</h1>
+        <a href="{{ route('projects.show', $project->id) }}" class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-700 px-4 py-2 text-sm font-medium border border-slate-200 transition-colors shadow-sm no-underline">
+            <i class="fa-solid fa-arrow-left"></i> Back to Project
+        </a>
+    </div>
 
-        .cost-section { margin-bottom: 24px; }
-        .cost-section-header { background: #f8fafc; padding: 12px 16px; border-radius: 12px 12px 0 0; border: 1px solid #e2e8f0; border-bottom: 2px solid; display: flex; justify-content: space-between; align-items: center; }
-        .cost-section-header h6 { margin: 0; font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; }
-        .cost-section-header .subtotal { font-weight: 800; font-size: 0.9rem; }
+    @if(session('success'))
+        <div class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-4 mb-8 flex items-start gap-3 text-sm">
+            <i class="fa-solid fa-circle-check mt-0.5 text-emerald-600"></i>
+            <span class="font-medium">{{ session('success') }}</span>
+        </div>
+    @endif
 
-        .cat-equipment { border-bottom-color: #0284c7; }
-        .cat-equipment h6 { color: #0284c7; }
-        .cat-personnel { border-bottom-color: #d97706; }
-        .cat-personnel h6 { color: #d97706; }
-        .cat-logistics { border-bottom-color: #9333ea; }
-        .cat-logistics h6 { color: #9333ea; }
-        .cat-analysis { border-bottom-color: #16a34a; }
-        .cat-analysis h6 { color: #16a34a; }
-        .cat-miscellaneous, .cat-general { border-bottom-color: #475569; }
-        .cat-miscellaneous h6, .cat-general h6 { color: #475569; }
-
-        .cost-table { width: 100%; border-collapse: collapse; }
-        .cost-table th { background: #f8fafc; color: #64748b; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; padding: 10px 14px; font-weight: 700; border-bottom: 1px solid #e2e8f0; }
-        .cost-table td { padding: 8px 14px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
-        .cost-table .form-control-sm { border: 1px solid transparent; background: transparent; transition: all 0.2s; }
-        .cost-table .form-control-sm:hover { background: #f8fafc; border-color: #e2e8f0; }
-        .cost-table .form-control-sm:focus { background: #fff; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.1); }
-
-        .summary-card { background: #fff; border: 1px solid #e2e8f0; border-radius: 16px; position: sticky; top: 20px; }
-        .summary-card .card-header { background: linear-gradient(135deg, #0f172a, #1e293b); color: #fff; border-radius: 16px 16px 0 0; padding: 16px 20px; border: none; }
-        .summary-total { font-size: 1.6rem; font-weight: 800; color: #0f172a; }
-        .category-subtotal { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.85rem; }
-        .category-subtotal:last-child { border-bottom: none; }
-
-        .btn-action { border-radius: 10px; font-weight: 600; font-size: 0.85rem; padding: 10px 16px; width: 100%; margin-bottom: 8px; transition: all 0.2s; }
-        .btn-action:hover { transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-        .btn-save { background: #0f172a; color: #fff; border: none; }
-        .btn-save:hover { background: #1e293b; color: #fff; }
-        .btn-recalc { background: #fff; color: #d97706; border: 2px solid #fbbf24; }
-        .btn-recalc:hover { background: #fef3c7; color: #d97706; }
-        .btn-report { background: #fff; color: #0284c7; border: 2px solid #0284c7; }
-        .btn-report:hover { background: #e0f2fe; color: #0284c7; }
-        .btn-quotation { background: #fff; color: #16a34a; border: 2px solid #16a34a; }
-        .btn-quotation:hover { background: #dcfce7; color: #16a34a; }
-    </style>
-
-    <div class="container-fluid py-4" style="max-width: 1400px;">
-
-        @if(session('success'))
-            <div class="alert alert-success shadow-sm rounded-3 border-0 mb-4 fw-bold">
-                <i class="fa-solid fa-check-circle me-2"></i> {{ session('success') }}
+    {{-- ── ENGINEERING SUMMARY ────────────────────────────────── --}}
+    <div class="bg-white border border-slate-200 p-6 mb-8 shadow-sm">
+        <div class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-6">
+            <div class="text-center">
+                <div class="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Distance</div>
+                <div class="text-lg font-bold text-sky-600">{{ number_format($duration['distance_nm'], 2) }} NM</div>
             </div>
-        @endif
-
-        {{-- ── ENGINEERING SUMMARY ────────────────────────────────── --}}
-        <div class="eng-card">
-            <div class="eng-grid">
-                <div class="eng-item">
-                    <div class="eng-label">Distance</div>
-                    <div class="eng-value cyan">{{ number_format($duration['distance_nm'], 2) }} NM</div>
-                </div>
-                <div class="eng-item">
-                    <div class="eng-label">Speed</div>
-                    <div class="eng-value blue">{{ $duration['speed_knots'] }} kn</div>
-                </div>
-                <div class="eng-item">
-                    <div class="eng-label">Survey Hours</div>
-                    <div class="eng-value amber">{{ number_format($duration['survey_hours'], 1) }} hrs</div>
-                </div>
-                <div class="eng-item">
-                    <div class="eng-label">Execution</div>
-                    <div class="eng-value green">{{ number_format($duration['execution_days'], 1) }} days</div>
-                </div>
-                <div class="eng-item">
-                    <div class="eng-label">Weather</div>
-                    <div class="eng-value" style="color:#94a3b8">{{ $duration['weather_days'] }} days</div>
-                </div>
-                <div class="eng-item">
-                    <div class="eng-label">MOB/DEMOB</div>
-                    <div class="eng-value" style="color:#94a3b8">{{ $duration['mod_demod_days'] }} days</div>
-                </div>
-                <div class="eng-item">
-                    <div class="eng-label">Patch Test</div>
-                    <div class="eng-value" style="color:#94a3b8">{{ $duration['patch_test_days'] }} days</div>
-                </div>
-                <div class="eng-item">
-                    <div class="eng-label">Total Duration</div>
-                    <div class="eng-value rose">{{ number_format($duration['total_days'], 1) }} days</div>
-                </div>
+            <div class="text-center border-l border-slate-100">
+                <div class="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Speed</div>
+                <div class="text-lg font-bold text-blue-500">{{ $duration['speed_knots'] }} kn</div>
             </div>
-            
-            <div class="mt-3 text-center" style="font-size: 0.75rem; color: #94a3b8;">
-                <i class="fa-solid fa-circle-info me-1"></i> Global Allowances (Weather, MOB/DEMOB, Patch Test) are configured in the <a href="{{ route('projects.show', $project->id) }}" style="color: #22d3ee; text-decoration: none; border-bottom: 1px dotted #22d3ee;">Project Overview</a> and automatically applied to the total duration.
+            <div class="text-center border-l border-slate-100">
+                <div class="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Survey Hours</div>
+                <div class="text-lg font-bold text-amber-500">{{ number_format($duration['survey_hours'], 1) }} hrs</div>
+            </div>
+            <div class="text-center border-l border-slate-100">
+                <div class="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Execution</div>
+                <div class="text-lg font-bold text-emerald-500">{{ number_format($duration['execution_days'], 1) }} days</div>
+            </div>
+            <div class="text-center border-l border-slate-100">
+                <div class="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Weather</div>
+                <div class="text-lg font-bold text-slate-400">{{ $duration['weather_days'] }} days</div>
+            </div>
+            <div class="text-center border-l border-slate-100">
+                <div class="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">MOB/DEMOB</div>
+                <div class="text-lg font-bold text-slate-400">{{ $duration['mod_demod_days'] }} days</div>
+            </div>
+            <div class="text-center border-l border-slate-100">
+                <div class="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Patch Test</div>
+                <div class="text-lg font-bold text-slate-400">{{ $duration['patch_test_days'] }} days</div>
+            </div>
+            <div class="text-center border-l border-slate-100">
+                <div class="text-[10px] uppercase font-bold text-slate-500 tracking-wider mb-1">Total Duration</div>
+                <div class="text-lg font-bold text-rose-500">{{ number_format($duration['total_days'], 1) }} days</div>
             </div>
         </div>
+        
+        <div class="mt-5 text-center text-xs font-medium text-slate-500 flex justify-center items-center gap-1.5">
+            <i class="fa-solid fa-circle-info text-slate-400"></i> Global Allowances are configured in the <a href="{{ route('projects.show', $project->id) }}" class="text-teal-600 hover:text-teal-700 underline underline-offset-2">Project Overview</a> and automatically applied.
+        </div>
+    </div>
 
-        <form action="{{ route('projects.cost.store', $project->id) }}" method="POST" id="cost-form">
-            @csrf
-            <div class="row">
+    <form action="{{ route('projects.cost.store', $project->id) }}" method="POST" id="cost-form">
+        @csrf
+        <div class="flex flex-col lg:flex-row gap-8">
 
-                {{-- ── LINE ITEMS (GROUPED BY CATEGORY) ──────────────── --}}
-                <div class="col-lg-9 mb-4">
+            {{-- ── LINE ITEMS (GROUPED BY CATEGORY) ──────────────── --}}
+            <div class="flex-grow">
+                @php
+                    $flatIndex = 0;
+                    $categoryColors = [
+                        'Equipment' => ['bg' => 'bg-sky-50', 'text' => 'text-sky-700', 'border' => 'border-sky-200', 'icon' => 'fa-wrench'],
+                        'Personnel' => ['bg' => 'bg-amber-50', 'text' => 'text-amber-700', 'border' => 'border-amber-200', 'icon' => 'fa-users'],
+                        'Logistics' => ['bg' => 'bg-purple-50', 'text' => 'text-purple-700', 'border' => 'border-purple-200', 'icon' => 'fa-truck'],
+                        'Analysis'  => ['bg' => 'bg-emerald-50', 'text' => 'text-emerald-700', 'border' => 'border-emerald-200', 'icon' => 'fa-chart-line'],
+                        'Miscellaneous' => ['bg' => 'bg-slate-50', 'text' => 'text-slate-700', 'border' => 'border-slate-300', 'icon' => 'fa-box'],
+                        'General'   => ['bg' => 'bg-slate-50', 'text' => 'text-slate-700', 'border' => 'border-slate-300', 'icon' => 'fa-box'],
+                    ];
+                @endphp
 
-                    @php
-                        $flatIndex = 0;
-                        $categoryClasses = [
-                            'Equipment' => 'cat-equipment',
-                            'Personnel' => 'cat-personnel',
-                            'Logistics' => 'cat-logistics',
-                            'Analysis'  => 'cat-analysis',
-                            'Miscellaneous' => 'cat-miscellaneous',
-                            'General'   => 'cat-general',
-                        ];
-                    @endphp
-
-                    @foreach($groupedItems as $category => $items)
-                        <div class="cost-section">
-                            <div class="cost-section-header {{ $categoryClasses[$category] ?? 'cat-general' }}">
-                                <h6><i class="fa-solid fa-{{ match($category) {
-                                    'Equipment' => 'wrench',
-                                    'Personnel' => 'users',
-                                    'Logistics' => 'truck',
-                                    'Analysis' => 'chart-line',
-                                    default => 'box'
-                                } }} me-2"></i>{{ $category }}</h6>
-                                <span class="subtotal category-subtotal-value" data-category="{{ $category }}">RM 0.00</span>
-                            </div>
-                            <div style="border: 1px solid #e2e8f0; border-top: none; border-radius: 0 0 12px 12px; overflow: hidden;">
-                                <table class="cost-table">
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 35%">Description</th>
-                                            <th style="width: 12%" class="text-end">Days (Duration)</th>
-                                            <th style="width: 12%" class="text-end">Qty/Pax</th>
-                                            <th style="width: 16%" class="text-end">Unit Rate (RM)</th>
-                                            <th style="width: 15%" class="text-end">Total (RM)</th>
-                                            <th style="width: 10%"></th>
+                @foreach($groupedItems as $category => $items)
+                    @php $c = $categoryColors[$category] ?? $categoryColors['General']; @endphp
+                    <div class="cost-section bg-white border border-slate-200 mb-8 shadow-sm">
+                        <div class="px-5 py-3 border-b border-b-2 {{ $c['border'] }} {{ $c['bg'] }} flex justify-between items-center">
+                            <h6 class="text-xs font-bold uppercase tracking-wider {{ $c['text'] }} m-0">
+                                <i class="fa-solid {{ $c['icon'] }} mr-2 opacity-75"></i>{{ $category }}
+                            </h6>
+                            <span class="category-subtotal-value text-sm font-bold text-slate-800" data-category="{{ $category }}">RM 0.00</span>
+                        </div>
+                        
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-sm cost-table">
+                                <thead>
+                                    <tr class="bg-slate-50/50 border-b border-slate-200 text-slate-500">
+                                        <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px] w-[35%]">Description</th>
+                                        <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px] w-[12%] text-right">Days</th>
+                                        <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px] w-[12%] text-right">Qty/Pax</th>
+                                        <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px] w-[16%] text-right">Unit Rate (RM)</th>
+                                        <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px] w-[15%] text-right">Total (RM)</th>
+                                        <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px] w-[10%] text-center"></th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-slate-100">
+                                    @foreach($items as $item)
+                                        <tr class="cost-row hover:bg-slate-50 transition-colors group" data-category="{{ $category }}">
+                                            <input type="hidden" name="items[{{ $flatIndex }}][cost_rate_id]" value="{{ $item->cost_rate_id ?? '' }}">
+                                            <input type="hidden" name="items[{{ $flatIndex }}][category]" value="{{ $category }}">
+                                            <td class="px-3 py-2">
+                                                <input type="text" name="items[{{ $flatIndex }}][description]" class="w-full px-2 py-1.5 bg-transparent border border-transparent hover:border-slate-300 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:bg-white text-sm text-slate-800 transition-all font-medium" value="{{ $item->description }}" required>
+                                            </td>
+                                            <td class="px-3 py-2">
+                                                <input type="number" step="0.01" name="items[{{ $flatIndex }}][days]" class="w-full px-2 py-1.5 bg-transparent border border-transparent hover:border-slate-300 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:bg-white text-sm text-slate-800 transition-all text-right item-days font-medium @if(($item->unit_type ?? $item->costRate?->unit_type ?? '') === 'Lump Sum') !bg-slate-100 !text-slate-400 !border-slate-200 @endif" value="{{ $item->days }}" required @if(($item->unit_type ?? $item->costRate?->unit_type ?? '') === 'Lump Sum') readonly tabindex="-1" title="Not applicable for Lump Sum" @endif>
+                                            </td>
+                                            <td class="px-3 py-2">
+                                                <input type="number" step="1" name="items[{{ $flatIndex }}][units]" class="w-full px-2 py-1.5 bg-transparent border border-transparent hover:border-slate-300 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:bg-white text-sm text-slate-800 transition-all text-right item-units font-medium @if(($item->unit_type ?? $item->costRate?->unit_type ?? '') === 'Lump Sum') !bg-slate-100 !text-slate-400 !border-slate-200 @endif" value="{{ $item->units ?? 1 }}" required @if(($item->unit_type ?? $item->costRate?->unit_type ?? '') === 'Lump Sum') readonly tabindex="-1" title="Not applicable for Lump Sum" @endif>
+                                            </td>
+                                            <td class="px-3 py-2">
+                                                <input type="number" step="0.01" name="items[{{ $flatIndex }}][unit_rate]" class="w-full px-2 py-1.5 bg-transparent border border-transparent hover:border-slate-300 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:bg-white text-sm text-slate-800 transition-all text-right item-rate font-medium" value="{{ $item->unit_rate }}" required>
+                                            </td>
+                                            <td class="px-4 py-2 text-right item-total font-bold text-slate-900 align-middle">
+                                                {{ number_format($item->total_price, 2) }}
+                                            </td>
+                                            <td class="px-3 py-2 text-center align-middle">
+                                                <button type="button" class="btn-remove-row text-slate-300 hover:text-red-500 transition-colors px-2 py-1 focus:outline-none">
+                                                    <i class="fa-solid fa-trash-can text-sm font-light"></i>
+                                                </button>
+                                            </td>
                                         </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($items as $item)
-                                            <tr class="cost-row" data-category="{{ $category }}">
-                                                <input type="hidden" name="items[{{ $flatIndex }}][cost_rate_id]" value="{{ $item->cost_rate_id ?? '' }}">
-                                                <input type="hidden" name="items[{{ $flatIndex }}][category]" value="{{ $category }}">
-                                                <td>
-                                                    <input type="text" name="items[{{ $flatIndex }}][description]" class="form-control form-control-sm" value="{{ $item->description }}" required>
-                                                </td>
-                                                <td>
-                                                    <input type="number" step="0.01" name="items[{{ $flatIndex }}][days]" class="form-control form-control-sm item-days text-end @if(($item->unit_type ?? $item->costRate?->unit_type ?? '') === 'Lump Sum') bg-light text-muted @endif" value="{{ $item->days }}" required @if(($item->unit_type ?? $item->costRate?->unit_type ?? '') === 'Lump Sum') readonly tabindex="-1" title="Not applicable for Lump Sum" @endif>
-                                                </td>
-                                                <td>
-                                                    <input type="number" step="1" name="items[{{ $flatIndex }}][units]" class="form-control form-control-sm item-units text-end @if(($item->unit_type ?? $item->costRate?->unit_type ?? '') === 'Lump Sum') bg-light text-muted @endif" value="{{ $item->units ?? 1 }}" required @if(($item->unit_type ?? $item->costRate?->unit_type ?? '') === 'Lump Sum') readonly tabindex="-1" title="Not applicable for Lump Sum" @endif>
-                                                </td>
-                                                <td>
-                                                    <input type="number" step="0.01" name="items[{{ $flatIndex }}][unit_rate]" class="form-control form-control-sm item-rate text-end" value="{{ $item->unit_rate }}" required>
-                                                </td>
-                                                <td class="text-end item-total fw-bold" style="font-size: 0.9rem;">
-                                                    {{ number_format($item->total_price, 2) }}
-                                                </td>
-                                                <td class="text-center">
-                                                    <button type="button" class="btn btn-sm text-danger btn-remove-row" style="background: none; border: none; opacity: 0.5;" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=0.5">
-                                                        <i class="fa-solid fa-trash-can"></i>
-                                                    </button>
-                                                </td>
-                                            </tr>
-                                            @php $flatIndex++; @endphp
-                                        @endforeach
-                                    </tbody>
-                                </table>
+                                        @php $flatIndex++; @endphp
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                @endforeach
+
+                {{-- Add custom item --}}
+                <div class="text-center mt-6">
+                    <button type="button" id="btn-add-row" class="inline-flex items-center gap-2 bg-white text-teal-600 border border-teal-600 hover:bg-teal-50 px-5 py-2.5 text-sm font-bold transition-colors">
+                        <i class="fa-solid fa-plus font-light"></i> Add Custom Line Item
+                    </button>
+                </div>
+            </div>
+
+            {{-- ── SUMMARY PANEL ─────────────────────────────────── --}}
+            <div class="w-full lg:w-[320px] flex-shrink-0">
+                <div class="bg-white border border-slate-200 shadow-sm sticky top-6">
+                    <div class="bg-slate-900 px-5 py-4 border-b border-slate-800">
+                        <h5 class="text-white font-bold tracking-tight m-0 flex items-center gap-2"><i class="fa-solid fa-calculator text-slate-400"></i> Summary</h5>
+                    </div>
+                    
+                    <div class="p-5">
+                        <div class="mb-5">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-1">Total Duration</label>
+                            <h4 class="text-xl font-bold text-slate-900 m-0">{{ number_format($duration['total_days'], 1) }} <span class="text-sm font-medium text-slate-400 ml-1">days</span></h4>
+                        </div>
+
+                        <div class="h-px bg-slate-200 my-4 w-full"></div>
+
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase tracking-wider mb-3">By Category</label>
+                        <div id="category-breakdown" class="flex flex-col gap-2.5">
+                            {{-- Populated by JS --}}
+                        </div>
+
+                        <div class="h-px bg-slate-200 my-4 w-full"></div>
+
+                        <div class="flex justify-between items-center mb-5">
+                            <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Grand Total</span>
+                            <div class="flex items-baseline gap-1.5">
+                                <span class="text-slate-400 text-sm font-medium">RM</span>
+                                <span class="text-2xl font-black text-slate-900 tracking-tight" id="grand-total">0.00</span>
                             </div>
                         </div>
-                    @endforeach
 
-                    {{-- Add custom item --}}
-                    <div class="text-center mt-3">
-                        <button type="button" class="btn btn-outline-primary btn-sm rounded-pill px-4 fw-bold" id="btn-add-row">
-                            <i class="fa-solid fa-plus me-1"></i> Add Custom Line Item
+                        @if($estimation && $estimation->status === 'Manual')
+                            <div class="bg-amber-50 text-amber-800 border border-amber-200 px-3 py-2 mb-4 text-xs font-medium flex items-start gap-2">
+                                <i class="fa-solid fa-pen mt-0.5"></i> Manually edited. Rates may differ from master.
+                            </div>
+                        @endif
+
+                        <button type="submit" class="w-full flex justify-center items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-3 text-sm font-bold transition-colors">
+                            <i class="fa-solid fa-floppy-disk font-light"></i> Save Estimation
                         </button>
                     </div>
-                </div>
 
-                {{-- ── SUMMARY PANEL ─────────────────────────────────── --}}
-                <div class="col-lg-3">
-                    <div class="summary-card">
-                        <div class="card-header">
-                            <h5 class="mb-0 fw-bold"><i class="fa-solid fa-calculator me-2"></i>Summary</h5>
-                        </div>
-                        <div class="card-body p-3">
-
-                            <div class="mb-3">
-                                <label class="text-muted small text-uppercase fw-bold mb-1">Total Duration</label>
-                                <h4 class="fw-bold mb-0">{{ number_format($duration['total_days'], 1) }} <small class="text-muted">days</small></h4>
-                            </div>
-
-                            <hr>
-
-                            <label class="text-muted small text-uppercase fw-bold mb-2">By Category</label>
-                            <div id="category-breakdown">
-                                {{-- Populated by JS --}}
-                            </div>
-
-                            <hr>
-
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="text-muted fw-bold text-uppercase" style="font-size: 0.75rem;">Grand Total</span>
-                                <div>
-                                    <span class="text-muted me-1" style="font-size: 0.8rem;">RM</span>
-                                    <span class="summary-total" id="grand-total">0.00</span>
-                                </div>
-                            </div>
-
-                            @if($estimation && $estimation->status === 'Manual')
-                                <div class="alert alert-warning py-2 px-3 mb-3" style="font-size: 0.75rem; border-radius: 8px;">
-                                    <i class="fa-solid fa-pen me-1"></i> Manually edited. Rates may differ from master.
-                                </div>
-                            @endif
-
-                            <button type="submit" class="btn btn-action btn-save">
-                                <i class="fa-solid fa-floppy-disk me-2"></i> Save Estimation
-                            </button>
-                        </div>
-
-                        <div class="card-footer bg-transparent border-top p-3">
-                            <button type="button" class="btn btn-action btn-recalc" id="btn-recalculate">
-                                <i class="fa-solid fa-arrows-rotate me-2"></i> Recalculate from Master
-                            </button>
-                            <a href="{{ route('projects.report.pdf', $project->id) }}" class="btn btn-action btn-report" target="_blank">
-                                <i class="fa-solid fa-file-pdf me-2"></i> Download Report
-                            </a>
-                        </div>
+                    <div class="bg-slate-50 border-t border-slate-200 p-4 flex flex-col gap-2">
+                        <button type="button" id="btn-recalculate" class="w-full flex justify-center items-center gap-2 bg-white border border-amber-500 text-amber-600 hover:bg-amber-50 px-4 py-2 text-sm font-bold transition-colors">
+                            <i class="fa-solid fa-arrows-rotate font-light"></i> Recalculate
+                        </button>
+                        <a href="{{ route('projects.report.pdf', $project->id) }}" target="_blank" class="w-full flex justify-center items-center gap-2 bg-white border border-sky-500 text-sky-600 hover:bg-sky-50 px-4 py-2 text-sm font-bold transition-colors no-underline">
+                            <i class="fa-solid fa-file-pdf font-light"></i> Download Report
+                        </a>
                     </div>
                 </div>
-
             </div>
-        </form>
-    </div>
+
+        </div>
+    </form>
 
     {{-- Hidden template for new rows --}}
     <template id="row-template">
-        <tr class="cost-row" data-category="Miscellaneous">
+        <tr class="cost-row hover:bg-slate-50 transition-colors group" data-category="Miscellaneous">
             <input type="hidden" name="items[__INDEX__][cost_rate_id]" value="">
             <input type="hidden" name="items[__INDEX__][category]" value="Miscellaneous">
-            <td>
-                <input type="text" name="items[__INDEX__][description]" class="form-control form-control-sm" placeholder="Custom item..." required>
+            <td class="px-3 py-2">
+                <input type="text" name="items[__INDEX__][description]" class="w-full px-2 py-1.5 bg-transparent border border-transparent hover:border-slate-300 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:bg-white text-sm text-slate-800 transition-all font-medium" placeholder="Custom item..." required>
             </td>
-            <td>
-                <input type="number" step="0.01" name="items[__INDEX__][days]" class="form-control form-control-sm item-days text-end" value="1" required>
+            <td class="px-3 py-2">
+                <input type="number" step="0.01" name="items[__INDEX__][days]" class="w-full px-2 py-1.5 bg-transparent border border-transparent hover:border-slate-300 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:bg-white text-sm text-slate-800 transition-all text-right item-days font-medium" value="1" required>
             </td>
-            <td>
-                <input type="number" step="1" name="items[__INDEX__][units]" class="form-control form-control-sm item-units text-end" value="1" required>
+            <td class="px-3 py-2">
+                <input type="number" step="1" name="items[__INDEX__][units]" class="w-full px-2 py-1.5 bg-transparent border border-transparent hover:border-slate-300 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:bg-white text-sm text-slate-800 transition-all text-right item-units font-medium" value="1" required>
             </td>
-            <td>
-                <input type="number" step="0.01" name="items[__INDEX__][unit_rate]" class="form-control form-control-sm item-rate text-end" value="0.00" required>
+            <td class="px-3 py-2">
+                <input type="number" step="0.01" name="items[__INDEX__][unit_rate]" class="w-full px-2 py-1.5 bg-transparent border border-transparent hover:border-slate-300 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:bg-white text-sm text-slate-800 transition-all text-right item-rate font-medium" value="0.00" required>
             </td>
-            <td class="text-end item-total fw-bold" style="font-size: 0.9rem;">0.00</td>
-            <td class="text-center">
-                <button type="button" class="btn btn-sm text-danger btn-remove-row" style="background: none; border: none;">
-                    <i class="fa-solid fa-trash-can"></i>
+            <td class="px-4 py-2 text-right item-total font-bold text-slate-900 align-middle">
+                0.00
+            </td>
+            <td class="px-3 py-2 text-center align-middle">
+                <button type="button" class="btn-remove-row text-slate-300 hover:text-red-500 transition-colors px-2 py-1 focus:outline-none">
+                    <i class="fa-solid fa-trash-can text-sm font-light"></i>
                 </button>
             </td>
         </tr>
@@ -321,7 +266,7 @@
                 const breakdownEl = document.getElementById('category-breakdown');
                 breakdownEl.innerHTML = '';
                 for (const [cat, total] of Object.entries(categoryTotals)) {
-                    breakdownEl.innerHTML += `<div class="category-subtotal"><span>${cat}</span><span class="fw-bold">RM ${formatCurrency(total)}</span></div>`;
+                    breakdownEl.innerHTML += `<div class="flex justify-between items-center text-sm"><span class="text-slate-600 font-medium">${cat}</span><span class="font-bold text-slate-900">RM ${formatCurrency(total)}</span></div>`;
                 }
             }
 
@@ -361,7 +306,11 @@
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonColor: '#d97706',
-                    cancelButtonColor: '#64748b',
+                    cancelButtonColor: '#f8fafc',
+                    customClass: {
+                        cancelButton: 'text-slate-800 border-none shadow-sm',
+                        confirmButton: 'text-white'
+                    },
                     confirmButtonText: 'Yes, recalculate'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -384,5 +333,4 @@
             calculateTotals();
         });
     </script>
-
 </x-app-layout>

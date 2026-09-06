@@ -1,265 +1,128 @@
-<x-app-layout containerClass="px-0">
-    <style>
-        .dashboard-wrapper {
-            background-color: #f8fafc;
-            min-height: calc(100vh - 64px);
-        }
-
-        /* Top Dark Section */
-        .dashboard-hero {
-            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            padding: 3rem 1.5rem 5rem;
-            position: relative;
-        }
-
-        .dashboard-container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        .page-title {
-            color: #ffffff;
-            font-size: 1.85rem;
-            font-weight: 700;
-            letter-spacing: -0.02em;
-            margin-bottom: 0.25rem;
-        }
-        .page-subtitle {
-            color: #94a3b8;
-            font-size: 0.95rem;
-        }
-
-        .btn-premium {
-            background: #3b82f6;
-            color: #ffffff;
-            border: none;
-            padding: 0.75rem 1.5rem;
-            border-radius: 8px;
-            font-weight: 600;
-            font-size: 0.9rem;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
-            transition: all 0.2s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        .btn-premium:hover {
-            background: #2563eb;
-            color: #ffffff;
-            transform: translateY(-1px);
-            box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
-        }
-
-        /* Main Content Area */
-        .content-area {
-            padding: 0 1.5rem 5rem;
-            margin-top: -3rem;
-            position: relative;
-            z-index: 10;
-        }
-
-        /* Table */
-        .table-card {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
-            border: 1px solid rgba(226, 232, 240, 0.8);
-            overflow: hidden;
-        }
-        .table-header-controls {
-            padding: 1.5rem;
-            border-bottom: 1px solid #f1f5f9;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-        .table-title {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin: 0;
-        }
-
-        .premium-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .premium-table th {
-            padding: 1rem 1.5rem;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            color: #64748b;
-            background: #f8fafc;
-            border-bottom: 1px solid #e2e8f0;
-            text-align: left;
-        }
-        .premium-table td {
-            padding: 1.25rem 1.5rem;
-            font-size: 0.9rem;
-            color: #334155;
-            border-bottom: 1px solid #f1f5f9;
-            vertical-align: middle;
-        }
-        .premium-table tr:last-child td {
-            border-bottom: none;
-        }
-        .premium-table tr:hover td {
-            background: #fcfcfd;
-        }
-
-        .action-btn {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 34px;
-            height: 34px;
-            border-radius: 6px;
-            color: #64748b;
-            transition: all 0.2s;
-            text-decoration: none;
-            margin-left: 0.25rem;
-            background: transparent;
-            border: none;
-        }
-        .action-btn:hover {
-            background: #f1f5f9;
-            color: #0f172a;
-        }
-        .action-btn.delete:hover {
-            background: #fef2f2;
-            color: #dc2626;
-        }
-    </style>
-
-    <div class="dashboard-wrapper">
-        <div class="dashboard-hero">
-            <div class="dashboard-container d-flex flex-column flex-md-row justify-content-between align-items-md-center">
-                <div>
-                    <h1 class="page-title">Clients</h1>
-                    <div class="page-subtitle">Manage client details and contacts</div>
-                </div>
-                <div class="mt-4 mt-md-0">
-                    <button class="btn-premium" data-bs-toggle="modal" data-bs-target="#createClientModal">
-                        <i class="fa-solid fa-plus"></i> Add Client
-                    </button>
-                </div>
-            </div>
+<x-app-layout containerClass="w-full px-8 py-8">
+    
+    <!-- 1. PAGE HEADER -->
+    <div class="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-8">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900 mb-1 tracking-tight">Clients</h1>
+            <div class="text-sm font-medium text-slate-500">Manage client details and contacts</div>
         </div>
-
-        <div class="content-area dashboard-container">
-            @if(session('success'))
-                <div class="alert alert-success rounded-3 border-0 mb-4" style="background: #ecfdf5; color: #059669; box-shadow: 0 2px 4px rgba(0,0,0,0.05); padding: 1rem 1.5rem; display: flex; align-items: center; gap: 0.75rem;">
-                    <i class="fa-solid fa-circle-check fs-5"></i>
-                    {{ session('success') }}
-                </div>
-            @endif
-
-            <div class="table-card">
-                <div class="table-header-controls">
-                    <h3 class="table-title">Client Directory</h3>
-                </div>
-
-                <div class="table-responsive">
-                    <table class="premium-table">
-                        <thead>
-                            <tr>
-                                <th>Name / Company</th>
-                                <th>Contact Info</th>
-                                <th>Projects</th>
-                                <th class="text-end">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($clients as $client)
-                                <tr>
-                                    <td>
-                                        <div style="font-weight: 600; color: #0f172a; margin-bottom: 2px;">{{ $client->name }}</div>
-                                        <div style="font-size: 0.8rem; color: #64748b;">
-                                            <i class="fa-regular fa-building me-1" style="color: #cbd5e1;"></i> {{ $client->company ?? 'No Company' }}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <div style="font-size: 0.85rem; color: #475569; margin-bottom: 2px;">
-                                            <i class="fa-regular fa-envelope me-1" style="color: #cbd5e1;"></i> {{ $client->email ?? '-' }}
-                                        </div>
-                                        <div style="font-size: 0.85rem; color: #475569;">
-                                            <i class="fa-solid fa-phone me-1" style="color: #cbd5e1;"></i> {{ $client->phone ?? '-' }}
-                                        </div>
-                                    </td>
-                                    <td>
-                                        <span style="background: #f1f5f9; color: #475569; padding: 2px 8px; border-radius: 99px; font-size: 0.8rem; font-weight: 600;">
-                                            {{ $client->projects->count() }} Projects
-                                        </span>
-                                    </td>
-                                    <td class="text-end text-nowrap">
-                                        <button type="button" class="action-btn" title="Edit Client">
-                                            <i class="fa-solid fa-pen"></i>
-                                        </button>
-                                        <form action="{{ route('clients.destroy', $client->id) }}" method="POST" class="d-inline form-delete">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="action-btn delete" title="Delete Client" onclick="return confirm('Are you sure?')">
-                                                <i class="fa-solid fa-trash-can"></i>
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="4" class="text-center py-5">
-                                        <div class="text-muted mb-2">No clients found.</div>
-                                    </td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+        <div>
+            <!-- Reusing Bootstrap modal trigger, styled with Tailwind -->
+            <button data-bs-toggle="modal" data-bs-target="#createClientModal" class="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 text-sm font-medium transition-colors border border-transparent shadow-sm">
+                <i class="fa-solid fa-plus font-light"></i> Add Client
+            </button>
         </div>
     </div>
 
-    <!-- Create Client Modal -->
+    @if(session('success'))
+        <div class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-4 mb-8 flex items-start gap-3 text-sm">
+            <i class="fa-solid fa-circle-check mt-0.5 text-emerald-600"></i>
+            <span class="font-medium">{{ session('success') }}</span>
+        </div>
+    @endif
+
+    <!-- 2. CLIENTS TABLE WORKSPACE -->
+    <div class="bg-white border border-slate-200 mb-12 shadow-sm">
+        
+        <!-- Table Controls -->
+        <div class="px-5 py-3 border-b border-slate-200 flex flex-wrap justify-between items-center gap-4 bg-slate-50">
+            <h3 class="text-sm font-bold text-slate-800">Client Directory</h3>
+        </div>
+
+        <!-- Table Data (Dense) -->
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-sm">
+                <thead>
+                    <tr class="bg-slate-50/50 border-b border-slate-200 text-slate-500">
+                        <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Name / Company</th>
+                        <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Contact Info</th>
+                        <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Projects</th>
+                        <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px] text-right">Actions</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    @forelse($clients as $client)
+                        <tr class="hover:bg-slate-50 transition-colors group">
+                            <td class="px-5 py-3 align-middle">
+                                <div class="font-semibold text-slate-800">{{ $client->name }}</div>
+                                <div class="text-[11px] text-slate-500 flex items-center mt-0.5">
+                                    <i class="fa-regular fa-building mr-1 opacity-70"></i> {{ $client->company ?? 'No Company' }}
+                                </div>
+                            </td>
+                            <td class="px-5 py-3 align-middle">
+                                <div class="text-slate-700 text-xs font-medium mb-1 flex items-center"><i class="fa-regular fa-envelope mr-1.5 opacity-70 text-slate-400 w-3"></i> {{ $client->email ?? '-' }}</div>
+                                <div class="text-slate-700 text-xs font-medium flex items-center"><i class="fa-solid fa-phone mr-1.5 opacity-70 text-slate-400 w-3"></i> {{ $client->phone ?? '-' }}</div>
+                            </td>
+                            <td class="px-5 py-3 align-middle">
+                                <span class="bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded border border-slate-200 text-xs font-medium">
+                                    {{ $client->projects->count() }} Projects
+                                </span>
+                            </td>
+                            <td class="px-5 py-3 align-middle text-right whitespace-nowrap">
+                                <div class="flex items-center justify-end gap-1">
+                                    <!-- We do not have a dedicated edit view, assuming it uses a modal or isn't built yet based on original code, so keeping it disabled or unlinked as original just had # -->
+                                    <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-all" title="Edit Client">
+                                        <i class="fa-solid fa-pen font-light text-sm"></i>
+                                    </button>
+                                    <form action="{{ route('clients.destroy', $client->id) }}" method="POST" class="inline-block m-0 form-delete">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all" title="Delete Client" onclick="return confirm('Are you sure?')">
+                                            <i class="fa-solid fa-trash-can font-light text-sm"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center py-10 bg-white">
+                                <div class="text-slate-500 mb-2 font-medium">No clients found.</div>
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Create Client Modal (Bootstrap + Tailwind styling) -->
     <div class="modal fade" id="createClientModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content" style="border: none; border-radius: 12px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);">
-                <div class="modal-header" style="border-bottom: 1px solid #f1f5f9; padding: 1.5rem;">
-                    <h5 class="modal-title fw-bold" style="color: #0f172a;">Add New Client</h5>
+            <div class="modal-content !border-slate-200 !rounded-none !shadow-lg">
+                <div class="modal-header border-b border-slate-200 !p-5">
+                    <h5 class="modal-title font-bold text-slate-900 tracking-tight text-lg">Add New Client</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form action="{{ route('clients.store') }}" method="POST">
                     @csrf
-                    <div class="modal-body" style="padding: 1.5rem;">
-                        <div class="mb-3">
-                            <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: #475569;">Client Name *</label>
-                            <input type="text" name="name" class="form-control" required style="border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 8px;">
+                    <div class="modal-body !p-5">
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Client Name *</label>
+                            <input type="text" name="name" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500" required>
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: #475569;">Company</label>
-                            <input type="text" name="company" class="form-control" style="border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 8px;">
+                        <div class="mb-4">
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Company</label>
+                            <input type="text" name="company" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500">
                         </div>
-                        <div class="row mb-3">
-                            <div class="col-6">
-                                <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: #475569;">Email</label>
-                                <input type="email" name="email" class="form-control" style="border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 8px;">
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Email</label>
+                                <input type="email" name="email" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500">
                             </div>
-                            <div class="col-6">
-                                <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: #475569;">Phone</label>
-                                <input type="text" name="phone" class="form-control" style="border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 8px;">
+                            <div>
+                                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Phone</label>
+                                <input type="text" name="phone" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500">
                             </div>
                         </div>
                         <div class="mb-2">
-                            <label class="form-label" style="font-size: 0.85rem; font-weight: 600; color: #475569;">Address</label>
-                            <textarea name="address" class="form-control" rows="2" style="border: 1px solid #e2e8f0; background: #f8fafc; border-radius: 8px;"></textarea>
+                            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Address</label>
+                            <textarea name="address" rows="2" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500"></textarea>
                         </div>
                     </div>
-                    <div class="modal-footer" style="border-top: 1px solid #f1f5f9; padding: 1.25rem 1.5rem;">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal" style="font-weight: 600; color: #475569; border: 1px solid #e2e8f0; border-radius: 8px;">Cancel</button>
-                        <button type="submit" class="btn btn-primary" style="font-weight: 600; background: #3b82f6; border: none; border-radius: 8px;">Save Client</button>
+                    <div class="modal-footer border-t border-slate-200 !p-5 bg-slate-50">
+                        <button type="button" class="px-4 py-2 bg-white border border-slate-200 text-slate-600 text-sm font-medium hover:bg-slate-50 transition-colors" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="px-4 py-2 bg-teal-600 border border-transparent text-white text-sm font-medium hover:bg-teal-700 transition-colors">Save Client</button>
                     </div>
                 </form>
             </div>

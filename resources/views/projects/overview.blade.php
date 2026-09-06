@@ -1,11 +1,9 @@
-<x-app-layout>
+<x-app-layout containerClass="w-full px-8 py-8">
     <x-slot name="header">{{ $project->name }}</x-slot>
 
     <style>
         .page-container {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 3rem 1rem 5rem;
+            width: 100%;
         }
         
         .section-header {
@@ -151,7 +149,7 @@
             <div class="meta-strip mt-4">
                 <div class="meta-item">
                     <div class="meta-label">Client</div>
-                    <div class="meta-value">{{ $project->client?->name ?? $project->getRawOriginal('client') ?? 'N/A' }}</div>
+                    <div class="meta-value">{{ $project->clientModel?->name ?? $project->getRawOriginal('client') ?? 'N/A' }}</div>
                 </div>
                 <div class="meta-item">
                     <div class="meta-label">Location</div>

@@ -5,16 +5,19 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'ISES') }} — INOS Survey Estimation System</title>
+        <title>{{ config('app.name', 'ISES') }} — Eco Hydrotech</title>
 
         <!-- Google Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800&display=swap" rel="stylesheet">
 
-        <!-- Bootstrap 5 CSS -->
+        <!-- Bootstrap 5 CSS (kept for legacy views) -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        <!-- FontAwesome -->
+        
+        <!-- Scripts (Tailwind & JS) -->
+        @vite(['resources/css/app.css', 'resources/js/app.js'])
+        <!-- FontAwesome (Using lighter weight approach) -->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
         <!-- Leaflet CSS -->
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -29,227 +32,134 @@
         <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
         <!-- SweetAlert2 -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        
+        <!-- Alpine.js -->
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
 
         <!-- Custom CSS -->
         <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ time() + 1 }}">
+    </head>
+    
+    <body class="bg-slate-50 font-sans antialiased text-slate-800" x-data="{ sidebarOpen: window.innerWidth >= 1024 }">
+        
+        <div class="flex h-screen overflow-hidden">
+            
+            <!-- OVERLAY (Mobile) -->
+            <div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 z-20 bg-slate-900/50 lg:hidden" @click="sidebarOpen = false" style="display: none;"></div>
+
+            <!-- 1. SIDE NAVIGATION -->
+            @unless($hideSidebar ?? false)
+                <aside :class="sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0 lg:w-[4.5rem]'" class="fixed inset-y-0 left-0 z-30 bg-slate-900 text-slate-300 transition-all duration-300 ease-in-out flex flex-col shadow-2xl lg:shadow-none border-r border-slate-800 lg:static relative group">
+                    
+                    <!-- Sidebar Header / Logo -->
+                    <div class="flex items-center h-16 border-b border-slate-800 flex-shrink-0" :class="sidebarOpen ? 'px-4 justify-between' : 'justify-center'">
+                        <a href="{{ url('/') }}" class="flex items-center text-white hover:text-teal-400 transition-colors overflow-hidden whitespace-nowrap" title="Dashboard">
+                            <x-application-logo class="h-6 w-auto text-teal-500 flex-shrink-0" style="color: #14b8a6;" />
+                        </a>
+                        
+                        <!-- Toggle Button Integrated into Sidebar Header -->
+                        <button @click="sidebarOpen = !sidebarOpen" class="hidden lg:flex items-center justify-center w-6 h-6 text-slate-400 hover:text-white transition-colors focus:outline-none" title="Toggle Sidebar">
+                            <i class="fa-solid text-xs" :class="sidebarOpen ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
+                        </button>
+                    </div>
+
+                    <!-- Sidebar Navigation Links -->
+                    <div class="flex-1 overflow-y-auto py-6 flex flex-col gap-1.5 custom-scrollbar" :class="sidebarOpen ? 'px-3' : 'px-2 items-center'">
+                        
+                        <a href="{{ route('projects.index') }}" title="Projects" class="flex items-center px-3 py-2.5 transition-all group {{ request()->is('projects') || request()->is('projects/create') ? 'bg-teal-500/10 text-white border-l-2 border-teal-500' : 'hover:bg-slate-800 hover:text-white text-slate-400 border-l-2 border-transparent' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
+                            <i class="fa-solid fa-layer-group w-5 text-center text-sm transition-colors {{ request()->is('projects') || request()->is('projects/create') ? 'text-teal-400' : 'group-hover:text-slate-300' }}"></i> 
+                            <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Projects</span>
+                        </a>
+                        <a href="{{ route('clients.index') }}" title="Clients" class="flex items-center px-3 py-2.5 transition-all group {{ request()->is('clients*') ? 'bg-teal-500/10 text-white border-l-2 border-teal-500' : 'hover:bg-slate-800 hover:text-white text-slate-400 border-l-2 border-transparent' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
+                            <i class="fa-solid fa-users w-5 text-center text-sm transition-colors {{ request()->is('clients*') ? 'text-teal-400' : 'group-hover:text-slate-300' }}"></i> 
+                            <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Clients</span>
+                        </a>
+                        <a href="{{ route('settings.costs') }}" title="Settings" class="flex items-center px-3 py-2.5 transition-all group {{ request()->is('settings*') ? 'bg-teal-500/10 text-white border-l-2 border-teal-500' : 'hover:bg-slate-800 hover:text-white text-slate-400 border-l-2 border-transparent' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
+                            <i class="fa-solid fa-gear w-5 text-center text-sm transition-colors {{ request()->is('settings*') ? 'text-teal-400' : 'group-hover:text-slate-300' }}"></i> 
+                            <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Settings</span>
+                        </a>
+
+                        <!-- Sub-navigations removed to keep sidebar minimal as requested -->
+
+                    </div>
+
+                    <!-- Sidebar Footer -->
+                    <div class="border-t border-slate-800 flex-shrink-0 flex flex-col">
+                        
+                        <!-- User Info -->
+                        @auth
+                            <div class="p-3 bg-slate-950 flex items-center justify-center transition-all border-t border-slate-800" :class="sidebarOpen ? '' : 'flex-col gap-2'">
+                                <a href="{{ route('profile.edit') }}" title="Profile" class="w-8 h-8 rounded bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700 flex items-center justify-center font-semibold text-xs flex-shrink-0 transition-colors">
+                                    {{ substr(auth()->user()->name, 0, 1) }}
+                                </a>
+                                <div x-show="sidebarOpen" class="flex-1 min-w-0 ml-3">
+                                    <div class="text-sm font-medium text-white truncate">{{ auth()->user()->name }}</div>
+                                </div>
+                                <form method="POST" action="{{ route('logout') }}" title="Logout" :class="sidebarOpen ? 'ml-2' : ''">
+                                    @csrf
+                                    <button type="submit" class="text-slate-500 hover:text-white transition-colors p-1.5 rounded hover:bg-slate-800 focus:outline-none flex items-center justify-center w-8 h-8">
+                                        <i class="fa-solid fa-arrow-right-from-bracket text-sm"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        @endauth
+                    </div>
+                </aside>
+            @endunless
+
+            <!-- 2. MAIN CONTENT AREA -->
+            <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative bg-white">
+                
+                <!-- TOP UTILITY HEADER -->
+                <!-- Removed branding, removed hamburger (handled in sidebar), clean white BG, 1px bottom border -->
+                <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 z-10 flex-shrink-0">
+                    <div class="flex items-center gap-3">
+                        @unless($hideSidebar ?? false)
+                            <!-- Hamburger only visible on mobile -->
+                            <button @click="sidebarOpen = true" class="text-slate-500 hover:text-slate-800 focus:outline-none p-1.5 rounded hover:bg-slate-100 transition-colors lg:hidden mr-2">
+                                <i class="fa-solid fa-bars"></i>
+                            </button>
+                        @else
+                            <!-- If sidebar is completely hidden (e.g. Map View) -->
+                            @if(request()->route('project'))
+                                @php
+                                    $project = request()->route('project');
+                                    $projectId = is_object($project) ? $project->id : $project;
+                                @endphp
+                                <a href="{{ route('projects.show', $projectId) }}" class="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors font-medium text-sm">
+                                    <i class="fa-solid fa-arrow-left text-xs"></i> Back to Project
+                                </a>
+                            @else
+                                <a href="{{ route('projects.index') }}" class="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors font-medium text-sm">
+                                    <i class="fa-solid fa-arrow-left text-xs"></i> Dashboard
+                                </a>
+                            @endif
+                            <div class="h-4 w-px bg-slate-300 mx-3"></div>
+                            <span class="text-sm font-medium text-slate-800 tracking-wide">Map Engine</span>
+                        @endunless
+                        
+                        <!-- Page Title / Breadcrumb (Dynamic) -->
+                        @if(isset($header))
+                            <div class="text-sm font-medium text-slate-600">
+                                {{ $header }}
+                            </div>
+                        @endif
+                    </div>
+                </header>
+
+                <!-- PAGE CONTENT -->
+                <!-- Removed max-w, using w-full px-8 for full fluid layout -->
+                <main class="flex-1 overflow-y-auto overflow-x-hidden bg-slate-50 {{ $containerClass ?? 'w-full' }}">
+                    {{ $slot }}
+                </main>
+            </div>
+        </div>
 
         <style>
-            /* ============================================================
-               DYNAMIC ISLAND NAVBAR
-               ============================================================ */
-            body {
-                padding-top: 70px; /* reserve space for fixed navbar */
-            }
-            /* On the full-screen workspace page, remove the body padding
-               so the workspace fills edge-to-edge */
-            body.workspace-page {
-                padding-top: 0;
-            }
-
-            .ises-navbar {
-                position: fixed;
-                top: 0;
-                left: 0;
-                z-index: 9999;
-                width: 100%;
-                background: rgba(255, 255, 255, 0.98);
-                backdrop-filter: blur(12px);
-                -webkit-backdrop-filter: blur(12px);
-                border-bottom: 1px solid rgba(226, 232, 240, 0.8);
-                padding: 0;
-                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-                transition: all 0.3s ease;
-                height: 64px;
-            }
-            .ises-navbar .container-fluid {
-                height: 100%;
-                padding: 0 1.5rem;
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                max-width: 1400px;
-                margin: 0 auto;
-            }
-            .ises-navbar:hover {
-                box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0,0,0,0.03);
-            }
-            .ises-navbar .navbar-brand {
-                color: #0f172a;
-                font-weight: 800;
-                font-size: 1.1rem;
-                letter-spacing: 0.5px;
-                text-decoration: none;
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            }
-            .ises-navbar .navbar-brand .brand-icon {
-                font-weight: 900;
-                color: #0f172a;
-                background: #0f172a;
-                color: #ffffff;
-                font-size: 1.2rem;
-                width: 32px;
-                height: 32px;
-                border-radius: 50%;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-            }
-            .ises-navbar .nav-link {
-                color: #64748b !important;
-                font-size: 0.85rem;
-                font-weight: 600;
-                padding: 0 16px !important;
-                transition: all 0.2s;
-                text-decoration: none;
-                height: 100%;
-                display: flex;
-                align-items: center;
-                border-bottom: 2px solid transparent;
-            }
-            .ises-navbar .nav-link:hover {
-                color: #0f172a !important;
-                border-bottom-color: #cbd5e1;
-            }
-            .ises-navbar .nav-link.active {
-                color: #0f172a !important;
-                border-bottom-color: #3b82f6;
-            }
-            .ises-navbar .nav-divider {
-                width: 1px;
-                height: 20px;
-                background: rgba(0, 0, 0, 0.08);
-                margin: 0 8px;
-            }
-            .btn-island {
-                background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-                color: #ffffff !important;
-                font-size: 0.85rem;
-                font-weight: 600;
-                border: none;
-                border-radius: 99px;
-                padding: 8px 20px;
-                transition: all 0.2s ease;
-                text-decoration: none;
-                display: inline-flex;
-                align-items: center;
-                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
-            }
-            .btn-island:hover {
-                transform: translateY(-1px);
-                box-shadow: 0 6px 16px rgba(59, 130, 246, 0.35);
-            }
-            .user-avatar {
-                width: 32px;
-                height: 32px;
-                border-radius: 50%;
-                background: #e2e8f0;
-                color: #475569;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                font-size: 0.8rem;
-                font-weight: 700;
-                margin-left: 12px;
-            }
-
-            /* Page header below the navbar (non-workspace pages) */
-            .page-header-bar {
-                background: #fff;
-                border-bottom: 1px solid #eef2f5;
-                padding: 14px 0;
-                margin-bottom: 24px;
-            }
-            .page-header-bar h4 {
-                font-size: 1rem;
-                font-weight: 700;
-                color: #0f172a;
-                margin: 0;
-            }
+            .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+            .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+            .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #334155; border-radius: 20px; }
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #475569; }
         </style>
-    </head>
-    <body class="{{ isset($containerClass) && str_contains((string) ($containerClass ?? ''), 'px-0') ? 'workspace-page' : '' }} bg-light">
-
-        <!-- PREMIUM SAAS NAVBAR -->
-        <nav class="ises-navbar">
-            <div class="container-fluid">
-                <!-- Brand / Logo -->
-                <a class="navbar-brand d-flex align-items-center" href="{{ url('/') }}" style="height: 100%; padding: 0;">
-                    <x-application-logo style="height: 45px; width: auto; color: #0f172a;" />
-                </a>
-
-                <!-- Central Links -->
-                <div class="d-none d-md-flex align-items-center gap-2 h-100">
-                    @if(request()->route('project') && !request()->routeIs('projects.index'))
-                        @php
-                            $project = request()->route('project');
-                            $projectId = is_object($project) ? $project->id : $project;
-                        @endphp
-                        <a class="nav-link" href="{{ route('projects.index') }}">
-                            <i class="fa-solid fa-arrow-left me-2 opacity-75"></i> All Projects
-                        </a>
-                        <div style="width: 1px; height: 24px; background: #e2e8f0; margin: 0 8px;"></div>
-                        <a class="nav-link {{ request()->routeIs('projects.show') ? 'active' : '' }}" href="{{ route('projects.show', $projectId) }}">
-                            <i class="fa-solid fa-chart-pie me-2 opacity-75"></i> Overview
-                        </a>
-                        <a class="nav-link {{ request()->routeIs('projects.surveys.map') ? 'active' : '' }}" href="{{ route('projects.show', $projectId) }}#map">
-                            <i class="fa-solid fa-map-location-dot me-2 opacity-75"></i> Map
-                        </a>
-                        <a class="nav-link {{ request()->routeIs('projects.cost.show') ? 'active' : '' }}" href="{{ route('projects.cost.show', $projectId) }}">
-                            <i class="fa-solid fa-calculator me-2 opacity-75"></i> Costing
-                        </a>
-                        <a class="nav-link {{ request()->routeIs('projects.report.*') ? 'active' : '' }}" href="{{ route('projects.report.preview', $projectId) }}">
-                            <i class="fa-regular fa-file-pdf me-2 opacity-75"></i> Report
-                        </a>
-                    @else
-                        <a class="nav-link {{ request()->is('projects*') ? 'active' : '' }}" href="{{ route('projects.index') }}">
-                            <i class="fa-solid fa-layer-group me-2 opacity-75"></i> Projects
-                        </a>
-                        <a class="nav-link {{ request()->is('clients*') ? 'active' : '' }}" href="{{ route('clients.index') }}">
-                            <i class="fa-solid fa-users me-2 opacity-75"></i> Clients
-                        </a>
-                        <a class="nav-link {{ request()->is('settings*') ? 'active' : '' }}" href="{{ route('settings.costs') }}">
-                            <i class="fa-solid fa-gear me-2 opacity-75"></i> Settings
-                        </a>
-                    @endif
-                </div>
-
-                <!-- Action Button / User -->
-                <div class="d-flex align-items-center">
-                    @auth
-                        <div class="dropdown">
-                            <button class="btn d-flex align-items-center gap-2 p-1" style="border: none; background: transparent; transition: opacity 0.2s;" type="button" data-bs-toggle="dropdown" aria-expanded="false" onmouseover="this.style.opacity='0.8'" onmouseout="this.style.opacity='1'">
-                                <div style="text-align: right; line-height: 1.2;" class="d-none d-sm-block">
-                                    <div style="font-size: 0.85rem; font-weight: 600; color: #0f172a;">{{ auth()->user()->name }}</div>
-                                    <div style="font-size: 0.7rem; color: #64748b;">Administrator</div>
-                                </div>
-                                <div class="user-avatar" style="box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);">
-                                    {{ substr(auth()->user()->name, 0, 1) }}
-                                </div>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end shadow-sm" style="border: 1px solid #e2e8f0; border-radius: 12px; margin-top: 12px; min-width: 200px; padding: 0.5rem;">
-                                <li><a class="dropdown-item py-2" href="{{ route('profile.edit') }}" style="border-radius: 6px;"><i class="fa-regular fa-user me-2 text-muted"></i> Profile</a></li>
-                                <li><hr class="dropdown-divider" style="margin: 0.5rem 0;"></li>
-                                <li>
-                                    <form method="POST" action="{{ route('logout') }}">
-                                        @csrf
-                                        <button type="submit" class="dropdown-item py-2 text-danger" style="border-radius: 6px;"><i class="fa-solid fa-arrow-right-from-bracket me-2"></i> Logout</button>
-                                    </form>
-                                </li>
-                            </ul>
-                        </div>
-                    @endauth
-                </div>
-            </div>
-        </nav>
-
-
-
-        <!-- Page Content -->
-        <main class="{{ $containerClass ?? 'container mb-5' }}">
-            {{ $slot }}
-        </main>
-
     </body>
 </html>
