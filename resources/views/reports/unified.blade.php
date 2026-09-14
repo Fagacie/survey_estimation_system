@@ -70,7 +70,7 @@
             <tr>
                 <td style="width: 50%;">
                     <div class="info-label">Quotation To</div>
-                    <div class="info-value">{{ $project->clientModel?->name ?? $project->getRawOriginal('client') ?? 'Client Name' }}</div>
+                    <div class="info-value">{{ $project->client?->name ?? 'Client Name' }}</div>
                 </td>
                 <td style="width: 50%;">
                     <div class="info-label">Project Details</div>
@@ -228,7 +228,7 @@
                 Prepared By<br><strong>{{ $project->user->name ?? 'System Administrator' }}</strong><br>Date: {{ $generated_at->format('d/m/Y') }}
             </td>
             <td style="padding-left:20px;">
-                Accepted By<br><strong>{{ $project->clientModel?->name ?? $project->getRawOriginal('client') ?? 'Client' }}</strong><br>Date: _______________
+                Accepted By<br><strong>{{ $project->client?->name ?? 'Client' }}</strong><br>Date: _______________
             </td>
         </tr>
     </table>

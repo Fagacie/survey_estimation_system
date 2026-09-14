@@ -54,7 +54,7 @@
                         <div id="panelProject" class="accordion-collapse collapse show">
                             <div class="accordion-body">
                                 <div class="stat-row"><span class="stat-label">Name</span><span class="stat-value">{{ $project->name }}</span></div>
-                                <div class="stat-row"><span class="stat-label">Client</span><span class="stat-value">{{ $project->clientModel?->name ?? $project->getRawOriginal('client') ?? 'N/A' }}</span></div>
+                                <div class="stat-row"><span class="stat-label">Client</span><span class="stat-value">{{ $project->client?->name ?? 'N/A' }}</span></div>
                                 <div class="stat-row"><span class="stat-label">Location</span><span class="stat-value">{{ $project->location ?? 'N/A' }}</span></div>
                             </div>
                         </div>
@@ -236,32 +236,10 @@
                                 <div class="stat-row"><span class="stat-label fw-bold">Total Survey Time</span><span class="stat-value" id="calc-survey-hours" style="color: var(--accent-amber); font-weight: bold;">0.00 hours</span></div>
                                 <div class="stat-row mb-3"><span class="stat-label fw-bold">ESTIMATED SURVEY DAYS</span><span class="stat-value highlight" id="calc-working-days" style="color: var(--accent-amber);">0.00 days</span></div>
 
-                                <!-- PROJECT DURATION ALLOWANCES -->
-                                <div class="mb-2 fw-bold text-uppercase" style="color: var(--sb-text-muted); font-size: 0.75rem; letter-spacing: 0.5px; border-top: 1px solid var(--sb-border); padding-top: 10px;">Project Duration Allowances</div>
-                                <div class="row g-2 mb-3">
-                                    <div class="col-6">
-                                        <label class="form-label-panel mb-0" title="Mobilization and Demobilization Days">MOB/DEMOB (Days)</label>
-                                        <input type="number" step="0.1" id="sbes-mod" class="form-control-panel mt-1" value="{{ $project->mod_demod_days ?? 0 }}" disabled title="Set in Project Overview">
-                                    </div>
-                                    <div class="col-6">
-                                        <label class="form-label-panel mb-0" title="Expected weather standby days">Weather (Days)</label>
-                                        <input type="number" step="0.1" id="sbes-weather" class="form-control-panel mt-1" value="{{ $project->weather_days ?? 0 }}" disabled title="Set in Project Overview">
-                                    </div>
-                                    <div class="col-6">
-                                        <label class="form-label-panel mb-0" title="Patch tests and other survey allowances">Other (Patch Test)</label>
-                                        <input type="number" step="0.1" id="sbes-patch" class="form-control-panel mt-1" value="{{ $project->patch_test_days ?? 0 }}" disabled title="Set in Project Overview">
-                                    </div>
-                                </div>
 
-                                <!-- PROJECT DURATION (OUTPUT) -->
-                                <div class="stat-row" style="border-top: 1px solid var(--sb-border); padding-top: 8px;">
-                                    <span class="stat-label fw-bold">TOTAL PROJECT DURATION</span>
-                                    <span class="stat-value" id="calc-total-days" style="color: var(--accent-rose); font-size: 1.05rem; font-weight: 700;">0.00 days</span>
-                                </div>
                             </div>
                         </div>
                     </div>
-
 
                 </div><!-- end accordion -->
 
@@ -913,11 +891,8 @@
         // TIME ESTIMATION
         // ============================================================
         function calculateTimeEstimation() {
-            let speedKnots  = parseFloat(document.getElementById('sbes-speed').value)   || 0;
-            let workHrs     = parseFloat(document.getElementById('sbes-workhrs').value)  || 0;
-            let weatherDays = parseFloat(document.getElementById('sbes-weather').value)  || 0;
-            let modDays     = parseFloat(document.getElementById('sbes-mod').value)       || 0;
-            let patchDays   = parseFloat(document.getElementById('sbes-patch').value)     || 0;
+            let speedKnots  = parseFloat(document.getElementById('sbes-speed')?.value)   || 0;
+            let workHrs     = parseFloat(document.getElementById('sbes-workhrs')?.value)  || 0;
 
             let totalNm = window.surveyCalcVars ? window.surveyCalcVars.totalNM : 0;
             let workingDays = 0;
@@ -951,11 +926,8 @@
                 if(msHours) msHours.innerText = '0.0';
             }
 
-            // FORMULA: Estimated Project Duration = Survey Days + Weather Allowance + MOB/DEMOB + Other (Patch Test)
-            let totalDays = workingDays + weatherDays + modDays + patchDays;
-            
-            let elTotalDays = document.getElementById('calc-total-days');
-            if(elTotalDays) elTotalDays.innerText = totalDays.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + ' days';
+            // FORMULA: Estimated Project Duration = Survey Days
+            let totalDays = workingDays;
             
             let msDays = document.getElementById('ms-working-days');
             if(msDays) msDays.innerText = totalDays.toLocaleString(undefined, {minimumFractionDigits:1, maximumFractionDigits:1});
@@ -1259,28 +1231,35 @@
 
             let paramsPayload = {
                 sbes: {
-                    survey_speed_knots: document.getElementById('sbes-speed').value || null,
-                    working_hours_per_day: document.getElementById('sbes-workhrs').value || null,
-                    weather_days: document.getElementById('sbes-weather').value || 0,
-                    mod_demod_days: document.getElementById('sbes-mod').value || 0,
-                    patch_test_days: document.getElementById('sbes-patch').value || 0
+                    survey_speed_knots: document.getElementById('sbes-speed')?.value || null,
+                    working_hours_per_day: document.getElementById('sbes-workhrs')?.value || null
                 }
             };
 
             Swal.fire({
-                title: 'Saving Planning...',
-                text: 'Persisting map geometry and parameters...',
-                allowOutsideClick: false,
-                didOpen: () => { Swal.showLoading(); }
-            });
+                title: 'Save Survey Planning?',
+                text: "Warning: Changing survey parameters or geometry may invalidate the current Project Cost Estimation. You will need to recalculate it.",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#0f172a',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: 'Yes, save and recalculate later'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Saving Planning...',
+                        text: 'Persisting map geometry and parameters...',
+                        allowOutsideClick: false,
+                        didOpen: () => { Swal.showLoading(); }
+                    });
 
-            console.log("DEBUG: POSTing to backend -> ", mapPayload);
-            fetch("{{ route('projects.surveys.map.save', [$project->id, $surveyLocation->id]) }}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                },
+                    console.log("DEBUG: POSTing to backend -> ", mapPayload);
+                    fetch("{{ route('projects.surveys.map.save', [$project->id, $surveyLocation->id]) }}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                        },
                 body: JSON.stringify(mapPayload)
             })
             .then(response => {
@@ -1399,6 +1378,8 @@
                 console.error(error);
                 Swal.fire('Error', error.message || 'Failed to save.', 'error');
             });
+            } // close if
+            }); // close then
         }
     </script>
 </x-app-layout>

@@ -21,6 +21,7 @@ class ReportService
     public function compileReportData(Project $project): array
     {
         $project->load([
+            'client',
             'boundaries',
             'surveyLines',
             'surveyLocations.sbesParameters',

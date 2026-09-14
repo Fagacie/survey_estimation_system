@@ -37,7 +37,7 @@ class Project extends Model
      * Get the client that owns the project.
      * Renamed to clientModel to prevent collision with the legacy 'client' string column.
      */
-    public function clientModel()
+    public function client()
     {
         return $this->belongsTo(Client::class, 'client_id');
     }

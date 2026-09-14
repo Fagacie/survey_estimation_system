@@ -149,7 +149,7 @@
             <div class="meta-strip mt-4">
                 <div class="meta-item">
                     <div class="meta-label">Client</div>
-                    <div class="meta-value">{{ $project->clientModel?->name ?? $project->getRawOriginal('client') ?? 'N/A' }}</div>
+                    <div class="meta-value">{{ $project->client?->name ?? 'N/A' }}</div>
                 </div>
                 <div class="meta-item">
                     <div class="meta-label">Location</div>

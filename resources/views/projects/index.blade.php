@@ -129,7 +129,7 @@
                                     </div>
                                 </td>
                                 <td class="px-5 py-3 align-middle">
-                                    <span class="text-slate-700 font-medium text-xs">{{ $project->clientModel?->name ?? $project->getRawOriginal('client') ?? '-' }}</span>
+                                    <span class="text-slate-700 font-medium text-xs">{{ $project->client?->name ?? '-' }}</span>
                                 </td>
                                 <td class="px-5 py-3 align-middle">
                                     @if($project->status === 'draft')

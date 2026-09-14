@@ -77,6 +77,12 @@
                     ];
                 @endphp
 
+                @php
+                    if($groupedItems->isEmpty()) {
+                        $groupedItems = collect(['Miscellaneous' => collect()]);
+                    }
+                @endphp
+
                 @foreach($groupedItems as $category => $items)
                     @php $c = $categoryColors[$category] ?? $categoryColors['General']; @endphp
                     <div class="cost-section bg-white border border-slate-200 mb-8 shadow-sm">
@@ -88,7 +94,7 @@
                         </div>
                         
                         <div class="overflow-x-auto">
-                            <table class="w-full text-left border-collapse text-sm cost-table">
+                            <table class="w-full min-w-[900px] text-left border-collapse text-sm cost-table">
                                 <thead>
                                     <tr class="bg-slate-50/50 border-b border-slate-200 text-slate-500">
                                         <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px] w-[35%]">Description</th>
@@ -312,11 +318,11 @@
                         confirmButton: 'text-white'
                     },
                     confirmButtonText: 'Yes, recalculate'
-                }).then((result) => {
+                }).then((result) => { 
                     if (result.isConfirmed) {
                         // POST to recalculate endpoint
                         let form = document.createElement('form');
-                        form.method = 'POST';
+                        form.method = 'POST';   
                         form.action = '{{ route("projects.cost.recalculate", $project->id) }}';
                         let csrf = document.createElement('input');
                         csrf.type = 'hidden';
