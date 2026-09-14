@@ -177,13 +177,21 @@
                             </div>
                         </div>
 
-                        @if($estimation && $estimation->status === 'Manual')
+                        @if($estimation && $estimation->status === 'Outdated')
+                            <div class="bg-red-50 text-red-800 border border-red-200 px-4 py-3 mb-4 text-sm font-medium flex items-start gap-2 shadow-sm rounded-md">
+                                <i class="fa-solid fa-triangle-exclamation mt-0.5 text-red-600"></i>
+                                <div>
+                                    <strong class="block mb-1">Recalculation Required</strong>
+                                    Map geometry or survey parameters have changed. You must recalculate the costs to synchronize with the new data.
+                                </div>
+                            </div>
+                        @elseif($estimation && $estimation->status === 'Manual')
                             <div class="bg-amber-50 text-amber-800 border border-amber-200 px-3 py-2 mb-4 text-xs font-medium flex items-start gap-2">
                                 <i class="fa-solid fa-pen mt-0.5"></i> Manually edited. Rates may differ from master.
                             </div>
                         @endif
 
-                        <button type="submit" class="w-full flex justify-center items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-3 text-sm font-bold transition-colors">
+                        <button type="submit" class="w-full flex justify-center items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-4 py-3 text-sm font-bold transition-colors @if($estimation && $estimation->status === 'Outdated') opacity-50 cursor-not-allowed pointer-events-none @endif" @if($estimation && $estimation->status === 'Outdated') disabled @endif>
                             <i class="fa-solid fa-floppy-disk font-light"></i> Save Estimation
                         </button>
                     </div>
@@ -206,9 +214,14 @@
     <template id="row-template">
         <tr class="cost-row hover:bg-slate-50 transition-colors group" data-category="Miscellaneous">
             <input type="hidden" name="items[__INDEX__][cost_rate_id]" value="">
-            <input type="hidden" name="items[__INDEX__][category]" value="Miscellaneous">
-            <td class="px-3 py-2">
-                <input type="text" name="items[__INDEX__][description]" class="w-full px-2 py-1.5 bg-transparent border border-transparent hover:border-slate-300 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:bg-white text-sm text-slate-800 transition-all font-medium" placeholder="Custom item..." required>
+            <td class="px-3 py-2 flex flex-col gap-1">
+                <select name="items[__INDEX__][category]" class="w-full px-2 py-1 text-xs bg-slate-100 border border-transparent hover:border-slate-300 focus:border-teal-500 text-slate-600 font-medium transition-all rounded">
+                    <option value="Personnel">Personnel</option>
+                    <option value="Vessel & Equipment">Vessel & Equipment</option>
+                    <option value="Consumables">Consumables</option>
+                    <option value="Miscellaneous" selected>Miscellaneous</option>
+                </select>
+                <input type="text" name="items[__INDEX__][description]" class="w-full px-2 py-1.5 bg-transparent border border-transparent hover:border-slate-300 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:bg-white text-sm text-slate-800 transition-all font-medium" placeholder="Custom item description..." required>
             </td>
             <td class="px-3 py-2">
                 <input type="number" step="0.01" name="items[__INDEX__][days]" class="w-full px-2 py-1.5 bg-transparent border border-transparent hover:border-slate-300 focus:border-teal-500 focus:ring-1 focus:ring-teal-500 focus:bg-white text-sm text-slate-800 transition-all text-right item-days font-medium" value="1" required>
@@ -296,10 +309,10 @@
             btnAdd.addEventListener('click', function() {
                 let html = template.replace(/__INDEX__/g, itemIndex++);
 
-                // Find the last cost-table tbody, or append to the form
-                let lastTbody = document.querySelector('.cost-section:last-of-type .cost-table tbody');
-                if (lastTbody) {
-                    lastTbody.insertAdjacentHTML('beforeend', html);
+                // Find all tbodys inside cost sections and pick the last one
+                let allTbodys = document.querySelectorAll('.cost-section .cost-table tbody');
+                if (allTbodys.length > 0) {
+                    allTbodys[allTbodys.length - 1].insertAdjacentHTML('beforeend', html);
                 }
                 calculateTotals();
             });

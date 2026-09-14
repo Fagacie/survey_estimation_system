@@ -9,7 +9,7 @@ class SurveyLocation extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['project_id', 'name'];
+    protected $fillable = ['project_id', 'name', 'status'];
 
     public function project()
     {

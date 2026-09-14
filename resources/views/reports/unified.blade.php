@@ -147,15 +147,39 @@
     @endif
 
     <div class="section-title">3. Time Estimation</div>
+    
+    <div style="font-size: 8.5pt; font-weight: bold; margin-bottom: 6px; color: #475569;">Execution by Area</div>
+    <table class="cost-table" style="margin-bottom: 12px;">
+        <thead>
+            <tr>
+                <th>Survey Area</th>
+                <th style="text-align: right;">Distance (NM)</th>
+                <th style="text-align: right;">Speed (kn)</th>
+                <th style="text-align: right;">Hrs/Day</th>
+                <th style="text-align: right;">Execution (Days)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($locations_data as $loc)
+            <tr>
+                <td>{{ $loc['name'] }}</td>
+                <td style="text-align: right;">{{ number_format($loc['total_length_nm'], 2) }}</td>
+                <td style="text-align: right;">{{ $loc['survey_speed_knots'] }}</td>
+                <td style="text-align: right;">{{ $loc['working_hours_per_day'] }}</td>
+                <td style="text-align: right; font-weight: bold;">{{ number_format($loc['execution_days'], 2) }}</td>
+            </tr>
+            @endforeach
+            <tr class="sub-row">
+                <td colspan="4" style="text-align: right;">Total Execution Days</td>
+                <td style="text-align: right;">{{ number_format($duration['execution_days'], 2) }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div style="font-size: 8.5pt; font-weight: bold; margin-bottom: 6px; color: #475569;">Global Allowances & Total Duration</div>
     <table class="data-table">
         <tr>
-            <td class="label">Survey Speed</td>
-            <td>{{ $duration['speed_knots'] }} knots (Avg)</td>
-            <td class="label">Working Hours/Day</td>
-            <td>Varies by Area</td>
-        </tr>
-        <tr>
-            <td class="label">Survey Execution</td>
+            <td class="label">Total Execution</td>
             <td>{{ number_format($duration['execution_days'], 2) }} days</td>
             <td class="label">Weather Standby</td>
             <td>{{ $duration['weather_days'] }} days</td>
@@ -163,8 +187,12 @@
         <tr>
             <td class="label">MOB/DEMOB</td>
             <td>{{ $duration['mod_demod_days'] }} days</td>
-            <td class="label" style="background:#0f172a; color:#fff;">EST. DURATION</td>
-            <td style="font-weight:bold; font-size:10pt;">{{ number_format($duration['total_days'], 1) }} DAYS</td>
+            <td class="label">Patch Test</td>
+            <td>{{ $duration['patch_test_days'] }} days</td>
+        </tr>
+        <tr>
+            <td colspan="3" class="label" style="text-align: right; font-size: 9pt;"><strong>Total Project Duration</strong></td>
+            <td style="font-size: 9pt; color: #0f172a;"><strong>{{ number_format($duration['total_days'], 2) }} days</strong></td>
         </tr>
     </table>
 

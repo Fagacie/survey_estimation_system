@@ -24,6 +24,12 @@ class CostEstimationController extends Controller
         $project = auth()->user()->projects()->findOrFail($id);
         $project->load('surveyLocations.sbesParameters', 'boundaries', 'costEstimation.items.costRate');
 
+        // STRICT GATEWAY: Block access if there are no survey locations or if any are 'Pending'
+        if ($project->surveyLocations->isEmpty()) {
+            return redirect()->route('projects.overview', $project->id)
+                ->with('error', 'You must add at least one Survey Area before estimating costs.');
+        }
+
         // Always calculate the latest engineering figures from the centralized service
         $calcResult = $this->costService->calculate($project);
         $duration = $calcResult['duration'];

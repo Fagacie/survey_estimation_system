@@ -76,6 +76,12 @@ class ReportService
 
             $areaM2 = $locBoundaries->sum('area');
             $distNm = $location->sbesParameters->total_distance_nm ?? 0;
+            $speed = $location->sbesParameters->survey_speed_knots ?? 5.0;
+            $hoursPerDay = $location->sbesParameters->working_hours_per_day ?? 8.0;
+            
+            $surveyHours = $speed > 0 ? $distNm / $speed : 0;
+            $executionDays = $hoursPerDay > 0 ? $surveyHours / $hoursPerDay : 0;
+
             $globalDistanceNm += $distNm;
 
             // Map screenshot — use pre-captured image saved from the Map page
@@ -95,7 +101,10 @@ class ReportService
                 'main_line_count'    => $mainLinesCount,
                 'cross_line_count'   => $crossLinesCount,
                 'total_length_nm'    => $distNm,
-                'survey_speed_knots' => $location->sbesParameters->survey_speed_knots ?? 'N/A',
+                'survey_speed_knots' => $speed,
+                'working_hours_per_day' => $hoursPerDay,
+                'survey_hours'       => round($surveyHours, 2),
+                'execution_days'     => round($executionDays, 2),
                 'map_screenshot'     => $screenshotUrl,
             ];
         }

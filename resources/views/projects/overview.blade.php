@@ -140,6 +140,11 @@
                 {{ session('success') }}
             </div>
         @endif
+        @if(session('error'))
+            <div class="alert alert-danger rounded-0 border-0 bg-light text-danger mb-5" style="border-left: 3px solid #ef4444 !important;">
+                {{ session('error') }}
+            </div>
+        @endif
 
         <!-- 1. PROJECT HEADER -->
         <div class="mb-5">
@@ -176,7 +181,14 @@
                     @foreach($project->surveyLocations as $location)
                         <li class="clean-list-item">
                             <div>
-                                <div style="font-weight: 500; color: #111; font-size: 0.95rem;">{{ $location->name }}</div>
+                                <div class="d-flex align-items-center gap-2">
+                                    <div style="font-weight: 500; color: #111; font-size: 0.95rem;">{{ $location->name }}</div>
+                                    @if($location->status === 'Mapped')
+                                        <span class="badge bg-success bg-opacity-10 text-success border border-success" style="font-size: 0.65rem; font-weight: 600; padding: 0.35em 0.65em;">Mapped</span>
+                                    @else
+                                        <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary" style="font-size: 0.65rem; font-weight: 600; padding: 0.35em 0.65em;">Pending</span>
+                                    @endif
+                                </div>
                                 <div style="font-size: 0.8rem; color: #888; margin-top: 2px;">Added {{ $location->created_at->format('M d, Y') }}</div>
                             </div>
                             <div class="d-flex align-items-center gap-4">
@@ -231,7 +243,6 @@
         <!-- 4. ACTION -->
         @if($project->surveyLocations->count() > 0)
             <div class="text-center mt-5 pt-5 border-top" style="border-color: #eaeaea !important;">
-                <p class="text-muted mb-4" style="font-size: 0.95rem;">All areas mapped and allowances configured?</p>
                 <a href="{{ route('projects.cost.show', $project->id) }}" class="btn-dark-minimal">
                     Proceed to Cost Estimation
                 </a>

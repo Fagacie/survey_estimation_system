@@ -74,11 +74,15 @@ class SurveyLocationController extends Controller
         $this->authorizeSurveyLocation($project, $surveyLocation);
 
         // Simple direct save for sbes parameters linked to this survey location
+        \Log::info("saveParameters HIT for location: " . $surveyLocation->id);
+        
         $data = $request->validate([
             'sbes' => 'required|array',
             'sbes.survey_speed_knots' => 'nullable|numeric',
             'sbes.working_hours_per_day' => 'nullable|numeric',
         ]);
+
+        \Log::info("saveParameters validation passed: " . json_encode($data));
 
         $surveyLocation->sbesParameters()->updateOrCreate(
             ['survey_location_id' => $surveyLocation->id],
@@ -88,6 +92,20 @@ class SurveyLocationController extends Controller
                 'working_hours_per_day' => $data['sbes']['working_hours_per_day'] ?? null,
             ]
         );
+
+        \Log::info("sbesParameters updated, current fillable: " . json_encode($surveyLocation->getFillable()));
+        \Log::info("Current status before update: " . $surveyLocation->status);
+
+        // Update SurveyLocation status
+        $updated = $surveyLocation->update(['status' => 'Mapped']);
+        
+        \Log::info("SurveyLocation update returned: " . ($updated ? 'true' : 'false'));
+        \Log::info("New status after update: " . $surveyLocation->fresh()->status);
+
+        // Invalidate Cost Estimation
+        if ($project->costEstimation) {
+            $project->costEstimation->update(['status' => 'Outdated']);
+        }
 
         return response()->json([
             'success' => true,

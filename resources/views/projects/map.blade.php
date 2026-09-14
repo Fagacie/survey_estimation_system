@@ -1237,23 +1237,13 @@
             };
 
             Swal.fire({
-                title: 'Save Survey Planning?',
-                text: "Warning: Changing survey parameters or geometry may invalidate the current Project Cost Estimation. You will need to recalculate it.",
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#0f172a',
-                cancelButtonColor: '#64748b',
-                confirmButtonText: 'Yes, save and recalculate later'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    Swal.fire({
-                        title: 'Saving Planning...',
-                        text: 'Persisting map geometry and parameters...',
-                        allowOutsideClick: false,
-                        didOpen: () => { Swal.showLoading(); }
-                    });
+                title: 'Saving Planning...',
+                text: 'Saving map geometry and parameters...',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
 
-                    console.log("DEBUG: POSTing to backend -> ", mapPayload);
+            console.log("DEBUG: POSTing to backend -> ", mapPayload);
                     fetch("{{ route('projects.surveys.map.save', [$project->id, $surveyLocation->id]) }}", {
                         method: 'POST',
                         headers: {
@@ -1284,102 +1274,52 @@
             .then(paramsResult => {
                 if (!paramsResult.success) throw new Error("Parameter save failed: " + (paramsResult.message || ''));
 
-                // Step 3: Capture map screenshot and upload
-                Swal.update({ text: 'Capturing map screenshot for report...' });
-                
+                // Success message immediately
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Saved',
+                    text: 'Survey planning data saved successfully.',
+                    timer: 1500,
+                    showConfirmButton: false
+                });
+
+                // Take screenshot silently in background before redirect
                 let mapEl = document.getElementById('map');
-                
-                // 3a. Hide all Leaflet UI controls before capture
                 let controlContainer = mapEl.querySelector('.leaflet-control-container');
                 if (controlContainer) controlContainer.style.display = 'none';
                 
-                // Also hide any custom floating UI overlays on the map
                 let floatingOverlays = document.querySelectorAll('.workspace-map > .position-absolute');
                 floatingOverlays.forEach(el => el.style.display = 'none');
                 
-                // 3b. Fit map to survey data bounds with padding for a clean centered view
-                let allBounds = L.latLngBounds([]);
-                let hasBounds = false;
-                
-                boundaryLayerGroup.eachLayer(l => {
-                    if (l.getBounds) { allBounds.extend(l.getBounds()); hasBounds = true; }
-                });
-                mainLineLayerGroup.eachLayer(l => {
-                    if (l.getBounds) { allBounds.extend(l.getBounds()); hasBounds = true; }
-                });
-                crossLineLayerGroup.eachLayer(l => {
-                    if (l.getBounds) { allBounds.extend(l.getBounds()); hasBounds = true; }
-                });
-                drawnItems.eachLayer(l => {
-                    if (l.getBounds) { allBounds.extend(l.getBounds()); hasBounds = true; }
-                    else if (l.getLatLng) { allBounds.extend(l.getLatLng()); hasBounds = true; }
-                });
-                
-                if (hasBounds && allBounds.isValid()) {
-                    map.fitBounds(allBounds, { padding: [60, 60], animate: false });
-                }
-                
-                // 3c. Wait for tiles to fully load before capturing
-                return new Promise((resolve) => {
-                    let tileTimeout = setTimeout(resolve, 2000); // max wait 2s
-                    
-                    function onTilesLoaded() {
-                        clearTimeout(tileTimeout);
-                        // Small extra delay for final render
-                        setTimeout(resolve, 500);
-                    }
-                    
-                    if (activeBaseLayer && activeBaseLayer.isLoading && activeBaseLayer.isLoading()) {
-                        activeBaseLayer.once('load', onTilesLoaded);
-                    } else {
-                        // Tiles already loaded, just wait a beat
-                        clearTimeout(tileTimeout);
-                        setTimeout(resolve, 800);
-                    }
-                }).then(() => {
-                    // dom-to-image handles Leaflet's 3D transforms and SVG layers perfectly
-                    return domtoimage.toPng(mapEl, {
-                        width: mapEl.offsetWidth,
-                        height: mapEl.offsetHeight,
-                        style: {
-                            transform: 'none' // Ensure no parent scaling throws off the capture
-                        }
-                    });
+                domtoimage.toPng(mapEl, {
+                    width: mapEl.offsetWidth,
+                    height: mapEl.offsetHeight,
+                    style: { transform: 'none' }
                 }).then(dataUrl => {
-                    // 3d. Restore controls immediately after capture
                     if (controlContainer) controlContainer.style.display = '';
                     floatingOverlays.forEach(el => el.style.display = '');
                     
-                    return fetch("{{ route('projects.surveys.map.screenshot', [$project->id, $surveyLocation->id]) }}", {
+                    fetch("{{ route('projects.surveys.map.screenshot', [$project->id, $surveyLocation->id]) }}", {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
                             'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                         },
                         body: JSON.stringify({ image: dataUrl })
+                    }).finally(() => {
+                        window.location.href = window.location.pathname + '?t=' + new Date().getTime();
                     });
-                }).then(r => r.json()).then(screenshotResult => {
-                    console.log("DEBUG: Screenshot result:", screenshotResult);
-                }).catch(ssErr => {
-                    // Restore controls even on error
+                }).catch(err => {
                     if (controlContainer) controlContainer.style.display = '';
                     floatingOverlays.forEach(el => el.style.display = '');
-                    console.warn("Screenshot capture failed (non-blocking):", ssErr);
+                    // Redirect anyway even if screenshot fails
+                    window.location.href = window.location.pathname + '?t=' + new Date().getTime();
                 });
             })
-            .then(() => {
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Saved',
-                    text: 'Planning data and map screenshot saved successfully.'
-                }).then(() => window.location.href = window.location.pathname + '?t=' + new Date().getTime());
-            })
             .catch(error => {
-                console.error(error);
-                Swal.fire('Error', error.message || 'Failed to save.', 'error');
+                console.error("Save Error:", error);
+                Swal.fire('Error', error.message || 'Failed to save map data.', 'error');
             });
-            } // close if
-            }); // close then
         }
     </script>
 </x-app-layout>
