@@ -58,6 +58,14 @@ class Project extends Model
         return $this->boundaries()->first();
     }
 
+    /**
+     * Get the project's billing milestones.
+     */
+    public function billingMilestones()
+    {
+        return $this->hasMany(BillingMilestone::class);
+    }
+
     public function surveyLines()
     {
         return $this->hasMany(SurveyLine::class);
@@ -82,5 +90,10 @@ class Project extends Model
     public function costEstimation()
     {
         return $this->hasOne(CostEstimation::class);
+    }
+
+    public function invoices()
+    {
+        return $this->hasMany(Invoice::class);
     }
 }

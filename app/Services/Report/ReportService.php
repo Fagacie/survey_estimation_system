@@ -109,8 +109,15 @@ class ReportService
             ];
         }
 
+        // Company settings
+        $company = \App\Models\CompanySetting::getMany([
+            'company_name', 'company_registration', 'company_address',
+            'company_phone', 'company_email', 'company_logo',
+        ]);
+
         return [
             'project'          => $project,
+            'company'          => $company,
             'duration'         => $calcResult['duration'],
             'estimation'       => $estimation,
             'cost_items'       => $costItems,

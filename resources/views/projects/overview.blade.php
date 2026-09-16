@@ -243,9 +243,14 @@
         <!-- 4. ACTION -->
         @if($project->surveyLocations->count() > 0)
             <div class="text-center mt-5 pt-5 border-top" style="border-color: #eaeaea !important;">
-                <a href="{{ route('projects.cost.show', $project->id) }}" class="btn-dark-minimal">
-                    Proceed to Cost Estimation
-                </a>
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{{ route('projects.cost.show', $project->id) }}" class="btn-dark-minimal">
+                        Proceed to Cost Estimation
+                    </a>
+                    <a href="{{ route('projects.invoices.create', $project->id) }}" class="btn-outline-dark-minimal" style="padding: 0.75rem 2rem; font-size: 0.95rem;">
+                        <i class="fa-solid fa-file-invoice me-1"></i> Create Invoice
+                    </a>
+                </div>
             </div>
         @endif
     </div>

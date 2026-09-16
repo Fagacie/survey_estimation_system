@@ -32,9 +32,6 @@
         <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
         <!-- SweetAlert2 -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-        
-        <!-- Alpine.js -->
-        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.1/dist/cdn.min.js"></script>
 
         <!-- Custom CSS -->
         <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ time() + 1 }}">
@@ -73,6 +70,10 @@
                         <a href="{{ route('clients.index') }}" title="Clients" class="flex items-center px-3 py-2.5 transition-all group {{ request()->is('clients*') ? 'bg-teal-500/10 text-white border-l-2 border-teal-500' : 'hover:bg-slate-800 hover:text-white text-slate-400 border-l-2 border-transparent' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
                             <i class="fa-solid fa-users w-5 text-center text-sm transition-colors {{ request()->is('clients*') ? 'text-teal-400' : 'group-hover:text-slate-300' }}"></i> 
                             <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Clients</span>
+                        </a>
+                        <a href="{{ route('invoices.index') }}" title="Invoices" class="flex items-center px-3 py-2.5 transition-all group {{ request()->is('invoices*') ? 'bg-teal-500/10 text-white border-l-2 border-teal-500' : 'hover:bg-slate-800 hover:text-white text-slate-400 border-l-2 border-transparent' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
+                            <i class="fa-solid fa-file-invoice w-5 text-center text-sm transition-colors {{ request()->is('invoices*') ? 'text-teal-400' : 'group-hover:text-slate-300' }}"></i> 
+                            <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Invoices</span>
                         </a>
                         <a href="{{ route('settings.costs') }}" title="Settings" class="flex items-center px-3 py-2.5 transition-all group {{ request()->is('settings*') ? 'bg-teal-500/10 text-white border-l-2 border-teal-500' : 'hover:bg-slate-800 hover:text-white text-slate-400 border-l-2 border-transparent' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
                             <i class="fa-solid fa-gear w-5 text-center text-sm transition-colors {{ request()->is('settings*') ? 'text-teal-400' : 'group-hover:text-slate-300' }}"></i> 
