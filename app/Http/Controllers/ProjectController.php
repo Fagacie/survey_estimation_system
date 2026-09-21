@@ -18,8 +18,10 @@ class ProjectController extends Controller
             $search = $request->search;
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('project_code', 'like', "%{$search}%")
-                  ->orWhere('client', 'like', "%{$search}%");
+                  ->orWhere('number', 'like', "%{$search}%")
+                  ->orWhereHas('client', function($q2) use ($search) {
+                      $q2->where('company_name', 'like', "%{$search}%");
+                  });
             });
         }
         
@@ -36,6 +38,8 @@ class ProjectController extends Controller
             'draft' => auth()->user()->projects()->where('status', 'draft')->count(),
             'planned' => auth()->user()->projects()->where('status', 'planned')->count(),
             'completed' => auth()->user()->projects()->where('status', 'completed')->count(),
+            'mapped' => auth()->user()->projects()->whereHas('surveyLocations', fn ($q) => $q->where('status', 'Mapped'))->count(),
+            'quotations' => auth()->user()->projects()->has('lineItems')->count(),
         ];
 
         // (SurveyStatistic table was removed, distance is calculated live in the map UI)
@@ -43,7 +47,7 @@ class ProjectController extends Controller
 
         $projectsWithLines = auth()->user()->projects()->has('surveyLines')->count();
         $projectsAwaitingPlanning = auth()->user()->projects()->doesntHave('boundaries')->count();
-        $projectsWithCost = auth()->user()->projects()->has('costEstimation')->count();
+        $projectsWithCost = auth()->user()->projects()->has('lineItems')->count();
 
         $overview = [
             'total_distance' => round($totalDistance, 2),
@@ -57,7 +61,7 @@ class ProjectController extends Controller
         $missingBoundariesCount = auth()->user()->projects()->where('status', '!=', 'completed')->doesntHave('boundaries')->count();
         $missingLinesCount = auth()->user()->projects()->where('status', '!=', 'completed')->has('boundaries')->doesntHave('surveyLines')->count();
         $missingParamsCount = 0; // Removed this metric for now
-        $missingCostCount = auth()->user()->projects()->where('status', '!=', 'completed')->doesntHave('costEstimation')->count();
+        $missingCostCount = auth()->user()->projects()->where('status', '!=', 'completed')->doesntHave('lineItems')->count();
 
         $attention = [
             'missing_boundaries' => $missingBoundariesCount,
@@ -74,8 +78,7 @@ class ProjectController extends Controller
      */
     public function create()
     {
-        $clients = \App\Models\Client::orderBy('name')->get();
-        return view('projects.create', compact('clients'));
+        return view('projects.create');
     }
 
     /**
@@ -84,24 +87,54 @@ class ProjectController extends Controller
     public function store(\App\Http\Requests\StoreProjectRequest $request)
     {
         $validated = $request->validated();
+        $userId = auth()->id();
 
-        if (empty($validated['project_code'])) {
-            // Auto-generate project code, checking soft-deleted records to avoid unique constraint violations
-            $lastProject = \App\Models\Project::withTrashed()->latest('id')->first();
-            $nextId = $lastProject ? $lastProject->id + 1 : 1;
-            
-            $code = 'PRJ-' . str_pad($nextId, 5, '0', STR_PAD_LEFT);
-            while (\App\Models\Project::withTrashed()->where('project_code', $code)->exists()) {
-                $nextId++;
-                $code = 'PRJ-' . str_pad($nextId, 5, '0', STR_PAD_LEFT);
-            }
-            $validated['project_code'] = $code;
+        // Client Creation / Retrieval
+        $clientId = null;
+        if (!empty($validated['client_name'])) {
+            $client = \App\Models\Client::firstOrCreate(
+                ['company_name' => $validated['client_name']],
+                ['client_address' => $validated['client_address'] ?? null, 'created_by' => $userId]
+            );
+            $clientId = $client->client_Id;
         }
 
-        $validated['user_id'] = auth()->id();
-        $project = \App\Models\Project::create($validated);
+        if (empty($validated['number'])) {
+            // Auto-generate project code
+            $lastProject = \App\Models\Project::withTrashed()->latest('project_Id')->first();
+            $nextId = $lastProject ? $lastProject->project_Id + 1 : 1;
+            
+            $code = 'EHS/PRJ/' . date('y') . '/' . str_pad($nextId, 3, '0', STR_PAD_LEFT);
+            while (\App\Models\Project::withTrashed()->where('number', $code)->exists()) {
+                $nextId++;
+                $code = 'EHS/PRJ/' . date('y') . '/' . str_pad($nextId, 3, '0', STR_PAD_LEFT);
+            }
+            $validated['number'] = $code;
+        }
 
-        return redirect()->route('projects.show', $project->id)->with('success', 'Project created successfully. You can now plan your survey lines.');
+        $project = \App\Models\Project::create([
+            'client_Id'  => $clientId,
+            'number'     => $validated['number'],
+            'name'       => $validated['name'],
+            'period'     => $validated['period'] ?? null,
+            'pic_name'   => $validated['pic_name'] ?? null,
+            'pic_no'     => $validated['pic_no'] ?? null,
+            'status'     => $validated['status'] ?? 'draft',
+            'project_category' => $validated['project_category'] ?? 'survey',
+            'survey_type' => $validated['survey_type'] ?? 'sbes',
+            'created_by' => $userId,
+        ]);
+
+        // Redirection Logic
+        if (($validated['project_category'] ?? 'survey') === 'modeling') {
+            return redirect()->route('projects.coming_soon')->with('success', 'Project created successfully. Modeling workflow is coming soon.');
+        }
+
+        if (($validated['survey_type'] ?? 'sbes') !== 'sbes') {
+            return redirect()->route('projects.coming_soon')->with('success', 'Project created successfully. This survey workflow is coming soon.');
+        }
+
+        return redirect()->route('projects.show', $project->project_Id)->with('success', 'Project created successfully. You can now plan your survey lines.');
     }
 
     /**
@@ -139,8 +172,7 @@ class ProjectController extends Controller
     public function edit($id)
     {
         $project = auth()->user()->projects()->findOrFail($id);
-        $clients = \App\Models\Client::orderBy('name')->get();
-        return view('projects.edit', compact('project', 'clients'));
+        return view('projects.edit', compact('project'));
     }
 
     /**
@@ -148,10 +180,33 @@ class ProjectController extends Controller
      */
     public function update(\App\Http\Requests\UpdateProjectRequest $request, string $id)
     {
-        $project = auth()->user()->projects()->findOrFail($id);
-        $project->update($request->validated());
+        $project = \App\Models\Project::where('project_Id', $id)->firstOrFail();
+        $validated = $request->validated();
 
-        return redirect()->route('projects.index')->with('success', 'Project updated successfully.');
+        $userId = auth()->id();
+
+        // Client Creation / Retrieval
+        $clientId = null;
+        if (!empty($validated['client_name'])) {
+            $client = \App\Models\Client::firstOrCreate(
+                ['company_name' => $validated['client_name']],
+                ['client_address' => $validated['client_address'] ?? null, 'created_by' => $userId]
+            );
+            $clientId = $client->client_Id;
+        }
+
+        $project->update([
+            'client_Id'  => $clientId,
+            'number'     => $validated['number'] ?? $project->number,
+            'name'       => $validated['name'],
+            'period'     => $validated['period'] ?? null,
+            'pic_name'   => $validated['pic_name'] ?? null,
+            'pic_no'     => $validated['pic_no'] ?? null,
+            'status'     => $validated['status'] ?? 'draft',
+            'updated_by' => $userId,
+        ]);
+
+        return redirect()->route('projects.show', $project->project_Id)->with('success', 'Project updated successfully.');
     }
 
     /**

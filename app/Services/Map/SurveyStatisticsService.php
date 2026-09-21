@@ -38,7 +38,7 @@ class SurveyStatisticsService
         $surveyLocation->sbesParameters()->updateOrCreate(
             ['survey_location_id' => $surveyLocation->id],
             [
-                'project_id' => $project->id,
+                'project_id' => $project->project_Id,
                 'total_distance_nm' => round($totalDistanceNM, 4)
             ]
         );
@@ -55,3 +55,4 @@ class SurveyStatisticsService
         ];
     }
 }
+

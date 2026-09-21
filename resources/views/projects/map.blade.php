@@ -220,7 +220,7 @@
                             <div class="accordion-body">
                                 
                                 <!-- SURVEY CALCULATION PARAMETERS -->
-                                <div class="mb-2 fw-bold text-uppercase" style="color: var(--sb-text-muted); font-size: 0.75rem; letter-spacing: 0.5px;">Survey Calculation Parameters</div>
+                                <div class="mb-2 fw-bold text-uppercase" style="color: var(--sb-text-muted); font-size: 0.75rem; letter-spacing: 0.5px;">SBES Calculation Parameters</div>
                                 <div class="row g-2 mb-3">
                                     <div class="col-6">
                                         <label class="form-label-panel mb-0" title="Survey vessel speed">Survey Speed (knots)</label>
@@ -229,6 +229,19 @@
                                     <div class="col-6">
                                         <label class="form-label-panel mb-0" title="Operating hours per day">Working Hrs / Day</label>
                                         <input type="number" step="0.1" id="sbes-workhrs" class="form-control-panel mt-1" value="{{ $surveyLocation->sbesParameters?->working_hours_per_day ?? '8.0' }}" onchange="calculateTimeEstimation()">
+                                    </div>
+                                    <div class="col-12 mt-3 fw-bold text-uppercase" style="color: var(--sb-text-muted); font-size: 0.75rem; letter-spacing: 0.5px;">Global Allowances</div>
+                                    <div class="col-4 mt-2">
+                                        <label class="form-label-panel mb-0" title="Weather Standby Days">Weather</label>
+                                        <input type="number" step="0.1" id="project-weather" class="form-control-panel mt-1" value="{{ $project->weather_days ?? '0' }}" onchange="calculateTimeEstimation()">
+                                    </div>
+                                    <div class="col-4 mt-2">
+                                        <label class="form-label-panel mb-0" title="Mobilization / Demobilization">Mob / Demob</label>
+                                        <input type="number" step="0.1" id="project-mob" class="form-control-panel mt-1" value="{{ $project->mod_demod_days ?? '0' }}" onchange="calculateTimeEstimation()">
+                                    </div>
+                                    <div class="col-4 mt-2">
+                                        <label class="form-label-panel mb-0" title="Patch Test Days">Patch Test</label>
+                                        <input type="number" step="0.1" id="project-patch" class="form-control-panel mt-1" value="{{ $project->patch_test_days ?? '0' }}" onchange="calculateTimeEstimation()">
                                     </div>
                                 </div>
                                 
@@ -247,11 +260,14 @@
             </div><!-- end sidebar-content -->
 
             <!-- STICKY BOTTOM ACTIONS -->
-            <div class="p-3 border-t border-slate-200 bg-slate-50 flex flex-col gap-2 flex-shrink-0" style="border-top: 1px solid var(--sb-border);">
-                <button class="btn-save-planning-trigger w-full flex justify-center items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded text-sm font-semibold transition-colors">
+            <div class="p-3 border-t border-slate-200 bg-slate-50 flex-shrink-0" style="border-top: 1px solid var(--sb-border);">
+                <button class="btn-save-planning-trigger btn btn-dark w-100 mb-2 fw-bold d-flex justify-content-center align-items-center gap-2">
                     <i class="fa-solid fa-floppy-disk"></i> Save Map Planning
                 </button>
-                <a href="{{ route('projects.show', $project->id) }}" class="w-full flex justify-center items-center bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 px-4 py-2.5 rounded text-sm font-medium transition-colors no-underline">
+                <a href="{{ route('projects.report.preview', $project->project_Id) }}" class="btn btn-outline-secondary w-100 mb-2 fw-semibold d-flex justify-content-center align-items-center gap-2">
+                    <i class="fa-solid fa-file-lines"></i> Survey Report
+                </a>
+                <a href="{{ route('projects.show', $project->project_Id) }}" class="btn btn-outline-secondary w-100 fw-semibold d-flex justify-content-center align-items-center gap-2">
                     Exit Map
                 </a>
             </div>
@@ -602,8 +618,8 @@
             @endif
 
             let ts = new Date().getTime();
-            console.log("DEBUG: Fetching lines on page load! URL=", `{{ route('projects.surveys.lines', [$project->id, $surveyLocation->id]) }}?t=${ts}`);
-            fetch(`{{ route('projects.surveys.lines', [$project->id, $surveyLocation->id]) }}?t=${ts}`)
+            console.log("DEBUG: Fetching lines on page load! URL=", `{{ route('projects.surveys.lines', [$project->project_Id, $surveyLocation->id]) }}?t=${ts}`);
+            fetch(`{{ route('projects.surveys.lines', [$project->project_Id, $surveyLocation->id]) }}?t=${ts}`)
                 .then(response => {
                     console.log("DEBUG: Fetch lines response received", response);
                     return response.json();
@@ -893,6 +909,9 @@
         function calculateTimeEstimation() {
             let speedKnots  = parseFloat(document.getElementById('sbes-speed')?.value)   || 0;
             let workHrs     = parseFloat(document.getElementById('sbes-workhrs')?.value)  || 0;
+            let weatherDays = parseFloat(document.getElementById('project-weather')?.value) || 0;
+            let mobDays     = parseFloat(document.getElementById('project-mob')?.value)     || 0;
+            let patchDays   = parseFloat(document.getElementById('project-patch')?.value)     || 0;
 
             let totalNm = window.surveyCalcVars ? window.surveyCalcVars.totalNM : 0;
             let workingDays = 0;
@@ -906,31 +925,27 @@
                 if(elHours) elHours.innerText = surveyHours.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + ' hours';
                 
                 let msHours = document.getElementById('ms-survey-hours');
-                if(msHours) msHours.innerText = surveyHours.toLocaleString(undefined, {minimumFractionDigits:1, maximumFractionDigits:1});
+                if(msHours) msHours.innerText = surveyHours.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
 
                 if (workHrs > 0) {
-                    // FORMULA: Survey Days = Total Survey Time (hours) / Working Hours Per Day (Exact fractional days)
+                    // FORMULA: Survey Execution Days = Total Survey Time (hours) / Working Hours Per Day (Exact fractional days)
                     workingDays = surveyHours / workHrs;
-                    let elWorkingDays = document.getElementById('calc-working-days');
-                    if(elWorkingDays) elWorkingDays.innerText = workingDays.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + ' days';
-                } else {
-                    let elWorkingDays = document.getElementById('calc-working-days');
-                    if(elWorkingDays) elWorkingDays.innerText = '0.00 days';
                 }
             } else {
                 let elHours = document.getElementById('calc-survey-hours');
                 if(elHours) elHours.innerText = '0.00 hours';
-                let elWorkingDays = document.getElementById('calc-working-days');
-                if(elWorkingDays) elWorkingDays.innerText = '0.00 days';
                 let msHours = document.getElementById('ms-survey-hours');
-                if(msHours) msHours.innerText = '0.0';
+                if(msHours) msHours.innerText = '0.00';
             }
 
-            // FORMULA: Estimated Project Duration = Survey Days
-            let totalDays = workingDays;
+            // FORMULA: Estimated Project Duration = Survey Days + global allowances
+            let totalDays = workingDays + weatherDays + mobDays + patchDays;
             
+            let elWorkingDays = document.getElementById('calc-working-days');
+            if(elWorkingDays) elWorkingDays.innerText = totalDays.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + ' days';
+
             let msDays = document.getElementById('ms-working-days');
-            if(msDays) msDays.innerText = totalDays.toLocaleString(undefined, {minimumFractionDigits:1, maximumFractionDigits:1});
+            if(msDays) msDays.innerText = totalDays.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2});
         }
 
         // ============================================================
@@ -1130,7 +1145,7 @@
             let dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(fc));
             let dl = document.createElement('a');
             dl.setAttribute("href", dataStr);
-            dl.setAttribute("download", "survey_" + {{ $project->id }} + "_" + Date.now() + ".geojson");
+            dl.setAttribute("download", "survey_" + {{ $project->project_Id }} + "_" + Date.now() + ".geojson");
             document.body.appendChild(dl);
             dl.click();
             dl.remove();
@@ -1233,6 +1248,11 @@
                 sbes: {
                     survey_speed_knots: document.getElementById('sbes-speed')?.value || null,
                     working_hours_per_day: document.getElementById('sbes-workhrs')?.value || null
+                },
+                allowances: {
+                    weather_days: document.getElementById('project-weather')?.value || 0,
+                    mod_demod_days: document.getElementById('project-mob')?.value || 0,
+                    patch_test_days: document.getElementById('project-patch')?.value || 0
                 }
             };
 
@@ -1244,7 +1264,7 @@
             });
 
             console.log("DEBUG: POSTing to backend -> ", mapPayload);
-                    fetch("{{ route('projects.surveys.map.save', [$project->id, $surveyLocation->id]) }}", {
+                    fetch("{{ route('projects.surveys.map.save', [$project->project_Id, $surveyLocation->id]) }}", {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -1261,7 +1281,7 @@
                 if (!mapResult.success) throw new Error("Map save failed: " + (mapResult.message || ''));
 
                 console.log("DEBUG: POSTing Parameters to backend -> ", paramsPayload);
-                return fetch("{{ route('projects.surveys.parameters.store', [$project->id, $surveyLocation->id]) }}", {
+                return fetch("{{ route('projects.surveys.parameters.store', [$project->project_Id, $surveyLocation->id]) }}", {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -1299,7 +1319,7 @@
                     if (controlContainer) controlContainer.style.display = '';
                     floatingOverlays.forEach(el => el.style.display = '');
                     
-                    fetch("{{ route('projects.surveys.map.screenshot', [$project->id, $surveyLocation->id]) }}", {
+                    fetch("{{ route('projects.surveys.map.screenshot', [$project->project_Id, $surveyLocation->id]) }}", {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

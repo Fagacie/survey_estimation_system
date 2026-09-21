@@ -13,7 +13,7 @@ class SurveyParameterService
     {
         if (isset($data['sbes'])) {
             $project->sbesParameters()->updateOrCreate(
-                ['project_id' => $project->id],
+                ['project_Id' => $project->id],
                 $data['sbes']
             );
         }
@@ -41,3 +41,4 @@ class SurveyParameterService
         }
     }
 }
+

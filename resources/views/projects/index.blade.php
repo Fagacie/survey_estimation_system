@@ -1,14 +1,17 @@
 <x-app-layout containerClass="w-full px-8 py-8">
     
     <!-- 1. PAGE HEADER -->
-    <div class="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-8">
+    <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-5 pb-4 border-b border-slate-200">
         <div>
-            <h1 class="text-2xl font-bold text-slate-900 mb-1 tracking-tight">Dashboard</h1>
-            <div class="text-sm font-medium text-slate-500">Your survey estimation projects</div>
+            <h1 class="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
+                Project Control Room 
+                <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full border border-slate-200 tracking-widest uppercase font-semibold">{{ now()->format('d M Y') }}</span>
+            </h1>
+            <div class="text-xs font-medium text-slate-500 mt-1">Manage survey planning, mapping data, and quotations.</div>
         </div>
         <div>
-            <a href="{{ route('projects.create') }}" class="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-5 py-2.5 text-sm font-medium transition-colors border border-transparent shadow-sm">
-                <i class="fa-solid fa-plus font-light"></i> New Project
+            <a href="{{ route('projects.create') }}" class="inline-flex items-center gap-1.5 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md text-xs font-semibold transition-colors shadow-sm">
+                <i class="fa-solid fa-plus"></i> New Project
             </a>
         </div>
     </div>
@@ -20,31 +23,54 @@
         </div>
     @endif
 
-    <!-- 2. CORE METRICS (Reduced padding, strong typography, unified borders) -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
-        <div class="bg-white border border-slate-200 p-4 flex flex-col justify-between h-20 shadow-sm">
-            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Projects</div>
-            <div class="text-2xl font-semibold text-slate-800">{{ $metrics['total'] }}</div>
+    <!-- 2. CORE METRICS (Ultra-compact strip) -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+        <div class="bg-white border border-slate-200/80 rounded-lg p-3 flex items-center gap-3 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] hover:border-indigo-200 transition-colors">
+            <div class="w-9 h-9 rounded-md bg-indigo-50 flex items-center justify-center shrink-0 border border-indigo-100/50">
+                <i class="fa-solid fa-layer-group text-indigo-600 text-sm"></i>
+            </div>
+            <div>
+                <div class="text-[9px] font-bold tracking-[0.1em] text-slate-400 uppercase mb-0.5">Total Projects</div>
+                <div class="text-xl font-extrabold text-slate-800 leading-none">{{ $metrics['total'] }}</div>
+            </div>
         </div>
-        <div class="bg-white border border-slate-200 p-4 flex flex-col justify-between h-20 shadow-sm">
-            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Drafts</div>
-            <div class="text-2xl font-semibold text-slate-800">{{ $metrics['draft'] }}</div>
+        
+        <div class="bg-white border border-slate-200/80 rounded-lg p-3 flex items-center gap-3 shadow-[0_2px_10px_-3px_rgba(245,158,11,0.05)] hover:border-amber-200 transition-colors">
+            <div class="w-9 h-9 rounded-md bg-amber-50 flex items-center justify-center shrink-0 border border-amber-100/50">
+                <i class="fa-regular fa-pen-to-square text-amber-500 text-sm"></i>
+            </div>
+            <div>
+                <div class="text-[9px] font-bold tracking-[0.1em] text-slate-400 uppercase mb-0.5">Drafts</div>
+                <div class="text-xl font-extrabold text-slate-800 leading-none">{{ $metrics['draft'] }}</div>
+            </div>
         </div>
-        <div class="bg-white border border-slate-200 p-4 flex flex-col justify-between h-20 shadow-sm">
-            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">In Progress</div>
-            <div class="text-2xl font-semibold text-teal-700">{{ $metrics['planned'] }}</div>
+
+        <div class="bg-white border border-slate-200/80 rounded-lg p-3 flex items-center gap-3 shadow-[0_2px_10px_-3px_rgba(20,184,166,0.05)] hover:border-teal-200 transition-colors">
+            <div class="w-9 h-9 rounded-md bg-teal-50 flex items-center justify-center shrink-0 border border-teal-100/50">
+                <i class="fa-solid fa-map-location-dot text-teal-600 text-sm"></i>
+            </div>
+            <div>
+                <div class="text-[9px] font-bold tracking-[0.1em] text-slate-400 uppercase mb-0.5">Mapped Areas</div>
+                <div class="text-xl font-extrabold text-slate-800 leading-none">{{ $metrics['mapped'] }}</div>
+            </div>
         </div>
-        <div class="bg-white border border-slate-200 p-4 flex flex-col justify-between h-20 shadow-sm">
-            <div class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Completed</div>
-            <div class="text-2xl font-semibold text-emerald-700">{{ $metrics['completed'] }}</div>
+
+        <div class="bg-white border border-slate-200/80 rounded-lg p-3 flex items-center gap-3 shadow-[0_2px_10px_-3px_rgba(16,185,129,0.05)] hover:border-emerald-200 transition-colors">
+            <div class="w-9 h-9 rounded-md bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100/50">
+                <i class="fa-solid fa-file-invoice-dollar text-emerald-600 text-sm"></i>
+            </div>
+            <div>
+                <div class="text-[9px] font-bold tracking-[0.1em] text-slate-400 uppercase mb-0.5">Quotations</div>
+                <div class="text-xl font-extrabold text-slate-800 leading-none">{{ $metrics['quotations'] }}</div>
+            </div>
         </div>
     </div>
 
     @if($metrics['total'] > 0)
         <!-- 3. ATTENTION REQUIRED (Operational Alerts - Scannable text list) -->
         @if($attention['missing_boundaries'] > 0 || $attention['missing_lines'] > 0 || $attention['missing_parameters'] > 0 || $attention['missing_cost'] > 0)
-            <div class="bg-white border border-slate-200 mb-8 shadow-sm">
-                <div class="px-5 py-3 border-b border-slate-200 bg-amber-50/30 flex items-center gap-2">
+            <div class="dashboard-attention bg-white mb-8 shadow-sm">
+                <div class="dashboard-attention-header px-5 py-3 flex items-center gap-2">
                     <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm"></i>
                     <h3 class="text-sm font-bold text-slate-800">Action Required</h3>
                 </div>
@@ -80,11 +106,11 @@
         @endif
 
         <!-- 4. PROJECTS TABLE WORKSPACE -->
-        <div class="bg-white border border-slate-200 mb-12 shadow-sm">
+        <div class="dashboard-table bg-white mb-12 shadow-sm">
             
             <!-- Table Controls -->
-            <div class="px-5 py-3 border-b border-slate-200 flex flex-wrap justify-between items-center gap-4 bg-slate-50">
-                <h3 class="text-sm font-bold text-slate-800">Recent Projects</h3>
+            <div class="dashboard-table-toolbar px-5 py-4 flex flex-wrap justify-between items-center gap-4">
+                <div><h3 class="text-base font-bold text-slate-800 mb-1">Survey portfolio</h3><p class="text-xs text-slate-500 m-0">Latest projects and their current handoff point</p></div>
                 
                 <form method="GET" action="{{ route('projects.index') }}" class="flex flex-wrap gap-2">
                     <input type="text" name="search" class="w-64 px-3 py-1.5 bg-white border border-slate-200 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500" placeholder="Search projects..." value="{{ request('search') }}">
@@ -119,17 +145,17 @@
                             <tr class="hover:bg-slate-50 transition-colors group">
                                 <td class="px-5 py-3 align-middle">
                                     <span class="font-mono text-slate-500 text-xs">
-                                        {{ $project->project_code ?? 'PRJ-' . str_pad($project->id, 4, '0', STR_PAD_LEFT) }}
+                                        {{ $project->number ?? 'PRJ-' . str_pad($project->project_Id, 4, '0', STR_PAD_LEFT) }}
                                     </span>
                                 </td>
                                 <td class="px-5 py-3 align-middle">
                                     <div class="font-semibold text-slate-800">{{ $project->name }}</div>
                                     <div class="text-[11px] text-slate-500 flex items-center mt-0.5">
-                                        <i class="fa-solid fa-location-dot mr-1 opacity-70"></i> {{ $project->location ?? 'Unspecified' }}
+                                        <i class="fa-regular fa-clock mr-1 opacity-70"></i> {{ $project->period ?? 'Unspecified' }}
                                     </div>
                                 </td>
                                 <td class="px-5 py-3 align-middle">
-                                    <span class="text-slate-700 font-medium text-xs">{{ $project->client?->name ?? '-' }}</span>
+                                    <span class="text-slate-700 font-medium text-xs">{{ $project->client?->company_name ?? '-' }}</span>
                                 </td>
                                 <td class="px-5 py-3 align-middle">
                                     @if($project->status === 'draft')
@@ -151,13 +177,13 @@
                                 </td>
                                 <td class="px-5 py-3 align-middle text-right whitespace-nowrap">
                                     <div class="flex items-center justify-end gap-1">
-                                        <a href="{{ route('projects.show', $project->id) }}" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-teal-600 hover:bg-teal-50 transition-all" title="View">
+                                        <a href="{{ route('projects.show', $project->project_Id) }}" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-teal-600 hover:bg-teal-50 transition-all" title="View">
                                             <i class="fa-solid fa-arrow-right font-light"></i>
                                         </a>
-                                        <a href="{{ route('projects.edit', $project->id) }}" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-all" title="Edit">
+                                        <a href="{{ route('projects.edit', $project->project_Id) }}" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-all" title="Edit">
                                             <i class="fa-solid fa-pen font-light text-sm"></i>
                                         </a>
-                                        <form action="{{ route('projects.destroy', $project->id) }}" method="POST" class="inline-block form-delete m-0">
+                                        <form action="{{ route('projects.destroy', $project->project_Id) }}" method="POST" class="inline-block form-delete m-0">
                                             @csrf
                                             @method('DELETE')
                                             <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all btn-delete-action" title="Delete">

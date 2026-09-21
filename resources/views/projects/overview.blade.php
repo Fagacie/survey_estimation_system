@@ -149,16 +149,16 @@
         <!-- 1. PROJECT HEADER -->
         <div class="mb-5">
             <h1 class="display-5 fw-bold mb-1" style="color: #111; letter-spacing: -0.03em;">{{ $project->name }}</h1>
-            <div class="text-muted" style="font-size: 0.95rem;">Project Code: {{ $project->project_code ?? 'N/A' }}</div>
+            <div class="text-muted" style="font-size: 0.95rem;">Project Code: {{ $project->number ?? 'N/A' }}</div>
             
             <div class="meta-strip mt-4">
                 <div class="meta-item">
                     <div class="meta-label">Client</div>
-                    <div class="meta-value">{{ $project->client?->name ?? 'N/A' }}</div>
+                    <div class="meta-value">{{ $project->client?->company_name ?? 'N/A' }}</div>
                 </div>
                 <div class="meta-item">
-                    <div class="meta-label">Location</div>
-                    <div class="meta-value">{{ $project->location ?? 'N/A' }}</div>
+                    <div class="meta-label">Period</div>
+                    <div class="meta-value">{{ $project->period ?? 'N/A' }}</div>
                 </div>
                 <div class="meta-item">
                     <div class="meta-label">Created</div>
@@ -192,10 +192,10 @@
                                 <div style="font-size: 0.8rem; color: #888; margin-top: 2px;">Added {{ $location->created_at->format('M d, Y') }}</div>
                             </div>
                             <div class="d-flex align-items-center gap-4">
-                                <a href="{{ route('projects.surveys.map', [$project->id, $location->id]) }}" class="text-decoration-none" style="color: #111; font-size: 0.85rem; font-weight: 500;">
+                                <a href="{{ route('projects.surveys.map', [$project->project_Id, $location->id]) }}" class="text-decoration-none" style="color: #111; font-size: 0.85rem; font-weight: 500;">
                                     Open Map &rarr;
                                 </a>
-                                <form action="{{ route('projects.surveys.destroy', [$project->id, $location->id]) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this survey area?');">
+                                <form action="{{ route('projects.surveys.destroy', [$project->project_Id, $location->id]) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this survey area?');">
                                     @csrf
                                     @method('DELETE')
                                     <button type="submit" style="background:none; border:none; color:#ef4444; font-size: 0.85rem; padding:0;">Remove</button>
@@ -214,52 +214,23 @@
             @endif
         </div>
 
-        <!-- 3. PROJECT SETTINGS (GLOBAL ALLOWANCES) -->
-        <div class="mb-5">
-            <div class="section-header">2. Global Allowances</div>
-            <form action="{{ route('projects.updateAllowances', $project->id) }}" method="POST">
-                @csrf
-                @method('PUT')
-                <div class="allowance-grid">
-                    <div>
-                        <label class="input-label">Weather Standby (Days)</label>
-                        <input type="number" step="0.1" name="weather_days" class="minimal-input" value="{{ $project->weather_days }}" placeholder="0.0">
-                    </div>
-                    <div>
-                        <label class="input-label">MOB/DEMOB (Days)</label>
-                        <input type="number" step="0.1" name="mod_demod_days" class="minimal-input" value="{{ $project->mod_demod_days }}" placeholder="0.0">
-                    </div>
-                    <div>
-                        <label class="input-label">Patch Test (Days)</label>
-                        <input type="number" step="0.1" name="patch_test_days" class="minimal-input" value="{{ $project->patch_test_days }}" placeholder="0.0">
-                    </div>
-                </div>
-                <div class="text-end mt-3">
-                    <button type="submit" class="btn-outline-dark-minimal">Save Settings</button>
-                </div>
-            </form>
-        </div>
-
-        <!-- 4. ACTION -->
+        <!-- 3. ACTION -->
         @if($project->surveyLocations->count() > 0)
             <div class="text-center mt-5 pt-5 border-top" style="border-color: #eaeaea !important;">
                 <div class="d-flex justify-content-center gap-3">
-                    <a href="{{ route('projects.cost.show', $project->id) }}" class="btn-dark-minimal">
-                        Proceed to Cost Estimation
+                    <a href="{{ route('quotation.index', ['project_id' => $project->project_Id]) }}" class="btn-dark-minimal">
+                        Proceed to Quotation
                     </a>
-                    <a href="{{ route('projects.invoices.create', $project->id) }}" class="btn-outline-dark-minimal" style="padding: 0.75rem 2rem; font-size: 0.95rem;">
-                        <i class="fa-solid fa-file-invoice me-1"></i> Create Invoice
-                    </a>
+                    <a href="{{ route('projects.report.preview', $project->project_Id) }}" class="btn-outline-dark-minimal">View Survey Report</a>
                 </div>
             </div>
         @endif
     </div>
 
-    <!-- New Survey Area Modal -->
     <div class="modal fade" id="newSurveyModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-0 border-0" style="box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
-                <form action="{{ route('projects.surveys.store', $project->id) }}" method="POST">
+                <form action="{{ route('projects.surveys.store', $project->project_Id) }}" method="POST">
                     @csrf
                     <div class="modal-header border-bottom-0 pb-0 pt-4 px-4 d-flex justify-content-between align-items-center">
                         <h5 class="modal-title fw-bold" style="font-size: 1.1rem; letter-spacing: -0.02em;">New Survey Area</h5>

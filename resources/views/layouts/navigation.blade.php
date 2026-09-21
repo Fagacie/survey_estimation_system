@@ -17,15 +17,6 @@
                         {{ __('Projects') }}
                     </x-nav-link>
 
-                    <x-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')" 
-                                style="border-bottom-width: 2px; padding-top: 2px; font-weight: 500; font-size: 0.95rem; color: {{ request()->routeIs('clients.*') ? '#0f172a' : '#64748b' }}; border-color: {{ request()->routeIs('clients.*') ? '#3b82f6' : 'transparent' }};">
-                        {{ __('Clients') }}
-                    </x-nav-link>
-                    
-                    <x-nav-link :href="route('settings.costs')" :active="request()->routeIs('settings.*')"
-                                style="border-bottom-width: 2px; padding-top: 2px; font-weight: 500; font-size: 0.95rem; color: {{ request()->routeIs('settings.*') ? '#0f172a' : '#64748b' }}; border-color: {{ request()->routeIs('settings.*') ? '#3b82f6' : 'transparent' }};">
-                        {{ __('Settings') }}
-                    </x-nav-link>
                 </div>
             </div>
 
@@ -85,12 +76,6 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('projects.*')" style="color: {{ request()->routeIs('projects.*') ? '#3b82f6' : '#475569' }};">
                 {{ __('Projects') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('clients.index')" :active="request()->routeIs('clients.*')" style="color: {{ request()->routeIs('clients.*') ? '#3b82f6' : '#475569' }};">
-                {{ __('Clients') }}
-            </x-responsive-nav-link>
-            <x-responsive-nav-link :href="route('settings.costs')" :active="request()->routeIs('settings.*')" style="color: {{ request()->routeIs('settings.*') ? '#3b82f6' : '#475569' }};">
-                {{ __('Settings') }}
             </x-responsive-nav-link>
         </div>
 

@@ -80,6 +80,10 @@ class SurveyLocationController extends Controller
             'sbes' => 'required|array',
             'sbes.survey_speed_knots' => 'nullable|numeric',
             'sbes.working_hours_per_day' => 'nullable|numeric',
+            'allowances' => 'nullable|array',
+            'allowances.weather_days' => 'nullable|numeric|min:0',
+            'allowances.mod_demod_days' => 'nullable|numeric|min:0',
+            'allowances.patch_test_days' => 'nullable|numeric|min:0',
         ]);
 
         \Log::info("saveParameters validation passed: " . json_encode($data));
@@ -87,11 +91,17 @@ class SurveyLocationController extends Controller
         $surveyLocation->sbesParameters()->updateOrCreate(
             ['survey_location_id' => $surveyLocation->id],
             [
-                'project_id' => $project->id, // For legacy fallback if needed
+                'project_id' => $project->project_Id, // Support both just in case
                 'survey_speed_knots' => $data['sbes']['survey_speed_knots'] ?? null,
                 'working_hours_per_day' => $data['sbes']['working_hours_per_day'] ?? null,
             ]
         );
+
+        $project->update([
+            'weather_days' => $data['allowances']['weather_days'] ?? $project->weather_days ?? 0,
+            'mod_demod_days' => $data['allowances']['mod_demod_days'] ?? $project->mod_demod_days ?? 0,
+            'patch_test_days' => $data['allowances']['patch_test_days'] ?? $project->patch_test_days ?? 0,
+        ]);
 
         \Log::info("sbesParameters updated, current fillable: " . json_encode($surveyLocation->getFillable()));
         \Log::info("Current status before update: " . $surveyLocation->status);
@@ -101,11 +111,6 @@ class SurveyLocationController extends Controller
         
         \Log::info("SurveyLocation update returned: " . ($updated ? 'true' : 'false'));
         \Log::info("New status after update: " . $surveyLocation->fresh()->status);
-
-        // Invalidate Cost Estimation
-        if ($project->costEstimation) {
-            $project->costEstimation->update(['status' => 'Outdated']);
-        }
 
         return response()->json([
             'success' => true,
@@ -158,6 +163,11 @@ class SurveyLocationController extends Controller
             ->get()
             ->map(function ($line) {
                 $geom = is_string($line->geometry) ? json_decode($line->geometry, true) : $line->geometry;
+                $lineType = $line->type ?? 'main';
+
+                if (is_array($geom) && isset($geom['properties']['line_type'])) {
+                    $lineType = $geom['properties']['line_type'];
+                }
                 
                 // If the geometry field incorrectly contains a full GeoJSON Feature, extract the actual geometry
                 // Do this recursively in case it was double or triple nested by old bugs
@@ -173,7 +183,7 @@ class SurveyLocationController extends Controller
                     'type' => 'Feature',
                     'geometry' => $geom,
                     'properties' => [
-                        'line_type' => $line->type ?? 'main'
+                        'line_type' => $lineType
                     ]
                 ];
             })
@@ -187,14 +197,14 @@ class SurveyLocationController extends Controller
 
     private function authorizeProject(Project $project): void
     {
-        abort_unless((int) $project->user_id === (int) auth()->id(), 404);
+        abort_unless((int) $project->created_by === (int) auth()->id(), 404);
     }
 
     private function authorizeSurveyLocation(Project $project, SurveyLocation $surveyLocation): void
     {
         $this->authorizeProject($project);
 
-        abort_unless((int) $surveyLocation->project_id === (int) $project->id, 404);
+        abort_unless((int) $surveyLocation->project_id === (int) $project->project_Id, 404);
     }
 
     private function canonicalLineType(?string $type): ?string
@@ -202,3 +212,4 @@ class SurveyLocationController extends Controller
         return in_array($type, ['main', 'cross', 'reference', 'adcp_marker'], true) ? $type : null;
     }
 }
+

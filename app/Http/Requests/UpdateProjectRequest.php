@@ -14,13 +14,13 @@ class UpdateProjectRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'project_code' => 'required|string|max:50|unique:projects,project_code,' . $this->route('project'),
+            'number' => 'nullable|string|max:255',
             'name' => 'required|string|max:255',
-            'client_id' => 'nullable|exists:clients,id',
-            'location' => 'nullable|string|max:255',
-            'start_date' => 'nullable|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'description' => 'nullable|string',
+            'client_name' => 'nullable|string|max:255',
+            'client_address' => 'nullable|string|max:1000',
+            'pic_name' => 'nullable|string|max:255',
+            'pic_no' => 'nullable|string|max:255',
+            'period' => 'nullable|string|max:255',
             'status' => 'required|in:draft,planned,completed',
         ];
     }

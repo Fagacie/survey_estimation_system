@@ -8,6 +8,7 @@ class SurveyGenerationSetting extends Model
 {
     protected $fillable = [
         'project_id',
+        'survey_location_id',
         'line_spacing',
         'orientation_angle',
         'margin',
@@ -25,6 +26,12 @@ class SurveyGenerationSetting extends Model
 
     public function project()
     {
-        return $this->belongsTo(Project::class);
+        return $this->belongsTo(Project::class, 'project_id', 'project_Id');
+    }
+
+    public function surveyLocation()
+    {
+        return $this->belongsTo(SurveyLocation::class, 'survey_location_id');
     }
 }
+

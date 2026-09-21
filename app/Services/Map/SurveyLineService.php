@@ -47,3 +47,4 @@ class SurveyLineService
         return in_array($type, ['main', 'cross', 'reference', 'adcp_marker'], true) ? $type : null;
     }
 }
+

@@ -2,98 +2,67 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Project extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
+
+    protected $table = 'projects';
+    protected $primaryKey = 'project_Id';
 
     protected $fillable = [
-        'project_code',
+        'number',
         'name',
-        'client', // Legacy field
-        'client_id',
         'location',
+        'status',
+        'description',
         'start_date',
         'end_date',
-        'description',
+        'period',
+        'client_Id',
+        'pic_name',
+        'pic_no',
         'weather_days',
         'mod_demod_days',
         'patch_test_days',
-        'status',
-        'user_id',
+        'created_by',
+        'updated_by',
     ];
 
-    /**
-     * Get the user that owns the project.
-     */
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
+    protected $casts = [
+        'start_date' => 'date',
+        'end_date' => 'date',
+        'weather_days' => 'float',
+        'mod_demod_days' => 'float',
+        'patch_test_days' => 'float',
+    ];
 
-    /**
-     * Get the client that owns the project.
-     * Renamed to clientModel to prevent collision with the legacy 'client' string column.
-     */
     public function client()
     {
-        return $this->belongsTo(Client::class, 'client_id');
+        return $this->belongsTo(Client::class, 'client_Id', 'client_Id');
     }
 
-    /**
-     * Get the project's boundaries.
-     */
-    public function boundaries()
+    public function lineItems()
     {
-        return $this->hasMany(ProjectBoundary::class);
-    }
-
-    /**
-     * Helper to get the first boundary for backwards compatibility if needed
-     */
-    public function getBoundaryAttribute()
-    {
-        return $this->boundaries()->first();
-    }
-
-    /**
-     * Get the project's billing milestones.
-     */
-    public function billingMilestones()
-    {
-        return $this->hasMany(BillingMilestone::class);
-    }
-
-    public function surveyLines()
-    {
-        return $this->hasMany(SurveyLine::class);
+        return $this->hasMany(QtInvoice::class, 'project_Id', 'project_Id');
     }
 
     public function surveyLocations()
     {
-        return $this->hasMany(SurveyLocation::class);
+        return $this->hasMany(SurveyLocation::class, 'project_id', 'project_Id');
     }
 
-    public function sbesParameters()
+    public function surveyLines()
     {
-        return $this->hasOne(SbesParameter::class);
-    }
-    
-    // We keep these helper methods because some views (like dashboard) might still reference them
-    public function surveyGenerationSetting()
-    {
-        return $this->hasOne(SurveyGenerationSetting::class);
+        return $this->hasMany(SurveyLine::class, 'project_id', 'project_Id');
     }
 
-    public function costEstimation()
+    public function boundaries()
     {
-        return $this->hasOne(CostEstimation::class);
+        return $this->hasMany(ProjectBoundary::class, 'project_id', 'project_Id');
     }
 
-    public function invoices()
-    {
-        return $this->hasMany(Invoice::class);
-    }
 }

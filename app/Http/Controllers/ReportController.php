@@ -2,62 +2,81 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\Report\ReportService;
+use App\Models\Project;
+use App\Services\Calculation\ProjectEstimationService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Response;
 
 class ReportController extends Controller
 {
-    protected ReportService $reportService;
-
-    public function __construct(ReportService $reportService)
+    public function __construct(private ProjectEstimationService $estimationService)
     {
-        $this->reportService = $reportService;
     }
-
-    public function downloadReport(string $id)
-    {
-        set_time_limit(300); // Allow up to 5 minutes for report generation
-        $project = auth()->user()->projects()->findOrFail($id);
-        $data = $this->reportService->compileReportData($project);
-
-        $this->reportService->trackReport($project, 'full_report', $data['report_number']);
-
-        $pdf = Pdf::loadView('reports.unified', $data);
-        $pdf->setPaper('A4', 'portrait');
-
-        $filename = 'Survey_Proposal_' . $project->project_code . '_' . now()->format('Ymd') . '.pdf';
-        return $pdf->download($filename);
-    }
-
-
 
     public function preview(string $id)
     {
-        set_time_limit(300); // Allow up to 5 minutes for report generation
-        $project = auth()->user()->projects()->findOrFail($id);
-        $data = $this->reportService->compileReportData($project);
-        return view('reports.unified', $data);
+        $data = $this->compile($id);
+        
+        if (request()->has('raw')) {
+            return view('reports.survey', $data);
+        }
+        
+        return view('reports.preview', $data);
     }
 
-    public function captureMap(string $projectId, string $locationId)
+    public function download(string $id): Response
     {
-        $project = \App\Models\Project::findOrFail($projectId);
-        $location = $project->surveyLocations()->findOrFail($locationId);
+        $data = $this->compile($id);
+        $pdf = Pdf::loadView('reports.survey', $data)->setPaper('A4', 'portrait');
 
-        $boundaries = [
-            'type' => 'FeatureCollection',
-            'features' => $location->boundaries->map(fn($b) => $b->geometry)->toArray()
-        ];
-        
-        $lines = [
-            'type' => 'FeatureCollection',
-            'features' => $location->surveyLines->map(fn($l) => $l->geometry)->toArray()
-        ];
+        $safeProjectNumber = str_replace(['/', '\\'], '-', $data['project']->number ?? 'Unknown');
+        return $pdf->download('Survey_Report_'.$safeProjectNumber.'_'.now()->format('Ymd').'.pdf');
+    }
 
-        return view('reports.map-capture', [
-            'location' => $location,
-            'boundaries' => json_encode($boundaries),
-            'lines' => json_encode($lines)
-        ]);
+    private function compile(string $id): array
+    {
+        $project = auth()->user()->projects()
+            ->with(['client', 'surveyLocations.boundaries', 'surveyLocations.surveyLines', 'surveyLocations.sbesParameters'])
+            ->findOrFail($id);
+
+        $locations = $project->surveyLocations->map(function ($location) {
+            $distance = (float) ($location->sbesParameters?->total_distance_nm ?? 0);
+            $speed = (float) ($location->sbesParameters?->survey_speed_knots ?? 0);
+            $hoursPerDay = (float) ($location->sbesParameters?->working_hours_per_day ?? 8.0);
+            if ($hoursPerDay <= 0) {
+                $hoursPerDay = 8.0;
+            }
+            $hours = $speed > 0 ? $distance / $speed : 0;
+
+            return [
+                'name' => $location->name,
+                'distance_nm' => $distance,
+                'survey_hours' => $hours,
+                'execution_days' => $hoursPerDay > 0 ? $hours / $hoursPerDay : 0,
+                'line_count' => $location->surveyLines->count(),
+                'main_line_count' => $location->surveyLines->where('type', 'main')->count(),
+                'cross_line_count' => $location->surveyLines->where('type', 'cross')->count(),
+                'boundary_count' => $location->boundaries->count(),
+                'boundary_area' => $location->boundaries->sum('area'),
+                'screenshot' => $this->screenshotData($location->id),
+            ];
+        })->values();
+
+        return [
+            'project' => $project,
+            'locations' => $locations,
+            'duration' => $this->estimationService->calculate($project),
+            'generated_at' => now(),
+        ];
+    }
+
+    private function screenshotData(int $locationId): ?string
+    {
+        $path = storage_path('app/public/maps/'.$locationId.'.png');
+        if (!is_file($path)) {
+            return null;
+        }
+
+        return 'data:image/png;base64,'.base64_encode(file_get_contents($path));
     }
 }

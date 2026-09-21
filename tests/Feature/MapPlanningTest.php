@@ -17,18 +17,18 @@ class MapPlanningTest extends TestCase
     {
         $user = User::factory()->create();
         $project = Project::create([
-            'user_id' => $user->id,
-            'project_code' => 'TEST-MAP',
+            'created_by' => $user->id,
+            'number' => 'TEST-MAP',
             'name' => 'Map Test',
             'status' => 'draft',
         ]);
         $surveyLocation = SurveyLocation::create([
-            'project_id' => $project->id,
+            'project_id' => $project->project_Id,
             'name' => 'Area A',
         ]);
 
         SurveyLine::create([
-            'project_id' => $project->id,
+            'project_id' => $project->project_Id,
             'survey_location_id' => $surveyLocation->id,
             'type' => 'generated',
             'line_number' => 1,
@@ -59,13 +59,13 @@ class MapPlanningTest extends TestCase
     {
         $user = User::factory()->create();
         $project = Project::create([
-            'user_id' => $user->id,
-            'project_code' => 'TEST-SAVE',
+            'created_by' => $user->id,
+            'number' => 'TEST-SAVE',
             'name' => 'Save Test',
             'status' => 'draft',
         ]);
         $surveyLocation = SurveyLocation::create([
-            'project_id' => $project->id,
+            'project_id' => $project->project_Id,
             'name' => 'Area A',
         ]);
 
@@ -99,7 +99,7 @@ class MapPlanningTest extends TestCase
 
         $response->assertOk()->assertJsonPath('success', true);
         $this->assertDatabaseHas('survey_lines', [
-            'project_id' => $project->id,
+            'project_id' => $project->project_Id,
             'survey_location_id' => $surveyLocation->id,
             'type' => 'main',
         ]);
