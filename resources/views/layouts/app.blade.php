@@ -75,9 +75,28 @@
                         </a>
 
 
-                        <!-- Sub-navigations removed to keep sidebar minimal as requested -->
+                        <!-- Items Management Navigation Dropdown -->
+                        <div x-data="{ itemsOpen: false }" class="w-full">
+                            <button @click="itemsOpen = !itemsOpen" title="Items Database" class="ises-nav-link flex items-center justify-between px-3 py-2.5 transition-all group w-full focus:outline-none" :class="sidebarOpen ? '' : 'justify-center'">
+                                <div class="flex items-center gap-3">
+                                    <i class="fa-solid fa-database w-5 text-center text-sm"></i>
+                                    <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Items Database</span>
+                                </div>
+                                <i x-show="sidebarOpen" class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform duration-200" :class="itemsOpen ? 'rotate-180' : ''"></i>
+                            </button>
+                            
+                            <!-- Sub-navigation -->
+                            <div x-show="itemsOpen && sidebarOpen" x-transition class="pl-11 pr-3 py-1 space-y-1">
+                                <a href="{{ route('admin.index') }}" class="block px-3 py-2 text-xs font-medium text-slate-500 rounded-lg hover:bg-slate-100 hover:text-slate-800 transition-colors {{ request()->routeIs('admin.index') ? 'bg-slate-100 text-teal-600' : '' }}">
+                                    View All Items
+                                </a>
+                                <a href="{{ route('newItem') }}" class="block px-3 py-2 text-xs font-medium text-slate-500 rounded-lg hover:bg-slate-100 hover:text-slate-800 transition-colors {{ request()->routeIs('newItem') ? 'bg-slate-100 text-teal-600' : '' }}">
+                                    + Add New Item
+                                </a>
+                            </div>
+                        </div>
 
-                    </div>
+                        <!-- Sub-navigations removed to keep sidebar minimal as requested -->                    </div>
 
                     <!-- Sidebar Footer -->
                     <div class="border-t border-slate-800 flex-shrink-0 flex flex-col">
@@ -157,5 +176,7 @@
             .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #334155; border-radius: 20px; }
             .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #475569; }
         </style>
+        
+        @stack('scripts')
     </body>
 </html>

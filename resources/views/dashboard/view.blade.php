@@ -1,18 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Quotation #{{ $quotation->quotation_no }}</title>
-    
-    <!-- Bootstrap 5 CSS -->
+<x-app-layout containerClass="w-full px-8 py-8 bg-slate-50 relative min-h-screen">
+    <x-slot name="header">Quotation #{{ $quotation->quotation_no }}</x-slot>
+
+    <!-- Bootstrap 5 CSS (Scoped for print layout if necessary) -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
+    
     <style>
         /* =========================================================
            GLOBAL & PREVIEW STYLES
@@ -391,19 +384,17 @@
             }
         }
     </style>
-</head>
-<body class="bg-slate-50">
-    @include('dashboard.navbar')
 
-<!-- ACTION BAR (HIDDEN IN PRINT VIEW) -->
-<div class="container max-w-4xl mb-3 no-print">
-    <div class="d-flex justify-content-between align-items-center bg-white p-3 rounded shadow-sm">
-        <a href="{{ url('/history') }}" class="btn btn-outline-secondary btn-sm">&larr; Back to History</a>
-        <button onclick="window.print()" class="btn btn-primary btn-sm">
-            <i class="bi bi-printer-fill"></i> Print / Save PDF
-        </button>
-    </div>
-</div>
+    <div class="max-w-7xl mx-auto">
+        <!-- ACTION BAR (HIDDEN IN PRINT VIEW) -->
+        <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 no-print sticky top-4 z-50">
+            <a href="{{ url('/history') }}" class="px-4 py-2 rounded-lg text-sm font-bold border border-slate-300 hover:bg-slate-50 transition-colors text-slate-700">
+                <i class="fa-solid fa-arrow-left mr-2"></i> BACK TO HISTORY
+            </a>
+            <button onclick="window.print()" class="px-5 py-2.5 rounded-lg text-sm font-bold bg-teal-600 text-white hover:bg-teal-500 shadow-sm transition-colors">
+                <i class="fa-solid fa-print mr-2"></i> PRINT / SAVE PDF
+            </button>
+        </div>
 
 <!-- A4 PAGE CONTAINER -->
 <div class="page-container">
@@ -594,60 +585,7 @@
                                 <p class="mb-0">Eco Hydrotech Solutions Sdn. Bhd.</p>
                             </div>
 
-                            <!-- TECHNICAL SURVEY ANNEX -->
-                            @if($quotation->project && $quotation->project->surveyLocations->where('status', 'Mapped')->count() > 0)
-                                @php
-                                    $location = $quotation->project->surveyLocations->where('status', 'Mapped')->first();
-                                    $params = $location->sbesParameters;
-                                @endphp
-                                <div class="page-break-before" style="margin-top: 40px;">
-                                    <h4 class="quote-title mb-4">Technical Survey Annex</h4>
-                                    
-                                    <div class="row">
-                                        <div class="col-12 mb-4 text-center">
-                                            @php
-                                                $mapPath = storage_path('app/public/maps/' . $location->id . '.png');
-                                                $mapUrl = asset('storage/maps/' . $location->id . '.png');
-                                            @endphp
-                                            @if(file_exists($mapPath))
-                                                <img src="{{ $mapUrl }}" alt="Survey Map" style="max-width: 100%; max-height: 400px; object-fit: contain; border: 2px solid #1c6e7a; border-radius: 4px; padding: 5px;">
-                                            @else
-                                                <div style="padding: 40px; background: #f8f9fa; border: 1px dashed #ccc;">Map screenshot not available.</div>
-                                            @endif
-                                        </div>
-                                    </div>
 
-                                    @if($params)
-                                    <h6 class="quote-section-heading">Estimated Survey Parameters</h6>
-                                    <table class="quote-table mb-4">
-                                        <thead>
-                                            <tr>
-                                                <th>Parameter</th>
-                                                <th>Value</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td style="font-weight: 600;">Survey Speed</td>
-                                                <td>{{ $params->survey_speed_knots ?? '-' }} knots</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="font-weight: 600;">Working Hours / Day</td>
-                                                <td>{{ $params->working_hours_per_day ?? '-' }} hours</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="font-weight: 600;">Weather Standby</td>
-                                                <td>{{ $params->weather_days ?? '0' }} days</td>
-                                            </tr>
-                                            <tr>
-                                                <td style="font-weight: 600;">Mob / Demob</td>
-                                                <td>{{ $params->mod_demod_days ?? '0' }} days</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    @endif
-                                </div>
-                            @endif
 
                         </div>
 
@@ -676,7 +614,9 @@
 
     </div>
     
-    <!-- Bootstrap Bundle JS -->
+    </div> <!-- end .max-w-7xl -->
+    @push('scripts')
+    <!-- Bootstrap Bundle JS (scoped for this view if needed by components) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    @endpush
+</x-app-layout>

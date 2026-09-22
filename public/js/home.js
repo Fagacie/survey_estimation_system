@@ -551,15 +551,91 @@ document.addEventListener('DOMContentLoaded', function () {
 // ==================================================================
 
 function createItemCard(module_Id, category_Id) {
-    const template = document.getElementById('item-card-template');
-    const clone = template.content.cloneNode(true);
-    const card = clone.querySelector('[data-item-row]') || clone.querySelector('.quotation-item-card');
+    const uniqueIndex = Date.now() + '_' + Math.floor(Math.random() * 1000);
+    
+    // Hardcoded template string to completely bypass any DOM/Alpine/Caching issues
+    const htmlString = `
+        <div class="card quotation-item-card p-3 mb-3 bg-white border position-relative rounded" data-item-row="true" data-unique-id="item_${uniqueIndex}">
+            <!-- DELETE TRASH ICON -->
+            <button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 m-2 remove-item-btn btn-delete-item" title="Delete Item">
+                <i class="bi bi-trash-fill fs-6"></i>
+            </button>
+
+            <div class="row g-3">
+                <!-- CATEGORY / SERVICE DROPDOWN -->
+                <div class="col-md-6 col-lg-3">
+                    <label class="form-label fw-bold text-uppercase">SERVICE</label>
+                    <select name="items[${uniqueIndex}][service_id]" id="items_${uniqueIndex}_service_id" class="form-select form-select-sm item-service select-service">
+                        <option value="">Select Service...</option>
+                    </select>
+                </div>
+
+                <!-- ITEM DROPDOWN -->
+                <div class="col-md-6 col-lg-3">
+                    <label class="form-label fw-bold text-uppercase">ITEM</label>
+                    <select name="items[${uniqueIndex}][item_id]" id="items_${uniqueIndex}_item_id" class="form-select form-select-sm item-name select-item">
+                        <option value="">Select Item...</option>
+                    </select>
+                </div>
+
+                <!-- DAILY RATE -->
+                <div class="col-6 col-md-3 col-lg-2">
+                    <label class="form-label fw-bold text-uppercase">DAILY RATE (MYR)</label>
+                    <input type="number" step="0.01" name="items[${uniqueIndex}][daily_rate]" id="items_${uniqueIndex}_daily_rate" class="form-control form-control-sm item-rate input-daily-rate" value="0.00">
+                </div>
+
+                <!-- UNIT QTY -->
+                <div class="col-6 col-md-3 col-lg-2">
+                    <label class="form-label fw-bold text-uppercase">UNIT QTY</label>
+                    <input type="number" name="items[${uniqueIndex}][unit_qty]" id="items_${uniqueIndex}_unit_qty" class="form-control form-control-sm item-qty input-unit-qty" value="1" min="1">
+                </div>
+
+                <!-- DAYS -->
+                <div class="col-6 col-md-3 col-lg-2">
+                    <label class="form-label fw-bold text-uppercase">DAYS</label>
+                    <input type="number" name="items[${uniqueIndex}][days]" id="items_${uniqueIndex}_days" class="form-control form-control-sm item-days input-days" value="1" min="1">
+                </div>
+
+                <!-- MARK-UP (%) -->
+                <div class="col-6 col-md-3 col-lg-2">
+                    <label class="form-label fw-bold text-uppercase">MARK-UP (%)</label>
+                    <input type="number" step="0.01" name="items[${uniqueIndex}][mark_up]" id="items_${uniqueIndex}_mark_up" class="form-control form-control-sm item-markup input-markup" value="0">
+                </div>
+
+                <!-- INTERNAL RATE WITH UNIT DISPLAY -->
+                <div class="col-md-6 col-lg-3">
+                    <label class="form-label fw-bold text-uppercase">INTERNAL RATE (MYR)</label>
+                    <div class="input-group input-group-sm">
+                        <input type="text" name="items[${uniqueIndex}][internal_rate]" id="items_${uniqueIndex}_internal_rate" class="form-control form-control-sm input-internal-rate" placeholder="0.00" readonly>
+                        <span class="input-group-text bg-light text-muted rate-unit-display d-none" id="rateUnitDisplay_${uniqueIndex}"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- LINE ITEM FOOTER TOTAL -->
+            <div class="item-card-footer d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                <span class="text-uppercase text-muted small fw-bold">LINE ITEM TOTAL</span>
+                <span class="fw-bold text-dark fs-6 line-item-total line-total">MYR 0.00</span>
+            </div>
+
+            <!-- HIDDEN KEYS -->
+            <input type="hidden" name="items[${uniqueIndex}][module_id]" id="items_${uniqueIndex}_module_id" class="input-module-id">
+            <input type="hidden" name="items[${uniqueIndex}][category_id]" id="items_${uniqueIndex}_category_id" class="input-section-id">
+        </div>
+    `;
+
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = htmlString.trim();
+    const card = wrapper.firstElementChild;
 
     const inputModule = card.querySelector('.input-module-id');
     const inputSection = card.querySelector('.input-section-id');
 
     if (inputModule) inputModule.value = module_Id || '';
     if (inputSection) inputSection.value = category_Id || '';
+
+    // Assign a unique ID to the card for easier debugging if needed
+    card.dataset.uniqueId = 'item_' + uniqueIndex;
 
     const daysInput = card.querySelector('.item-days, .input-days');
     const estimatedDays = Number(window.projectEstimation?.total_days || 0);
@@ -573,7 +649,14 @@ function createItemCard(module_Id, category_Id) {
 
 function populateServicesDropdown(cardNode, module_Id, category_Id) {
     const serviceSelect = cardNode.querySelector('.select-service, .item-category');
-    if (!serviceSelect || !window.adminModulesTree) return;
+    if (!serviceSelect) {
+        console.warn('populateServicesDropdown: Service select dropdown not found in cardNode');
+        return;
+    }
+    if (!window.adminModulesTree) {
+        console.warn('populateServicesDropdown: window.adminModulesTree is not defined');
+        return;
+    }
 
     serviceSelect.innerHTML = '<option value="">Select Service...</option>';
 
@@ -585,13 +668,23 @@ function populateServicesDropdown(cardNode, module_Id, category_Id) {
         String(m.module_id ?? '').trim() === String(module_Id ?? '').trim()
     );
 
-    if (!moduleData || !Array.isArray(moduleData.categories)) return;
+    if (!moduleData || !Array.isArray(moduleData.categories)) {
+        console.warn(`populateServicesDropdown: Categories not found for Module ${module_Id}`);
+        return;
+    }
 
     const categoryData = moduleData.categories.find(c =>
         String(c.category_id ?? '').trim() === String(category_Id ?? '').trim()
     );
 
-    if (!categoryData || !Array.isArray(categoryData.services)) return;
+    if (!categoryData || !Array.isArray(categoryData.services)) {
+        console.warn(`populateServicesDropdown: Services not found for Category ${category_Id} in Module ${module_Id}`);
+        return;
+    }
+
+    if (categoryData.services.length === 0) {
+        console.warn(`populateServicesDropdown: Category ${category_Id} has an empty services array.`);
+    }
 
     categoryData.services.forEach(serv => {
         const opt = document.createElement('option');
@@ -623,19 +716,33 @@ function handleServiceChange(serviceSelect) {
         String(m.module_id ?? '').trim() === String(module_Id ?? '').trim()
     );
 
-    if (!moduleData || !Array.isArray(moduleData.categories)) return;
+    if (!moduleData || !Array.isArray(moduleData.categories)) {
+        console.warn('handleServiceChange: module or categories not found');
+        return;
+    }
 
     const categoryData = moduleData.categories.find(c =>
         String(c.category_id ?? '').trim() === String(category_Id ?? '').trim()
     );
 
-    if (!categoryData || !Array.isArray(categoryData.services)) return;
+    if (!categoryData || !Array.isArray(categoryData.services)) {
+        console.warn('handleServiceChange: category or services not found');
+        return;
+    }
 
     const matchedService = categoryData.services.find(s =>
         String(s.service_id).trim() === String(selectedServiceId).trim()
     );
 
-    if (!matchedService || !Array.isArray(matchedService.items)) return;
+    if (!matchedService) {
+        console.warn('handleServiceChange: Selected service ID not found in categoryData.services');
+        return;
+    }
+    
+    if (!Array.isArray(matchedService.items) || matchedService.items.length === 0) {
+        console.warn('handleServiceChange: Service has no items array or it is empty.');
+        return;
+    }
 
     matchedService.items.forEach(item => {
         const opt = document.createElement('option');
@@ -786,10 +893,11 @@ function updateActiveTabBreakdown() {
 }
 
 function updateStickyGrandTotalBar(grandTotal) {
-    const bottomSummaryLabel = document.querySelector('.all-modules-list');
+    const bottomSummaryLabel = document.querySelector('.all-modules-list')
+        || document.querySelector('.all-module-list')
+        || document.querySelector('.sticky-bottom-summary span');
 
     if (!bottomSummaryLabel) {
-        console.warn('Target container .all-modules-list not found in HTML.');
         return;
     }
 

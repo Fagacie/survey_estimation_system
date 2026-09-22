@@ -1,28 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - Data Management</title>
-
-    <!-- Favicon -->
-    <link rel="icon" type="image/svg+xml" href="https://laravel.com/img/logomark.min.svg">
+<x-app-layout containerClass="w-full px-8 py-8 bg-slate-50 relative min-h-screen">
+    <x-slot name="header">Admin - Data Management</x-slot>
 
     <!-- Bootstrap & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
+    
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ asset('css/navbar.css') }}">
     <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
     <link rel="stylesheet" href="{{ asset('css/module-item.css') }}">
-</head>
-
-<body>
-
-    <!-- Navigation Bar -->
-    @include('dashboard.navbar')
 
     <!-- MAIN WRAPPER TO CENTER CONTENT -->
     <div class="admin-container">
@@ -76,8 +61,9 @@
     <script>
         window.adminModulesTree = @json($adminModulesTree);
     </script>
+    @push('scripts')
     <!-- Bootstrap JS & Admin JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ asset('js/admin.js') }}"></script>
-</body>
-</html>
+    @endpush
+</x-app-layout>
