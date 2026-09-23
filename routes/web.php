@@ -11,7 +11,7 @@ use App\Models\Category;
 use App\Models\Service;
 
 Route::get('/', function () {
-    return redirect()->route('login');
+    return redirect()->route('signin');
 });
 
 // DEV ROUTE: Test Perf
