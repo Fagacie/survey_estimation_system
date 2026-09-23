@@ -17,9 +17,9 @@ self.addEventListener('message', function(e) {
         } else if (mode === 'centerline' && centerlineFeature) {
             linesFeatures = generateCrossSections(spacingMeters, centerlineFeature, boundaryFeature);
         } else {
-            // Generate Main Lines (Discrete)
+            // Generate Main Lines (Discrete or Continuous)
             if (spacingMeters > 0) {
-                let generated = generateLineSet(spacingMeters, angle, boundaryFeature, center, bbox, false);
+                let generated = generateLineSet(spacingMeters, angle, boundaryFeature, center, bbox, data.continuous || false);
                 linesFeatures = linesFeatures.concat(generated);
             }
 

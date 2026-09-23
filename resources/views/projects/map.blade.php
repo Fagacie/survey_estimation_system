@@ -18,6 +18,7 @@
         <div class="workspace-sidebar">
 
             <!-- KEY METRIC HIGHLIGHT STRIP (Always Visible) -->
+            @if($project->survey_type !== 'drone')
             <div class="metric-strip">
                 <div class="metric-grid">
                     <div class="metric-item">
@@ -38,6 +39,7 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             <!-- SCROLLABLE ACCORDION CONTENT -->
             <div class="sidebar-content">
@@ -607,8 +609,8 @@
             // 12. Time estimation reactivity (handled by inline onchange in HTML)
 
             // Drone Mapping UI Initialization
-            const isDroneMode = '{{ $project->survey_type }}' === 'drone';
-            if (isDroneMode && typeof DroneUI !== 'undefined') {
+            window.isDroneMode = '{{ $project->survey_type }}' === 'drone';
+            if (window.isDroneMode && typeof DroneUI !== 'undefined') {
                 DroneUI.init('drone-ui-container');
                 const droneAcc = document.getElementById('droneMappingAccordionItem');
                 if (droneAcc) droneAcc.style.display = 'block';
@@ -816,7 +818,7 @@
             boundaryFeatures = [];
             
             let genModeEl = document.getElementById('gen-mode');
-            let mode = genModeEl ? genModeEl.value : 'polygon';
+            let mode = genModeEl ? genModeEl.value : (window.isDroneMode ? 'polygon' : 'polygon');
             let foundCenterline = false;
 
             drawnItems.eachLayer(function(layer) {
@@ -952,8 +954,12 @@
             // Boundary
             updateIfExist('stat-boundary-area', boundaryArea.toLocaleString(undefined, {maximumFractionDigits:2}) + ' m²');
             updateIfExist('stat-eng-boundary-area', boundaryArea.toLocaleString(undefined, {maximumFractionDigits:2}) + ' m²');
+            updateIfExist('res_area', boundaryArea.toLocaleString(undefined, {maximumFractionDigits:2}) + ' m²');
+            
             updateIfExist('stat-boundary-perimeter', (boundaryPerimeter / 1000).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + ' km');
             updateIfExist('stat-eng-boundary-perimeter', (boundaryPerimeter / 1000).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + ' km');
+            updateIfExist('res_perimeter', (boundaryPerimeter / 1000).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + ' km');
+            
             updateIfExist('stat-survey-length', (coverageWidth / 1000).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + ' km');
 
             // Main Lines
@@ -1081,8 +1087,10 @@
                 spacingMeters = window.droneTempSpacing || 10;
                 angle = window.droneTempAngle || 0;
             } else if (type === 'cross') {
-                spacingMeters = parseFloat(document.getElementById('gen-cross-spacing').value);
-                let baseAngle = parseFloat(document.getElementById('gen-angle').value) || 0;
+                let genCrossEl = document.getElementById('gen-cross-spacing');
+                spacingMeters = genCrossEl ? parseFloat(genCrossEl.value) : 100;
+                let genAngleEl = document.getElementById('gen-angle');
+                let baseAngle = genAngleEl ? (parseFloat(genAngleEl.value) || 0) : 0;
                 // Hardcode tie lines to strictly 90 degrees offset from main lines
                 let crossAngle = 90;
                 angle = baseAngle + crossAngle;
@@ -1092,8 +1100,10 @@
                     return;
                 }
             } else {
-                spacingMeters = parseFloat(document.getElementById('gen-spacing').value);
-                angle = parseFloat(document.getElementById('gen-angle').value);
+                let genSpacingEl = document.getElementById('gen-spacing');
+                spacingMeters = genSpacingEl ? parseFloat(genSpacingEl.value) : 10;
+                let genAngleEl = document.getElementById('gen-angle');
+                angle = genAngleEl ? (parseFloat(genAngleEl.value) || 0) : 0;
             }
 
             let loadingText = type === 'cross' ? 'Generating Tie Lines...' : 'Generating Main Lines...';
@@ -1146,9 +1156,12 @@
 
                     if (mode === 'centerline' && type === 'main') {
                         postMode = 'centerline_offset';
-                        postSpacing = parseFloat(document.getElementById('gen-cl-spacing').value);
-                        leftCount = parseInt(document.getElementById('gen-cl-left').value);
-                        rightCount = parseInt(document.getElementById('gen-cl-right').value);
+                        let clSpacingEl = document.getElementById('gen-cl-spacing');
+                        postSpacing = clSpacingEl ? parseFloat(clSpacingEl.value) : 50;
+                        let clLeftEl = document.getElementById('gen-cl-left');
+                        leftCount = clLeftEl ? parseInt(clLeftEl.value) : 2;
+                        let clRightEl = document.getElementById('gen-cl-right');
+                        rightCount = clRightEl ? parseInt(clRightEl.value) : 2;
                     }
 
                     worker.postMessage({
@@ -1162,7 +1175,8 @@
                         crossAngle: 0,
                         centerlineFeature: centerlineFeature,
                         leftCount: leftCount,
-                        rightCount: rightCount
+                        rightCount: rightCount,
+                        continuous: isDrone
                     });
                 });
             });
@@ -1213,11 +1227,11 @@
                 
                 // If a callback was provided, invoke it with the total main line distance
                 if (typeof callback === 'function') {
-                    // Grab distance from the recalculateAllStats outputs
-                    // The element 'stat-main-dist-km' holds it in km (e.g. "2.45 km")
-                    let kmText = document.getElementById('stat-main-dist-km').innerText;
-                    let kmVal = parseFloat(kmText.replace(' km', '')) || 0;
-                    callback(kmVal * 1000); // pass meters
+                    // Use the globally calculated variable if available
+                    let dist = (window.surveyCalcVars && window.surveyCalcVars.mainLengthMeters) 
+                                ? window.surveyCalcVars.mainLengthMeters 
+                                : 0;
+                    callback(dist);
                 }
             }).catch(err => {
                 hideMapLoading();
@@ -1329,9 +1343,9 @@
                 boundaries: boundariesPayload,
                 lines: lines,
                 generation_settings: {
-                    line_spacing: document.getElementById('gen-spacing').value,
-                    orientation_angle: document.getElementById('gen-angle').value,
-                    cross_spacing: document.getElementById('gen-cross-spacing').value || null
+                    line_spacing: document.getElementById('gen-spacing') ? document.getElementById('gen-spacing').value : null,
+                    orientation_angle: document.getElementById('gen-angle') ? document.getElementById('gen-angle').value : null,
+                    cross_spacing: document.getElementById('gen-cross-spacing') ? document.getElementById('gen-cross-spacing').value : null
                 },
                 is_generated: true,
                 override_total_distance_meters: window.currentTotalLengthMeters || 0

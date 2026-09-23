@@ -32,44 +32,29 @@ const DroneUI = {
                 <div class="section-label mb-2" style="color: var(--accent-blue);"><i class="fa-solid fa-sliders"></i> Flight Parameters</div>
                 
                 <div class="row g-2 mb-3">
-                    <div class="col-12">
-                        <label class="form-label-panel d-flex justify-content-between mb-1">
-                            <span>Altitude</span>
-                            <span id="drone_alt_val" class="fw-bold" style="color: var(--accent-blue);">100 m</span>
-                        </label>
-                        <input type="range" id="drone_altitude" name="drone_altitude" min="10" max="500" value="100" class="form-range" style="width: 100%;">
+                    <div class="col-6">
+                        <label class="form-label-panel">Altitude (m)</label>
+                        <input type="number" id="drone_altitude" name="drone_altitude" min="10" max="500" step="1" value="100" class="form-control-panel w-100">
                     </div>
                     
-                    <div class="col-12 mt-3">
-                        <label class="form-label-panel d-flex justify-content-between mb-1">
-                            <span>Speed</span>
-                            <span id="drone_speed_val" class="fw-bold" style="color: var(--accent-blue);">15 m/s</span>
-                        </label>
-                        <input type="range" id="drone_speed" name="drone_speed" min="1" max="25" value="15" class="form-range" style="width: 100%;">
+                    <div class="col-6">
+                        <label class="form-label-panel">Speed (m/s)</label>
+                        <input type="number" id="drone_speed" name="drone_speed" min="1" max="25" step="0.5" value="15" class="form-control-panel w-100">
                     </div>
                     
-                    <div class="col-12 mt-3">
-                        <label class="form-label-panel d-flex justify-content-between mb-1">
-                            <span>Front Overlap</span>
-                            <span id="drone_front_val" class="fw-bold" style="color: var(--accent-blue);">80%</span>
-                        </label>
-                        <input type="range" id="drone_front_overlap" name="drone_front_overlap" min="10" max="90" value="80" class="form-range" style="width: 100%;">
+                    <div class="col-6 mt-2">
+                        <label class="form-label-panel">Front Overlap (%)</label>
+                        <input type="number" id="drone_front_overlap" name="drone_front_overlap" min="10" max="90" step="1" value="80" class="form-control-panel w-100">
                     </div>
 
-                    <div class="col-12 mt-3">
-                        <label class="form-label-panel d-flex justify-content-between mb-1">
-                            <span>Side Overlap</span>
-                            <span id="drone_side_val" class="fw-bold" style="color: var(--accent-blue);">70%</span>
-                        </label>
-                        <input type="range" id="drone_side_overlap" name="drone_side_overlap" min="10" max="90" value="70" class="form-range" style="width: 100%;">
+                    <div class="col-6 mt-2">
+                        <label class="form-label-panel">Side Overlap (%)</label>
+                        <input type="number" id="drone_side_overlap" name="drone_side_overlap" min="10" max="90" step="1" value="70" class="form-control-panel w-100">
                     </div>
 
-                    <div class="col-12 mt-3">
-                        <label class="form-label-panel d-flex justify-content-between mb-1">
-                            <span>Course Angle</span>
-                            <span id="drone_course_val" class="fw-bold" style="color: var(--accent-blue);">0°</span>
-                        </label>
-                        <input type="range" id="drone_course_angle" name="drone_course_angle" min="0" max="359" value="0" class="form-range" style="width: 100%;">
+                    <div class="col-12 mt-2">
+                        <label class="form-label-panel">Course Angle (°)</label>
+                        <input type="number" id="drone_course_angle" name="drone_course_angle" min="0" max="359" step="1" value="0" class="form-control-panel w-100">
                     </div>
                 </div>
 
@@ -90,6 +75,15 @@ const DroneUI = {
                 <div class="section-label mb-2" style="color: var(--accent-purple);"><i class="fa-solid fa-chart-simple"></i> Flight Statistics</div>
                 
                 <div class="stat-row">
+                    <span class="stat-label">Survey Area</span>
+                    <span id="res_area" class="stat-value">0.00 m²</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Boundary Perimeter</span>
+                    <span id="res_perimeter" class="stat-value">0.00 m</span>
+                </div>
+                
+                <div class="stat-row mt-2 pt-2" style="border-top: 1px dashed var(--sb-border);">
                     <span class="stat-label">Ortho GSD</span>
                     <span id="res_gsd" class="stat-value">0.00 cm/px</span>
                 </div>
@@ -106,6 +100,11 @@ const DroneUI = {
                     <input type="hidden" id="drone_total_images" name="drone_total_images" value="0">
                 </div>
 
+                <div class="stat-row">
+                    <span class="stat-label">Est. Batteries (Pairs)</span>
+                    <span id="res_batteries" class="stat-value">0</span>
+                </div>
+
                 <div class="stat-row mt-2 pt-2" style="border-top: 1px solid var(--sb-border);">
                     <span class="stat-label fw-bold">EST. FLIGHT DURATION</span>
                     <span id="res_duration" class="stat-value highlight" style="color: var(--accent-green); font-size: 1.05rem;">00h 00m</span>
@@ -118,17 +117,19 @@ const DroneUI = {
 
     bindEvents: function() {
         const _this = this;
-        const sliders = ['drone_altitude', 'drone_speed', 'drone_front_overlap', 'drone_side_overlap', 'drone_course_angle'];
+        const inputs = ['drone_altitude', 'drone_speed', 'drone_front_overlap', 'drone_side_overlap', 'drone_course_angle'];
         
-        sliders.forEach(id => {
+        inputs.forEach(id => {
             const el = document.getElementById(id);
             if(el) {
                 el.addEventListener('input', function() {
-                    const labelSpan = document.getElementById(id.replace('drone_', 'drone_').replace('_overlap', '_val').replace('altitude', 'alt_val').replace('speed', 'speed_val').replace('course_angle', 'course_val'));
-                    if (labelSpan) {
-                        labelSpan.innerText = this.value;
-                    }
                     _this.updateCalculations();
+                    
+                    // Mark as stale if geometry affects lines
+                    if (window.drawnItems && window.drawnItems.getLayers().length > 0) {
+                        const warning = document.getElementById('drone-stale-warning');
+                        if (warning) warning.classList.remove('d-none');
+                    }
                 });
             }
         });
@@ -199,6 +200,10 @@ const DroneUI = {
         const minutes = Math.floor((durationSeconds % 3600) / 60);
         const seconds = Math.floor(durationSeconds % 60);
 
+        // 4. Batteries (Assume 30 mins effective flight time per battery pair)
+        const durationMinutes = durationSeconds / 60;
+        const batteryPairs = Math.ceil(durationMinutes / 30);
+
         // Update UI
         document.getElementById('res_distance').innerText = Math.round(totalDistanceMeters).toLocaleString() + ' m';
         document.getElementById('drone_total_distance').value = totalDistanceMeters;
@@ -208,6 +213,9 @@ const DroneUI = {
         
         document.getElementById('res_images').innerText = totalImages.toLocaleString() + ' images';
         document.getElementById('drone_total_images').value = totalImages;
+
+        const batteryEl = document.getElementById('res_batteries');
+        if (batteryEl) batteryEl.innerText = batteryPairs.toLocaleString();
     }
 };
 
