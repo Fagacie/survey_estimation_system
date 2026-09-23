@@ -130,7 +130,7 @@ class ProjectController extends Controller
             return redirect()->route('projects.coming_soon')->with('success', 'Project created successfully. Modeling workflow is coming soon.');
         }
 
-        if (($validated['survey_type'] ?? 'sbes') !== 'sbes') {
+        if (!in_array(($validated['survey_type'] ?? 'sbes'), ['sbes', 'drone'])) {
             return redirect()->route('projects.coming_soon')->with('success', 'Project created successfully. This survey workflow is coming soon.');
         }
 

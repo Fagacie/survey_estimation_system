@@ -35,5 +35,10 @@ class SurveyLocation extends Model
     {
         return $this->hasOne(SurveyGenerationSetting::class);
     }
+
+    public function droneMappingParameters()
+    {
+        return $this->hasOne(DroneMappingParameter::class);
+    }
 }
 
