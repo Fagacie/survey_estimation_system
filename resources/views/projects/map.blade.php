@@ -86,6 +86,7 @@
                     </div>
 
                     <!-- 3. LINE GENERATOR -->
+                    @if($project->survey_type !== 'drone')
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed accent-cyan" type="button" data-bs-toggle="collapse" data-bs-target="#panelGenerator">
@@ -207,8 +208,10 @@
                             </div>
                         </div>
                     </div>
+                    @endif
 
                     <!-- 5. SURVEY PARAMETERS & TIME -->
+                    @if($project->survey_type !== 'drone')
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed accent-amber" type="button" data-bs-toggle="collapse" data-bs-target="#panelTime">
@@ -253,6 +256,24 @@
                             </div>
                         </div>
                     </div>
+                    @endif
+
+                    <!-- 6. DRONE MAPPING -->
+                    @if($project->survey_type === 'drone')
+                    <div class="accordion-item" id="droneMappingAccordionItem" style="display: none;">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed accent-green" type="button" data-bs-toggle="collapse" data-bs-target="#panelDrone">
+                                <span class="panel-icon bg-green"><i class="fa-solid fa-plane"></i></span>
+                                Drone Mapping
+                            </button>
+                        </h2>
+                        <div id="panelDrone" class="accordion-collapse collapse show">
+                            <div class="accordion-body p-0" id="drone-ui-container">
+                                <!-- The drone UI will be rendered here by DroneUI.init() -->
+                            </div>
+                        </div>
+                    </div>
+                    @endif
 
                 </div><!-- end accordion -->
 
@@ -347,6 +368,9 @@
          ============================================================ -->
     <!-- DYNAMIC CACHE BUSTER FOR MATH ENGINE -->
     <script src="{{ asset('js/survey-math.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/drone_mapping/camera_specs.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/drone_mapping/photogrammetry.js') }}?v={{ time() }}"></script>
+    <script src="{{ asset('js/drone_mapping/ui.js') }}?v={{ time() }}"></script>
 
     <script>
         // ============================================================
@@ -377,7 +401,8 @@
             crossLineLayerGroup.eachLayer(l => { hasGeneratedLines = true; });
             if (hasGeneratedLines) {
                 isGeometryStale = true;
-                document.getElementById('stale-warning').classList.remove('d-none');
+                let warningEl = document.getElementById('stale-warning');
+                if (warningEl) warningEl.classList.remove('d-none');
             }
         }
 
@@ -481,43 +506,47 @@
             });
 
             // 9. Generator buttons
-            document.getElementById('btn-generate-main').addEventListener('click', () => generateLines('main'));
-            document.getElementById('btn-generate-cross').addEventListener('click', () => generateLines('cross'));
+            let btnGenMain = document.getElementById('btn-generate-main');
+            if (btnGenMain) {
+                btnGenMain.addEventListener('click', () => generateLines('main'));
+                document.getElementById('btn-generate-cross').addEventListener('click', () => generateLines('cross'));
 
-            // 10. Clear lines
-            document.getElementById('btn-clear-lines').addEventListener('click', function() {
-                let toRemove = [];
-                drawnItems.eachLayer(function(layer) {
-                    if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
-                        toRemove.push(layer);
+                // 10. Clear lines
+                document.getElementById('btn-clear-lines').addEventListener('click', function() {
+                    let toRemove = [];
+                    drawnItems.eachLayer(function(layer) {
+                        if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
+                            toRemove.push(layer);
+                        }
+                    });
+                    toRemove.forEach(l => drawnItems.removeLayer(l));
+                    mainLineLayerGroup.clearLayers();
+                    crossLineLayerGroup.clearLayers();
+                    labelLayerGroup.clearLayers();
+                    isGeometryStale = false;
+                    let warningEl = document.getElementById('stale-warning');
+                    if (warningEl) warningEl.classList.add('d-none');
+                    recalculateAllStats();
+                });
+
+                // 11. Parameter change listeners
+                document.getElementById('gen-mode').addEventListener('change', function() {
+                    if(this.value === 'centerline') {
+                        document.getElementById('gen-mode-polygon').classList.add('d-none');
+                        document.getElementById('gen-mode-centerline').classList.remove('d-none');
+                    } else {
+                        document.getElementById('gen-mode-polygon').classList.remove('d-none');
+                        document.getElementById('gen-mode-centerline').classList.add('d-none');
                     }
                 });
-                toRemove.forEach(l => drawnItems.removeLayer(l));
-                mainLineLayerGroup.clearLayers();
-                crossLineLayerGroup.clearLayers();
-                labelLayerGroup.clearLayers();
-                isGeometryStale = false;
-                document.getElementById('stale-warning').classList.add('d-none');
-                recalculateAllStats();
-            });
+                document.getElementById('gen-spacing').addEventListener('input', markStale);
+                document.getElementById('gen-angle').addEventListener('input', markStale);
+                document.getElementById('gen-cross-spacing').addEventListener('input', markStale);
 
-            // 11. Parameter change listeners
-            document.getElementById('gen-mode').addEventListener('change', function() {
-                if(this.value === 'centerline') {
-                    document.getElementById('gen-mode-polygon').classList.add('d-none');
-                    document.getElementById('gen-mode-centerline').classList.remove('d-none');
-                } else {
-                    document.getElementById('gen-mode-polygon').classList.remove('d-none');
-                    document.getElementById('gen-mode-centerline').classList.add('d-none');
-                }
-            });
-            document.getElementById('gen-spacing').addEventListener('input', markStale);
-            document.getElementById('gen-angle').addEventListener('input', markStale);
-            document.getElementById('gen-cross-spacing').addEventListener('input', markStale);
-
-            document.getElementById('gen-cl-spacing').addEventListener('input', markStale);
-            document.getElementById('gen-cl-left').addEventListener('input', markStale);
-            document.getElementById('gen-cl-right').addEventListener('input', markStale);
+                document.getElementById('gen-cl-spacing').addEventListener('input', markStale);
+                document.getElementById('gen-cl-left').addEventListener('input', markStale);
+                document.getElementById('gen-cl-right').addEventListener('input', markStale);
+            }
 
             // 11b. Image Overlay Logic
             let currentImageOverlay = null;
@@ -576,6 +605,54 @@
             }
 
             // 12. Time estimation reactivity (handled by inline onchange in HTML)
+
+            // Drone Mapping UI Initialization
+            const isDroneMode = '{{ $project->survey_type }}' === 'drone';
+            if (isDroneMode && typeof DroneUI !== 'undefined') {
+                DroneUI.init('drone-ui-container');
+                const droneAcc = document.getElementById('droneMappingAccordionItem');
+                if (droneAcc) droneAcc.style.display = 'block';
+            }
+
+            // Define the global callback for Drone Mapping Line Generation
+            window.requestDroneLinesGeneration = function() {
+                if (!DroneUI.currentSettings) return;
+
+                // 1. Calculate side lap spacing in meters
+                const footprints = PhotogrammetryMath.calculateGroundFootprint(
+                    DroneUI.currentSettings.altitude, 
+                    DroneUI.currentSettings.cameraSpec
+                );
+                const lineSpacingMeters = PhotogrammetryMath.calculateLineSpacing(
+                    footprints.ground_width_m, 
+                    DroneUI.currentSettings.sideOverlap
+                );
+                
+                const angle = document.getElementById('drone_course_angle').value;
+
+                // 2. Clear old lines
+                mainLineLayerGroup.clearLayers();
+                crossLineLayerGroup.clearLayers();
+                labelLayerGroup.clearLayers();
+                
+                let toRemove = [];
+                drawnItems.eachLayer(function(layer) {
+                    if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
+                        toRemove.push(layer);
+                    }
+                });
+                toRemove.forEach(l => drawnItems.removeLayer(l));
+                
+                // 3. Inject settings into global window variables instead of missing DOM elements
+                window.droneTempSpacing = lineSpacingMeters;
+                window.droneTempAngle = parseFloat(angle) || 0;
+                
+                // 4. Trigger standard line generation
+                generateLines('main', true, function(totalDistanceMeters) {
+                    // This callback runs after lines are generated and distance is known
+                    DroneUI.updateFinalMetrics(totalDistanceMeters);
+                });
+            };
 
 
             // 13. Save Planning
@@ -738,7 +815,8 @@
             let boundaryArea = 0, boundaryPerimeter = 0, verticesCount = 0;
             boundaryFeatures = [];
             
-            let mode = document.getElementById('gen-mode').value;
+            let genModeEl = document.getElementById('gen-mode');
+            let mode = genModeEl ? genModeEl.value : 'polygon';
             let foundCenterline = false;
 
             drawnItems.eachLayer(function(layer) {
@@ -813,7 +891,8 @@
             let lineLength = 0;    // length of each individual survey line (shortest side)
 
             if (boundaryFeatures.length > 0) {
-                let angle = parseFloat(document.getElementById('gen-angle').value) || 0;
+                let genAngleEl = document.getElementById('gen-angle');
+                let angle = genAngleEl ? (parseFloat(genAngleEl.value) || 0) : 0;
                 let fc = turf.featureCollection(boundaryFeatures);
                 let center = turf.center(fc);
                 
@@ -964,8 +1043,9 @@
         // ============================================================
         // LINE GENERATION (Main or Cross)
         // ============================================================
-        function generateLines(type) {
-            let mode = document.getElementById('gen-mode').value;
+        function generateLines(type, isDrone = false, callback = null) {
+            let genModeEl = document.getElementById('gen-mode');
+            let mode = genModeEl ? genModeEl.value : (isDrone ? 'polygon' : 'polygon');
             let centerlineFeature = null;
 
             if (mode === 'centerline' && type === 'main') {
@@ -997,7 +1077,10 @@
 
             let spacingMeters, angle;
 
-            if (type === 'cross') {
+            if (isDrone) {
+                spacingMeters = window.droneTempSpacing || 10;
+                angle = window.droneTempAngle || 0;
+            } else if (type === 'cross') {
                 spacingMeters = parseFloat(document.getElementById('gen-cross-spacing').value);
                 let baseAngle = parseFloat(document.getElementById('gen-angle').value) || 0;
                 // Hardcode tie lines to strictly 90 degrees offset from main lines
@@ -1123,9 +1206,19 @@
                 });
 
                 isGeometryStale = false;
-                document.getElementById('stale-warning').classList.add('d-none');
+                let warningEl = document.getElementById('stale-warning');
+                if (warningEl) warningEl.classList.add('d-none');
                 recalculateAllStats();
                 hideMapLoading();
+                
+                // If a callback was provided, invoke it with the total main line distance
+                if (typeof callback === 'function') {
+                    // Grab distance from the recalculateAllStats outputs
+                    // The element 'stat-main-dist-km' holds it in km (e.g. "2.45 km")
+                    let kmText = document.getElementById('stat-main-dist-km').innerText;
+                    let kmVal = parseFloat(kmText.replace(' km', '')) || 0;
+                    callback(kmVal * 1000); // pass meters
+                }
             }).catch(err => {
                 hideMapLoading();
                 Swal.fire('Error', 'Line generation failed: ' + err, 'error');
@@ -1248,6 +1341,17 @@
                 sbes: {
                     survey_speed_knots: document.getElementById('sbes-speed')?.value || null,
                     working_hours_per_day: document.getElementById('sbes-workhrs')?.value || null
+                },
+                drone: {
+                    camera_model: document.getElementById('drone_camera_model')?.value || null,
+                    altitude_m: document.getElementById('drone_altitude')?.value || null,
+                    speed_ms: document.getElementById('drone_speed')?.value || null,
+                    front_overlap_percent: document.getElementById('drone_front_overlap')?.value || null,
+                    side_overlap_percent: document.getElementById('drone_side_overlap')?.value || null,
+                    course_angle_deg: document.getElementById('drone_course_angle')?.value || null,
+                    total_flight_distance_m: document.getElementById('drone_total_distance')?.value || null,
+                    total_images: document.getElementById('drone_total_images')?.value || null,
+                    estimated_duration_hours: document.getElementById('drone_duration_hours')?.value || null
                 },
                 allowances: {
                     weather_days: document.getElementById('project-weather')?.value || 0,

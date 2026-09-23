@@ -80,6 +80,16 @@ class SurveyLocationController extends Controller
             'sbes' => 'required|array',
             'sbes.survey_speed_knots' => 'nullable|numeric',
             'sbes.working_hours_per_day' => 'nullable|numeric',
+            'drone' => 'nullable|array',
+            'drone.camera_model' => 'nullable|string',
+            'drone.altitude_m' => 'nullable|numeric',
+            'drone.speed_ms' => 'nullable|numeric',
+            'drone.front_overlap_percent' => 'nullable|numeric',
+            'drone.side_overlap_percent' => 'nullable|numeric',
+            'drone.course_angle_deg' => 'nullable|numeric',
+            'drone.total_flight_distance_m' => 'nullable|numeric',
+            'drone.total_images' => 'nullable|numeric',
+            'drone.estimated_duration_hours' => 'nullable|numeric',
             'allowances' => 'nullable|array',
             'allowances.weather_days' => 'nullable|numeric|min:0',
             'allowances.mod_demod_days' => 'nullable|numeric|min:0',
@@ -96,6 +106,23 @@ class SurveyLocationController extends Controller
                 'working_hours_per_day' => $data['sbes']['working_hours_per_day'] ?? null,
             ]
         );
+
+        if (!empty($data['drone']['camera_model'])) {
+            $surveyLocation->droneMappingParameters()->updateOrCreate(
+                ['survey_location_id' => $surveyLocation->id],
+                [
+                    'camera_model' => $data['drone']['camera_model'],
+                    'altitude_m' => $data['drone']['altitude_m'] ?? 100,
+                    'speed_ms' => $data['drone']['speed_ms'] ?? 15,
+                    'front_overlap_percent' => $data['drone']['front_overlap_percent'] ?? 80,
+                    'side_overlap_percent' => $data['drone']['side_overlap_percent'] ?? 70,
+                    'course_angle_deg' => $data['drone']['course_angle_deg'] ?? 0,
+                    'total_flight_distance_m' => $data['drone']['total_flight_distance_m'] ?? 0,
+                    'total_images' => $data['drone']['total_images'] ?? 0,
+                    'estimated_duration_hours' => $data['drone']['estimated_duration_hours'] ?? 0,
+                ]
+            );
+        }
 
         $project->update([
             'weather_days' => $data['allowances']['weather_days'] ?? $project->weather_days ?? 0,

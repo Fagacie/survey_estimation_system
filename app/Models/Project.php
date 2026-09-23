@@ -28,6 +28,8 @@ class Project extends Model
         'weather_days',
         'mod_demod_days',
         'patch_test_days',
+        'project_category',
+        'survey_type',
         'created_by',
         'updated_by',
     ];
