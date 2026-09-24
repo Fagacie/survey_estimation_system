@@ -21,6 +21,11 @@
         }
         /* Scoped bootstrap grid layout overrides to let Tailwind handle the grid cleanly */
         .project-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; }
+
+        .collapse {
+            visibility: visible !important;
+        }
+
     </style>
 
     <div class="max-w-7xl mx-auto">
