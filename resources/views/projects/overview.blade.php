@@ -79,7 +79,7 @@
             font-weight: 500;
         }
 
-        /* BUTTONS */
+        /* BUTTONS & LINKS */
         .btn-outline-dark-minimal {
             background: transparent;
             border: 1px solid #111;
@@ -89,6 +89,10 @@
             font-weight: 500;
             border-radius: 4px;
             transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
         }
         .btn-outline-dark-minimal:hover {
             background: #111;
@@ -103,7 +107,9 @@
             font-weight: 500;
             border-radius: 4px;
             transition: all 0.2s;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             text-decoration: none;
         }
         .btn-dark-minimal:hover {
@@ -134,7 +140,13 @@
     </style>
 
     <div class="page-container">
-        
+
+        <div class="mb-4">
+            <a href="{{ route('projects.index') }}" class="btn-outline-dark-minimal text-decoration-none" style="padding: 0.4rem 1rem; font-size: 0.8rem;">
+                &larr; Back
+            </a>
+        </div>
+
         @if(session('success'))
             <div class="alert alert-success rounded-0 border-0 bg-light text-success mb-5" style="border-left: 3px solid #10b981 !important;">
                 {{ session('success') }}
@@ -221,19 +233,71 @@
             @endif
         </div>
 
+        <!-- 2. MODELLING -->
+        <div class="mb-5">
+            <div class="d-flex justify-content-between align-items-end mb-3">
+                <div class="section-header border-0 mb-0 pb-0">2. Modelling</div>
+            </div>
+
+        @php $summary = $project->modellingSummary; @endphp
+
+        @if($summary)
+            <ul class="clean-list">
+                <li class="clean-list-item">
+                    <div>
+                        <div class="d-flex align-items-center gap-2">
+                            <div style="font-weight: 500; color: #111; font-size: 0.95rem;">Modelling configured</div>
+                            <span class="badge bg-success bg-opacity-10 text-success border border-success" style="font-size: 0.65rem; font-weight: 600; padding: 0.35em 0.65em;">Saved</span>
+                        </div>
+                        <div style="font-size: 0.8rem; color: #888; margin-top: 2px;">
+                            Package: {{ $summary->package_name ?? 'Custom selection' }},
+                            {{ $project->modellingItems->pluck('catalog_module_id')->unique()->count() }} modules,
+                            RM {{ number_format($summary->grand_total, 2) }}
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-4">
+                        <a href="{{ route('projects.modeling.builder', ['project_id' => $project->project_Id]) }}" class="text-decoration-none" style="color: #111; font-size: 0.85rem; font-weight: 500;">
+                            Edit Modelling &rarr;
+                        </a>
+                        <form action="{{ route('projects.modeling.destroy', $project->project_Id) }}" method="POST" class="d-inline" onsubmit="return confirm('Remove modelling data for this project?');">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" style="background:none; border:none; color:#ef4444; font-size: 0.85rem; padding:0;">Remove</button>
+                        </form>
+                    </div>
+                </li>
+            </ul>
+        @else
+                <div class="text-center py-5 border" style="background: #fafafa; border-color: #eaeaea; border-radius: 4px;">
+                    <div class="text-muted mb-3" style="font-size: 0.9rem;">No modelling has been done yet.</div>
+                    <a href="{{ route('projects.modeling.builder', ['project_id' => $project->project_Id]) }}" class="btn-outline-dark-minimal text-decoration-none">
+                        Start Modelling
+                    </a>
+                </div>
+            @endif
+        </div>
+
         <!-- 3. ACTION -->
-        @if($project->surveyLocations->count() > 0)
+        @php $hasSurvey = $project->surveyLocations->count() > 0; @endphp
+
+        @if($hasSurvey || $project->modellingSummary)
             <div class="text-center mt-5 pt-5 border-top" style="border-color: #eaeaea !important;">
-                <div class="d-flex justify-content-center gap-3">
+                <div class="d-flex justify-content-center align-items-center gap-3">
                     <a href="{{ route('quotation.index', ['project_id' => $project->project_Id]) }}" class="btn-dark-minimal">
                         Proceed to Quotation
                     </a>
-                    <a href="{{ route('projects.report.preview', $project->project_Id) }}" class="btn-outline-dark-minimal">View Survey Report</a>
+
+                    @if($hasSurvey)
+                        <a href="{{ route('projects.report.preview', $project->project_Id) }}" class="btn-outline-dark-minimal" style="padding: 0.75rem 1.75rem; font-size: 0.95rem;">
+                            View Survey Report
+                        </a>
+                    @endif
                 </div>
             </div>
         @endif
     </div>
 
+    <!-- MODAL -->
     <div class="modal fade" id="newSurveyModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-0 border-0" style="box-shadow: 0 20px 40px rgba(0,0,0,0.1);">

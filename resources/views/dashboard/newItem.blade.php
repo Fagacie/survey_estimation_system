@@ -176,9 +176,13 @@
         'category_id' => old('category_id', isset($item) ? ($item->category_id ?? $item->service?->category_id ?? '') : ''),
         'service_id'  => old('service_id', isset($item) ? ($item->service_id ?? '') : ''),
         ]) !!};
+
+    // Full URLs built by Laravel, so they include your project folder
+    window.categoriesUrl = "{{ url('/data/modules/__ID__/categories') }}";
+    window.servicesUrl   = "{{ url('/data/categories/__ID__/services') }}";
     </script>
 
-    <!-- Load item.js after window.editItemData is declared -->
+    <!-- Load item.js after the variables above are declared -->
     <script src="{{ asset('js/item.js') }}"></script>
     @endpush
 </x-app-layout>

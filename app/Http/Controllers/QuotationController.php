@@ -9,6 +9,7 @@ use App\Models\Project;
 use App\Models\QtInvoice;
 use App\Models\QtInvoiceItem;
 use App\Models\PaymentTerm;
+use App\Models\Signatory;
 use App\Services\Calculation\ProjectEstimationService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -61,15 +62,19 @@ class QuotationController extends Controller
         $estimation = null;
         if ($request->filled('project_id')) {
             $prefillProject = auth()->user()->projects()
-                ->with('client')
+                ->with(['client', 'modellingSummary'])
                 ->whereKey($request->project_id)
                 ->firstOrFail();
             $estimation = $this->estimationService->calculate($prefillProject);
             \Illuminate\Support\Facades\Log::info('QuotationController@index - Prefill Project fetched');
         }
 
+        // People who can be chosen under "Signed by", and the default (first person added)
+        $signatories   = Signatory::orderBy('name')->get();
+        $defaultSigner = Signatory::orderBy('id')->first();
+
         \Illuminate\Support\Facades\Log::info('QuotationController@index - Returning View at ' . (microtime(true) - $start) . 's');
-        return view('dashboard.home', compact('modules', 'adminModulesTree', 'prefillProject', 'estimation'));
+        return view('dashboard.home', compact('modules', 'adminModulesTree', 'prefillProject', 'estimation', 'signatories', 'defaultSigner'));
     }
 
     public function store(Request $request)
@@ -85,11 +90,12 @@ class QuotationController extends Controller
             'start_date'          => 'nullable|date', // Kept optional for fallback calculation
             'end_date'            => 'nullable|date',   // Kept optional for fallback calculation
             'pic'                 => 'nullable|string',
-            'pic_no'           => 'nullable|integer',
+            'pic_no'           => 'nullable|string|max:255',
             'payment_terms'               => 'nullable|array',
             'payment_terms.*.percentage'  => 'required_with:payment_terms|string',
             'payment_terms.*.condition'   => 'nullable|string|max:255',
             'additional_notes' => 'nullable|string',
+            'signatory_id'        => 'nullable|integer|exists:signatories,id',   // Signed by
             'items'               => 'required|array|min:1',
             'items.*.module_id'   => 'required',
             'items.*.item_id'      => 'required|integer|exists:items,item_id',
@@ -107,10 +113,18 @@ class QuotationController extends Controller
                 $clientId = null;
                 if ($request->filled('client_name')) {
                     $client = Client::firstOrCreate(
-                        ['company_name' => $request->client_name],
-                        ['client_address' => $request->client_address],
-                        ['created_by' => $userId]
+                        ['company_name' => trim($request->client_name)],
+                        ['client_address' => $request->client_address, 'created_by' => $userId]
                     );
+
+                    // Company already existed: keep its address up to date
+                    if ($request->filled('client_address') && $client->client_address !== $request->client_address) {
+                        $client->update([
+                            'client_address' => $request->client_address,
+                            'updated_by'     => $userId,
+                        ]);
+                    }
+
                     $clientId = $client->client_Id;
                 }
 
@@ -119,6 +133,29 @@ class QuotationController extends Controller
                 $project = null;
                 if ($projectId) {
                     $project = auth()->user()->projects()->whereKey($projectId)->firstOrFail();
+
+                    // Save the details typed on this page back to the project.
+                    // Only filled boxes are saved, so an empty box never wipes existing data.
+                    $changes = ['updated_by' => $userId];
+
+                    if ($request->filled('project_name')) { $changes['name']      = $request->project_name; }
+                    if ($request->filled('period'))       { $changes['period']    = $request->period; }
+                    if ($request->filled('pic'))          { $changes['pic_name']  = $request->pic; }
+                    if ($request->filled('pic_no'))       { $changes['pic_no']    = $request->pic_no; }
+                    if ($clientId)                        { $changes['client_Id'] = $clientId; }
+
+                    // Fix the XX placeholder in the project number once the company is known
+                    $fixedNumber = Project::fillClientInNumber($project->number, $request->client_name);
+                    if ($fixedNumber !== $project->number) {
+                        $changes['number'] = $fixedNumber;
+                    }
+
+                    // Older project with no number at all: use the one built on the page
+                    if (empty($project->number) && $request->filled('number')) {
+                        $changes['number'] = $request->number;
+                    }
+
+                    $project->update($changes);
                 }
 
                 if (!$projectId && $request->filled('project_name')) {
@@ -133,7 +170,7 @@ class QuotationController extends Controller
 
                     $project = Project::create([
                         'client_Id'  => $clientId,
-                        'number'     => $request->number,   
+                        'number'     => $request->number,
                         'name'       => $request->project_name,
                         'period'     => $periodValue,
                         'pic_name'   => $request->pic,
@@ -202,8 +239,9 @@ class QuotationController extends Controller
                     'survey_distance_nm' => $estimation['distance_nm'],
                     'survey_hours' => $estimation['survey_hours'],
                     'survey_duration_days' => $estimation['total_days'],
-                    'payment_terms'=> $paymentTermsText,   // <-- CHANGED: was $validated['payment_terms'] ?? null
+                    'payment_terms'=> $paymentTermsText,
                     'additional_notes' => $validated['additional_notes'] ?? null,
+                    'signatory_id' => $validated['signatory_id'] ?? null,   // Signed by
                     'created_by'   => $userId,
                 ]);
 
@@ -232,7 +270,7 @@ class QuotationController extends Controller
                     ]);
                 }
 
-                // 9. Create structured Payment Term rows (NEW)
+                // 9. Create structured Payment Term rows
                 $sstRate = 0.08;
                 $finalTotal = $grandTotal + ($grandTotal * $sstRate);   // grand total INCLUDING SST
 
@@ -244,23 +282,25 @@ class QuotationController extends Controller
                         'name'         => 'Payment ' . ($index + 1),
                         'percentage'   => $percentageValue,
                         'condition'    => $term['condition'] ?? null,
-                        'amount'       => round($finalTotal * ($percentageValue / 100), 2),   // now uses post-SST total
+                        'amount'       => round($finalTotal * ($percentageValue / 100), 2),   // uses post-SST total
                         'created_by'   => $userId,
                     ]);
                 }
 
                 return [
-                    'quotation_id' => $quotation->quotation_Id,
-                    'quotation_no' => $quotationNo,
+                    'quotation_id'   => $quotation->quotation_Id,
+                    'quotation_no'   => $quotationNo,
+                    'project_number' => $lockedProject->number,
                 ];
             });
 
-        return response()->json([
-            'success'      => true,
-            'quotation_id' => $result['quotation_id'],
-            'quotation_no' => $result['quotation_no'],
-            'message'      => 'Quotation successfully saved to database!'
-        ], 200);
+            return response()->json([
+                'success'        => true,
+                'quotation_id'   => $result['quotation_id'],
+                'quotation_no'   => $result['quotation_no'],
+                'project_number' => $result['project_number'],
+                'message'        => 'Quotation successfully saved to database!'
+            ], 200);
 
         } catch (\Exception $e) {
             return response()->json([
@@ -273,16 +313,20 @@ class QuotationController extends Controller
     public function show($id)
     {
         $quotation = QtInvoice::with([
-            'items', 
+            'items',
             'items.catalogItem.category',
             'items.catalogItem.service',
             'project.client',
-            'paymentTerms'  
+            'paymentTerms',
+            'signatory'
         ])
             ->where('quotation_Id', $id)
             ->firstOrFail();
 
-        return view('dashboard.view', compact('quotation'));
+        // Chosen signer; older quotations (no signer chosen) fall back to the first person in the list
+        $signer = $quotation->signatory ?? Signatory::orderBy('id')->first();
+
+        return view('dashboard.view', compact('quotation', 'signer'));
     }
 
     public function history()
@@ -303,7 +347,9 @@ class QuotationController extends Controller
     {
         // Running number is global across ALL projects, regardless of type/client.
         // Number format is always: EHS/{TYPE}/{CLIENT_CODE}/{RUNNING} e.g. EHS/CP/TGAS/007
-        $lastRunning = Project::whereNotNull('number')
+        // withTrashed() so deleted projects are counted too (same rule as ProjectController@store)
+        $lastRunning = Project::withTrashed()
+            ->whereNotNull('number')
             ->where('number', 'like', '%/%')
             ->get()
             ->map(function ($project) {

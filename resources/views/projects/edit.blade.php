@@ -1,15 +1,16 @@
 <x-app-layout>
-    <x-slot name="header">
-        <div class="d-flex justify-content-between align-items-center">
-            <span>Edit Project</span>
-            <a href="{{ route('projects.index') }}" class="btn btn-outline-secondary btn-sm">
-                <i class="fa-solid fa-arrow-left"></i> Back
-            </a>
-        </div>
-    </x-slot>
+    
+    <x-slot name="header">Edit Project</x-slot>
 
     <div class="row justify-content-center">
         <div class="col-md-8">
+
+            <div class="mt-4">
+                <a href="{{ route('projects.index') }}" class="btn btn-outline-secondary btn-sm">
+                    <i class="fa-solid fa-arrow-left me-1"></i> Back to Projects
+                </a>
+            </div>
+
             <div class="card shadow-sm border-0 mt-4">
                 <div class="card-body p-4">
                     <form action="{{ route('projects.update', $project->project_Id) }}" method="POST">
@@ -23,8 +24,36 @@
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">Project No.</label>
-                                <input type="text" name="number" class="form-control @error('number') is-invalid @enderror" value="{{ old('number', $project->number) }}">
-                                @error('number') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                                <input type="text" class="form-control bg-light" value="{{ $project->number }}" readonly>
+                                <div class="form-text">Updates automatically when the type changes.</div>
+                            </div>
+                        </div>
+
+                        <!-- Project Type + Location (NEW) -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Project Type</label>
+                                <select name="project_type" class="form-select @error('project_type') is-invalid @enderror">
+                                    <option value="">{{ $project->project_type ? 'Choose project type' : 'Not set (older project)' }}</option>
+                                    @foreach(\App\Models\Project::TYPES as $code => $label)
+                                        <option value="{{ $code }}" {{ old('project_type', $project->project_type) == $code ? 'selected' : '' }}>
+                                            {{ $code }} - {{ $label }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('project_type') <div class="invalid-feedback">{{ $message }}</div> @enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Location</label>
+                                <select name="location" class="form-select @error('location') is-invalid @enderror">
+                                    <option value="">{{ $project->location ? 'Choose location' : 'Not set (older project)' }}</option>
+                                    @foreach(\App\Models\Project::LOCATIONS as $loc)
+                                        <option value="{{ $loc }}" {{ old('location', $project->location) == $loc ? 'selected' : '' }}>
+                                            {{ $loc }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('location') <div class="invalid-feedback">{{ $message }}</div> @enderror
                             </div>
                         </div>
 
