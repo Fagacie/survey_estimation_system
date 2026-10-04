@@ -57,7 +57,7 @@
                         </a>
                         
                         <!-- Toggle Button Integrated into Sidebar Header -->
-                        <button @click="sidebarOpen = !sidebarOpen" class="hidden lg:flex items-center justify-center w-6 h-6 text-slate-400 hover:text-white transition-colors focus:outline-none" title="Toggle Sidebar">
+                        <button @click="sidebarOpen = !sidebarOpen" class="hidden lg:flex items-center justify-center w-6 h-6 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors focus:outline-none border-none outline-none" title="Toggle Sidebar">
                             <i class="fa-solid text-xs" :class="sidebarOpen ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
                         </button>
                     </div>
@@ -65,19 +65,19 @@
                     <!-- Sidebar Navigation Links -->
                     <div class="flex-1 overflow-y-auto py-6 flex flex-col gap-1.5 custom-scrollbar" :class="sidebarOpen ? 'px-3' : 'px-2 items-center'">
                         
-                        <a href="{{ route('projects.index') }}" title="Survey Projects" class="ises-nav-link flex items-center px-3 py-2.5 transition-all group" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
+                        <a href="{{ route('projects.index') }}" title="Survey Projects" class="ises-nav-link flex items-center px-3 py-2.5 transition-all group {{ request()->routeIs('projects.*') ? 'active' : '' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
                             <i class="fa-solid fa-map-location-dot w-5 text-center text-sm"></i>
                             <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Survey Projects</span>
                         </a>
-                        <a href="{{ route('quotations.history') }}" title="Quotation History" class="ises-nav-link flex items-center px-3 py-2.5 transition-all group" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
+                        <a href="{{ route('quotations.history') }}" title="Quotation History" class="ises-nav-link flex items-center px-3 py-2.5 transition-all group {{ request()->routeIs('quotations.*') ? 'active' : '' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
                             <i class="fa-solid fa-file-invoice-dollar w-5 text-center text-sm"></i>
                             <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Quotation History</span>
                         </a>
 
 
                         <!-- Items Management Navigation Dropdown -->
-                        <div x-data="{ itemsOpen: false }" class="w-full">
-                            <button @click="itemsOpen = !itemsOpen" title="Items Database" class="ises-nav-link flex items-center justify-between px-3 py-2.5 transition-all group w-full focus:outline-none" :class="sidebarOpen ? '' : 'justify-center'">
+                        <div x-data="{ itemsOpen: {{ request()->routeIs('admin.index', 'newItem') ? 'true' : 'false' }} }" class="w-full">
+                            <button @click="itemsOpen = !itemsOpen" title="Items Database" class="ises-nav-link flex items-center justify-between px-3 py-2.5 transition-all group w-full focus:outline-none border-none outline-none bg-transparent {{ request()->routeIs('admin.index', 'newItem') ? 'active' : '' }}" :class="sidebarOpen ? '' : 'justify-center'">
                                 <div class="flex items-center gap-3">
                                     <i class="fa-solid fa-database w-5 text-center text-sm"></i>
                                     <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Items Database</span>
@@ -87,10 +87,10 @@
                             
                             <!-- Sub-navigation -->
                             <div x-show="itemsOpen && sidebarOpen" x-transition class="pl-11 pr-3 py-1 space-y-1">
-                                <a href="{{ route('admin.index') }}" class="block px-3 py-2 text-xs font-medium text-slate-500 rounded-lg hover:bg-slate-100 hover:text-slate-800 transition-colors {{ request()->routeIs('admin.index') ? 'bg-slate-100 text-teal-600' : '' }}">
+                                <a href="{{ route('admin.index') }}" class="ises-nav-link block px-3 py-2 text-xs font-medium transition-colors {{ request()->routeIs('admin.index') ? 'active' : '' }}">
                                     View All Items
                                 </a>
-                                <a href="{{ route('newItem') }}" class="block px-3 py-2 text-xs font-medium text-slate-500 rounded-lg hover:bg-slate-100 hover:text-slate-800 transition-colors {{ request()->routeIs('newItem') ? 'bg-slate-100 text-teal-600' : '' }}">
+                                <a href="{{ route('newItem') }}" class="ises-nav-link block px-3 py-2 text-xs font-medium transition-colors {{ request()->routeIs('newItem') ? 'active' : '' }}">
                                     + Add New Item
                                 </a>
                             </div>
@@ -103,8 +103,8 @@
                         
                         <!-- User Info -->
                         @auth
-                            <div class="ises-sidebar-user p-3 flex items-center justify-center transition-all" :class="sidebarOpen ? '' : 'flex-col gap-2'">
-                                <a href="{{ route('profile.edit') }}" title="Profile" class="ises-avatar flex items-center justify-center font-semibold text-xs flex-shrink-0 transition-colors">
+                            <div class="ises-sidebar-user p-3 flex items-center justify-center transition-all bg-white" :class="sidebarOpen ? '' : 'flex-col gap-2'">
+                                <a href="{{ route('profile.edit') }}" title="Profile" class="ises-avatar flex items-center justify-center font-semibold text-xs flex-shrink-0 transition-colors bg-rose-600 rounded-full text-white">
                                     {{ substr(auth()->user()->name, 0, 1) }}
                                 </a>
                                 <div x-show="sidebarOpen" class="flex-1 min-w-0 ml-3">
@@ -112,7 +112,7 @@
                                 </div>
                                 <form method="POST" action="{{ route('logout') }}" title="Logout" :class="sidebarOpen ? 'ml-2' : ''">
                                     @csrf
-                                    <button type="submit" class="text-slate-400 hover:text-rose-600 transition-colors p-1.5 rounded hover:bg-rose-50 focus:outline-none flex items-center justify-center w-8 h-8">
+                                    <button type="submit" class="text-slate-400 hover:text-rose-600 transition-colors p-1.5 rounded hover:bg-rose-50 focus:outline-none border-none outline-none bg-transparent flex items-center justify-center w-8 h-8">
                                         <i class="fa-solid fa-arrow-right-from-bracket text-sm"></i>
                                     </button>
                                 </form>
@@ -175,11 +175,6 @@
             .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
             .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #334155; border-radius: 20px; }
             .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #475569; }
-        </style>
-        
-        @stack('scripts')
-    </body>
-</html>
         </style>
         
         @stack('scripts')

@@ -10,7 +10,7 @@
             <div class="text-xs font-medium text-slate-500 mt-1">Manage survey planning, mapping data, and quotations.</div>
         </div>
         <div>
-            <a href="{{ route('projects.create') }}" class="inline-flex items-center gap-1.5 bg-teal-600 hover:bg-teal-700 text-white px-4 py-2 rounded-md text-xs font-semibold transition-colors shadow-sm">
+            <a href="{{ route('projects.create') }}" class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-xs font-semibold transition-colors shadow-sm">
                 <i class="fa-solid fa-plus"></i> New Project
             </a>
         </div>
@@ -23,54 +23,38 @@
         </div>
     @endif
 
-    <!-- 2. CORE METRICS (Ultra-compact strip) -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
-        <div class="bg-white border border-slate-200/80 rounded-lg p-3 flex items-center gap-3 shadow-[0_2px_10px_-3px_rgba(6,81,237,0.05)] hover:border-indigo-200 transition-colors">
-            <div class="w-9 h-9 rounded-md bg-indigo-50 flex items-center justify-center shrink-0 border border-indigo-100/50">
-                <i class="fa-solid fa-layer-group text-indigo-600 text-sm"></i>
-            </div>
-            <div>
-                <div class="text-[9px] font-bold tracking-[0.1em] text-slate-400 uppercase mb-0.5">Total Projects</div>
-                <div class="text-xl font-extrabold text-slate-800 leading-none">{{ $metrics['total'] }}</div>
-            </div>
+    <!-- 2. CORE METRICS (Ultra-clean and minimal) -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm flex flex-col justify-center relative overflow-hidden group">
+            <div class="text-[11px] font-bold tracking-wider text-gray-500 uppercase mb-1">Total Projects</div>
+            <div class="text-3xl font-black text-gray-900 leading-none">{{ $metrics['total'] }}</div>
+            <i class="fa-solid fa-layer-group absolute right-5 top-1/2 -translate-y-1/2 text-4xl text-slate-100 group-hover:scale-110 transition-transform"></i>
         </div>
         
-        <div class="bg-white border border-slate-200/80 rounded-lg p-3 flex items-center gap-3 shadow-[0_2px_10px_-3px_rgba(245,158,11,0.05)] hover:border-amber-200 transition-colors">
-            <div class="w-9 h-9 rounded-md bg-amber-50 flex items-center justify-center shrink-0 border border-amber-100/50">
-                <i class="fa-regular fa-pen-to-square text-amber-500 text-sm"></i>
-            </div>
-            <div>
-                <div class="text-[9px] font-bold tracking-[0.1em] text-slate-400 uppercase mb-0.5">Drafts</div>
-                <div class="text-xl font-extrabold text-slate-800 leading-none">{{ $metrics['draft'] }}</div>
-            </div>
+        <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm flex flex-col justify-center relative overflow-hidden group">
+            <div class="text-[11px] font-bold tracking-wider text-gray-500 uppercase mb-1">Drafts</div>
+            <div class="text-3xl font-black text-gray-900 leading-none">{{ $metrics['draft'] }}</div>
+            <i class="fa-solid fa-pen-ruler absolute right-5 top-1/2 -translate-y-1/2 text-4xl text-slate-100 group-hover:scale-110 transition-transform"></i>
         </div>
 
-        <div class="bg-white border border-slate-200/80 rounded-lg p-3 flex items-center gap-3 shadow-[0_2px_10px_-3px_rgba(20,184,166,0.05)] hover:border-teal-200 transition-colors">
-            <div class="w-9 h-9 rounded-md bg-teal-50 flex items-center justify-center shrink-0 border border-teal-100/50">
-                <i class="fa-solid fa-map-location-dot text-teal-600 text-sm"></i>
-            </div>
-            <div>
-                <div class="text-[9px] font-bold tracking-[0.1em] text-slate-400 uppercase mb-0.5">Mapped Areas</div>
-                <div class="text-xl font-extrabold text-slate-800 leading-none">{{ $metrics['mapped'] }}</div>
-            </div>
+        <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm flex flex-col justify-center relative overflow-hidden group">
+            <div class="text-[11px] font-bold tracking-wider text-gray-500 uppercase mb-1">Mapped Areas</div>
+            <div class="text-3xl font-black text-gray-900 leading-none">{{ $metrics['mapped'] }}</div>
+            <i class="fa-solid fa-map-location-dot absolute right-5 top-1/2 -translate-y-1/2 text-4xl text-slate-100 group-hover:scale-110 transition-transform"></i>
         </div>
 
-        <div class="bg-white border border-slate-200/80 rounded-lg p-3 flex items-center gap-3 shadow-[0_2px_10px_-3px_rgba(16,185,129,0.05)] hover:border-emerald-200 transition-colors">
-            <div class="w-9 h-9 rounded-md bg-emerald-50 flex items-center justify-center shrink-0 border border-emerald-100/50">
-                <i class="fa-solid fa-file-invoice-dollar text-emerald-600 text-sm"></i>
-            </div>
-            <div>
-                <div class="text-[9px] font-bold tracking-[0.1em] text-slate-400 uppercase mb-0.5">Quotations</div>
-                <div class="text-xl font-extrabold text-slate-800 leading-none">{{ $metrics['quotations'] }}</div>
-            </div>
+        <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm flex flex-col justify-center relative overflow-hidden group">
+            <div class="text-[11px] font-bold tracking-wider text-gray-500 uppercase mb-1">Quotations</div>
+            <div class="text-3xl font-black text-gray-900 leading-none">{{ $metrics['quotations'] }}</div>
+            <i class="fa-solid fa-file-invoice-dollar absolute right-5 top-1/2 -translate-y-1/2 text-4xl text-slate-100 group-hover:scale-110 transition-transform"></i>
         </div>
     </div>
 
     @if($metrics['total'] > 0)
         <!-- 3. ATTENTION REQUIRED (Operational Alerts - Scannable text list) -->
         @if($attention['missing_boundaries'] > 0 || $attention['missing_lines'] > 0 || $attention['missing_parameters'] > 0 || $attention['missing_cost'] > 0)
-            <div class="dashboard-attention bg-white mb-8 shadow-sm">
-                <div class="dashboard-attention-header px-5 py-3 flex items-center gap-2">
+            <div class="bg-white border border-gray-200 rounded-lg mb-8 shadow-sm">
+                <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
                     <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm"></i>
                     <h3 class="text-sm font-bold text-slate-800">Action Required</h3>
                 </div>
@@ -106,22 +90,51 @@
         @endif
 
         <!-- 4. PROJECTS TABLE WORKSPACE -->
-        <div class="dashboard-table bg-white mb-12 shadow-sm">
+        <div class="bg-white border border-gray-200 rounded-lg mb-12 shadow-sm">
             
             <!-- Table Controls -->
-            <div class="dashboard-table-toolbar px-5 py-4 flex flex-wrap justify-between items-center gap-4">
+            <div class="px-5 py-4 border-b border-gray-100 flex flex-wrap justify-between items-center gap-4">
                 <div><h3 class="text-base font-bold text-slate-800 mb-1">Survey portfolio</h3><p class="text-xs text-slate-500 m-0">Latest projects and their current handoff point</p></div>
                 
-                <form method="GET" action="{{ route('projects.index') }}" class="flex flex-wrap gap-2">
-                    <input type="text" name="search" class="w-64 px-3 py-1.5 bg-white border border-slate-200 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500" placeholder="Search projects..." value="{{ request('search') }}">
-                    <select name="status" class="w-40 px-3 py-1.5 bg-white border border-slate-200 text-sm focus:outline-none focus:border-teal-500 focus:ring-1 focus:ring-teal-500" onchange="this.form.submit()">
-                        <option value="">All Statuses</option>
-                        <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
-                        <option value="planned" {{ request('status') === 'planned' ? 'selected' : '' }}>In Progress</option>
-                        <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
-                    </select>
-                    @if(request('search') || request('status'))
-                        <a href="{{ route('projects.index') }}" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-200 text-xs font-bold uppercase tracking-wider transition-colors flex items-center">Clear</a>
+                <form method="GET" action="{{ route('projects.index') }}" class="flex flex-wrap gap-3 w-full md:w-auto">
+                    <!-- Search Input -->
+                    <div class="relative">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-search text-slate-400 text-sm"></i>
+                        </div>
+                        <input type="text" name="search" class="w-full md:w-64 pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-md text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow shadow-sm" placeholder="Search projects..." value="{{ request('search') }}">
+                    </div>
+                    
+                    <!-- Status Filter -->
+                    <div class="relative">
+                        <select name="status" class="w-full md:w-40 pl-3 pr-8 py-2 appearance-none bg-white border border-slate-200 rounded-md text-sm text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow shadow-sm cursor-pointer" onchange="this.form.submit()">
+                            <option value="">All Statuses</option>
+                            <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
+                            <option value="planned" {{ request('status') === 'planned' ? 'selected' : '' }}>In Progress</option>
+                            <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <i class="fa-solid fa-chevron-down text-slate-400 text-[10px]"></i>
+                        </div>
+                    </div>
+
+                    <!-- Date Range Filter -->
+                    <div class="relative">
+                        <select name="date_range" class="w-full md:w-40 pl-3 pr-8 py-2 appearance-none bg-white border border-slate-200 rounded-md text-sm text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow shadow-sm cursor-pointer" onchange="this.form.submit()">
+                            <option value="">All Time</option>
+                            <option value="last_30_days" {{ request('date_range') === 'last_30_days' ? 'selected' : '' }}>Last 30 Days</option>
+                            <option value="this_month" {{ request('date_range') === 'this_month' ? 'selected' : '' }}>This Month</option>
+                            <option value="this_year" {{ request('date_range') === 'this_year' ? 'selected' : '' }}>This Year</option>
+                        </select>
+                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                            <i class="fa-regular fa-calendar text-slate-400 text-[11px]"></i>
+                        </div>
+                    </div>
+
+                    @if(request('search') || request('status') || request('date_range'))
+                        <a href="{{ route('projects.index') }}" class="px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-md text-sm font-medium transition-colors flex items-center gap-2 shadow-sm">
+                            <i class="fa-solid fa-xmark text-xs"></i> Clear
+                        </a>
                     @endif
                     <button type="submit" class="hidden">Filter</button>
                 </form>
@@ -132,12 +145,12 @@
                 <table class="w-full text-left border-collapse text-sm">
                     <thead>
                         <tr class="bg-slate-50/50 border-b border-slate-200 text-slate-500">
-                            <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Code</th>
-                            <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Project Details</th>
-                            <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Client</th>
-                            <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Status</th>
-                            <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Updated</th>
-                            <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px] text-right">Actions</th>
+                            <th class="px-5 py-3 font-bold uppercase tracking-wider text-[11px]">Code</th>
+                            <th class="px-5 py-3 font-bold uppercase tracking-wider text-[11px]">Project Details</th>
+                            <th class="px-5 py-3 font-bold uppercase tracking-wider text-[11px]">Client</th>
+                            <th class="px-5 py-3 font-bold uppercase tracking-wider text-[11px]">Status</th>
+                            <th class="px-5 py-3 font-bold uppercase tracking-wider text-[11px]">Updated</th>
+                            <th class="px-5 py-3 font-bold uppercase tracking-wider text-[11px] text-right">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
@@ -163,8 +176,8 @@
                                             <div class="w-1.5 h-1.5 rounded-full bg-slate-400"></div> Draft
                                         </div>
                                     @elseif($project->status === 'planned')
-                                        <div class="flex items-center gap-1.5 text-teal-700 text-xs font-medium">
-                                            <div class="w-1.5 h-1.5 rounded-full bg-teal-500"></div> In Progress
+                                        <div class="flex items-center gap-1.5 text-blue-700 text-xs font-medium">
+                                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div> In Progress
                                         </div>
                                     @else
                                         <div class="flex items-center gap-1.5 text-emerald-700 text-xs font-medium">
@@ -177,7 +190,7 @@
                                 </td>
                                 <td class="px-5 py-3 align-middle text-right whitespace-nowrap">
                                     <div class="flex items-center justify-end gap-1">
-                                        <a href="{{ route('projects.show', $project->project_Id) }}" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-teal-600 hover:bg-teal-50 transition-all" title="View">
+                                        <a href="{{ route('projects.show', $project->project_Id) }}" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all" title="View">
                                             <i class="fa-solid fa-arrow-right font-light"></i>
                                         </a>
                                         <a href="{{ route('projects.edit', $project->project_Id) }}" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-all" title="Edit">
@@ -197,7 +210,7 @@
                             <tr>
                                 <td colspan="6" class="text-center py-10 bg-white">
                                     <div class="text-slate-500 mb-2 font-medium">No projects found.</div>
-                                    <a href="{{ route('projects.index') }}" class="text-teal-600 hover:text-teal-700 text-sm font-medium">Clear Filters</a>
+                                    <a href="{{ route('projects.index') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium">Clear Filters</a>
                                 </td>
                             </tr>
                         @endforelse
@@ -220,7 +233,7 @@
             <p class="text-slate-500 mb-6 mx-auto max-w-md text-sm">
                 Create your first survey estimation project to begin tracking boundaries, lines, and costs.
             </p>
-            <a href="{{ route('projects.create') }}" class="inline-flex items-center gap-2 bg-teal-600 hover:bg-teal-700 text-white px-6 py-2.5 text-sm font-medium transition-colors border border-transparent shadow-sm">
+            <a href="{{ route('projects.create') }}" class="inline-flex items-center gap-2 bg-[#0052cc] hover:bg-blue-700 text-white px-6 py-2.5 text-sm font-medium transition-colors border border-transparent shadow-sm">
                 <i class="fa-solid fa-plus font-light"></i> Create Project
             </a>
         </div>

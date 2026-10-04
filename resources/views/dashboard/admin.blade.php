@@ -28,16 +28,32 @@
         </div>
         
         <!-- SEARCH & FILTER -->
-        <div class="filter-card">
-            <div class="search-box">
-                <label>
-                    SEARCH
-                    <i class="bi bi-search"></i>
-                </label>
-                <input
-                    type="text"
-                    id="searchInput"
-                    placeholder="Search item...">
+        <div class="bg-white border border-slate-200 rounded-lg p-4 mb-8 shadow-sm flex flex-col md:flex-row gap-4 items-end">
+            <!-- Search -->
+            <div class="flex-1 w-full relative">
+                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Search Items</label>
+                <div class="relative">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-search text-slate-400 text-sm"></i>
+                    </div>
+                    <input type="text" id="searchInput" class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-md text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow shadow-sm" placeholder="Search by name, rate, or ID...">
+                </div>
+            </div>
+
+            <!-- Filter by Module -->
+            <div class="w-full md:w-64 relative">
+                <label class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Filter by Module</label>
+                <div class="relative">
+                    <select id="moduleFilter" class="w-full pl-3 pr-8 py-2 appearance-none bg-white border border-slate-200 rounded-md text-sm text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow shadow-sm cursor-pointer">
+                        <option value="">All Modules</option>
+                        @foreach($dataGroups->keys() as $moduleName)
+                            <option value="{{ strtolower($moduleName) }}">{{ $moduleName }}</option>
+                        @endforeach
+                    </select>
+                    <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                        <i class="fa-solid fa-chevron-down text-slate-400 text-[10px]"></i>
+                    </div>
+                </div>
             </div>
         </div>
 

@@ -29,6 +29,22 @@ class ProjectController extends Controller
             $query->where('status', $request->status);
         }
 
+        if ($request->filled('date_range')) {
+            $now = now();
+            switch ($request->date_range) {
+                case 'last_30_days':
+                    $query->where('created_at', '>=', $now->subDays(30));
+                    break;
+                case 'this_month':
+                    $query->whereMonth('created_at', $now->month)
+                          ->whereYear('created_at', $now->year);
+                    break;
+                case 'this_year':
+                    $query->whereYear('created_at', $now->year);
+                    break;
+            }
+        }
+
         $projects = $query->paginate(10);
 
         // 2. Core KPIs

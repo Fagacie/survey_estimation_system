@@ -1,220 +1,95 @@
 <x-app-layout containerClass="w-full px-8 py-8">
     <x-slot name="header">{{ $project->name }}</x-slot>
 
-    <style>
-        .page-container {
-            width: 100%;
-        }
-        
-        .section-header {
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: #888;
-            border-bottom: 1px solid #eaeaea;
-            padding-bottom: 0.75rem;
-            margin-bottom: 1.5rem;
-            font-weight: 600;
-        }
-
-        /* METADATA STRIP */
-        .meta-strip {
-            display: flex;
-            background: #fafafa;
-            border: 1px solid #eaeaea;
-            border-radius: 4px;
-            margin-top: 1.5rem;
-        }
-        .meta-item {
-            flex: 1;
-            padding: 1.25rem 1.5rem;
-            border-right: 1px solid #eaeaea;
-        }
-        .meta-item:last-child {
-            border-right: none;
-        }
-        .meta-label {
-            font-size: 0.7rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #888;
-            margin-bottom: 0.25rem;
-        }
-        .meta-value {
-            font-size: 0.95rem;
-            font-weight: 500;
-            color: #111;
-        }
-
-        /* FORMS & INPUTS */
-        .allowance-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 1.5rem;
-            background: #fff;
-            border: 1px solid #eaeaea;
-            padding: 2rem;
-            border-radius: 4px;
-        }
-        .minimal-input {
-            border: 1px solid #eaeaea;
-            border-radius: 4px;
-            padding: 0.6rem 1rem;
-            font-size: 0.95rem;
-            background: #fafafa;
-            color: #111;
-            width: 100%;
-            transition: border-color 0.2s;
-        }
-        .minimal-input:focus {
-            outline: none;
-            border-color: #111;
-            background: #fff;
-        }
-        .input-label {
-            font-size: 0.8rem;
-            color: #444;
-            margin-bottom: 0.5rem;
-            display: block;
-            font-weight: 500;
-        }
-
-        /* BUTTONS */
-        .btn-outline-dark-minimal {
-            background: transparent;
-            border: 1px solid #111;
-            color: #111;
-            padding: 0.6rem 1.5rem;
-            font-size: 0.85rem;
-            font-weight: 500;
-            border-radius: 4px;
-            transition: all 0.2s;
-        }
-        .btn-outline-dark-minimal:hover {
-            background: #111;
-            color: #fff;
-        }
-        .btn-dark-minimal {
-            background: #111;
-            border: 1px solid #111;
-            color: #fff;
-            padding: 0.75rem 2.5rem;
-            font-size: 0.95rem;
-            font-weight: 500;
-            border-radius: 4px;
-            transition: all 0.2s;
-            display: inline-block;
-            text-decoration: none;
-        }
-        .btn-dark-minimal:hover {
-            background: #333;
-            border-color: #333;
-            color: #fff;
-        }
-
-        /* LISTS */
-        .clean-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-            border: 1px solid #eaeaea;
-            border-radius: 4px;
-        }
-        .clean-list-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid #eaeaea;
-            background: #fff;
-        }
-        .clean-list-item:last-child {
-            border-bottom: none;
-        }
-    </style>
-
-    <div class="page-container">
+    <div class="w-full max-w-5xl mx-auto">
         
         @if(session('success'))
-            <div class="alert alert-success rounded-0 border-0 bg-light text-success mb-5" style="border-left: 3px solid #10b981 !important;">
-                {{ session('success') }}
+            <div class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-4 mb-8 flex items-start gap-3 text-sm rounded-md">
+                <i class="fa-solid fa-circle-check mt-0.5 text-emerald-600"></i>
+                <span class="font-medium">{{ session('success') }}</span>
             </div>
         @endif
         @if(session('error'))
-            <div class="alert alert-danger rounded-0 border-0 bg-light text-danger mb-5" style="border-left: 3px solid #ef4444 !important;">
-                {{ session('error') }}
+            <div class="bg-red-50 text-red-800 border border-red-200 p-4 mb-8 flex items-start gap-3 text-sm rounded-md">
+                <i class="fa-solid fa-triangle-exclamation mt-0.5 text-red-600"></i>
+                <span class="font-medium">{{ session('error') }}</span>
             </div>
         @endif
 
         <!-- 1. PROJECT HEADER -->
-        <div class="mb-5">
-            <h1 class="display-5 fw-bold mb-1" style="color: #111; letter-spacing: -0.03em;">{{ $project->name }}</h1>
-            <div class="text-muted" style="font-size: 0.95rem;">Project Code: {{ $project->number ?? 'N/A' }}</div>
+        <div class="mb-8">
+            <h1 class="text-3xl font-bold text-slate-900 tracking-tight mb-1">{{ $project->name }}</h1>
+            <div class="text-sm font-medium text-slate-500">Project Code: {{ $project->number ?? 'N/A' }}</div>
             
-            <div class="meta-strip mt-4">
-                <div class="meta-item">
-                    <div class="meta-label">Client</div>
-                    <div class="meta-value">{{ $project->client?->company_name ?? 'N/A' }}</div>
+            <div class="grid grid-cols-1 md:grid-cols-3 bg-white border border-slate-200 rounded-lg mt-6 shadow-sm overflow-hidden">
+                <div class="p-5 border-b md:border-b-0 md:border-r border-slate-200">
+                    <div class="text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-1">Client</div>
+                    <div class="text-sm font-semibold text-slate-800">{{ $project->client?->company_name ?? 'N/A' }}</div>
                 </div>
-                <div class="meta-item">
-                    <div class="meta-label">Period</div>
-                    <div class="meta-value">{{ $project->period ?? 'N/A' }}</div>
+                <div class="p-5 border-b md:border-b-0 md:border-r border-slate-200">
+                    <div class="text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-1">Period</div>
+                    <div class="text-sm font-semibold text-slate-800">{{ $project->period ?? 'N/A' }}</div>
                 </div>
-                <div class="meta-item">
-                    <div class="meta-label">Created</div>
-                    <div class="meta-value">{{ $project->created_at->format('d M Y') }}</div>
+                <div class="p-5">
+                    <div class="text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-1">Created</div>
+                    <div class="text-sm font-semibold text-slate-800">{{ $project->created_at->format('d M Y') }}</div>
                 </div>
             </div>
         </div>
 
         <!-- 2. SURVEY AREAS -->
-        <div class="mb-5">
-            <div class="d-flex justify-content-between align-items-end mb-3">
-                <div class="section-header border-0 mb-0 pb-0">1. Survey Areas</div>
-                <div>
+        <div class="mb-8">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">1. Survey Areas</h2>
+                <div class="flex gap-2">
                     @if($project->survey_type === 'drone')
-                        <a href="{{ url('/admin/equipment') }}" class="btn-outline-dark-minimal py-1 px-3 me-2" style="font-size: 0.75rem; text-decoration: none;">
+                        <a href="{{ url('/admin/equipment') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 rounded text-[11px] font-bold uppercase tracking-wider transition-colors shadow-sm">
                             <i class="fa-solid fa-database"></i> Equipment Database
                         </a>
                     @endif
-                    <button type="button" class="btn-outline-dark-minimal py-1 px-3" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#newSurveyModal">
-                        + Add Area
+                    <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white border border-transparent rounded text-[11px] font-bold uppercase tracking-wider transition-colors shadow-sm" data-bs-toggle="modal" data-bs-target="#newSurveyModal">
+                        <i class="fa-solid fa-plus"></i> Add Area
                     </button>
                 </div>
             </div>
 
             @if($project->surveyLocations->count() > 0)
-                <ul class="clean-list">
-                    @foreach($project->surveyLocations as $location)
-                        <li class="clean-list-item">
-                            <div>
-                                <div class="d-flex align-items-center gap-2">
-                                    <div style="font-weight: 500; color: #111; font-size: 0.95rem;">{{ $location->name }}</div>
-                                    @if($location->status === 'Mapped')
-                                        <span class="badge bg-success bg-opacity-10 text-success border border-success" style="font-size: 0.65rem; font-weight: 600; padding: 0.35em 0.65em;">Mapped</span>
-                                    @else
-                                        <span class="badge bg-secondary bg-opacity-10 text-secondary border border-secondary" style="font-size: 0.65rem; font-weight: 600; padding: 0.35em 0.65em;">Pending</span>
-                                    @endif
+                <div class="bg-white border border-slate-200 rounded-lg shadow-sm">
+                    <ul class="divide-y divide-slate-100">
+                        @foreach($project->surveyLocations as $location)
+                            <li class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
+                                <div>
+                                    <div class="flex items-center gap-2.5 mb-1">
+                                        <div class="font-bold text-slate-800 text-sm">{{ $location->name }}</div>
+                                        @if($location->status === 'Mapped')
+                                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Mapped</span>
+                                        @else
+                                            <span class="bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Pending</span>
+                                        @endif
+                                    </div>
+                                    <div class="text-[11px] text-slate-500 font-medium">Added {{ $location->created_at->format('M d, Y') }}</div>
                                 </div>
-                                <div style="font-size: 0.8rem; color: #888; margin-top: 2px;">Added {{ $location->created_at->format('M d, Y') }}</div>
-                            </div>
-                            <div class="d-flex align-items-center gap-4">
-                                <a href="{{ route('projects.surveys.map', [$project->project_Id, $location->id]) }}" class="text-decoration-none" style="color: #111; font-size: 0.85rem; font-weight: 500;">
-                                    Open Map &rarr;
-                                </a>
-                                <form action="{{ route('projects.surveys.destroy', [$project->project_Id, $location->id]) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this survey area?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" style="background:none; border:none; color:#ef4444; font-size: 0.85rem; padding:0;">Remove</button>
-                                </form>
-                            </div>
-                        </li>
-                    @endforeach
-                </ul>
+                                <div class="flex items-center gap-4">
+                                    <a href="{{ route('projects.surveys.map', [$project->project_Id, $location->id]) }}" class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
+                                        Open Map <i class="fa-solid fa-arrow-right text-[10px] ml-0.5"></i>
+                                    </a>
+                                    <form action="{{ route('projects.surveys.destroy', [$project->project_Id, $location->id]) }}" method="POST" class="m-0" onsubmit="return confirm('Delete this survey area?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-sm font-semibold text-red-500 hover:text-red-700 transition-colors">Remove</button>
+                                    </form>
+                                </div>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
             @else
-                <div class="text-center py-5 border" style="background: #fafafa; border-color: #eaeaea; border-radius: 4px;">
-                    <div class="text-muted mb-3" style="font-size: 0.9rem;">No survey areas have been defined.</div>
-                    <button type="button" class="btn-outline-dark-minimal" data-bs-toggle="modal" data-bs-target="#newSurveyModal">
+                <div class="text-center py-12 bg-white border border-slate-200 rounded-lg shadow-sm">
+                    <div class="w-12 h-12 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fa-regular fa-map text-xl"></i>
+                    </div>
+                    <div class="text-sm font-medium text-slate-500 mb-4">No survey areas have been defined.</div>
+                    <button type="button" class="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 rounded text-xs font-bold uppercase tracking-wider transition-colors shadow-sm" data-bs-toggle="modal" data-bs-target="#newSurveyModal">
                         Create First Area
                     </button>
                 </div>
@@ -223,32 +98,37 @@
 
         <!-- 3. ACTION -->
         @if($project->surveyLocations->count() > 0)
-            <div class="text-center mt-5 pt-5 border-top" style="border-color: #eaeaea !important;">
-                <div class="d-flex justify-content-center gap-3">
-                    <a href="{{ route('quotation.index', ['project_id' => $project->project_Id]) }}" class="btn-dark-minimal">
+            <div class="mt-8 pt-8 border-t border-slate-200 text-center">
+                <div class="flex flex-col sm:flex-row justify-center gap-3">
+                    <a href="{{ route('quotation.index', ['project_id' => $project->project_Id]) }}" class="inline-flex justify-center items-center px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-bold transition-colors shadow-sm">
                         Proceed to Quotation
                     </a>
-                    <a href="{{ route('projects.report.preview', $project->project_Id) }}" class="btn-outline-dark-minimal">View Survey Report</a>
+                    <a href="{{ route('projects.report.preview', $project->project_Id) }}" class="inline-flex justify-center items-center px-6 py-2.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-md text-sm font-bold transition-colors shadow-sm">
+                        View Survey Report
+                    </a>
                 </div>
             </div>
         @endif
     </div>
 
+    <!-- Modal -->
     <div class="modal fade" id="newSurveyModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content rounded-0 border-0" style="box-shadow: 0 20px 40px rgba(0,0,0,0.1);">
+            <div class="modal-content border-0 rounded-lg shadow-xl overflow-hidden">
                 <form action="{{ route('projects.surveys.store', $project->project_Id) }}" method="POST">
                     @csrf
-                    <div class="modal-header border-bottom-0 pb-0 pt-4 px-4 d-flex justify-content-between align-items-center">
-                        <h5 class="modal-title fw-bold" style="font-size: 1.1rem; letter-spacing: -0.02em;">New Survey Area</h5>
-                        <button type="button" class="btn-close" style="font-size: 0.7rem;" data-bs-dismiss="modal" aria-label="Close"></button>
+                    <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                        <h5 class="text-base font-bold text-slate-800">New Survey Area</h5>
+                        <button type="button" class="text-slate-400 hover:text-slate-600 transition-colors" data-bs-dismiss="modal" aria-label="Close">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
                     </div>
-                    <div class="modal-body p-4">
-                        <div class="mb-4">
-                            <label for="name" class="input-label" style="text-transform: uppercase; font-size: 0.7rem; letter-spacing: 0.05em; color: #888;">Area Name</label>
-                            <input type="text" class="minimal-input" style="border-top:none; border-left:none; border-right:none; border-radius:0; padding: 0.5rem 0; background: transparent;" id="name" name="name" placeholder="e.g. Main River, Tributary A" required>
+                    <div class="p-6 bg-white">
+                        <div class="mb-6">
+                            <label for="name" class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">Area Name</label>
+                            <input type="text" class="w-full px-3 py-2 bg-white border border-slate-200 rounded-md text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm transition-shadow" id="name" name="name" placeholder="e.g. Main River, Tributary A" required>
                         </div>
-                        <button type="submit" class="btn-dark-minimal w-100" style="padding: 0.75rem;">Create Area</button>
+                        <button type="submit" class="w-full flex justify-center py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-bold transition-colors shadow-sm">Create Area</button>
                     </div>
                 </form>
             </div>
