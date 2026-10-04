@@ -57,11 +57,27 @@ function calculateShotSpacing(groundHeight, frontOverlapPercent) {
 }
 
 /**
+ * Calculates the required Altitude in meters from a Target GSD in cm/pixel.
+ * @param {number} targetGSD_cm - Target Ground Sample Distance in cm/pixel
+ * @param {Object} cameraSpec - Camera specification object
+ * @returns {number} Altitude in meters
+ */
+function calculateAltitudeFromGSD(targetGSD_cm, cameraSpec) {
+    if (!targetGSD_cm || !cameraSpec || !cameraSpec.sensor_width_mm || !cameraSpec.image_width_px) return 0;
+    
+    // Altitude_m = (ImageWidth_px * TargetGSD_cm * FocalLength_mm) / (SensorWidth_mm * 100)
+    let altitudeMeters = (cameraSpec.image_width_px * targetGSD_cm * cameraSpec.focal_length_mm) / (cameraSpec.sensor_width_mm * 100);
+    
+    return altitudeMeters;
+}
+
+/**
  * Expose for frontend or module usage
  */
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         calculateGSD,
+        calculateAltitudeFromGSD,
         calculateGroundFootprint,
         calculateLineSpacing,
         calculateShotSpacing
@@ -69,6 +85,7 @@ if (typeof module !== 'undefined' && module.exports) {
 } else {
     window.PhotogrammetryMath = {
         calculateGSD,
+        calculateAltitudeFromGSD,
         calculateGroundFootprint,
         calculateLineSpacing,
         calculateShotSpacing

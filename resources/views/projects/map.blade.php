@@ -18,6 +18,7 @@
         <div class="workspace-sidebar">
 
             <!-- KEY METRIC HIGHLIGHT STRIP (Always Visible) -->
+            @if($project->survey_type !== 'drone')
             <div class="metric-strip">
                 <div class="metric-grid">
                     <div class="metric-item">
@@ -38,27 +39,13 @@
                     </div>
                 </div>
             </div>
+            @endif
 
             <!-- SCROLLABLE ACCORDION CONTENT -->
             <div class="sidebar-content">
                 <div class="accordion ws-accordion" id="sidebarAccordion">
 
-                    <!-- 1. PROJECT INFO -->
-                    <div class="accordion-item">
-                        <h2 class="accordion-header">
-                            <button class="accordion-button collapsed accent-blue" type="button" data-bs-toggle="collapse" data-bs-target="#panelProject">
-                                <span class="panel-icon bg-blue"><i class="fa-solid fa-folder-open"></i></span>
-                                Project
-                            </button>
-                        </h2>
-                        <div id="panelProject" class="accordion-collapse collapse show">
-                            <div class="accordion-body">
-                                <div class="stat-row"><span class="stat-label">Name</span><span class="stat-value">{{ $project->name }}</span></div>
-                                <div class="stat-row"><span class="stat-label">Client</span><span class="stat-value">{{ $project->client?->name ?? 'N/A' }}</span></div>
-                                <div class="stat-row"><span class="stat-label">Location</span><span class="stat-value">{{ $project->location ?? 'N/A' }}</span></div>
-                            </div>
-                        </div>
-                    </div>
+
 
                     <!-- 2. BOUNDARY -->
                     <div class="accordion-item">
@@ -301,6 +288,20 @@
 
             <!-- MAP FLOATING ACTIONS REMOVED (Moved to sidebar) -->
 
+            @if($project->survey_type === 'drone')
+            <!-- FLOATING MISSION ESTIMATE (Drone) -->
+            <div class="position-absolute" style="z-index: 1000; top: 15px; left: 50%; transform: translateX(-50%); pointer-events: none;">
+                <div class="bg-white rounded shadow-sm border p-2 d-flex gap-3 align-items-center" style="pointer-events: auto; background-color: rgba(255,255,255,0.95) !important;">
+                    <div class="fw-bold pe-2 border-end" style="font-size: 0.8rem; color: var(--accent-orange);"><i class="fa-solid fa-plane"></i> Estimate</div>
+                    <div style="font-size: 0.75rem;"><span class="text-muted">Lines:</span> <span id="float-lines" class="fw-bold">0</span></div>
+                    <div style="font-size: 0.75rem;"><span class="text-muted">Images:</span> <span id="float-images" class="fw-bold">0</span></div>
+                    <div style="font-size: 0.75rem;"><span class="text-muted">Dist:</span> <span id="float-distance" class="fw-bold">0 m</span></div>
+                    <div style="font-size: 0.75rem;"><span class="text-muted">Time:</span> <span id="float-duration" class="fw-bold text-success">0m 0s</span></div>
+                    <div style="font-size: 0.75rem;"><span class="text-muted">Sorties:</span> <span id="float-sorties" class="fw-bold" style="color: var(--accent-purple);">0</span></div>
+                </div>
+            </div>
+            @endif
+
             <!-- BASEMAP SELECTOR (top-right) -->
             <div class="position-absolute mt-2 me-2" style="z-index: 1000; top: 80px; right: 10px;">
                 <div class="map-basemap-control">
@@ -368,7 +369,10 @@
          ============================================================ -->
     <!-- DYNAMIC CACHE BUSTER FOR MATH ENGINE -->
     <script src="{{ asset('js/survey-math.js') }}?v={{ time() }}"></script>
-    <script src="{{ asset('js/drone_mapping/camera_specs.js') }}?v={{ time() }}"></script>
+    <script>
+        window.DB_DRONES = @json($activeDrones ?? []);
+        window.DB_CAMERAS = @json($activeCameras ?? []);
+    </script>
     <script src="{{ asset('js/drone_mapping/photogrammetry.js') }}?v={{ time() }}"></script>
     <script src="{{ asset('js/drone_mapping/ui.js') }}?v={{ time() }}"></script>
 
@@ -607,9 +611,11 @@
             // 12. Time estimation reactivity (handled by inline onchange in HTML)
 
             // Drone Mapping UI Initialization
-            const isDroneMode = '{{ $project->survey_type }}' === 'drone';
-            if (isDroneMode && typeof DroneUI !== 'undefined') {
-                DroneUI.init('drone-ui-container');
+            window.isDroneMode = '{{ $project->survey_type }}' === 'drone';
+            window.EQUIPMENT_DB_URL = "{{ url('/admin/equipment') }}";
+            if (window.isDroneMode && typeof DroneUI !== 'undefined') {
+                const savedParams = {!! json_encode($surveyLocation->droneMappingParameters) !!};
+                DroneUI.init('drone-ui-container', savedParams);
                 const droneAcc = document.getElementById('droneMappingAccordionItem');
                 if (droneAcc) droneAcc.style.display = 'block';
             }
@@ -617,6 +623,11 @@
             // Define the global callback for Drone Mapping Line Generation
             window.requestDroneLinesGeneration = function() {
                 if (!DroneUI.currentSettings) return;
+                
+                if (DroneUI.currentSettings.isValid === false) {
+                    Swal.fire('Validation Error', 'Please fix the invalid mission parameters before generating the flight path.', 'error');
+                    return;
+                }
 
                 // 1. Calculate side lap spacing in meters
                 const footprints = PhotogrammetryMath.calculateGroundFootprint(
@@ -628,12 +639,20 @@
                     DroneUI.currentSettings.sideOverlap
                 );
                 
-                const angle = document.getElementById('drone_course_angle').value;
+                let isAutoAngle = document.getElementById('angle_mode_auto') && document.getElementById('angle_mode_auto').checked;
+                let angle = parseFloat(document.getElementById('drone_course_angle').value) || 0;
+                let margin = DroneUI.currentSettings.margin || 0;
 
                 // 2. Clear old lines
                 mainLineLayerGroup.clearLayers();
                 crossLineLayerGroup.clearLayers();
                 labelLayerGroup.clearLayers();
+                
+                // Clear any Start/End markers specifically if they exist outside labelLayerGroup
+                if (window.routeMarkers) {
+                    window.routeMarkers.forEach(m => map.removeLayer(m));
+                }
+                window.routeMarkers = [];
                 
                 let toRemove = [];
                 drawnItems.eachLayer(function(layer) {
@@ -643,14 +662,115 @@
                 });
                 toRemove.forEach(l => drawnItems.removeLayer(l));
                 
+                if (boundaryFeatures.length === 0) {
+                    Swal.fire('No Boundary', 'Please draw a survey boundary polygon first.', 'warning');
+                    return;
+                }
+                
+                let originalBoundary = boundaryFeatures[0];
+                let effectiveBoundary = originalBoundary;
+                
+                // Apply inward margin
+                if (margin > 0) {
+                    try {
+                        let buffered = turf.buffer(originalBoundary, -margin, {units: 'meters'});
+                        if (!buffered || !buffered.geometry || buffered.geometry.type !== 'Polygon' && buffered.geometry.type !== 'MultiPolygon') {
+                            Swal.fire('Margin Too Large', 'The mapping margin has collapsed the survey area entirely. Reverting to original area.', 'warning');
+                        } else {
+                            effectiveBoundary = buffered;
+                        }
+                    } catch (e) {
+                        console.error("Buffer error:", e);
+                        Swal.fire('Margin Error', 'Could not apply margin. Reverting to original area.', 'warning');
+                    }
+                }
+                
+                // Expose effective boundary for generation
+                window.droneEffectiveBoundary = effectiveBoundary;
+                
+                // Draw Effective Boundary as a dashed orange line
+                if (effectiveBoundary !== originalBoundary) {
+                    let effLayer = L.geoJSON(effectiveBoundary, {
+                        style: { color: '#f97316', weight: 2, dashArray: '5, 5', fillOpacity: 0.1 }
+                    });
+                    // We don't want to add it to drawnItems because it's derived. We'll add it to boundaryLayerGroup.
+                    boundaryLayerGroup.addLayer(effLayer);
+                }
+
+                // Auto Angle Calculation
+                if (isAutoAngle) {
+                    try {
+                        let hull = turf.convex(effectiveBoundary);
+                        if (hull && hull.geometry && hull.geometry.coordinates && hull.geometry.coordinates[0]) {
+                            let coords = hull.geometry.coordinates[0];
+                            let longestDist = -1;
+                            let bestAngle = 0;
+                            
+                            for (let i = 0; i < coords.length - 1; i++) {
+                                let pt1 = turf.point(coords[i]);
+                                let pt2 = turf.point(coords[i+1]);
+                                let dist = turf.distance(pt1, pt2, {units: 'meters'});
+                                if (dist > longestDist) {
+                                    longestDist = dist;
+                                    bestAngle = turf.bearing(pt1, pt2);
+                                }
+                            }
+                            
+                            // Normalize angle to 0-359
+                            if (bestAngle < 0) bestAngle += 360;
+                            angle = bestAngle;
+                            document.getElementById('drone_course_angle').value = Math.round(angle);
+                        }
+                    } catch (e) {
+                        console.error("Auto angle error:", e);
+                    }
+                }
+
                 // 3. Inject settings into global window variables instead of missing DOM elements
                 window.droneTempSpacing = lineSpacingMeters;
-                window.droneTempAngle = parseFloat(angle) || 0;
+                window.droneTempAngle = angle;
                 
                 // 4. Trigger standard line generation
-                generateLines('main', true, function(totalDistanceMeters) {
+                generateLines('main', true, function(totalDistanceMeters, lineLengthsArray) {
                     // This callback runs after lines are generated and distance is known
-                    DroneUI.updateFinalMetrics(totalDistanceMeters);
+                    DroneUI.updateFinalMetrics(totalDistanceMeters, lineLengthsArray);
+                    
+                    // Add Start and End markers
+                    let layers = mainLineLayerGroup.getLayers();
+                    if (layers.length > 0) {
+                        let firstLineCoords = null;
+                        let lastLineCoords = null;
+                        
+                        // Because the worker might return multiple features, we need the first and last point
+                        // But turf might return one big MultiLineString or multiple LineStrings.
+                        // mainLineLayerGroup will have L.geoJSON wrappers.
+                        layers.forEach(layer => {
+                            if (layer.getLayers) {
+                                layer.getLayers().forEach(sublayer => {
+                                    if (sublayer.feature && sublayer.feature.geometry.type === 'LineString') {
+                                        let coords = sublayer.feature.geometry.coordinates;
+                                        if (coords.length > 0) {
+                                            if (!firstLineCoords) firstLineCoords = coords[0];
+                                            lastLineCoords = coords[coords.length - 1];
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                        
+                        if (firstLineCoords && lastLineCoords) {
+                            let startMarker = L.circleMarker([firstLineCoords[1], firstLineCoords[0]], {
+                                radius: 6, fillColor: '#22c55e', color: '#fff', weight: 2, fillOpacity: 1
+                            }).bindTooltip('Start');
+                            let endMarker = L.circleMarker([lastLineCoords[1], lastLineCoords[0]], {
+                                radius: 6, fillColor: '#ef4444', color: '#fff', weight: 2, fillOpacity: 1
+                            }).bindTooltip('End');
+                            
+                            startMarker.addTo(map);
+                            endMarker.addTo(map);
+                            window.routeMarkers.push(startMarker, endMarker);
+                        }
+                    }
                 });
             };
 
@@ -736,7 +856,12 @@
                     }
 
                     recalculateAllStats();
-
+                    
+                    // Synchronize Drone UI with re-calculated metrics to replace stale saved DB values
+                    if (window.isDroneMode && typeof DroneUI !== 'undefined' && window.surveyCalcVars && window.surveyCalcVars.mainLineLengthsArray) {
+                        DroneUI.updateFinalMetrics(window.surveyCalcVars.totalLength, window.surveyCalcVars.mainLineLengthsArray);
+                    }
+                    
                     if (drawnItems.getLayers().length > 0) {
                         map.fitBounds(drawnItems.getBounds());
                     } else if ("{{ $project->location }}") {
@@ -813,10 +938,11 @@
                 let mainCount = 0, crossCount = 0;
             let mainLength = 0, crossLength = 0;
             let boundaryArea = 0, boundaryPerimeter = 0, verticesCount = 0;
+            let mainLineLengths = []; // Added for Drone Mapping actual per-line image calculation
             boundaryFeatures = [];
             
             let genModeEl = document.getElementById('gen-mode');
-            let mode = genModeEl ? genModeEl.value : 'polygon';
+            let mode = genModeEl ? genModeEl.value : (window.isDroneMode ? 'polygon' : 'polygon');
             let foundCenterline = false;
 
             drawnItems.eachLayer(function(layer) {
@@ -848,12 +974,6 @@
                 } else if (layer instanceof L.Polyline) {
                     let len = 0;
                     let coords = geojson.geometry.coordinates;
-                    for (let i = 0; i < coords.length - 1; i++) {
-                        len += map.distance(
-                            L.latLng(coords[i][1], coords[i][0]),
-                            L.latLng(coords[i+1][1], coords[i+1][0])
-                        );
-                    }
                     let isCross = false;
                     let isMain = false;
 
@@ -873,12 +993,59 @@
                         }
                     }
 
-                    if (isCross) {
-                        crossLength += len;
-                        crossCount++;
-                    } else if (isMain) {
+                    if (window.isDroneMode && layer.isGenerated && isMain) {
+                        let currentLineLength = 0;
+                        let baseBearing = null;
+                        
+                        for (let i = 0; i < coords.length - 1; i++) {
+                            let p1 = turf.point(coords[i]);
+                            let p2 = turf.point(coords[i+1]);
+                            let segLen = map.distance(
+                                L.latLng(coords[i][1], coords[i][0]),
+                                L.latLng(coords[i+1][1], coords[i+1][0])
+                            );
+                            len += segLen;
+                            
+                            if (segLen < 0.1) continue;
+                            
+                            let rawBearing = turf.bearing(p1, p2);
+                            let bearing = (rawBearing + 360) % 180;
+                            if (baseBearing === null) baseBearing = bearing;
+                            
+                            let diff = Math.abs(bearing - baseBearing);
+                            let isParallel = diff < 10 || diff > 170;
+                            
+                            if (isParallel) {
+                                currentLineLength += segLen;
+                            } else {
+                                if (currentLineLength > 0) {
+                                    mainLineLengths.push(currentLineLength);
+                                    currentLineLength = 0;
+                                }
+                            }
+                        }
+                        if (currentLineLength > 0) {
+                            mainLineLengths.push(currentLineLength);
+                        }
+                        
                         mainLength += len;
-                        mainCount++;
+                        mainCount += mainLineLengths.length;
+                    } else {
+                        for (let i = 0; i < coords.length - 1; i++) {
+                            len += map.distance(
+                                L.latLng(coords[i][1], coords[i][0]),
+                                L.latLng(coords[i+1][1], coords[i+1][0])
+                            );
+                        }
+                        
+                        if (isCross) {
+                            crossLength += len;
+                            crossCount++;
+                        } else if (isMain) {
+                            mainLength += len;
+                            mainCount++;
+                            mainLineLengths.push(len); // Store true length for each segment
+                        }
                     }
                     
                     layer.feature = layer.feature || { type: "Feature", properties: {} };
@@ -915,7 +1082,9 @@
             }
 
             // FORMULA: Main Distance = Number of Main Lines × Survey Width (lineLength)
-            let mainLengthMeters = mainCount * lineLength;
+            // CRITICAL FIX: For Drone Mapping, use the exact sum of true GIS segment lengths (mainLength), 
+            // NOT the bounding box approximation.
+            let mainLengthMeters = window.isDroneMode ? mainLength : (mainCount * lineLength);
             
             // Crossline Distance = actual real-world length calculated (crossLength)
             let totalLength = mainLengthMeters + crossLength;
@@ -940,7 +1109,8 @@
                 totalLength: totalLength,
                 mainNM: mainNM,
                 crossNM: crossNM,
-                totalNM: totalNM
+                totalNM: totalNM,
+                mainLineLengthsArray: mainLineLengths // Export array of exact segment lengths
             };
 
             // Update UI elements if they exist
@@ -952,8 +1122,12 @@
             // Boundary
             updateIfExist('stat-boundary-area', boundaryArea.toLocaleString(undefined, {maximumFractionDigits:2}) + ' m²');
             updateIfExist('stat-eng-boundary-area', boundaryArea.toLocaleString(undefined, {maximumFractionDigits:2}) + ' m²');
+            updateIfExist('res_area', boundaryArea.toLocaleString(undefined, {maximumFractionDigits:2}) + ' m²');
+            
             updateIfExist('stat-boundary-perimeter', (boundaryPerimeter / 1000).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + ' km');
             updateIfExist('stat-eng-boundary-perimeter', (boundaryPerimeter / 1000).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + ' km');
+            updateIfExist('res_perimeter', (boundaryPerimeter / 1000).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + ' km');
+            
             updateIfExist('stat-survey-length', (coverageWidth / 1000).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2}) + ' km');
 
             // Main Lines
@@ -1081,8 +1255,10 @@
                 spacingMeters = window.droneTempSpacing || 10;
                 angle = window.droneTempAngle || 0;
             } else if (type === 'cross') {
-                spacingMeters = parseFloat(document.getElementById('gen-cross-spacing').value);
-                let baseAngle = parseFloat(document.getElementById('gen-angle').value) || 0;
+                let genCrossEl = document.getElementById('gen-cross-spacing');
+                spacingMeters = genCrossEl ? parseFloat(genCrossEl.value) : 100;
+                let genAngleEl = document.getElementById('gen-angle');
+                let baseAngle = genAngleEl ? (parseFloat(genAngleEl.value) || 0) : 0;
                 // Hardcode tie lines to strictly 90 degrees offset from main lines
                 let crossAngle = 90;
                 angle = baseAngle + crossAngle;
@@ -1092,8 +1268,10 @@
                     return;
                 }
             } else {
-                spacingMeters = parseFloat(document.getElementById('gen-spacing').value);
-                angle = parseFloat(document.getElementById('gen-angle').value);
+                let genSpacingEl = document.getElementById('gen-spacing');
+                spacingMeters = genSpacingEl ? parseFloat(genSpacingEl.value) : 10;
+                let genAngleEl = document.getElementById('gen-angle');
+                angle = genAngleEl ? (parseFloat(genAngleEl.value) || 0) : 0;
             }
 
             let loadingText = type === 'cross' ? 'Generating Tie Lines...' : 'Generating Main Lines...';
@@ -1125,8 +1303,9 @@
 
             let promises = boundaryFeatures.map(boundaryFeature => {
                 return new Promise((resolve, reject) => {
-                    let bbox = turf.bbox(boundaryFeature);
-                    let center = turf.center(boundaryFeature);
+                    let targetBoundary = (isDrone && window.droneEffectiveBoundary) ? window.droneEffectiveBoundary : boundaryFeature;
+                    let bbox = turf.bbox(targetBoundary);
+                    let center = turf.center(targetBoundary);
                     let worker = new Worker('/js/gis-worker.js?v=' + (new Date().getTime() + 1000));
 
                     worker.onmessage = function(e) {
@@ -1146,23 +1325,27 @@
 
                     if (mode === 'centerline' && type === 'main') {
                         postMode = 'centerline_offset';
-                        postSpacing = parseFloat(document.getElementById('gen-cl-spacing').value);
-                        leftCount = parseInt(document.getElementById('gen-cl-left').value);
-                        rightCount = parseInt(document.getElementById('gen-cl-right').value);
+                        let clSpacingEl = document.getElementById('gen-cl-spacing');
+                        postSpacing = clSpacingEl ? parseFloat(clSpacingEl.value) : 50;
+                        let clLeftEl = document.getElementById('gen-cl-left');
+                        leftCount = clLeftEl ? parseInt(clLeftEl.value) : 2;
+                        let clRightEl = document.getElementById('gen-cl-right');
+                        rightCount = clRightEl ? parseInt(clRightEl.value) : 2;
                     }
 
                     worker.postMessage({
                         mode: postMode,
                         spacingMeters: postSpacing,
                         angle: angle,
-                        boundaryFeature: boundaryFeature,
+                        boundaryFeature: targetBoundary,
                         center: center,
                         bbox: bbox,
                         crossSpacingMeters: 0,
                         crossAngle: 0,
                         centerlineFeature: centerlineFeature,
                         leftCount: leftCount,
-                        rightCount: rightCount
+                        rightCount: rightCount,
+                        continuous: isDrone
                     });
                 });
             });
@@ -1211,13 +1394,16 @@
                 recalculateAllStats();
                 hideMapLoading();
                 
-                // If a callback was provided, invoke it with the total main line distance
+                // If a callback was provided, invoke it with the total main line distance and exact segment lengths
                 if (typeof callback === 'function') {
-                    // Grab distance from the recalculateAllStats outputs
-                    // The element 'stat-main-dist-km' holds it in km (e.g. "2.45 km")
-                    let kmText = document.getElementById('stat-main-dist-km').innerText;
-                    let kmVal = parseFloat(kmText.replace(' km', '')) || 0;
-                    callback(kmVal * 1000); // pass meters
+                    // Use the globally calculated variable if available
+                    let dist = (window.surveyCalcVars && window.surveyCalcVars.totalLength) 
+                                ? window.surveyCalcVars.totalLength 
+                                : 0;
+                    let lineArr = (window.surveyCalcVars && window.surveyCalcVars.mainLineLengthsArray) 
+                                ? window.surveyCalcVars.mainLineLengthsArray 
+                                : [];
+                    callback(dist, lineArr);
                 }
             }).catch(err => {
                 hideMapLoading();
@@ -1329,13 +1515,17 @@
                 boundaries: boundariesPayload,
                 lines: lines,
                 generation_settings: {
-                    line_spacing: document.getElementById('gen-spacing').value,
-                    orientation_angle: document.getElementById('gen-angle').value,
-                    cross_spacing: document.getElementById('gen-cross-spacing').value || null
+                    line_spacing: document.getElementById('gen-spacing') ? document.getElementById('gen-spacing').value : null,
+                    orientation_angle: document.getElementById('gen-angle') ? document.getElementById('gen-angle').value : null,
+                    cross_spacing: document.getElementById('gen-cross-spacing') ? document.getElementById('gen-cross-spacing').value : null
                 },
                 is_generated: true,
                 override_total_distance_meters: window.currentTotalLengthMeters || 0
             };
+
+            let droneId = document.getElementById('drone_model_select')?.value;
+            let droneSpec = (window.droneMappingSpecs && window.droneMappingSpecs.drones) ? window.droneMappingSpecs.drones.find(d => d.name === droneId) : null;
+            let usableFlightTime = (droneSpec && droneSpec.usable_flight_time_min > 0) ? droneSpec.usable_flight_time_min : null;
 
             let paramsPayload = {
                 sbes: {
@@ -1343,12 +1533,24 @@
                     working_hours_per_day: document.getElementById('sbes-workhrs')?.value || null
                 },
                 drone: {
+                    drone_model: document.getElementById('drone_model_select')?.value || null,
                     camera_model: document.getElementById('drone_camera_model')?.value || null,
                     altitude_m: document.getElementById('drone_altitude')?.value || null,
+                    target_gsd_cm: document.getElementById('drone_target_gsd')?.value || null,
+                    gsd_cm: document.getElementById('drone_gsd_val')?.value || null,
+                    ground_footprint_width_m: document.getElementById('drone_ground_width_val')?.value || null,
+                    ground_footprint_height_m: document.getElementById('drone_ground_height_val')?.value || null,
+                    photo_spacing_m: document.getElementById('drone_photo_spacing_val')?.value || null,
+                    flight_line_spacing_m: document.getElementById('drone_line_spacing_val')?.value || null,
+                    photo_interval_s: document.getElementById('drone_photo_interval_val')?.value || null,
+                    usable_flight_time_min: usableFlightTime,
+                    sortie_count: document.getElementById('drone_sortie_count')?.value || null,
                     speed_ms: document.getElementById('drone_speed')?.value || null,
                     front_overlap_percent: document.getElementById('drone_front_overlap')?.value || null,
                     side_overlap_percent: document.getElementById('drone_side_overlap')?.value || null,
-                    course_angle_deg: document.getElementById('drone_course_angle')?.value || null,
+                    course_angle_deg: window.droneTempAngle !== undefined ? window.droneTempAngle : (document.getElementById('drone_course_angle')?.value || null),
+                    mapping_margin_m: document.getElementById('drone_mapping_margin')?.value || null,
+                    capture_mode: document.querySelector('input[name="capture_mode"]:checked') ? document.querySelector('input[name="capture_mode"]:checked').value : null,
                     total_flight_distance_m: document.getElementById('drone_total_distance')?.value || null,
                     total_images: document.getElementById('drone_total_images')?.value || null,
                     estimated_duration_hours: document.getElementById('drone_duration_hours')?.value || null
@@ -1368,13 +1570,13 @@
             });
 
             console.log("DEBUG: POSTing to backend -> ", mapPayload);
-                    fetch("{{ route('projects.surveys.map.save', [$project->project_Id, $surveyLocation->id]) }}", {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                body: JSON.stringify(mapPayload)
+            fetch("{{ route('projects.surveys.map.save', [$project->project_Id, $surveyLocation->id]) }}", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify({ ...mapPayload, params: paramsPayload })
             })
             .then(response => {
                 console.log("DEBUG: Map POST Response received.", response);

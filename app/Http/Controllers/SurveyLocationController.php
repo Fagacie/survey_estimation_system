@@ -44,8 +44,13 @@ class SurveyLocationController extends Controller
         $this->authorizeSurveyLocation($project, $surveyLocation);
 
         // Load relationships needed for the map
-        $surveyLocation->load('boundaries', 'sbesParameters');
-        return view('projects.map', compact('project', 'surveyLocation'));
+        $surveyLocation->load('boundaries', 'sbesParameters', 'droneMappingParameters');
+        
+        // Fetch active equipment for Drone Mapping
+        $activeDrones = \App\Models\Drone::where('is_active', true)->orderBy('name')->get();
+        $activeCameras = \App\Models\Camera::where('is_active', true)->orderBy('name')->get();
+
+        return view('projects.map', compact('project', 'surveyLocation', 'activeDrones', 'activeCameras'));
     }
 
     public function saveMap(Request $request, Project $project, SurveyLocation $surveyLocation)
@@ -81,8 +86,18 @@ class SurveyLocationController extends Controller
             'sbes.survey_speed_knots' => 'nullable|numeric',
             'sbes.working_hours_per_day' => 'nullable|numeric',
             'drone' => 'nullable|array',
+            'drone.drone_model' => 'nullable|string',
             'drone.camera_model' => 'nullable|string',
             'drone.altitude_m' => 'nullable|numeric',
+            'drone.target_gsd_cm' => 'nullable|numeric',
+            'drone.gsd_cm' => 'nullable|numeric',
+            'drone.ground_footprint_width_m' => 'nullable|numeric',
+            'drone.ground_footprint_height_m' => 'nullable|numeric',
+            'drone.photo_spacing_m' => 'nullable|numeric',
+            'drone.flight_line_spacing_m' => 'nullable|numeric',
+            'drone.photo_interval_s' => 'nullable|numeric',
+            'drone.usable_flight_time_min' => 'nullable|numeric',
+            'drone.sortie_count' => 'nullable|numeric',
             'drone.speed_ms' => 'nullable|numeric',
             'drone.front_overlap_percent' => 'nullable|numeric',
             'drone.side_overlap_percent' => 'nullable|numeric',
@@ -90,6 +105,8 @@ class SurveyLocationController extends Controller
             'drone.total_flight_distance_m' => 'nullable|numeric',
             'drone.total_images' => 'nullable|numeric',
             'drone.estimated_duration_hours' => 'nullable|numeric',
+            'drone.mapping_margin_m' => 'nullable|numeric',
+            'drone.capture_mode' => 'nullable|string|in:timed,distance',
             'allowances' => 'nullable|array',
             'allowances.weather_days' => 'nullable|numeric|min:0',
             'allowances.mod_demod_days' => 'nullable|numeric|min:0',
@@ -102,17 +119,27 @@ class SurveyLocationController extends Controller
             ['survey_location_id' => $surveyLocation->id],
             [
                 'project_id' => $project->project_Id, // Support both just in case
-                'survey_speed_knots' => $data['sbes']['survey_speed_knots'] ?? null,
-                'working_hours_per_day' => $data['sbes']['working_hours_per_day'] ?? null,
+                'survey_speed_knots' => $data['sbes']['survey_speed_knots'] ?? 4.0,
+                'working_hours_per_day' => $data['sbes']['working_hours_per_day'] ?? 8.0,
             ]
         );
 
-        if (!empty($data['drone']['camera_model'])) {
+        if (!empty($data['drone']['camera_model']) || !empty($data['drone']['drone_model'])) {
             $surveyLocation->droneMappingParameters()->updateOrCreate(
                 ['survey_location_id' => $surveyLocation->id],
                 [
-                    'camera_model' => $data['drone']['camera_model'],
+                    'drone_model' => $data['drone']['drone_model'] ?? null,
+                    'camera_model' => $data['drone']['camera_model'] ?? null,
                     'altitude_m' => $data['drone']['altitude_m'] ?? 100,
+                    'target_gsd_cm' => $data['drone']['target_gsd_cm'] ?? null,
+                    'gsd_cm' => $data['drone']['gsd_cm'] ?? null,
+                    'ground_footprint_width_m' => $data['drone']['ground_footprint_width_m'] ?? null,
+                    'ground_footprint_height_m' => $data['drone']['ground_footprint_height_m'] ?? null,
+                    'photo_spacing_m' => $data['drone']['photo_spacing_m'] ?? null,
+                    'flight_line_spacing_m' => $data['drone']['flight_line_spacing_m'] ?? null,
+                    'photo_interval_s' => $data['drone']['photo_interval_s'] ?? null,
+                    'usable_flight_time_min' => $data['drone']['usable_flight_time_min'] ?? null,
+                    'sortie_count' => $data['drone']['sortie_count'] ?? null,
                     'speed_ms' => $data['drone']['speed_ms'] ?? 15,
                     'front_overlap_percent' => $data['drone']['front_overlap_percent'] ?? 80,
                     'side_overlap_percent' => $data['drone']['side_overlap_percent'] ?? 70,
@@ -120,6 +147,8 @@ class SurveyLocationController extends Controller
                     'total_flight_distance_m' => $data['drone']['total_flight_distance_m'] ?? 0,
                     'total_images' => $data['drone']['total_images'] ?? 0,
                     'estimated_duration_hours' => $data['drone']['estimated_duration_hours'] ?? 0,
+                    'mapping_margin_m' => $data['drone']['mapping_margin_m'] ?? null,
+                    'capture_mode' => $data['drone']['capture_mode'] ?? null,
                 ]
             );
         }
