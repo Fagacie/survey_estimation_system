@@ -17,6 +17,7 @@
         }
         h1 { color: #174a73; font-size: 22px; margin: 0 0 4px; }
         h2 { color: #174a73; font-size: 14px; border-bottom: 1px solid #cbd5e1; padding-bottom: 5px; margin-top: 22px; }
+        h4 { color: #174a73; font-size: 12px; margin-top: 15px; margin-bottom: 5px; }
         .muted { color: #64748b; }
         .meta, .data { width: 100%; border-collapse: collapse; margin-top: 8px; table-layout: fixed; }
         .meta td, .data td, .data th { border: 1px solid #cbd5e1; padding: 6px; overflow: hidden; word-wrap: break-word; }
@@ -31,14 +32,22 @@
     </style>
 </head>
 <body>
-    <h1>HYDROGRAPHIC SURVEY REPORT</h1>
+    @if(isset($project) && $project->survey_type === 'drone')
+        <h1>DRONE MAPPING SURVEY REPORT</h1>
+    @else
+        <h1>HYDROGRAPHIC SURVEY REPORT</h1>
+    @endif
     <div class="muted">Generated {{ $generated_at->format('d M Y H:i') }}</div>
 
     <table class="meta">
         <tr><td class="label">Project</td><td>{{ $project->name }}</td><td class="label">Project No.</td><td>{{ $project->number ?? 'N/A' }}</td></tr>
         <tr><td class="label">Client</td><td>{{ $project->client?->company_name ?? 'N/A' }}</td><td class="label">Period</td><td>{{ $project->period ?? 'N/A' }}</td></tr>
+        @if(isset($project) && $project->survey_type === 'drone')
+        <tr><td class="label">Survey Type</td><td>Drone Mapping</td><td class="label">Date</td><td>{{ $generated_at->format('Y-m-d') }}</td></tr>
+        @endif
     </table>
 
+    @if(!isset($project) || $project->survey_type !== 'drone')
     <h2>Survey Summary</h2>
     <table class="summary">
         <tr>
@@ -53,16 +62,44 @@
         <tr><td class="label">Weather Standby</td><td>{{ number_format($duration['weather_days'], 2) }} days</td><td class="label">MOB/DEMOB</td><td>{{ number_format($duration['mod_demod_days'], 2) }} days</td></tr>
         <tr><td class="label">Patch Test</td><td>{{ number_format($duration['patch_test_days'], 2) }} days</td><td class="label">Survey Areas</td><td>{{ $locations->count() }}</td></tr>
     </table>
+    @endif
 
     <h2>Survey Areas</h2>
     @forelse($locations as $location)
         <div class="area">
             <h3>{{ $location['name'] }}</h3>
-            <table class="data">
-                <tr><td class="label">Distance</td><td>{{ number_format($location['distance_nm'], 4) }} NM</td><td class="label">Survey Hours</td><td>{{ number_format($location['survey_hours'], 2) }}</td></tr>
-                <tr><td class="label">Execution Days</td><td>{{ number_format($location['execution_days'], 2) }}</td><td class="label">Survey Lines</td><td>{{ $location['line_count'] }} ({{ $location['main_line_count'] }} main, {{ $location['cross_line_count'] }} cross)</td></tr>
-                <tr><td class="label">Boundaries</td><td>{{ $location['boundary_count'] }}</td><td class="label">Boundary Area</td><td>{{ number_format($location['boundary_area'], 2) }} m2</td></tr>
-            </table>
+            
+            @if(isset($location['is_drone']) && $location['is_drone'])
+                <h4>Equipment</h4>
+                <table class="data">
+                    <tr><td class="label">Selected Drone</td><td>{{ $location['drone_model'] }}</td><td class="label">Selected Camera</td><td>{{ $location['camera_model'] }}</td></tr>
+                </table>
+                
+                <h4>Mapping Parameters</h4>
+                <table class="data">
+                    <tr><td class="label">Altitude</td><td>{{ $location['altitude_m'] }} m</td><td class="label">Target GSD</td><td>{{ $location['target_gsd_cm'] ? $location['target_gsd_cm'] . ' cm' : 'N/A' }}</td></tr>
+                    <tr><td class="label">Calculated GSD</td><td>{{ $location['gsd_cm'] }} cm</td><td class="label">Flight Speed</td><td>{{ $location['speed_ms'] }} m/s</td></tr>
+                    <tr><td class="label">Front Overlap</td><td>{{ $location['front_overlap'] }} %</td><td class="label">Side Overlap</td><td>{{ $location['side_overlap'] }} %</td></tr>
+                    <tr><td class="label">Course Angle</td><td>{{ $location['course_angle'] }} &deg;</td><td class="label">Photo Spacing</td><td>{{ $location['photo_spacing_m'] }} m</td></tr>
+                    <tr><td class="label">Photo Interval</td><td>{{ $location['photo_interval_s'] > 0 ? $location['photo_interval_s'] . ' s' : 'N/A' }}</td><td class="label">Usable Flight Time</td><td>{{ $location['usable_flight_time_min'] ? $location['usable_flight_time_min'] . ' min' : 'N/A' }}</td></tr>
+                </table>
+                
+                <h4>Mission Estimate</h4>
+                <table class="data">
+                    <tr><td class="label">Flight Lines</td><td>{{ $location['flight_lines'] }}</td><td class="label">Total Images</td><td>{{ $location['total_images'] }}</td></tr>
+                    <tr><td class="label">Total Distance</td><td>{{ number_format($location['distance_m'], 0) }} m</td><td class="label">Pure Flight Time</td><td>{{ $location['pure_flight_time_s'] > 0 ? gmdate('H:i:s', $location['pure_flight_time_s']) : '00:00:00' }}</td></tr>
+                    <tr><td class="label">Estimated Sorties</td><td>{{ $location['sortie_count'] }}</td><td class="label">Boundary Area</td><td>{{ number_format($location['boundary_area'], 2) }} m&sup2;</td></tr>
+                </table>
+                
+                <h4>Survey Area Map</h4>
+            @else
+                <table class="data">
+                    <tr><td class="label">Distance</td><td>{{ number_format($location['distance_nm'], 4) }} NM</td><td class="label">Survey Hours</td><td>{{ number_format($location['survey_hours'], 2) }}</td></tr>
+                    <tr><td class="label">Execution Days</td><td>{{ number_format($location['execution_days'], 2) }}</td><td class="label">Survey Lines</td><td>{{ $location['line_count'] }} ({{ $location['main_line_count'] }} main, {{ $location['cross_line_count'] }} cross)</td></tr>
+                    <tr><td class="label">Boundaries</td><td>{{ $location['boundary_count'] }}</td><td class="label">Boundary Area</td><td>{{ number_format($location['boundary_area'], 2) }} m&sup2;</td></tr>
+                </table>
+            @endif
+
             @if($location['screenshot'])
                 <div class="area-image">
                     <img src="{{ $location['screenshot'] }}" alt="Survey map for {{ $location['name'] }}">

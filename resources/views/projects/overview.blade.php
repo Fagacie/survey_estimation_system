@@ -171,9 +171,16 @@
         <div class="mb-5">
             <div class="d-flex justify-content-between align-items-end mb-3">
                 <div class="section-header border-0 mb-0 pb-0">1. Survey Areas</div>
-                <button type="button" class="btn-outline-dark-minimal py-1 px-3" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#newSurveyModal">
-                    + Add Area
-                </button>
+                <div>
+                    @if($project->survey_type === 'drone')
+                        <a href="{{ url('/admin/equipment') }}" class="btn-outline-dark-minimal py-1 px-3 me-2" style="font-size: 0.75rem; text-decoration: none;">
+                            <i class="fa-solid fa-database"></i> Equipment Database
+                        </a>
+                    @endif
+                    <button type="button" class="btn-outline-dark-minimal py-1 px-3" style="font-size: 0.75rem;" data-bs-toggle="modal" data-bs-target="#newSurveyModal">
+                        + Add Area
+                    </button>
+                </div>
             </div>
 
             @if($project->surveyLocations->count() > 0)

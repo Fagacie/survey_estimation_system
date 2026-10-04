@@ -150,6 +150,15 @@ Route::middleware('auth')->group(function () {
     Route::put('/items/{id}', [AdminController::class, 'update'])->name('items.update');
     Route::delete('/items/{id}', [AdminController::class, 'destroy'])->name('items.destroy');
 
+    // Drone & Camera Equipment Management
+    Route::get('/admin/equipment', [\App\Http\Controllers\DroneEquipmentController::class, 'index'])->name('admin.equipment.index');
+    Route::post('/admin/equipment/drone', [\App\Http\Controllers\DroneEquipmentController::class, 'storeDrone'])->name('admin.equipment.drone.store');
+    Route::put('/admin/equipment/drone/{drone}', [\App\Http\Controllers\DroneEquipmentController::class, 'updateDrone'])->name('admin.equipment.drone.update');
+    Route::post('/admin/equipment/drone/{drone}/toggle', [\App\Http\Controllers\DroneEquipmentController::class, 'toggleDrone'])->name('admin.equipment.drone.toggle');
+    Route::post('/admin/equipment/camera', [\App\Http\Controllers\DroneEquipmentController::class, 'storeCamera'])->name('admin.equipment.camera.store');
+    Route::put('/admin/equipment/camera/{camera}', [\App\Http\Controllers\DroneEquipmentController::class, 'updateCamera'])->name('admin.equipment.camera.update');
+    Route::post('/admin/equipment/camera/{camera}/toggle', [\App\Http\Controllers\DroneEquipmentController::class, 'toggleCamera'])->name('admin.equipment.camera.toggle');
+
     /*
     |--------------------------------------------------------------------------
     | Dynamic Dropdown API Endpoints (AJAX)
