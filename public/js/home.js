@@ -56,8 +56,9 @@ function renderPaymentTerms() {
             <input type="text" class="payment-inline-input term-percentage me-1" data-index="${index}" value="${term.percentage}" style="width:70px;">
             <span class="me-1">-</span>
             <input type="text" class="payment-inline-input term-condition flex-grow-1 me-1" data-index="${index}" value="${term.condition}">
-            <button type="button" class="btn btn-sm btn-link text-danger p-0 remove-term-btn" data-index="${index}">
-                <i class="bi bi-x-lg"></i>
+            <button type="button" class="remove-term-btn" data-index="${index}" title="Remove payment term"
+                    style="background:none; border:none; color:#ef4444; padding:0 6px; cursor:pointer; font-size:0.95rem;">
+                <i class="fa-solid fa-xmark"></i>
             </button>
         `;
         paymentTermsList.appendChild(row);
@@ -181,16 +182,19 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         };
 
-        selectTypeEl.addEventListener('change', autoSuggestIfEmpty);
-        clientEl.addEventListener('input', autoSuggestIfEmpty);
+                // Only auto-build the number for a brand-new quotation. When a project is loaded,
+        // its number is fixed and must not be rebuilt by editing the client or other fields.
+        if (!isEditMode) {
+            selectTypeEl.addEventListener('change', autoSuggestIfEmpty);
+            clientEl.addEventListener('input', autoSuggestIfEmpty);
 
-        // Running number stays user-editable
-        numberRunEl.addEventListener('input', refreshProjectNumber);
-        numberRunEl.addEventListener('blur', () => {
-            const n = parseInt(numberRunEl.value, 10);
-            if (!isNaN(n)) numberRunEl.value = String(n).padStart(3, '0');
-            refreshProjectNumber();
-        });
+            numberRunEl.addEventListener('input', refreshProjectNumber);
+            numberRunEl.addEventListener('blur', () => {
+                const n = parseInt(numberRunEl.value, 10);
+                if (!isNaN(n)) numberRunEl.value = String(n).padStart(3, '0');
+                refreshProjectNumber();
+            });
+        }
     }
 
     // ==========================================
@@ -362,6 +366,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     const periodVal    = document.getElementById('period')?.value || document.querySelector('[name="period"]')?.value || '';
                     const noOfPicVal   = document.getElementById('pic_no')?.value || document.querySelector('[name="pic_no"]')?.value || '';
                     const additionalNotesVal = document.getElementById('additional_notes')?.value || '';
+                    const signatoryVal = document.getElementById('signatory_id')?.value || '';   // Signed by
 
                     const payload = {
                         project_id: projectId || null,
@@ -374,10 +379,11 @@ document.addEventListener('DOMContentLoaded', function () {
                         pic_no: noOfPicVal,    // <-- ADDED THIS KEY
                         payment_terms: paymentTerms,
                         additional_notes: additionalNotesVal,
+                        signatory_id: (signatoryVal && signatoryVal !== 'new') ? parseInt(signatoryVal, 10) : null,
                         items: items
                     };
 
-                    const response = await fetch('/quotation', {
+                    const response = await fetch(window.quotationStoreUrl, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -397,6 +403,14 @@ document.addEventListener('DOMContentLoaded', function () {
                         const quotationNoField = document.getElementById('quotation_no');
                         if (quotationNoField && result.quotation_no) {
                                 quotationNoField.value = result.quotation_no;
+                        }
+
+                        // Show the corrected project number on the form
+                        if (result.project_number) {
+                            const numHidden = document.getElementById('number');
+                            const numPrefix = document.getElementById('number_prefix');
+                            if (numHidden) numHidden.value = result.project_number;
+                            if (numPrefix) numPrefix.value = result.project_number.split('/').slice(0, -1).join('/') + '/';
                         }
 
                         showModal(); 
@@ -539,6 +553,108 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         renderPaymentTerms();
+    }
+
+    // ==========================================
+    // SIGNED BY: dropdown + "add new person"
+    // ==========================================
+    const signatorySelect = document.getElementById('signatory_id');
+    const newSignatoryBox = document.getElementById('newSignatoryBox');
+    const newSignatoryError = document.getElementById('newSignatoryError');
+    const newSignatoryName = document.getElementById('newSignatoryName');
+    const newSignatoryPosition = document.getElementById('newSignatoryPosition');
+    const newSignatoryFile = document.getElementById('newSignatoryFile');
+    const saveNewSignatoryBtn = document.getElementById('saveNewSignatoryBtn');
+    let lastSignatoryId = signatorySelect ? signatorySelect.value : '';
+
+    function resetNewSignatoryBox() {
+        newSignatoryName.value = '';
+        newSignatoryPosition.value = '';
+        newSignatoryFile.value = '';
+        newSignatoryError.textContent = '';
+        newSignatoryError.classList.add('d-none');
+        newSignatoryBox.classList.add('d-none');
+    }
+
+    if (signatorySelect && newSignatoryBox) {
+        // If the list is empty, only "+ Add new person..." exists: open the box straight away
+        if (signatorySelect.value === 'new') {
+            newSignatoryBox.classList.remove('d-none');
+            lastSignatoryId = '';
+        }
+
+        signatorySelect.addEventListener('change', function () {
+            if (signatorySelect.value === 'new') {
+                newSignatoryBox.classList.remove('d-none');
+            } else {
+                lastSignatoryId = signatorySelect.value;
+                resetNewSignatoryBox();
+            }
+        });
+
+        document.getElementById('cancelNewSignatoryBtn')?.addEventListener('click', function () {
+            resetNewSignatoryBox();
+            signatorySelect.value = lastSignatoryId;
+        });
+
+        saveNewSignatoryBtn?.addEventListener('click', async function () {
+            const showError = (msg) => {
+                newSignatoryError.textContent = msg;
+                newSignatoryError.classList.remove('d-none');
+            };
+            newSignatoryError.classList.add('d-none');
+
+            const name = newSignatoryName.value.trim();
+            const position = newSignatoryPosition.value.trim();
+            const file = newSignatoryFile.files[0];
+
+            if (!name || !position || !file) {
+                showError('Please fill in the name, position and signature image.');
+                return;
+            }
+
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content')
+                || document.querySelector('input[name="_token"]')?.value;
+
+            const formData = new FormData();
+            formData.append('name', name);
+            formData.append('position', position);
+            formData.append('signature', file);
+
+            saveNewSignatoryBtn.disabled = true;
+            try {
+                const res = await fetch(window.signatoryStoreUrl, {
+                    method: 'POST',
+                    headers: { 'X-CSRF-TOKEN': csrfToken, 'Accept': 'application/json' },
+                    body: formData
+                });
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    const s = data.signatory;
+                    window.signatories = window.signatories || [];
+                    window.signatories.push(s);
+                    if (!window.defaultSignatoryId) window.defaultSignatoryId = s.id;
+
+                    const opt = document.createElement('option');
+                    opt.value = s.id;
+                    opt.textContent = s.name;
+                    signatorySelect.insertBefore(opt, signatorySelect.querySelector('option[value="new"]'));
+
+                    signatorySelect.value = String(s.id);
+                    lastSignatoryId = String(s.id);
+                    resetNewSignatoryBox();
+                } else if (res.status === 422 && data.errors) {
+                    showError(Object.values(data.errors).flat().join(' '));
+                } else {
+                    showError(data.message || 'Could not add this person.');
+                }
+            } catch (err) {
+                showError('Network error: ' + err.message);
+            } finally {
+                saveNewSignatoryBtn.disabled = false;
+            }
+        });
     }
 
     document.querySelectorAll('.quotation-item-card').forEach(card => calculateItemTotal(card));
@@ -962,6 +1078,12 @@ function renderQuotationPreview() {
     const previewDoc = document.getElementById('quotationPreviewDocument');
     if (!previewDoc) return;
 
+    // Escape text that goes into innerHTML
+    const esc = (s) => String(s ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+
     const getVal = (idOrName) => {
         const el = document.getElementById(idOrName) || document.querySelector(`[name="${idOrName}"]`);
         return el ? (el.value.trim() || '-') : '-';
@@ -972,35 +1094,56 @@ function renderQuotationPreview() {
         if (el) el.textContent = value;
     };
 
-    const startDate = getVal('project_start_date');
-    const endDate = getVal('project_end_date');
-    const periodVal = getVal('period');
-
+    // ---------- HEADER DETAILS ----------
     setElementText('preview-date-issued', new Date().toLocaleDateString('en-GB'));
     setElementText('preview-project', getVal('project'));
-    
+
     const quotationNoVal = getVal('quotation_no');
     setElementText('preview-number', quotationNoVal !== '-' ? quotationNoVal : `${getVal('number')} (Draft — not yet saved)`);
-  
+
     setElementText('preview-client', getVal('client'));
     setAddressHtml('preview-client_address', getVal('client_address'));
-    setElementText('preview-period', (startDate !== '-' && endDate !== '-') ? `${startDate} to ${endDate} (${periodVal})` : periodVal);
     setElementText('preview-pic', getVal('pic'));
     setElementText('preview-pic_no', getVal('pic_no'));
 
-    // PAYMENT TERMS & ADDITIONAL NOTES
+    // ---------- PAYMENT TERMS ----------
     const previewPaymentTermsEl = document.getElementById('preview-payment-terms');
     if (previewPaymentTermsEl) {
         previewPaymentTermsEl.innerHTML = paymentTerms.length
             ? paymentTerms.map((t, i) =>
-                `<div class="mb-1">Payment ${i + 1} : <strong>${t.percentage || '-'}</strong> - ${t.condition || '-'}</div>`
+                `<div class="mb-1">Payment ${i + 1} : <strong>${esc(t.percentage) || '-'}</strong> - ${esc(t.condition) || '-'}</div>`
               ).join('')
             : '-';
     }
 
-    setElementText('preview-additional-notes', getVal('additional_notes'));
+    // ---------- ADDITIONAL NOTES (box is hidden when empty) ----------
+    const notesVal = (document.getElementById('additional_notes')?.value || '').trim();
+    setElementText('preview-additional-notes', notesVal);
+    const notesBox = document.getElementById('preview-additional-notes-box');
+    if (notesBox) notesBox.classList.toggle('d-none', !notesVal);
 
-    // SUBTOTAL / SST / GRAND TOTAL
+    // ---------- SIGNATURE ("Signed by") ----------
+    const sigSelect = document.getElementById('signatory_id');
+    const wantedId = (sigSelect && sigSelect.value && sigSelect.value !== 'new')
+        ? sigSelect.value
+        : window.defaultSignatoryId;
+    const chosenSigner = (window.signatories || []).find(s => String(s.id) === String(wantedId));
+
+    setElementText('preview-signer-name', chosenSigner ? chosenSigner.name : '-');
+    setElementText('preview-signer-position', chosenSigner ? chosenSigner.position : '');
+
+    const sigImg = document.getElementById('preview-signer-img');
+    if (sigImg) {
+        if (chosenSigner && chosenSigner.url) {
+            sigImg.src = chosenSigner.url;
+            sigImg.style.display = '';
+        } else {
+            sigImg.removeAttribute('src');
+            sigImg.style.display = 'none';
+        }
+    }
+
+    // ---------- SUBTOTAL / SST / GRAND TOTAL ----------
     let subtotal = 0;
     document.querySelectorAll('.quotation-item-card').forEach(card => {
         subtotal += parseFloat(card.getAttribute('data-item-total')) || 0;
@@ -1009,102 +1152,123 @@ function renderQuotationPreview() {
     const sst = subtotal * 0.08;
     const grandTotalWithTax = subtotal + sst;
 
-    setElementText('preview-subtotal', `MYR ${formatMoney(subtotal)}`);
-    setElementText('preview-sst', `MYR ${formatMoney(sst)}`);
+    setElementText('preview-subtotal', `RM ${formatMoney(subtotal)}`);
+    setElementText('preview-sst', `RM ${formatMoney(sst)}`);
     document.querySelectorAll('.preview-grand-total').forEach(el => {
-        el.textContent = `MYR ${formatMoney(grandTotalWithTax)}`;
+        el.textContent = `RM ${formatMoney(grandTotalWithTax)}`;
     });
 
+    // ---------- ITEMS TABLE: MODULE > SERVICE > ITEM ----------
+    const modulesArray = Array.isArray(window.adminModulesTree)
+        ? window.adminModulesTree
+        : Object.values(window.adminModulesTree || {});
+
     let tableRowsHtml = '';
-    let rowCounter = 1;
+    let hasRows = false;
 
     document.querySelectorAll('.tab-pane').forEach(tabPane => {
         const tabId = tabPane.getAttribute('id');
         const tabBtn = document.querySelector(`[data-bs-target="#${tabId}"], [href="#${tabId}"]`);
-        const moduleName = tabBtn ? (tabBtn.getAttribute('data-module-name') || tabBtn.textContent.trim()).toUpperCase() : 'MODULE';
+        const moduleName = tabBtn
+            ? (tabBtn.getAttribute('data-module-name') || tabBtn.textContent.trim()).toUpperCase()
+            : 'MODULE';
 
-        const itemCards = tabPane.querySelectorAll('.quotation-item-card');
+        // Group this module's selected items by service (keeps the order they were added)
+        const groups = new Map();
 
-        itemCards.forEach(card => {
+        tabPane.querySelectorAll('.quotation-item-card').forEach(card => {
             const itemSelect = card.querySelector('.select-item, .item-name');
             const selectedOption = itemSelect ? itemSelect.options[itemSelect.selectedIndex] : null;
-            const itemName = selectedOption && selectedOption.value ? selectedOption.textContent.trim() : 'Unselected Item';
-            const unitText = selectedOption && selectedOption.dataset.unit ? ` / ${selectedOption.dataset.unit}` : '';
+            if (!selectedOption || !selectedOption.value) return; // skip cards with no item chosen
+
+            const itemName = selectedOption.textContent.trim();
+            const unitText = selectedOption.dataset.unit ? ` / ${selectedOption.dataset.unit}` : '';
 
             const qty = card.querySelector('.item-qty, .input-unit-qty')?.value || '0';
             const days = card.querySelector('.item-days, .input-days')?.value || '0';
             const rate = card.querySelector('.item-rate, .input-daily-rate')?.value || '0.00';
-            const total = card.querySelector('.line-total, .line-item-total')?.textContent || 'MYR 0.00';
+            const total = (card.querySelector('.line-total, .line-item-total')?.textContent || 'RM 0.00')
+                .replace('MYR', 'RM');
 
-            // Get service name from the currently selected service dropdown
+            // Look up the service (and category) names from the catalog tree
             const serviceSelect = card.querySelector('.select-service, .item-category');
             const selectedServiceId = serviceSelect ? serviceSelect.value : null;
-
             const module_Id = card.querySelector('.input-module-id')?.value;
             const category_Id = card.querySelector('.input-section-id')?.value;
+
             let categoryName = '';
             let serviceName = '';
 
-            if (window.adminModulesTree) {
-                const modulesArray = Array.isArray(window.adminModulesTree)
-                    ? window.adminModulesTree
-                    : Object.values(window.adminModulesTree);
-
-                const moduleData = modulesArray.find(m =>
-                    String(m.module_id ?? '').trim() === String(module_Id ?? '').trim()
+            const moduleData = modulesArray.find(m =>
+                String(m.module_id ?? '').trim() === String(module_Id ?? '').trim()
+            );
+            if (moduleData && Array.isArray(moduleData.categories)) {
+                const categoryData = moduleData.categories.find(c =>
+                    String(c.category_id ?? '').trim() === String(category_Id ?? '').trim()
                 );
-
-                if (moduleData && Array.isArray(moduleData.categories)) {
-                    const categoryData = moduleData.categories.find(c =>
-                        String(c.category_id ?? '').trim() === String(category_Id ?? '').trim()
-                    );
-
-                    if (categoryData) {
-                        categoryName = categoryData.category_name || '';
-
-                        if (selectedServiceId && Array.isArray(categoryData.services)) {
-                            const serviceData = categoryData.services.find(s =>
-                                String(s.service_id).trim() === String(selectedServiceId).trim()
-                            );
-                            if (serviceData) serviceName = serviceData.service_name || '';
-                        }
+                if (categoryData) {
+                    categoryName = categoryData.category_name || '';
+                    if (selectedServiceId && Array.isArray(categoryData.services)) {
+                        const serviceData = categoryData.services.find(s =>
+                            String(s.service_id).trim() === String(selectedServiceId).trim()
+                        );
+                        if (serviceData) serviceName = serviceData.service_name || '';
                     }
                 }
             }
 
-            const subtitleParts = [categoryName, serviceName].filter(Boolean);
-            const subtitleHtml = subtitleParts.length
-                ? `<br><small class="text-muted">${subtitleParts.join(' &middot; ')}</small>`
-                : '';
+            // Middle heading row: service name (falls back to category if no service)
+            const groupLabel = serviceName || categoryName || '';
 
-            tableRowsHtml += `
-                <tr>
-                    <td>
-                        <span class="badge bg-light text-secondary border me-1">${moduleName}</span>
-                        <strong>${itemName}</strong>
-                        ${subtitleHtml}
-                    </td>
-                    <td class="text-center">${qty}</td>
-                    <td class="text-center">${days}</td>
-                    <td class="text-end">${formatMoney(parseFloat(rate))}${unitText}</td>
-                    <td class="text-end fw-bold">${total}</td>
-                </tr>
-            `;
-            rowCounter++;
+            if (!groups.has(groupLabel)) groups.set(groupLabel, []);
+            groups.get(groupLabel).push({ itemName, unitText, qty, days, rate, total });
+        });
+
+        if (groups.size === 0) return; // no selected items in this module
+
+        hasRows = true;
+
+        // Module heading row
+        tableRowsHtml += `
+            <tr class="quote-module-row">
+                <td colspan="5" class="quote-module-cell">${esc(moduleName)}</td>
+            </tr>
+        `;
+
+        groups.forEach((rows, groupLabel) => {
+            // Service heading row
+            if (groupLabel) {
+                tableRowsHtml += `
+                    <tr class="quote-service-row">
+                        <td colspan="5" class="quote-service-cell">${esc(groupLabel.toUpperCase())}</td>
+                    </tr>
+                `;
+            }
+
+            // Item rows
+            rows.forEach(r => {
+                tableRowsHtml += `
+                    <tr>
+                        <td class="quote-item-cell">${esc(r.itemName)}</td>
+                        <td class="text-center">${esc(r.qty)}</td>
+                        <td class="text-center">${esc(r.days)}</td>
+                        <td class="text-end">${formatMoney(parseFloat(r.rate))}${esc(r.unitText)}</td>
+                        <td class="text-end fw-bold">${esc(r.total)}</td>
+                    </tr>
+                `;
+            });
         });
     });
 
     const tbody = document.getElementById('preview-table-body');
     if (tbody) {
-        if (rowCounter === 1) {
-            tbody.innerHTML = `
+        tbody.innerHTML = hasRows
+            ? tableRowsHtml
+            : `
                 <tr>
                     <td colspan="5" class="text-center text-muted py-4">No items added to the quotation yet.</td>
                 </tr>
             `;
-        } else {
-            tbody.innerHTML = tableRowsHtml;
-        }
     }
 }
 

@@ -11,6 +11,7 @@ class Invoice extends Model
     protected $fillable = [
         'invoice_number',
         'quotation_Id',
+        'signatory_id',
         'invoice_date',
         'printed_date',
         'due_date',
@@ -28,5 +29,10 @@ class Invoice extends Model
     public function paymentTerm()
     {
         return $this->hasOne(PaymentTerm::class, 'invoice_Id', 'invoice_Id');
+    }
+
+    public function signatory()
+    {
+        return $this->belongsTo(Signatory::class, 'signatory_id');
     }
 }

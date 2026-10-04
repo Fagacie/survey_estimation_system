@@ -6,6 +6,8 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\QuotationController;
 use App\Http\Controllers\HistoryController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\ModellingController;
+use App\Http\Controllers\SignatoryController;
 use App\Models\Module;
 use App\Models\Category;
 use App\Models\Service;
@@ -86,9 +88,29 @@ Route::middleware('guest')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
-    Route::get('/projects/coming-soon', function() {
-        return view('projects.coming_soon');
-    })->name('projects.coming_soon');
+    Route::get('/projects/modeling/builder', [ModellingController::class, 'builder'])
+        ->name('projects.modeling.builder');
+
+    Route::prefix('projects/modeling')->name('projects.modeling.')->group(function () {
+        Route::get('/modules', [ModellingController::class, 'moduleIndex'])->name('modules.index');
+        Route::post('/modules', [ModellingController::class, 'moduleStore'])->name('modules.store');
+        Route::put('/modules/{catalogModule}', [ModellingController::class, 'moduleUpdate'])->name('modules.update');
+        Route::delete('/modules/{catalogModule}', [ModellingController::class, 'moduleDestroy'])->name('modules.destroy');
+
+        Route::get('/items', [ModellingController::class, 'itemIndex'])->name('items.index');
+        Route::post('/items', [ModellingController::class, 'itemStore'])->name('items.store');
+        Route::put('/items/{catalogItem}', [ModellingController::class, 'itemUpdate'])->name('items.update');
+        Route::delete('/items/{catalogItem}', [ModellingController::class, 'itemDestroy'])->name('items.destroy');
+
+        Route::get('/packages', [ModellingController::class, 'packageIndex'])->name('packages.index');
+        Route::post('/packages', [ModellingController::class, 'packageStore'])->name('packages.store');
+        Route::put('/packages/{package}', [ModellingController::class, 'packageUpdate'])->name('packages.update');
+        Route::delete('/packages/{package}', [ModellingController::class, 'packageDestroy'])->name('packages.destroy');
+
+        // Quote Management Routes
+        Route::post('/save', [ModellingController::class, 'saveQuote'])->name('save');
+        Route::delete('/{project}', [ModellingController::class, 'destroyQuote'])->name('destroy');
+    });
 
     Route::resource('projects', App\Http\Controllers\ProjectController::class);
 
@@ -123,6 +145,10 @@ Route::middleware('auth')->group(function () {
     Route::get('/quotations/{id}', [QuotationController::class, 'show'])->name('quotations.show');
     Route::get('/project/next-number', [QuotationController::class, 'nextNumber']);
     Route::get('/quotations/{id}/invoice', [QuotationController::class, 'showInvoice'])->name('quotations.invoice');
+
+    // Signatories ("Signed by" / "Approved by"): add a new person from the quotation builder
+    Route::post('/signatories', [SignatoryController::class, 'store'])->name('signatories.store');
+
     // 3. History Routes
     Route::get('/history', [HistoryController::class, 'index'])->name('history');
     Route::delete('/quotations/{id}', [HistoryController::class, 'destroy'])->name('quotations.destroy');
@@ -134,7 +160,7 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])
         ->name('invoices.show');
-    Route::post('/invoices/{invoice}/issue', [InvoiceController::class, 'issue'])->name('invoices.issue');
+    // (invoices.issue removed: the single "Edit Invoice" form now saves through invoices.updateDetails)
     Route::post('/invoices/{invoice}/update-details', [InvoiceController::class, 'updateDetails'])->name('invoices.updateDetails');
     
     /*
@@ -156,12 +182,12 @@ Route::middleware('auth')->group(function () {
     |--------------------------------------------------------------------------
     */
     // Fetch categories under a selected module
-    Route::get('/api/modules/{moduleId}/categories', function ($moduleId) {
+    Route::get('/data/modules/{moduleId}/categories', function ($moduleId) {
         return response()->json(Category::where('module_id', $moduleId)->get());
     });
 
     // Fetch services under a selected category
-    Route::get('/api/categories/{categoryId}/services', function ($categoryId) {
+    Route::get('/data/categories/{categoryId}/services', function ($categoryId) {
         return response()->json(Service::where('category_id', $categoryId)->get());
     });
 
@@ -170,56 +196,8 @@ Route::middleware('auth')->group(function () {
     | Quotation Preview Route
     |--------------------------------------------------------------------------
     */
-    Route::get('/quotation-preview', function () {
-        $data = [
-            'quotationNumber' => '1234',
-            'quotationDate' => '01/25/2030',
-            'companyLogo' => asset('images/logo.png'),
-            'companyName' => 'ECO HYDROTECH SOLUTIONS SDN. BHD.',
-            'companyAddressLine1' => 'Institute of Oceanography and Environment',
-            'companyAddressLine2' => 'Universiti Malaysia Terengganu',
-            'companyAddressLine3' => '21030, Kuala Nerus, Terengganu',
-            'companyCountry' => 'Malaysia',
-            'companyEmail' => 'ecohydrosolution@gmail.com',
-            'companyPhone' => '+60 16-322 7527',
-            'customer' => [
-                'name' => 'Acme Corporation',
-                'address' => '123 Business Street, Tech Park, 50000 Kuala Lumpur',
-                'email' => 'client@acme.com',
-                'phone' => '+60 12-345 6789',
-            ],
-            'project' => [
-                'name' => 'Coastal Monitoring System',
-                'description' => 'Supply and installation of water sampling and telemetry units.',
-            ],
-            'items' => [
-                [
-                    'description' => '[Product / Service Description]',
-                    'quantity' => 5,
-                    'unit_price' => 100,
-                ],
-                [
-                    'description' => '[Product / Service Description]',
-                    'quantity' => 5,
-                    'unit_price' => 100,
-                ],
-                [
-                    'description' => '[Product / Service Description]',
-                    'quantity' => 5,
-                    'unit_price' => 100,
-                ],
-            ],
-            'subtotal' => 1500,
-            'tax' => 100,
-            'vat' => 50,
-            'grandTotal' => 1650,
-            'validDays' => 30,
-            'deliveryTimeline' => '7-14 working days',
-            'paymentTerms' => '50% advance / 50% upon delivery',
-        ];
+    Route::get('/quotations/{quotation}/preview', [QuotationController::class, 'preview'])->name('quotations.preview');
 
-        return view('dashboard.quotation', $data);
-    })->name('quotation.preview');
 });
 
 require __DIR__.'/auth.php';

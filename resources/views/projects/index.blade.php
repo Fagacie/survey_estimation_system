@@ -173,7 +173,7 @@
                                     @endif
                                 </td>
                                 <td class="px-5 py-3 align-middle text-slate-500 text-xs font-medium">
-                                    {{ $project->updated_at->format('Y-m-d') }}
+                                    {{ $project->updated_at->format('d-m-Y') }}
                                 </td>
                                 <td class="px-5 py-3 align-middle text-right whitespace-nowrap">
                                     <div class="flex items-center justify-end gap-1">

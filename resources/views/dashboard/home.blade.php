@@ -53,16 +53,27 @@
                         <input type="text" id="project" name="project" value="{{ $prefillProject?->name ?? '' }}" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm transition-colors">
                     </div>
 
+                    @php
+                        $typeCodes = array_keys(\App\Models\Project::TYPES);   // CP, RP, MP, GP, JP
+                        $typeLocked = (bool) $prefillProject;                   // locked whenever a project is loaded
+                        $typeIdx = $prefillProject?->project_type ? array_search($prefillProject->project_type, $typeCodes) : false;
+                        $selectedTypeValue = $typeIdx !== false ? $typeIdx + 1 : null;
+                    @endphp
+
                     <div>
                         <label for="selectType" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Project Type</label>
-                        <select id="selectType" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm transition-colors bg-white">
-                            <option value="">Choose Project Type</option>
-                            <option value="1">CP - Coastal Project</option>
-                            <option value="2">RP - River Project</option>
-                            <option value="3">MP - Maritime Project</option>
-                            <option value="4">GP - Geotech Project</option>
-                            <option value="5">JP - Jetty Project</option>
+                        <select id="selectType" {{ $typeLocked ? 'disabled' : '' }}
+                                class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm transition-colors {{ $typeLocked ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : 'bg-white' }}">
+                            <option value="">{{ $typeLocked ? 'Not set (older project)' : 'Choose Project Type' }}</option>
+                            @foreach($typeCodes as $i => $code)
+                                <option value="{{ $i + 1 }}" {{ $selectedTypeValue === $i + 1 ? 'selected' : '' }}>
+                                    {{ $code }} - {{ \App\Models\Project::TYPES[$code] }}
+                                </option>
+                            @endforeach
                         </select>
+                        @if($typeLocked)
+                            <p class="text-xs text-slate-400 mt-1">Set when the project was created.</p>
+                        @endif
                     </div>
 
                     <div class="col-span-full md:col-span-2 lg:col-span-1 grid grid-cols-2 gap-4">
@@ -153,6 +164,16 @@
                         </button>
                     </li>
                     @endforeach
+
+                    @if($prefillProject && $prefillProject->modellingSummary)
+                    <li class="nav-item">
+                        <button class="nav-link" id="tab-modelling" data-bs-toggle="tab" data-bs-target="#module-modelling"
+                                type="button" role="tab" data-module-name="MODELLING">
+                            <i class="fa-solid fa-layer-group mr-1 opacity-70"></i> MODELLING
+                        </button>
+                    </li>
+                    @endif
+
                 </ul>
 
                 <div class="tab-content p-6" id="categoryTabsContent">
@@ -171,7 +192,89 @@
                         @endforeach
                     </div>
                     @endforeach
-                </div>
+
+                    @if($prefillProject && $prefillProject->modellingSummary)
+                    <div class="tab-pane fade" id="module-modelling" role="tabpanel" aria-labelledby="tab-modelling">
+                        @php
+                            $modellingSummary = $prefillProject->modellingSummary;
+                            $modellingGroups = $prefillProject->modellingItems()
+                                ->with(['catalogModule', 'catalogItem'])
+                                ->get()
+                                ->groupBy('catalog_module_id');
+                        @endphp
+
+                        <div class="bg-slate-50 border border-slate-200 rounded-lg p-4 mb-4 d-flex flex-wrap justify-content-between align-items-center gap-3">
+                            <div>
+                                <div class="text-xs fw-bold text-slate-500 text-uppercase">Modelling Package</div>
+                                <div class="text-sm fw-semibold text-slate-800">{{ $modellingSummary->package_name ?? 'Custom selection' }}</div>
+                            </div>
+                            <div class="text-end">
+                                <div class="text-xs fw-bold text-slate-500 text-uppercase">Modelling Total</div>
+                                <div class="fs-4 fw-bold text-teal-600">MYR {{ number_format($modellingSummary->grand_total, 2) }}</div>
+                            </div>
+                        </div>
+
+                        @foreach($modellingGroups as $moduleId => $items)
+                            @php $moduleName = $items->first()->catalogModule->name ?? 'Module'; @endphp
+                            <div class="card border-0 shadow-sm mb-3">
+                                <div class="card-header bg-light d-flex justify-content-between align-items-center py-2 px-3 border-0">
+                                    <span class="fw-bold text-uppercase text-dark">{{ $moduleName }}</span>
+                                    <span class="text-muted small fw-bold">Subtotal: <strong class="text-dark">MYR {{ number_format($items->sum('line_total'), 2) }}</strong></span>
+                                </div>
+                                <div class="card-body p-3">
+                                    <table class="table table-sm mb-0">
+                                        <thead>
+                                            <tr class="text-uppercase text-muted small">
+                                                <th>Item</th>
+                                                <th class="text-end">Qty</th>
+                                                <th class="text-end">Days</th>
+                                                <th class="text-end">Rate (MYR)</th>
+                                                <th class="text-end">Mark-up (%)</th>
+                                                <th class="text-end">Total (MYR)</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($items as $line)
+                                                <tr>
+                                                    <td>{{ $line->catalogItem->name ?? 'Item' }}</td>
+                                                    <td class="text-end">{{ $line->unit_qty }}</td>
+                                                    <td class="text-end">{{ $line->days }}</td>
+                                                    <td class="text-end">{{ number_format($line->daily_rate, 2) }}</td>
+                                                    <td class="text-end">{{ number_format($line->mark_up, 2) }}</td>
+                                                    <td class="text-end fw-bold">{{ number_format($line->line_total, 2) }}</td>
+                                                </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        @endforeach
+
+                        <div class="bg-white rounded-3 border p-3 mt-4">
+                            <div class="d-flex justify-content-between text-sm mb-1">
+                                <span class="text-slate-500">Subtotal (client)</span>
+                                <span class="fw-bold">MYR {{ number_format($modellingSummary->client_subtotal, 2) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between text-sm mb-1">
+                                <span class="text-slate-500">Contingency ({{ $modellingSummary->contingency_percent }}%)</span>
+                                <span class="fw-bold">MYR {{ number_format($modellingSummary->contingency_amount, 2) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between text-sm mb-1">
+                                <span class="text-slate-500">SST / Tax ({{ $modellingSummary->tax_percent }}%)</span>
+                                <span class="fw-bold">MYR {{ number_format($modellingSummary->tax_amount, 2) }}</span>
+                            </div>
+                            <div class="d-flex justify-content-between pt-2 border-top mt-2">
+                                <span class="fw-bold text-slate-800">Grand Total</span>
+                                <span class="fw-bold text-teal-600">MYR {{ number_format($modellingSummary->grand_total, 2) }}</span>
+                            </div>
+                        </div>
+
+                        <p class="text-xs text-slate-400 mt-3">
+                            This is a locked snapshot from the Modelling Builder. To make changes, go back to the project and click "Edit Modelling".
+                        </p>
+                    </div>
+                    @endif
+                 </div>
             </div>
 
             <!-- SUMMARY BREAKDOWN PANEL -->
@@ -194,6 +297,38 @@
                     <div class="mt-6 pt-4 border-t border-slate-100">
                         <label for="additional_notes" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Additional Notes</label>
                         <textarea id="additional_notes" name="additional_notes" rows="4" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm transition-colors placeholder:text-slate-400" placeholder="Enter any special conditions or notes here..."></textarea>
+                    </div>
+
+                    <!-- SIGNED BY -->
+                    <div class="mt-6 pt-4 border-t border-slate-100">
+                        <label for="signatory_id" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Signed by</label>
+                        <select id="signatory_id" name="signatory_id" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm transition-colors">
+                            @foreach($signatories as $s)
+                                <option value="{{ $s->id }}" {{ optional($defaultSigner)->id == $s->id ? 'selected' : '' }}>{{ $s->name }}</option>
+                            @endforeach
+                            <option value="new">+ Add new person...</option>
+                        </select>
+
+                        <div id="newSignatoryBox" class="d-none mt-3 border border-slate-200 rounded-lg p-4 bg-slate-50 space-y-3">
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Name</label>
+                                <input type="text" id="newSignatoryName" maxlength="255" class="w-full rounded-lg border-slate-300 py-2 px-3 text-sm shadow-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Position</label>
+                                <input type="text" id="newSignatoryPosition" maxlength="255" class="w-full rounded-lg border-slate-300 py-2 px-3 text-sm shadow-sm">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Signature image</label>
+                                <input type="file" id="newSignatoryFile" accept="image/png,image/jpeg" class="w-full text-sm">
+                                <p class="text-xs text-slate-400 mt-1">PNG or JPG, max 2 MB.</p>
+                            </div>
+                            <p id="newSignatoryError" class="d-none text-xs text-red-600"></p>
+                            <div class="flex gap-2">
+                                <button type="button" id="saveNewSignatoryBtn" class="px-4 py-2 rounded-lg text-sm font-bold bg-teal-600 text-white hover:bg-teal-500">Add person</button>
+                                <button type="button" id="cancelNewSignatoryBtn" class="px-4 py-2 rounded-lg text-sm font-semibold border border-slate-300 text-slate-700 hover:bg-white">Cancel</button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
@@ -367,13 +502,31 @@
     </div>
         
     @push('scripts')
+        @php
+            // People available under "Signed by" (used by the preview in home.js)
+            $signatoriesForJs = $signatories->map(function ($s) {
+                return [
+                    'id'       => $s->id,
+                    'name'     => $s->name,
+                    'position' => $s->position,
+                    'url'      => $s->signature_path ? asset($s->signature_path) : null,
+                ];
+            })->values();
+        @endphp
+
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <script>
             window.adminModulesTree = @json($adminModulesTree ?? []);
             window.projectEstimation = @json($estimation ?? null);
+            window.signatories = @json($signatoriesForJs);
+            window.defaultSignatoryId = @json(optional($defaultSigner)->id);
+            window.signatoryStoreUrl = "{{ route('signatories.store') }}";
         </script>
         <!-- Include flatpickr if necessary, though native dates usually suffice. The script was here. -->
         <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+        <script>
+            window.quotationStoreUrl = "{{ route('quotation.store') }}";
+        </script>
         <script src="{{ asset('js/home.js') }}?v={{ time() }}"></script>
     @endpush
 </x-app-layout>
