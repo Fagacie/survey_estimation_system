@@ -57,12 +57,12 @@
                                     <i class="fa-solid fa-pen"></i>
                                 </a>
 
-                                <!-- DELETE FORM: Submits DELETE request to Controller -->
+                                <!-- DELETE FORM: Submits DELETE request to Controller.
+                                     The confirmation popup is handled by admin.js -->
                                 <form 
                                     action="{{ route('items.destroy', $item['id'] ?? $item->id) }}" 
                                     method="POST" 
-                                    style="display: inline;" 
-                                    onsubmit="return confirm('Are you sure you want to delete this item?');"
+                                    style="display: inline;"
                                 >
                                     @csrf
                                     @method('DELETE')

@@ -1,4 +1,4 @@
-{{-- resources/views/dashboard/preview.blade.php --}}
+{{-- resources/views/dashboard/qtpreview.blade.php --}}
 
 <style>
     /* ==========================================
@@ -13,7 +13,7 @@
         background: #ffffff;
     }
 
-    /* Outer Table Wrapper Layout (mirrors view.blade.php structure) */
+    /* Outer Table Wrapper Layout */
     table.print-wrapper-table {
         width: 100%;
         border-collapse: collapse;
@@ -39,32 +39,33 @@
         display: block;
     }
 
-    /* Top Header Row Layout (Logo on Left, Company Info on Right) */
+    /* Top Header Row Layout (Page 1 Only: Logo on Left, Company Info on Right) */
     .quote-header-content {
         display: flex;
         justify-content: space-between;
         align-items: flex-start;
-        margin-top: -20px; /* Matched to view.blade.php */
+        margin-top: -20px;
         position: relative;
         z-index: 10;
-        padding: 0 40px; /* Matched to view.blade.php */
+        padding: 0 40px;
+        margin-bottom: 10px;
     }
 
     .quote-logo img {
-        max-height: 100px; /* Matched to view.blade.php */
+        max-height: 100px;
         width: auto;
         display: block;
     }
 
     .quote-company-info {
-        font-size: 1rem; /* Matched to view.blade.php */
-        line-height: 1.4;
+        font-size: 0.80rem; 
+        line-height: 1.15;
         color: #212529;
     }
 
-    /* Inner Body Content Area — Matched to view.blade.php's .quote-body */
+    /* Inner Body Content Area */
     .quote-body-content {
-        padding: 10px 40px 20px 40px;
+        padding: 10px 40px 100px 40px;
     }
 
     .quote-title-row {
@@ -72,7 +73,7 @@
     }
 
     .quote-title {
-        font-size: 1.6rem;
+        font-size: 1.4rem;
         font-weight: 700;
         color: #333;
         letter-spacing: 0.5px;
@@ -80,6 +81,7 @@
 
     .quote-meta {
         font-size: 0.85rem;
+        line-height: 1.2;
         color: #333;
     }
 
@@ -93,6 +95,13 @@
         background-color: #dfeefc;
         border-radius: 4px;
         padding: 0.75rem 1rem;
+        line-height: 1.2;
+        font-size: 0.85rem;
+    }
+
+    .quote-box div {
+        line-height: 1.2;
+        margin-top: 2px !important;
     }
 
     .quote-box-light {
@@ -124,15 +133,45 @@
         color: #ffffff;
         font-weight: 600;
         font-size: 0.85rem;
-        padding: 0.6rem 0.75rem;
+        padding: 0.4rem 0.75rem;
         border: none;
     }
 
     .quote-table tbody td {
         background-color: #f5f5f5;
-        padding: 0.6rem 0.75rem;
+        padding: 0.35rem 0.75rem;
         font-size: 0.85rem;
-        border-bottom: 4px solid #ffffff;
+        line-height: 1.25;
+        border-bottom: none;
+    }
+
+    .quote-table tbody td.quote-module-cell {
+        background-color: #d6e9ec;
+        color: #1c6e7a;
+        font-weight: 700;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+        padding-top: 0.45rem;
+        padding-bottom: 0.45rem;
+    }
+
+    .quote-table tbody td.quote-service-cell {
+        font-weight: 600;
+        padding-left: 1.5rem;
+        background-color: #ececec;
+        padding-top: 0.4rem;
+        padding-bottom: 0.4rem;
+    }
+
+    .quote-table tbody td.quote-item-cell {
+        padding-left: 2.75rem;
+    }
+
+    .quote-module-row,
+    .quote-service-row {
+        break-after: avoid;
+        page-break-after: avoid;
     }
 
     .quote-totals-table {
@@ -141,7 +180,7 @@
     }
 
     .quote-totals-table td {
-        padding: 0.4rem 0.75rem;
+        padding: 0.3rem 0.75rem;
     }
 
     .quote-totals-table tr:not(.quote-grand-total-row) td:last-child {
@@ -163,6 +202,7 @@
 
     .quote-two-col {
         font-size: 0.85rem;
+        line-height: 1.3;
     }
 
     .quote-two-col strong {
@@ -171,10 +211,11 @@
 
     .quote-signature p {
         font-size: 0.9rem;
+        line-height: 1.25;
     }
 
     /* =========================================================
-       PRINT SPECIFIC OVERRIDES (matched to view.blade.php)
+       PRINT SPECIFIC OVERRIDES
        ========================================================= */
     @page {
         size: A4 portrait;
@@ -182,6 +223,11 @@
     }
 
     @media print {
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
         .quote-doc,
         .quote-doc * {
             -webkit-print-color-adjust: exact !important;
@@ -189,48 +235,45 @@
             color-adjust: exact !important;
         }
 
-        /* Expand table to full page height so footer sits at page bottom */
-        table.print-wrapper-table {
-            height: 100vh !important;
-        }
-
-        /* Repeating header on every printed page */
+        /* Repeating header banner on every page */
         thead.repeat-print-header {
             display: table-header-group !important;
         }
 
-        /* Repeating footer, anchored to bottom of every printed page */
-        tfoot.repeat-print-footer {
-            display: table-footer-group !important;
+        /* Anchor footer strictly to bottom of every printed page */
+        .quote-print-footer {
+            position: fixed !important;
+            bottom: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            z-index: 1000;
         }
 
-        tfoot.repeat-print-footer td {
-            vertical-align: bottom !important;
-        }
-
-        /* Adjust body padding for print flow */
+        /* Body spacing for proper page flow */
         .quote-body-content {
             padding-top: 10px !important;
-            padding-bottom: 20px !important;
+            padding-bottom: 35mm !important;
             padding-left: 15mm !important;
             padding-right: 15mm !important;
         }
 
-        /* Force Payment Terms / Payment Info / Signature onto a fresh page */
+        /* Page 2 forced break */
         .page-break-before {
             page-break-before: always !important;
             break-before: page !important;
-            padding-top: 15mm !important;
+            padding-top: 25mm !important; /* Clears top image banner on page 2 */
         }
 
-        /* Avoid breaking these elements awkwardly mid-content */
+        /* Avoid breaking elements mid-content */
         .quote-title-row,
         .quote-box,
         .quote-box-light,
         .quote-details-strip,
         .quote-totals-table,
         .quote-two-col,
-        .quote-signature {
+        .quote-signature,
+        .quote-modelling-block,
+        .quote-section-heading {
             page-break-inside: avoid !important;
             break-inside: avoid !important;
         }
@@ -252,8 +295,7 @@
     <table class="print-wrapper-table">
 
         <!-- ===================================================================
-             HEADER SECTION (repeats on every printed page)
-             Includes: Banner Image + Company Logo + Address Details
+             TOP HEADER IMAGE BANNER (Repeats on EVERY page)
              =================================================================== -->
         <thead class="repeat-print-header">
             <tr>
@@ -261,31 +303,31 @@
                     <div class="quote-print-header">
                         <img src="{{ asset('images/header.jpeg') }}" alt="Header" class="quote-header-img">
                     </div>
-
-                    <div class="quote-header-content">
-                        <div class="quote-logo">
-                            <img src="{{ asset('images/logo.jpeg') }}" alt="Eco Hydrotech Solutions Logo">
-                        </div>
-                        <div class="text-end quote-company-info">
-                            <strong>ECO HYDROTECH SOLUTIONS SDN. BHD. (1688434-T)</strong><br>
-                            Institute of Oceanography and Environment<br>
-                            Universiti Malaysia Terengganu<br>
-                            21030, Kuala Nerus, Terengganu<br>
-                            Malaysia
-                        </div>
-                    </div>
                 </td>
             </tr>
         </thead>
 
         <!-- ===================================================================
-             BODY CONTENT: Quotation Metadata, Client Info, Items, Totals,
-             Payment Terms/Info & Signature (page 2 onward)
+             BODY CONTENT
              =================================================================== -->
         <tbody>
             <tr>
                 <td>
                     <div class="quote-body-content">
+
+                        <!-- LOGO & COMPANY INFO (PAGE 1 ONLY) -->
+                        <div class="quote-header-content">
+                            <div class="quote-logo">
+                                <img src="{{ asset('images/logo.jpeg') }}" alt="Eco Hydrotech Solutions Logo">
+                            </div>
+                            <div class="text-end quote-company-info">
+                                <strong>ECO HYDROTECH SOLUTIONS SDN. BHD. (1688434-T)</strong><br>
+                                Institute of Oceanography and Environment<br>
+                                Universiti Malaysia Terengganu<br>
+                                21030, Kuala Nerus, Terengganu<br>
+                                Malaysia
+                            </div>
+                        </div>
 
                         <!-- TITLE + QUOTATION NO / DATE -->
                         <div class="d-flex justify-content-between align-items-end quote-title-row">
@@ -299,7 +341,7 @@
 
                         <!-- CLIENT NAME / ADDRESS BOX -->
                         <div class="quote-box mb-3">
-                            <span class="quote-box-label">CLIENT NAME: <span id="preview-client" class="fw-bold">-</span></span>
+                            <span class="quote-box-label"></span><span id="preview-client" class="fw-bold">-</span>
                             <div id="preview-client_address" class="mt-1">-</div>
                         </div>
 
@@ -309,13 +351,8 @@
                         <div class="quote-box mb-2">
                             <span class="quote-box-label">PROJECT</span>
                             <div id="preview-project" class="mt-1 fw-bold">-</div>
-                        </div>
-
-                        <!-- SECONDARY DETAILS STRIP -->
-                        <div class="quote-details-strip mb-4">
-                            <span>Period: <strong id="preview-period">-</strong></span>
-                            <span>PIC: <strong id="preview-pic">-</strong></span>
-                            <span>No. of PIC: <strong id="preview-pic_no">-</strong></span>
+                            <div class="mt-1"><strong id="preview-pic">-</strong></div>
+                            <div><strong id="preview-pic_no">-</strong></div>
                         </div>
 
                         <!-- ITEMS TABLE -->
@@ -324,9 +361,9 @@
                                 <tr>
                                     <th>Description</th>
                                     <th class="text-center" style="width: 80px;">Quantity</th>
-                                    <th class="text-center" style="width: 80px;">Days</th>
-                                    <th class="text-end" style="width: 120px;">Unit Price</th>
-                                    <th class="text-end" style="width: 130px;">Total</th>
+                                    <th class="text-center" style="width: 80px;">Day/Sample</th>
+                                    <th class="text-end" style="width: 120px;">Unit Price(RM)</th>
+                                    <th class="text-end" style="width: 130px;">Total(RM)</th>
                                 </tr>
                             </thead>
                             <tbody id="preview-table-body">
@@ -341,28 +378,97 @@
                             <table class="quote-totals-table">
                                 <tr>
                                     <td>Subtotal</td>
-                                    <td class="text-end" id="preview-subtotal">MYR 0.00</td>
+                                    <td class="text-end" id="preview-subtotal">RM 0.00</td>
                                 </tr>
                                 <tr>
                                     <td>SST 8%</td>
-                                    <td class="text-end" id="preview-sst">MYR 0.00</td>
+                                    <td class="text-end" id="preview-sst">RM 0.00</td>
                                 </tr>
                                 <tr class="quote-grand-total-row">
                                     <td>Grand Total</td>
-                                    <td class="text-end preview-grand-total">MYR 0.00</td>
+                                    <td class="text-end preview-grand-total">RM 0.00</td>
                                 </tr>
                             </table>
                         </div>
 
+                        {{-- ===== MODELLING (separate table, read-only, from saved Modelling Builder data) ===== --}}
+                        @php
+                            $mdlSummary = isset($prefillProject) ? $prefillProject->modellingSummary : null;
+                            $mdlGroups = $mdlSummary
+                                ? $prefillProject->modellingItems()->with(['catalogModule', 'catalogItem'])->get()->groupBy('catalog_module_id')
+                                : collect();
+                        @endphp
+
+                        @if($mdlSummary && $mdlGroups->isNotEmpty())
+                        <div class="quote-modelling-block mb-4">
+                            <h6 class="quote-section-heading">MODELLING</h6>
+                            <div class="quote-details-strip mb-2">
+                                <span>Package: <strong>{{ $mdlSummary->package_name ?? 'Custom selection' }}</strong></span>
+                            </div>
+
+                            <table class="table quote-table mb-2">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th class="text-center" style="width: 80px;">Quantity</th>
+                                        <th class="text-center" style="width: 80px;">Day/Sample</th>
+                                        <th class="text-end" style="width: 120px;">Unit Price(RM)</th>
+                                        <th class="text-end" style="width: 130px;">Total(RM)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach($mdlGroups as $items)
+                                        <tr class="quote-module-row">
+                                            <td colspan="5" class="quote-module-cell">{{ $items->first()->catalogModule->name ?? 'Module' }}</td>
+                                        </tr>
+                                        @foreach($items as $line)
+                                            @php $units = max(($line->unit_qty ?? 1) * ($line->days ?? 1), 1); @endphp
+                                            <tr>
+                                                <td class="quote-item-cell">{{ $line->catalogItem->name ?? 'Item' }}</td>
+                                                <td class="text-center">{{ rtrim(rtrim(number_format($line->unit_qty, 2, '.', ''), '0'), '.') }}</td>
+                                                <td class="text-center">{{ rtrim(rtrim(number_format($line->days, 2, '.', ''), '0'), '.') }}</td>
+                                                <td class="text-end">{{ number_format($line->line_total / $units, 2) }}</td>
+                                                <td class="text-end">{{ number_format($line->line_total, 2) }}</td>
+                                            </tr>
+                                        @endforeach
+                                    @endforeach
+                                </tbody>
+                            </table>
+
+                            <div class="d-flex justify-content-end">
+                                <table class="quote-totals-table">
+                                    <tr>
+                                        <td>Modelling Subtotal</td>
+                                        <td class="text-end">RM {{ number_format($mdlSummary->client_subtotal, 2) }}</td>
+                                    </tr>
+                                    @if($mdlSummary->contingency_amount > 0)
+                                    <tr>
+                                        <td>Contingency {{ $mdlSummary->contingency_percent }}%</td>
+                                        <td class="text-end">RM {{ number_format($mdlSummary->contingency_amount, 2) }}</td>
+                                    </tr>
+                                    @endif
+                                    @if($mdlSummary->tax_amount > 0)
+                                    <tr>
+                                        <td>SST {{ $mdlSummary->tax_percent }}%</td>
+                                        <td class="text-end">RM {{ number_format($mdlSummary->tax_amount, 2) }}</td>
+                                    </tr>
+                                    @endif
+                                    <tr class="quote-grand-total-row">
+                                        <td>Modelling Total</td>
+                                        <td class="text-end">RM {{ number_format($mdlSummary->grand_total, 2) }}</td>
+                                    </tr>
+                                </table>
+                            </div>
+                        </div>
+                        @endif
+
                         <!-- ADDITIONAL NOTES -->
-                        <div class="quote-box quote-box-light mb-4">
-                            <span class="quote-box-label">Additional Notes</span>
-                            <div id="preview-additional-notes" class="mt-1" style="white-space: pre-wrap;">-</div>
+                        <div id="preview-additional-notes-box" class="quote-box quote-box-light mb-4 d-none">
+                            <div id="preview-additional-notes" class="mt-1" style="white-space: pre-wrap;"></div>
                         </div>
 
                         <!-- ===================================================================
-                             PAGE 2 CONTENT: Forced to break onto page 2 using .page-break-before
-                             Contains: Payment Terms, Payment Info, and Signature
+                             PAGE 2 CONTENT: Payment Terms, Payment Info, and Signature
                              =================================================================== -->
                         <div class="page-break-before">
 
@@ -383,14 +489,14 @@
                                 </div>
                             </div>  
 
-                            <!-- SIGNATURE BLOCK -->
-                            <div class="quote-signature mb-4">
-                                <p class="mb-4">Yours sincerely,</p>
-                                <img src="{{ asset('images/DrMadihasign.jpeg') }}" alt="Dr Madiha sign" style="max-height: 80px;">
-                                <p class="mb-0 fw-bold">Ts. Dr Madiha Mokhtar</p>
-                                <p class="mb-0">Technical Director</p>
-                                <p class="mb-0">Eco Hydrotech Solutions Sdn. Bhd.</p>
-                            </div>
+                        <!-- SIGNATURE BLOCK -->
+                        <div class="quote-signature mb-4">
+                            <p class="mb-4">Yours sincerely,</p>
+                            <img id="preview-signer-img" alt="Signature" style="max-height: 80px; display: none;">
+                            <p class="mb-0 fw-bold" id="preview-signer-name">-</p>
+                            <p class="mb-0" id="preview-signer-position"></p>
+                            <p class="mb-0">Eco Hydrotech Solutions Sdn. Bhd.</p>
+                        </div>
 
                         </div> <!-- END .page-break-before -->
 
@@ -399,19 +505,13 @@
             </tr>
         </tbody>
 
-        <!-- ===================================================================
-             FOOTER SECTION (repeats and anchors to bottom of every printed page)
-             =================================================================== -->
-        <tfoot class="repeat-print-footer">
-            <tr>
-                <td>
-                    <div class="quote-print-footer">
-                        <img src="{{ asset('images/footer.jpeg') }}" alt="Footer" class="quote-footer-img">
-                    </div>
-                </td>
-            </tr>
-        </tfoot>
-
     </table>
+
+    <!-- ===================================================================
+         FOOTER SECTION (Fixed to bottom of every printed page)
+         =================================================================== -->
+    <div class="quote-print-footer">
+        <img src="{{ asset('images/footer.jpeg') }}" alt="Footer" class="quote-footer-img">
+    </div>
 
 </div>

@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreProjectRequest extends FormRequest
 {
@@ -15,6 +16,8 @@ class StoreProjectRequest extends FormRequest
     {
         return [
             'number' => 'nullable|string|max:255',
+            'project_type' => ['required', Rule::in(array_keys(\App\Models\Project::TYPES))],
+            'location' => ['required', 'in:' . implode(',', \App\Models\Project::LOCATIONS)],
             'name' => 'required|string|max:255',
             'client_name' => 'nullable|string|max:255',
             'client_address' => 'nullable|string|max:1000',

@@ -6,9 +6,12 @@ use App\Models\Invoice;
 use App\Models\PaymentTerm;
 use App\Models\QtInvoice;
 use App\Models\Project;
+use App\Models\Signatory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class InvoiceController extends Controller
 {
@@ -37,7 +40,7 @@ class InvoiceController extends Controller
             $invoice = Invoice::create([
                 'invoice_number' => $this->generateInvoiceNumber($quotation->project_Id, $originalTerm->id),
                 'quotation_Id'   => $quotation->quotation_Id,
-                'invoice_date'   => null,   // set later, on Print
+                'invoice_date'   => null,   // set later, when the invoice form is saved
                 'printed_date'   => null,
                 'due_date'       => null,
                 'description'    => null,
@@ -64,9 +67,12 @@ class InvoiceController extends Controller
 
     public function show($invoiceId)
     {
-        $invoice = Invoice::with(['paymentTerm', 'quotation'])->findOrFail($invoiceId);
+        $invoice = Invoice::with(['paymentTerm', 'quotation', 'signatory'])->findOrFail($invoiceId);
 
-        return view('dashboard.invoice', compact('invoice'));
+        // People who can be chosen under "Approved by"
+        $signatories = Signatory::orderBy('name')->get();
+
+        return view('dashboard.invoice', compact('invoice', 'signatories'));
     }
 
     private function generateInvoiceNumber($projectId, $originalTermId): string
@@ -93,46 +99,73 @@ class InvoiceController extends Controller
         return sprintf('%s-INV/%d/%03d', $lockedProject->number, $year, $runningNumber);
     }
 
-    public function issue(Request $request, $invoiceId)
+    /**
+     * Single save for the invoice slip: dates + description + payment condition.
+     * Replaces the old issue() and updateDetails() pair.
+     */
+    public function updateDetails(Request $request, $invoiceId)
     {
         $validated = $request->validate([
             'invoice_date' => 'required|date',
             'due_date'     => 'required|date|after_or_equal:invoice_date',
-        ]);
+            'description'  => 'nullable|string|max:1000',
+            'condition'    => 'nullable|string|max:1000',
 
-        $invoice = Invoice::findOrFail($invoiceId);
-
-        $invoice->update([
-            'invoice_date' => $validated['invoice_date'],
-            'due_date'     => $validated['due_date'],
-            'printed_date' => now(),
-            'status'       => 'unpaid',
-            'updated_by'   => Auth::id(),
-        ]);
-
-        return response()->json(['success' => true, 'invoice' => $invoice]);
-    }
-
-    public function updateDetails(Request $request, $invoiceId)
-    {
-        $validated = $request->validate([
-            'description' => 'nullable|string|max:1000',
-            'condition'   => 'nullable|string|max:1000',
+            // Approved by: an existing person (id) or "new"
+            'signatory_id' => ['required', function ($attribute, $value, $fail) {
+                if ($value !== 'new' && ! Signatory::whereKey($value)->exists()) {
+                    $fail('The selected signatory is invalid.');
+                }
+            }],
+            'new_name'      => 'required_if:signatory_id,new|nullable|string|max:255',
+            'new_position'  => 'required_if:signatory_id,new|nullable|string|max:255',
+            'new_signature' => 'required_if:signatory_id,new|nullable|image|mimes:png,jpg,jpeg|max:2048',
         ]);
 
         $invoice = Invoice::with('paymentTerm')->findOrFail($invoiceId);
 
-        $invoice->update([
-            'description' => $validated['description'] ?? null,
-            'updated_by'  => Auth::id(),
-        ]);
+        DB::transaction(function () use ($invoice, $validated, $request) {
+            $firstSave = is_null($invoice->printed_date);
 
-        if ($invoice->paymentTerm) {
-            $invoice->paymentTerm->update([
-                'condition'  => $validated['condition'] ?? null,
-                'updated_by' => Auth::id(),
+            // Approved by: use the chosen person, or create a new one from the form
+            $signatoryId = $validated['signatory_id'];
+
+            if ($signatoryId === 'new') {
+                $file     = $request->file('new_signature');
+                $fileName = 'sig_' . Str::slug($validated['new_name']) . '_' . time() . '.' . $file->guessExtension();
+
+                File::ensureDirectoryExists(public_path('images/signatures'));
+                $file->move(public_path('images/signatures'), $fileName);
+
+                $signatory = Signatory::create([
+                    'name'           => $validated['new_name'],
+                    'position'       => $validated['new_position'],
+                    'signature_path' => 'images/signatures/' . $fileName,
+                    'created_by'     => Auth::id(),
+                ]);
+
+                $signatoryId = $signatory->id;
+            }
+
+            $invoice->update([
+                'invoice_date' => $validated['invoice_date'],
+                'due_date'     => $validated['due_date'],
+                'description'  => $validated['description'] ?? null,
+                'signatory_id' => $signatoryId,
+                // Only set on the first save, so later edits don't change the date on the slip
+                'printed_date' => $invoice->printed_date ?? now(),
+                // Only move draft -> unpaid on the first save, so a "paid" invoice isn't reset
+                'status'       => $firstSave ? 'unpaid' : $invoice->status,
+                'updated_by'   => Auth::id(),
             ]);
-        }
+
+            if ($invoice->paymentTerm) {
+                $invoice->paymentTerm->update([
+                    'condition'  => $validated['condition'] ?? null,
+                    'updated_by' => Auth::id(),
+                ]);
+            }
+        });
 
         return response()->json(['success' => true]);
     }

@@ -127,7 +127,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return Promise.resolve();
         }
 
-        return fetch(`/api/modules/${moduleId}/categories`)
+        return fetch(window.categoriesUrl.replace('__ID__', moduleId))
             .then(response => {
                 if (!response.ok) throw new Error('Network response was not ok');
                 return response.json();
@@ -177,7 +177,7 @@ document.addEventListener('DOMContentLoaded', function () {
             return Promise.resolve();
         }
 
-        return fetch(`/api/categories/${categoryId}/services`)
+        return fetch(window.servicesUrl.replace('__ID__', categoryId))
             .then(response => {
                 if (!response.ok) throw new Error('Network response was not ok');
                 return response.json();

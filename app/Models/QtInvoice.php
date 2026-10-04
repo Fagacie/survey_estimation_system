@@ -15,6 +15,7 @@ class QtInvoice extends Model
         'quotation_no', 
         'payment_terms',
         'additional_notes',
+        'signatory_id',
         'grand_total', 
         'survey_distance_nm',
         'survey_hours',
@@ -32,6 +33,11 @@ class QtInvoice extends Model
     public function project()
     {
         return $this->belongsTo(Project::class, 'project_Id', 'project_Id');
+    }
+
+    public function signatory()
+    {
+        return $this->belongsTo(Signatory::class, 'signatory_id');
     }
 
     public function items()

@@ -3,6 +3,12 @@
 
     <div class="w-full max-w-5xl mx-auto">
         
+        <div class="mb-4">
+            <a href="{{ route('projects.index') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 rounded text-xs font-bold transition-colors shadow-sm">
+                &larr; Back
+            </a>
+        </div>
+
         @if(session('success'))
             <div class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-4 mb-8 flex items-start gap-3 text-sm rounded-md">
                 <i class="fa-solid fa-circle-check mt-0.5 text-emerald-600"></i>
@@ -96,16 +102,69 @@
             @endif
         </div>
 
-        <!-- 3. ACTION -->
-        @if($project->surveyLocations->count() > 0)
+        <!-- 3. MODELLING -->
+        <div class="mb-8">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+                <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">2. Modelling</h2>
+            </div>
+
+            @php $summary = $project->modellingSummary; @endphp
+
+            @if($summary)
+                <div class="bg-white border border-slate-200 rounded-lg shadow-sm">
+                    <ul class="divide-y divide-slate-100">
+                        <li class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
+                            <div>
+                                <div class="flex items-center gap-2.5 mb-1">
+                                    <div class="font-bold text-slate-800 text-sm">Modelling configured</div>
+                                    <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Saved</span>
+                                </div>
+                                <div class="text-[11px] text-slate-500 font-medium">
+                                    Package: {{ $summary->package_name ?? 'Custom selection' }},
+                                    {{ $project->modellingItems->pluck('catalog_module_id')->unique()->count() }} modules,
+                                    RM {{ number_format($summary->grand_total, 2) }}
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-4">
+                                <a href="{{ route('projects.modeling.builder', ['project_id' => $project->project_Id]) }}" class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
+                                    Edit Modelling <i class="fa-solid fa-arrow-right text-[10px] ml-0.5"></i>
+                                </a>
+                                <form action="{{ route('projects.modeling.destroy', $project->project_Id) }}" method="POST" class="m-0" onsubmit="return confirm('Remove modelling data for this project?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="text-sm font-semibold text-red-500 hover:text-red-700 transition-colors">Remove</button>
+                                </form>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            @else
+                <div class="text-center py-12 bg-white border border-slate-200 rounded-lg shadow-sm">
+                    <div class="w-12 h-12 bg-slate-50 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-3">
+                        <i class="fa-solid fa-cubes text-xl"></i>
+                    </div>
+                    <div class="text-sm font-medium text-slate-500 mb-4">No modelling has been done yet.</div>
+                    <a href="{{ route('projects.modeling.builder', ['project_id' => $project->project_Id]) }}" class="inline-flex items-center gap-1.5 px-4 py-2 bg-white border border-slate-200 text-slate-700 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 rounded text-xs font-bold uppercase tracking-wider transition-colors shadow-sm">
+                        Start Modelling
+                    </a>
+                </div>
+            @endif
+        </div>
+
+        <!-- 4. ACTION -->
+        @php $hasSurvey = $project->surveyLocations->count() > 0; @endphp
+
+        @if($hasSurvey || $project->modellingSummary)
             <div class="mt-8 pt-8 border-t border-slate-200 text-center">
                 <div class="flex flex-col sm:flex-row justify-center gap-3">
                     <a href="{{ route('quotation.index', ['project_id' => $project->project_Id]) }}" class="inline-flex justify-center items-center px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-bold transition-colors shadow-sm">
                         Proceed to Quotation
                     </a>
-                    <a href="{{ route('projects.report.preview', $project->project_Id) }}" class="inline-flex justify-center items-center px-6 py-2.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-md text-sm font-bold transition-colors shadow-sm">
-                        View Survey Report
-                    </a>
+                    @if($hasSurvey)
+                        <a href="{{ route('projects.report.preview', $project->project_Id) }}" class="inline-flex justify-center items-center px-6 py-2.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-md text-sm font-bold transition-colors shadow-sm">
+                            View Survey Report
+                        </a>
+                    @endif
                 </div>
             </div>
         @endif

@@ -116,22 +116,36 @@ class ProjectController extends Controller
         }
 
         if (empty($validated['number'])) {
-            // Auto-generate project code
-            $lastProject = \App\Models\Project::withTrashed()->latest('project_Id')->first();
-            $nextId = $lastProject ? $lastProject->project_Id + 1 : 1;
-            
-            $code = 'EHS/PRJ/' . date('y') . '/' . str_pad($nextId, 3, '0', STR_PAD_LEFT);
-            while (\App\Models\Project::withTrashed()->where('number', $code)->exists()) {
-                $nextId++;
-                $code = 'EHS/PRJ/' . date('y') . '/' . str_pad($nextId, 3, '0', STR_PAD_LEFT);
-            }
-            $validated['number'] = $code;
+            // Auto-generate project code: EHS/<type>/<client initials>/<running no.>
+            $typeCode = $validated['project_type'];
+
+            // Client code = initials of each word in the client name, e.g. "KU"
+            $clientCode = collect(preg_split('/\s+/', trim($validated['client_name'] ?? '')))
+                ->filter()
+                ->map(fn ($w) => strtoupper(mb_substr($w, 0, 1)))
+                ->implode('') ?: 'XX';
+
+            $prefix = "EHS/{$typeCode}/{$clientCode}/";
+
+            // Running number is global across ALL projects (same rule as QuotationController::nextNumber)
+            $lastRunning = \App\Models\Project::withTrashed()
+                ->whereNotNull('number')
+                ->pluck('number')
+                ->filter(fn ($n) => str_contains($n, '/'))
+                ->map(fn ($n) => \Illuminate\Support\Str::afterLast($n, '/'))
+                ->filter(fn ($last) => is_numeric($last))
+                ->map(fn ($last) => (int) $last)
+                ->max() ?? 0;
+
+            $validated['number'] = $prefix . str_pad($lastRunning + 1, 3, '0', STR_PAD_LEFT);
         }
 
         $project = \App\Models\Project::create([
             'client_Id'  => $clientId,
             'number'     => $validated['number'],
+            'project_type' => $validated['project_type'],
             'name'       => $validated['name'],
+            'location'   => $validated['location'],            // <-- NEW
             'period'     => $validated['period'] ?? null,
             'pic_name'   => $validated['pic_name'] ?? null,
             'pic_no'     => $validated['pic_no'] ?? null,
@@ -143,14 +157,19 @@ class ProjectController extends Controller
 
         // Redirection Logic
         if (($validated['project_category'] ?? 'survey') === 'modeling') {
-            return redirect()->route('projects.coming_soon')->with('success', 'Project created successfully. Modeling workflow is coming soon.');
+            return redirect()
+                ->route('projects.modeling.builder', ['project_id' => $project->project_Id])
+                ->with('success', 'Project created successfully. Select modules to build your quotation.');
         }
 
         if (!in_array(($validated['survey_type'] ?? 'sbes'), ['sbes', 'drone'])) {
-            return redirect()->route('projects.coming_soon')->with('success', 'Project created successfully. This survey workflow is coming soon.');
+            return redirect()
+                ->route('projects.modeling.builder', ['project_id' => $project->project_Id])
+                ->with('success', 'Project created successfully. This survey workflow is coming soon.');
         }
 
         return redirect()->route('projects.show', $project->project_Id)->with('success', 'Project created successfully. You can now plan your survey lines.');
+
     }
 
     /**
@@ -196,7 +215,8 @@ class ProjectController extends Controller
      */
     public function update(\App\Http\Requests\UpdateProjectRequest $request, string $id)
     {
-        $project = \App\Models\Project::where('project_Id', $id)->firstOrFail();
+        // Only the owner's projects can be updated (same rule as the other methods)
+        $project = auth()->user()->projects()->findOrFail($id);
         $validated = $request->validated();
 
         $userId = auth()->id();
@@ -208,13 +228,44 @@ class ProjectController extends Controller
                 ['company_name' => $validated['client_name']],
                 ['client_address' => $validated['client_address'] ?? null, 'created_by' => $userId]
             );
+
+            // Company already existed: keep its address up to date
+            if (!empty($validated['client_address']) && $client->client_address !== $validated['client_address']) {
+                $client->update([
+                    'client_address' => $validated['client_address'],
+                    'updated_by'     => $userId,
+                ]);
+            }
+
             $clientId = $client->client_Id;
         }
 
+        // Project type is editable. If it changes, rebuild the number with the new type code,
+        // keeping the same running number: EHS/<type>/<client initials>/<running no.>
+        $newType = $validated['project_type'] ?? $project->project_type;
+        $number  = $project->number;
+
+        if ($newType && $newType !== $project->project_type) {
+            $clientCode = collect(preg_split('/\s+/', trim($validated['client_name'] ?? '')))
+                ->filter()
+                ->map(fn ($w) => strtoupper(mb_substr($w, 0, 1)))
+                ->implode('') ?: 'XX';
+
+            $running = \Illuminate\Support\Str::afterLast($project->number ?? '', '/');
+            $running = is_numeric($running) ? $running : str_pad((string) $project->project_Id, 3, '0', STR_PAD_LEFT);
+
+            $number = "EHS/{$newType}/{$clientCode}/{$running}";
+        }
+
+        // If the number still has the XX placeholder and a company is now given, fix it
+        $number = \App\Models\Project::fillClientInNumber($number, $validated['client_name'] ?? null);
+
         $project->update([
             'client_Id'  => $clientId,
-            'number'     => $validated['number'] ?? $project->number,
+            'number'     => $number,
+            'project_type' => $newType,
             'name'       => $validated['name'],
+            'location'   => $validated['location'] ?? $project->location,   // <-- NEW
             'period'     => $validated['period'] ?? null,
             'pic_name'   => $validated['pic_name'] ?? null,
             'pic_no'     => $validated['pic_no'] ?? null,
