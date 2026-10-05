@@ -104,7 +104,8 @@
         }
 
         /* Tables */
-        table { width: 100%; border-collapse: collapse; }
+        table { width: 100%; border-collapse: collapse; page-break-inside: auto; }
+        tr { page-break-inside: avoid; page-break-after: auto; }
         
         .table-bordered th, .table-bordered td {
             border: 1px solid #d8dde3;
@@ -140,14 +141,25 @@
 </head>
 <body>
 
+    @php
+        $getImg = function($path) {
+            $fullPath = public_path($path);
+            if(file_exists($fullPath)) {
+                $ext = pathinfo($fullPath, PATHINFO_EXTENSION);
+                return 'data:image/'.$ext.';base64,' . base64_encode(file_get_contents($fullPath));
+            }
+            return '';
+        };
+    @endphp
+
     <!-- FIXED HEADER -->
     <header>
-        <img src="{{ public_path('images/header.jpeg') }}" class="header-img">
+        <img src="{{ $getImg('images/header.jpeg') }}" class="header-img">
     </header>
 
     <!-- FIXED FOOTER -->
     <footer>
-        <img src="{{ public_path('images/footer.jpeg') }}" class="footer-img">
+        <img src="{{ $getImg('images/footer.jpeg') }}" class="footer-img">
     </footer>
 
     <!-- MAIN CONTENT -->
@@ -157,7 +169,7 @@
         <table class="w-100 mb-2">
             <tr>
                 <td style="width: 40%; vertical-align: top;">
-                    <img src="{{ public_path('images/logo.jpeg') }}" style="max-height: 100px;">
+                    <img src="{{ $getImg('images/logo.jpeg') }}" style="max-height: 100px;">
                 </td>
                 <td style="width: 60%; vertical-align: top;" class="text-end quote-meta">
                     <strong>ECO HYDROTECH SOLUTIONS SDN. BHD. (1688434-T)</strong><br>
@@ -308,11 +320,8 @@
             <p class="mb-4">Yours sincerely,</p>
             
             @if(isset($invoice->signatory) && $invoice->signatory->signature_path)
-                @php 
-                    $sigPath = public_path($invoice->signatory->signature_path);
-                @endphp
-                @if(file_exists($sigPath))
-                    <img src="{{ $sigPath }}" style="max-height: 80px; margin-bottom: 10px;">
+                @if(file_exists(public_path($invoice->signatory->signature_path)))
+                    <img src="{{ $getImg($invoice->signatory->signature_path) }}" style="max-height: 80px; margin-bottom: 10px;">
                 @endif
             @endif
             
