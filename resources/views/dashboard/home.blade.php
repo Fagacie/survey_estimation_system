@@ -29,7 +29,7 @@
     </style>
 
     <div class="max-w-7xl mx-auto">
-        <div class="flex items-center gap-3 mb-8">
+        <div id="quotationBuilderHeader" class="flex items-center gap-3 mb-8 print:hidden">
             <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 shadow-sm border border-teal-100">
                 <i class="fa-solid fa-file-invoice-dollar text-xl"></i>
             </div>
@@ -370,7 +370,6 @@
                     <button type="button" class="preview-button px-5 py-2.5 rounded-lg text-sm font-bold border border-slate-600 hover:bg-slate-800 transition-colors" id="previewBtn">
                         <i class="fa-regular fa-eye mr-2"></i> PREVIEW
                     </button>
-
                     <button type="button" id="saveQuotationBtn" class="px-5 py-2.5 rounded-lg text-sm font-bold bg-teal-500 hover:bg-teal-400 text-white shadow-sm transition-colors border border-transparent">
                         <i class="fa-regular fa-floppy-disk mr-2"></i> SAVE / DOWNLOAD
                     </button>
@@ -385,9 +384,13 @@
         <div id="previewModeContainer" class="d-none">
 
             <!-- Preview Action Bar -->
-            <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 sticky top-4 z-50">
+            <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 sticky top-4 z-50 print:hidden">
                 <button type="button" id="backToEditBtn" class="px-4 py-2 rounded-lg text-sm font-bold border border-slate-300 hover:bg-slate-50 transition-colors text-slate-700">
                     <i class="fa-solid fa-arrow-left mr-2"></i> BACK TO EDIT
+                </button>
+                
+                <button type="button" id="previewDownloadPdfBtn" class="px-5 py-2.5 rounded-lg text-sm font-bold bg-teal-600 text-white hover:bg-teal-500 shadow-sm transition-colors">
+                    <i class="fa-solid fa-file-pdf mr-2"></i> DOWNLOAD PDF
                 </button>
             </div>
 
@@ -412,7 +415,7 @@
                 </div>
                 
                 <div class="modal-body py-4 px-6 text-slate-600 text-sm leading-relaxed">
-                    The quotation has been successfully saved to the database. Would you like to view and print/export it as a PDF now?
+                    The quotation has been successfully saved to the database. Would you like to download it as a PDF now?
                 </div>
 
                 <div class="modal-footer border-0 pt-2 pb-5 px-6 flex gap-3">
@@ -420,7 +423,7 @@
                         No, stay here
                     </button>
                     <button type="button" id="confirmQuotationSaveBtn" class="flex-1 py-2.5 rounded-lg text-sm font-bold bg-teal-600 text-white hover:bg-teal-500 shadow-sm transition-colors">
-                        Yes, View PDF
+                        Yes, Download PDF
                     </button>
                 </div>
             </div>
@@ -527,6 +530,6 @@
         <script>
             window.quotationStoreUrl = "{{ route('quotation.store') }}";
         </script>
-        <script src="{{ asset('js/home.js') }}?v={{ time() }}"></script>
+        <script src="{{ asset('js/home.js') }}?v=v6_final"></script>
     @endpush
 </x-app-layout>

@@ -143,6 +143,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/quotation', [QuotationController::class, 'store'])->name('quotation.store');
     Route::get('/quotations/history', [HistoryController::class, 'index'])->name('quotations.history');
     Route::get('/quotations/{id}', [QuotationController::class, 'show'])->name('quotations.show');
+    Route::get('/quotations/{id}/download', [QuotationController::class, 'download'])->name('quotations.download');
     Route::get('/project/next-number', [QuotationController::class, 'nextNumber']);
     Route::get('/quotations/{id}/invoice', [QuotationController::class, 'showInvoice'])->name('quotations.invoice');
 
@@ -160,6 +161,8 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/invoices/{invoice}', [InvoiceController::class, 'show'])
         ->name('invoices.show');
+    Route::get('/invoices/{invoice}/download', [InvoiceController::class, 'download'])
+        ->name('invoices.download');
     // (invoices.issue removed: the single "Edit Invoice" form now saves through invoices.updateDetails)
     Route::post('/invoices/{invoice}/update-details', [InvoiceController::class, 'updateDetails'])->name('invoices.updateDetails');
     

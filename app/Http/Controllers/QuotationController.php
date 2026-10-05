@@ -6,6 +6,7 @@ use App\Models\Client;
 use App\Models\Module;
 use App\Models\Item;
 use App\Models\Project;
+use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\QtInvoice;
 use App\Models\QtInvoiceItem;
 use App\Models\PaymentTerm;
@@ -310,7 +311,7 @@ class QuotationController extends Controller
         }
     }
 
-    public function show($id)
+    public function show(\Illuminate\Http\Request $request, $id)
     {
         $quotation = QtInvoice::with([
             'items',
@@ -326,7 +327,33 @@ class QuotationController extends Controller
         // Chosen signer; older quotations (no signer chosen) fall back to the first person in the list
         $signer = $quotation->signatory ?? Signatory::orderBy('id')->first();
 
+        if ($request->has('print')) {
+            return redirect()->route('quotations.download', $id);
+        }
+
         return view('dashboard.view', compact('quotation', 'signer'));
+    }
+
+    public function download($id)
+    {
+        $quotation = QtInvoice::with([
+            'items',
+            'items.catalogItem.category',
+            'items.catalogItem.service',
+            'project.client',
+            'paymentTerms',
+            'signatory'
+        ])
+            ->where('quotation_Id', $id)
+            ->firstOrFail();
+
+        $signer = $quotation->signatory ?? Signatory::orderBy('id')->first();
+
+        $pdf = Pdf::loadView('dashboard.quotation-pdf', compact('quotation', 'signer'))
+                  ->setPaper('A4', 'portrait');
+
+        $safeQuotationNo = str_replace(['/', '\\'], '-', $quotation->quotation_no ?? 'Unknown');
+        return $pdf->download('Quotation_' . $safeQuotationNo . '.pdf');
     }
 
     public function history()

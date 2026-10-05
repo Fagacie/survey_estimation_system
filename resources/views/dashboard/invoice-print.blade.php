@@ -1,6 +1,8 @@
-<x-app-layout containerClass="w-full px-8 py-8 bg-slate-50 relative min-h-screen">
-    <x-slot name="header">Invoice {{ $invoice->invoice_number }}</x-slot>
-
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Invoice {{ $invoice->invoice_number }}</title>
+    <meta charset="utf-8">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
@@ -341,6 +343,8 @@
             }
         }
     </style>
+</head>
+<body onload="window.print()">
 
     <div class="invoice-page-wrap">
 
@@ -358,9 +362,9 @@
 
                 {{-- Print: greyed out until the form has been saved once (printed_date set) --}}
                 @if($invoice->printed_date)
-                    <a href="{{ route('invoices.download', $invoice->invoice_Id) }}" target="_blank" class="ctrl-btn ctrl-btn-primary">
-                        <i class="fa-solid fa-file-pdf"></i> Download PDF
-                    </a>
+                    <button type="button" class="ctrl-btn ctrl-btn-primary" onclick="window.print()">
+                        <i class="fa-solid fa-print"></i> Print
+                    </button>
                 @else
                     <button type="button" class="ctrl-btn" disabled title="Save the invoice details first">
                         <i class="fa-solid fa-print"></i> Print
@@ -553,136 +557,6 @@
 
     </div> <!-- end .invoice-page-wrap -->
 
-    {{-- EDIT INVOICE MODAL (dates + description + condition in one form) --}}
-    <div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form id="invoiceForm">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Edit Invoice</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div id="invoiceFormErrors" class="alert alert-danger d-none" style="white-space: pre-line;"></div>
-
-                        <div class="row g-3 mb-3">
-                            <div class="col-6">
-                                <label class="form-label fw-semibold">Invoice Date</label>
-                                <input type="date" class="form-control" name="invoice_date" required
-                                       value="{{ $invoice->invoice_date ? \Carbon\Carbon::parse($invoice->invoice_date)->format('Y-m-d') : '' }}">
-                            </div>
-                            <div class="col-6">
-                                <label class="form-label fw-semibold">Due Date</label>
-                                <input type="date" class="form-control" name="due_date" required
-                                       value="{{ $invoice->due_date ? \Carbon\Carbon::parse($invoice->due_date)->format('Y-m-d') : '' }}">
-                            </div>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Description</label>
-                            <textarea class="form-control" name="description" rows="3">{{ $invoice->description }}</textarea>
-                        </div>
-
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Payment Note (Condition)</label>
-                            <textarea class="form-control" name="condition" rows="3">{{ $invoice->paymentTerm->condition }}</textarea>
-                        </div>
-
-                        <hr>
-
-                        {{-- APPROVED BY: pick a saved person, or add a new one --}}
-                        <div class="mb-3">
-                            <label class="form-label fw-semibold">Approved by</label>
-                            <select class="form-select" name="signatory_id" id="signatorySelect" required>
-                                @foreach($signatories as $s)
-                                    <option value="{{ $s->id }}" {{ optional($signer)->id == $s->id ? 'selected' : '' }}>
-                                        {{ $s->name }}
-                                    </option>
-                                @endforeach
-                                <option value="new">+ Add new person...</option>
-                            </select>
-                        </div>
-
-                        <div id="newSignatoryFields" class="border rounded p-3 d-none">
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Name</label>
-                                <input type="text" class="form-control" name="new_name" maxlength="255">
-                            </div>
-                            <div class="mb-3">
-                                <label class="form-label fw-semibold">Position</label>
-                                <input type="text" class="form-control" name="new_position" maxlength="255">
-                            </div>
-                            <div>
-                                <label class="form-label fw-semibold">Signature image</label>
-                                <input type="file" class="form-control" name="new_signature" accept="image/png,image/jpeg">
-                                <div class="form-text">PNG with a transparent background looks best. Max 2 MB.</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || "{{ csrf_token() }}";
-
-        // Approved by: show the "new person" fields only when "+ Add new person" is chosen
-        const signatorySelect = document.getElementById('signatorySelect');
-        const newSignatoryFields = document.getElementById('newSignatoryFields');
-
-        function toggleNewSignatory() {
-            if (!signatorySelect || !newSignatoryFields) return;
-            newSignatoryFields.classList.toggle('d-none', signatorySelect.value !== 'new');
-        }
-
-        signatorySelect?.addEventListener('change', toggleNewSignatory);
-        toggleNewSignatory();
-
-        document.getElementById('invoiceForm')?.addEventListener('submit', async function (e) {
-            e.preventDefault();
-
-            const btn = this.querySelector('button[type="submit"]');
-            const errBox = document.getElementById('invoiceFormErrors');
-            errBox.classList.add('d-none');
-            btn.disabled = true;
-
-            try {
-                const res = await fetch('{{ route("invoices.updateDetails", $invoice->invoice_Id) }}', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': csrfToken,
-                        'Accept': 'application/json'
-                    },
-                    body: new FormData(this)
-                });
-
-                if (res.ok) {
-                    location.reload();
-                    return;
-                }
-
-                if (res.status === 422) {
-                    const data = await res.json();
-                    errBox.textContent = Object.values(data.errors).flat().join('\n');
-                    errBox.classList.remove('d-none');
-                } else {
-                    alert('Failed to save.');
-                }
-            } catch (err) {
-                alert('Failed to save. Please check your connection and try again.');
-            }
-
-            btn.disabled = false;
-        });
-    });
-    </script>
-    @endpush
-</x-app-layout>
+    </div> <!-- end .invoice-page-wrap -->
+</body>
+</html>

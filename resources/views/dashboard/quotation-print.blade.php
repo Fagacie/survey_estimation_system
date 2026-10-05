@@ -1,6 +1,8 @@
-<x-app-layout containerClass="w-full px-8 py-8 bg-slate-50 relative min-h-screen">
-    <x-slot name="header">Quotation #{{ $quotation->quotation_no }}</x-slot>
-
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quotation #{{ $quotation->quotation_no }}</title>
+    <meta charset="utf-8">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -262,18 +264,9 @@
             }
         }
     </style>
-
+</head>
+<body onload="window.print()">
     <div class="max-w-7xl mx-auto">
-        <!-- ACTION BAR (HIDDEN IN PRINT VIEW) -->
-        <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 no-print sticky top-4 z-50">
-            <a href="{{ url('/history') }}" class="px-4 py-2 rounded-lg text-sm font-bold border border-slate-300 hover:bg-slate-50 transition-colors text-slate-700">
-                <i class="fa-solid fa-arrow-left mr-2"></i> BACK TO HISTORY
-            </a>
-            <a href="{{ route('quotations.download', $quotation->quotation_Id) }}" target="_blank" class="px-5 py-2.5 rounded-lg text-sm font-bold bg-teal-600 text-white hover:bg-teal-500 shadow-sm transition-colors inline-block">
-                <i class="fa-solid fa-file-pdf mr-2"></i> DOWNLOAD PDF
-            </a>
-        </div>
-
         <!-- A4 PAGE CONTAINER -->
         <div class="page-container">
 
@@ -567,8 +560,5 @@
         </div>
 
     </div> <!-- end .max-w-7xl -->
-
-    @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    @endpush
-</x-app-layout>
+</body>
+</html>

@@ -7,6 +7,7 @@ use App\Models\PaymentTerm;
 use App\Models\QtInvoice;
 use App\Models\Project;
 use App\Models\Signatory;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -65,14 +66,30 @@ class InvoiceController extends Controller
         return redirect()->route('invoices.show', $invoice->invoice_Id);
     }
 
-    public function show($invoiceId)
+    public function show(Request $request, $invoiceId)
     {
         $invoice = Invoice::with(['paymentTerm', 'quotation', 'signatory'])->findOrFail($invoiceId);
 
         // People who can be chosen under "Approved by"
         $signatories = Signatory::orderBy('name')->get();
 
+        if ($request->has('print')) {
+            return redirect()->route('invoices.download', $invoiceId);
+        }
+
         return view('dashboard.invoice', compact('invoice', 'signatories'));
+    }
+
+    public function download($invoiceId)
+    {
+        $invoice = Invoice::with(['paymentTerm', 'quotation', 'signatory'])->findOrFail($invoiceId);
+        $signatories = Signatory::orderBy('name')->get();
+
+        $pdf = Pdf::loadView('dashboard.invoice-pdf', compact('invoice', 'signatories'))
+                  ->setPaper('A4', 'portrait');
+
+        $safeInvoiceNo = str_replace(['/', '\\'], '-', $invoice->invoice_no ?? 'Unknown');
+        return $pdf->download('Invoice_' . $safeInvoiceNo . '.pdf');
     }
 
     private function generateInvoiceNumber($projectId, $originalTermId): string

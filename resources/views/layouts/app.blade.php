@@ -36,18 +36,56 @@
         <!-- Custom CSS -->
         <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ time() + 1 }}">
         @stack('styles')
+
+        <style>
+            @media print {
+                /* Forcefully hide layout elements bypassing Tailwind cache */
+                .ises-sidebar, 
+                .ises-topbar, 
+                .ises-mobile-overlay {
+                    display: none !important;
+                }
+                
+                /* Reset layout containers to force white backgrounds to override Chrome dark modes */
+                html, body, .ises-app, main, #main-content, .bg-slate-50 {
+                    display: block !important;
+                    height: auto !important;
+                    min-height: auto !important;
+                    overflow: visible !important;
+                    background: #ffffff !important;
+                    background-color: #ffffff !important;
+                    color: #000000 !important;
+                    -webkit-print-color-adjust: exact !important;
+                    print-color-adjust: exact !important;
+                }
+                
+                .page-container, .invoice-slip, .quote-page, .invoice-page-wrap {
+                    box-shadow: none !important;
+                    border: none !important;
+                    margin: 0 !important;
+                    padding: 0 !important;
+                    width: 100% !important;
+                    max-width: 100% !important;
+                }
+                
+                /* Aggressively kill ALL shadows to fix Chrome print shadow bleeding bugs */
+                * {
+                    box-shadow: none !important;
+                }
+            }
+        </style>
     </head>
     
     <body class="ises-app bg-slate-50 antialiased text-slate-800" x-data="{ sidebarOpen: window.innerWidth >= 1024 }">
         
-        <div class="flex h-screen overflow-hidden">
+        <div class="flex h-screen overflow-hidden print:h-auto print:overflow-visible">
             
             <!-- OVERLAY (Mobile) -->
-            <div x-show="sidebarOpen" x-transition.opacity class="fixed inset-0 z-20 bg-slate-900/50 lg:hidden" @click="sidebarOpen = false" style="display: none;"></div>
+            <div x-show="sidebarOpen" x-transition.opacity class="ises-mobile-overlay fixed inset-0 z-20 bg-slate-900/50 lg:hidden print:hidden" @click="sidebarOpen = false" style="display: none;"></div>
 
             <!-- 1. SIDE NAVIGATION -->
             @unless($hideSidebar ?? false)
-                <aside :class="sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0 lg:w-[4.5rem]'" class="ises-sidebar fixed inset-y-0 left-0 z-30 transition-all duration-300 ease-in-out flex flex-col lg:static relative group">
+                <aside :class="sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0 lg:w-[4.5rem]'" class="ises-sidebar fixed inset-y-0 left-0 z-30 transition-all duration-300 ease-in-out flex flex-col lg:static relative group print:hidden">
                     
                     <!-- Sidebar Header / Logo -->
                     <div class="ises-sidebar-brand flex items-center h-16 flex-shrink-0" :class="sidebarOpen ? 'px-4 justify-between' : 'justify-center'">
@@ -123,11 +161,11 @@
             @endunless
 
             <!-- 2. MAIN CONTENT AREA -->
-            <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative bg-white">
+            <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative bg-white print:overflow-visible">
                 
                 <!-- TOP UTILITY HEADER -->
                 <!-- Removed branding, removed hamburger (handled in sidebar), clean white BG, 1px bottom border -->
-                <header class="ises-topbar h-16 flex items-center justify-between px-8 z-10 flex-shrink-0">
+                <header class="ises-topbar h-16 flex items-center justify-between px-8 z-10 flex-shrink-0 print:hidden">
                     <div class="flex items-center gap-3">
                         @unless($hideSidebar ?? false)
                             <!-- Hamburger only visible on mobile -->
@@ -164,7 +202,7 @@
 
                 <!-- PAGE CONTENT -->
                 <!-- Removed max-w, using w-full px-8 for full fluid layout -->
-                <main class="flex-1 overflow-y-auto overflow-x-hidden bg-slate-50 {{ $containerClass ?? 'w-full' }}">
+                <main class="flex-1 overflow-y-auto overflow-x-hidden bg-slate-50 {{ $containerClass ?? 'w-full' }} print:overflow-visible print:bg-white text-black">
                     {{ $slot }}
                 </main>
             </div>
