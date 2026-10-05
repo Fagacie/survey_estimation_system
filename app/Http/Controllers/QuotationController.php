@@ -186,7 +186,7 @@ class QuotationController extends Controller
 
                 $estimation = $this->estimationService->calculate($project);
 
-                // 4. Calculate Grand Total
+                // 4. Calculate Survey Subtotal (before SST)
                 $grandTotal = 0.00;
                 foreach ($validated['items'] as $item) {
                     $qty    = (int) $item['unit_qty'];
@@ -231,11 +231,20 @@ class QuotationController extends Controller
                         ->implode("\n");
                 }
 
+                // Totals: survey (with SST) + modelling (if the project has saved Modelling)
+                $sstRate        = 0.08;
+                $surveySubtotal = round($grandTotal, 2);
+                $surveySst      = round($surveySubtotal * $sstRate, 2);
+                $modellingTotal = round((float) optional($project->modellingSummary)->grand_total, 2);
+                $combinedTotal  = round($surveySubtotal + $surveySst + $modellingTotal, 2);
+
                 // 7. Create Quotation Header
                 $quotation = QtInvoice::create([
-                    'project_Id'   => $projectId,
-                    'quotation_no' => $quotationNo,
-                    'grand_total'  => $grandTotal,
+                    'project_Id'      => $projectId,
+                    'quotation_no'    => $quotationNo,
+                    'grand_total'     => $combinedTotal,
+                    'survey_total'    => $surveySubtotal,
+                    'modelling_total' => $modellingTotal,
                     'survey_distance_nm' => $estimation['distance_nm'],
                     'survey_hours' => $estimation['survey_hours'],
                     'survey_duration_days' => $estimation['total_days'],
@@ -271,8 +280,7 @@ class QuotationController extends Controller
                 }
 
                 // 9. Create structured Payment Term rows
-                $sstRate = 0.08;
-                $finalTotal = $grandTotal + ($grandTotal * $sstRate);   // grand total INCLUDING SST
+                $finalTotal = $combinedTotal;   // survey + SST + modelling
 
                 foreach (($validated['payment_terms'] ?? []) as $index => $term) {
                     $percentageValue = (float) str_replace('%', '', $term['percentage'] ?? '0');
@@ -282,7 +290,7 @@ class QuotationController extends Controller
                         'name'         => 'Payment ' . ($index + 1),
                         'percentage'   => $percentageValue,
                         'condition'    => $term['condition'] ?? null,
-                        'amount'       => round($finalTotal * ($percentageValue / 100), 2),   // uses post-SST total
+                        'amount'       => round($finalTotal * ($percentageValue / 100), 2),   // percentage of the full amount
                         'created_by'   => $userId,
                     ]);
                 }
@@ -370,11 +378,10 @@ class QuotationController extends Controller
     {
         $quotation = QtInvoice::with('paymentTerms.invoiceCopy')->findOrFail($id);
 
-        $sstRate = 0.08;
-        $sstAmount = $quotation->grand_total * $sstRate;
-        $finalTotal = $quotation->grand_total + $sstAmount;
+        // SST is only on the survey part; grand_total already includes survey + SST + modelling
+        $sstAmount  = round($quotation->survey_total * 0.08, 2);
+        $finalTotal = $quotation->grand_total;
 
         return view('dashboard.tbinvoice', compact('quotation', 'sstAmount', 'finalTotal'));
-
     }
 }

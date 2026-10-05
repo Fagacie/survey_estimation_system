@@ -20,11 +20,15 @@ class QtInvoice extends Model
         'survey_distance_nm',
         'survey_hours',
         'survey_duration_days',
+        'survey_total',
+        'modelling_total',
         'created_by', 
         'updated_by'];
 
     protected $casts = [
         'grand_total' => 'decimal:2',
+        'survey_total' => 'decimal:2',
+        'modelling_total' => 'decimal:2',
         'survey_distance_nm' => 'decimal:4',
         'survey_hours' => 'decimal:2',
         'survey_duration_days' => 'decimal:2',

@@ -188,7 +188,7 @@
     }
 
     .quote-grand-total-row td {
-        background-color: #1c6e7a;
+        background-color: #008195;
         color: #ffffff;
         font-weight: 700;
     }
@@ -199,6 +199,47 @@
         font-size: 0.9rem;
         margin-bottom: 0.5rem;
     }
+
+    /* ===== Combined totals bars (Survey + Modelling + Grand Total) ===== */
+    /* CHANGE THE FONT SIZES HERE */
+    :root {
+        --total-font-survey: 0.9rem;
+        --total-font-modelling: 0.9rem;
+        --total-font-grand: 1rem;
+    }
+
+    table.quote-summary-table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    table.quote-summary-table td {
+        background-color: #ececec;
+        color: #504f4f;
+        font-weight: 500;
+        padding: 0.2rem 0.45rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    table.quote-summary-table td.qs-label {
+        text-align: left;
+    }
+
+    table.quote-summary-table td.qs-amount {
+        text-align: right;
+        white-space: nowrap;
+        width: 1%;
+    }
+
+    table.quote-summary-table tr.qs-survey td    { font-size: var(--total-font-survey); }
+    table.quote-summary-table tr.qs-modelling td { font-size: var(--total-font-modelling); }
+    table.quote-summary-table tr.qs-grand td {
+        font-size: var(--total-font-grand);
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        border-bottom: none;
+    }
+
 
     .quote-two-col {
         font-size: 0.85rem;
@@ -255,6 +296,13 @@
             padding-bottom: 35mm !important;
             padding-left: 15mm !important;
             padding-right: 15mm !important;
+        }
+
+        .quote-modelling-block,
+        table.quote-summary-table,
+        .quote-section-heading {
+            page-break-inside: avoid !important;
+            break-inside: avoid !important;
         }
 
         /* Page 2 forced break */
@@ -460,6 +508,24 @@
                                 </table>
                             </div>
                         </div>
+                        @endif
+
+                        @if($mdlSummary && $mdlGroups->isNotEmpty())
+                        <table class="quote-summary-table mb-4">
+                            <tr class="qs-survey">
+                                <td class="qs-label">Survey Total (incl. SST 8%)</td>
+                                <td class="qs-amount" id="preview-combined-survey">RM 0.00</td>
+                            </tr>
+                            <tr class="qs-modelling">
+                                <td class="qs-label">Modelling Total</td>
+                                <td class="qs-amount" id="preview-combined-modelling"
+                                    data-value="{{ $mdlSummary->grand_total }}">RM {{ number_format($mdlSummary->grand_total, 2) }}</td>
+                            </tr>
+                            <tr class="qs-grand">
+                                <td class="qs-label">GRAND TOTAL</td>
+                                <td class="qs-amount" id="preview-combined-grand">RM 0.00</td>
+                            </tr>
+                        </table>
                         @endif
 
                         <!-- ADDITIONAL NOTES -->

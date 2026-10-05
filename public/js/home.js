@@ -1158,6 +1158,17 @@ function renderQuotationPreview() {
         el.textContent = `RM ${formatMoney(grandTotalWithTax)}`;
     });
 
+    
+    // ---------- COMBINED TOTAL (Survey incl. SST + Modelling) ----------
+    // These elements only exist when the project has saved Modelling
+    const combinedModellingEl = document.getElementById('preview-combined-modelling');
+    if (combinedModellingEl) {
+        const modellingTotal = parseFloat(combinedModellingEl.dataset.value) || 0;
+
+        setElementText('preview-combined-survey', `RM ${formatMoney(grandTotalWithTax)}`);
+        setElementText('preview-combined-grand', `RM ${formatMoney(grandTotalWithTax + modellingTotal)}`);
+    }
+
     // ---------- ITEMS TABLE: MODULE > SERVICE > ITEM ----------
     const modulesArray = Array.isArray(window.adminModulesTree)
         ? window.adminModulesTree
