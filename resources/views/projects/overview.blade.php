@@ -220,13 +220,22 @@
     <!-- Script for Modal handling -->
     <script>
         function openSurveyModal(type) {
-            document.getElementById('modal_survey_type').value = type;
+            console.log("Opening modal for type: " + type);
+            var hiddenInput = document.getElementById('modal_survey_type');
+            if (hiddenInput) {
+                hiddenInput.value = type;
+                console.log("Set hidden input to: " + hiddenInput.value);
+            }
             if (type === 'drone') {
                 document.getElementById('modal_title').innerText = 'New Drone Mapping Area';
             } else {
                 document.getElementById('modal_title').innerText = 'New SBES Survey Area';
             }
-            var myModal = new bootstrap.Modal(document.getElementById('newSurveyModal'));
+            var modalEl = document.getElementById('newSurveyModal');
+            var myModal = bootstrap.Modal.getInstance(modalEl);
+            if (!myModal) {
+                myModal = new bootstrap.Modal(modalEl);
+            }
             myModal.show();
         }
     </script>
