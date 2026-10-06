@@ -15,7 +15,8 @@ class ReportController extends Controller
 
     public function preview(string $id)
     {
-        $data = $this->compile($id);
+        $locationId = request()->query('location_id');
+        $data = $this->compile($id, $locationId);
         
         if (request()->has('raw')) {
             return view('reports.survey', $data);
@@ -26,22 +27,34 @@ class ReportController extends Controller
 
     public function download(string $id): Response
     {
-        $data = $this->compile($id);
+        $locationId = request()->query('location_id');
+        $data = $this->compile($id, $locationId);
         $pdf = Pdf::loadView('reports.survey', $data)->setPaper('A4', 'portrait');
 
         $safeProjectNumber = str_replace(['/', '\\'], '-', $data['project']->number ?? 'Unknown');
-        $prefix = ($data['project']->survey_type === 'drone') ? 'Drone_Mapping_Report_' : 'Survey_Report_';
+        
+        $isDrone = false;
+        if ($data['locations']->count() > 0) {
+            $isDrone = $data['locations']->first()['is_drone'];
+        }
+        $prefix = $isDrone ? 'Drone_Mapping_Report_' : 'Survey_Report_';
+        
         return $pdf->download($prefix.$safeProjectNumber.'_'.now()->format('Ymd').'.pdf');
     }
 
-    private function compile(string $id): array
+    private function compile(string $id, ?string $locationId = null): array
     {
         $project = auth()->user()->projects()
             ->with(['client', 'surveyLocations.boundaries', 'surveyLocations.surveyLines', 'surveyLocations.sbesParameters', 'surveyLocations.droneMappingParameters'])
             ->findOrFail($id);
 
-        $locations = $project->surveyLocations->map(function ($location) use ($project) {
-            $isDrone = $project->survey_type === 'drone';
+        $locations = $project->surveyLocations;
+        if ($locationId) {
+            $locations = $locations->where('id', $locationId);
+        }
+
+        $locations = $locations->map(function ($location) {
+            $isDrone = $location->survey_type === 'drone';
 
             if ($isDrone) {
                 $droneParams = $location->droneMappingParameters;

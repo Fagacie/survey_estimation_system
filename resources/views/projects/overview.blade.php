@@ -77,6 +77,9 @@
                                 <div class="text-[11px] text-slate-500 font-medium">Added {{ $location->created_at->format('M d, Y') }}</div>
                             </div>
                             <div class="flex flex-col sm:flex-row items-center gap-3">
+                                <a href="{{ route('projects.report.preview', ['project' => $project->project_Id, 'location_id' => $location->id]) }}" class="text-sm font-semibold text-teal-600 hover:text-teal-800 transition-colors flex items-center gap-1">
+                                    Report <i class="fa-solid fa-file-pdf text-[10px] ml-0.5"></i>
+                                </a>
                                 <a href="{{ route('projects.surveys.map', [$project->project_Id, $location->id]) }}" class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
                                     Open Map <i class="fa-solid fa-arrow-right text-[10px] ml-0.5"></i>
                                 </a>
@@ -185,14 +188,6 @@
                 
             </div>
         </div>
-
-        @if($hasSurvey)
-            <div class="mt-8 pt-8 border-t border-slate-200 text-center">
-                <a href="{{ route('projects.report.preview', $project->project_Id) }}" class="inline-flex justify-center items-center px-6 py-2.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 rounded-md text-sm font-bold transition-colors shadow-sm">
-                    View Comprehensive Survey Report
-                </a>
-            </div>
-        @endif
 
     </div>
 
