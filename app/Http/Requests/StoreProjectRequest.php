@@ -25,8 +25,7 @@ class StoreProjectRequest extends FormRequest
             'pic_no' => 'nullable|string|max:255',
             'period' => 'nullable|string|max:255',
             'status' => 'required|in:draft,planned,completed',
-            'project_category' => 'required|in:survey,modeling',
-            'survey_type' => 'nullable|string|in:sbes,mbes,drone',
+            'description' => 'nullable|string|max:2000',
         ];
     }
 }

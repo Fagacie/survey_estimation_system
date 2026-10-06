@@ -48,11 +48,9 @@
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
                 <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">1. Survey Areas</h2>
                 <div class="flex gap-2">
-                    @if($project->survey_type === 'drone')
-                        <a href="{{ url('/admin/equipment') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 rounded text-[11px] font-bold uppercase tracking-wider transition-colors shadow-sm">
-                            <i class="fa-solid fa-database"></i> Equipment Database
-                        </a>
-                    @endif
+                    <a href="{{ url('/admin/equipment') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 rounded text-[11px] font-bold uppercase tracking-wider transition-colors shadow-sm">
+                        <i class="fa-solid fa-database"></i> Equipment Database
+                    </a>
                     <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white border border-transparent rounded text-[11px] font-bold uppercase tracking-wider transition-colors shadow-sm" data-bs-toggle="modal" data-bs-target="#newSurveyModal">
                         <i class="fa-solid fa-plus"></i> Add Area
                     </button>

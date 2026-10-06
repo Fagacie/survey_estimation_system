@@ -145,30 +145,16 @@ class ProjectController extends Controller
             'number'     => $validated['number'],
             'project_type' => $validated['project_type'],
             'name'       => $validated['name'],
-            'location'   => $validated['location'],            // <-- NEW
+            'location'   => $validated['location'],
             'period'     => $validated['period'] ?? null,
+            'description' => $validated['description'] ?? null,
             'pic_name'   => $validated['pic_name'] ?? null,
             'pic_no'     => $validated['pic_no'] ?? null,
             'status'     => $validated['status'] ?? 'draft',
-            'project_category' => $validated['project_category'] ?? 'survey',
-            'survey_type' => $validated['survey_type'] ?? 'sbes',
             'created_by' => $userId,
         ]);
 
-        // Redirection Logic
-        if (($validated['project_category'] ?? 'survey') === 'modeling') {
-            return redirect()
-                ->route('projects.modeling.builder', ['project_id' => $project->project_Id])
-                ->with('success', 'Project created successfully. Select modules to build your quotation.');
-        }
-
-        if (!in_array(($validated['survey_type'] ?? 'sbes'), ['sbes', 'drone'])) {
-            return redirect()
-                ->route('projects.modeling.builder', ['project_id' => $project->project_Id])
-                ->with('success', 'Project created successfully. This survey workflow is coming soon.');
-        }
-
-        return redirect()->route('projects.show', $project->project_Id)->with('success', 'Project created successfully. You can now plan your survey lines.');
+        return redirect()->route('projects.show', $project->project_Id)->with('success', 'Project created successfully. You can now add survey areas or set up modelling.');
 
     }
 
