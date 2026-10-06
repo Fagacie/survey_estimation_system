@@ -113,28 +113,26 @@
                         </a>
 
 
-                        <!-- Items Management Navigation Dropdown -->
-                        <div x-data="{ itemsOpen: {{ request()->routeIs('admin.index', 'newItem') ? 'true' : 'false' }} }" class="w-full">
-                            <button @click="itemsOpen = !itemsOpen" title="Items Database" class="ises-nav-link flex items-center justify-between px-3 py-2.5 transition-all group w-full focus:outline-none border-none outline-none bg-transparent {{ request()->routeIs('admin.index', 'newItem') ? 'active' : '' }}" :class="sidebarOpen ? '' : 'justify-center'">
+                        <!-- Database Management Navigation Dropdown -->
+                        <div x-data="{ itemsOpen: {{ request()->routeIs('admin.index', 'newItem', 'admin.equipment.*') ? 'true' : 'false' }} }" class="w-full">
+                            <button @click="itemsOpen = !itemsOpen" title="Database Management" class="ises-nav-link flex items-center justify-between px-3 py-2.5 transition-all group w-full focus:outline-none border-none outline-none bg-transparent {{ request()->routeIs('admin.index', 'newItem', 'admin.equipment.*') ? 'active' : '' }}" :class="sidebarOpen ? '' : 'justify-center'">
                                 <div class="flex items-center gap-3">
                                     <i class="fa-solid fa-database w-5 text-center text-sm"></i>
-                                    <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Items Database</span>
+                                    <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Database</span>
                                 </div>
                                 <i x-show="sidebarOpen" class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform duration-200" :class="itemsOpen ? 'rotate-180' : ''"></i>
                             </button>
                             
                             <!-- Sub-navigation -->
                             <div x-show="itemsOpen && sidebarOpen" x-transition class="pl-11 pr-3 py-1 space-y-1">
-                                <a href="{{ route('admin.index') }}" class="ises-nav-link block px-3 py-2 text-xs font-medium transition-colors {{ request()->routeIs('admin.index') ? 'active' : '' }}">
-                                    View All Items
+                                <a href="{{ route('admin.index') }}" class="ises-nav-link block px-3 py-2 text-[11px] font-medium transition-colors {{ request()->routeIs('admin.index', 'newItem') ? 'active' : '' }}">
+                                    Modelling Catalog
                                 </a>
-                                <a href="{{ route('newItem') }}" class="ises-nav-link block px-3 py-2 text-xs font-medium transition-colors {{ request()->routeIs('newItem') ? 'active' : '' }}">
-                                    + Add New Item
+                                <a href="{{ route('admin.equipment.index') }}" class="ises-nav-link block px-3 py-2 text-[11px] font-medium transition-colors {{ request()->routeIs('admin.equipment.*') ? 'active' : '' }}">
+                                    Drone Mapping Equipment
                                 </a>
                             </div>
                         </div>
-
-                        <!-- Sub-navigations removed to keep sidebar minimal as requested -->                    </div>
 
                     <!-- Sidebar Footer -->
                     <div class="border-t border-slate-800 flex-shrink-0 flex flex-col">
