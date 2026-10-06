@@ -8,8 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class SurveyLocation extends Model
 {
     use HasFactory;
-
-    protected $fillable = ['project_id', 'name', 'status'];
+    protected $fillable = ['project_id', 'name', 'status', 'survey_type'];
 
     public function project()
     {

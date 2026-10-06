@@ -18,7 +18,7 @@
         <div class="workspace-sidebar">
 
             <!-- KEY METRIC HIGHLIGHT STRIP (Always Visible) -->
-            @if($project->survey_type !== 'drone')
+            @if($surveyLocation->survey_type !== 'drone')
             <div class="metric-strip">
                 <div class="metric-grid">
                     <div class="metric-item">
@@ -73,7 +73,7 @@
                     </div>
 
                     <!-- 3. LINE GENERATOR -->
-                    @if($project->survey_type !== 'drone')
+                    @if($surveyLocation->survey_type !== 'drone')
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed accent-cyan" type="button" data-bs-toggle="collapse" data-bs-target="#panelGenerator">
@@ -198,7 +198,7 @@
                     @endif
 
                     <!-- 5. SURVEY PARAMETERS & TIME -->
-                    @if($project->survey_type !== 'drone')
+                    @if($surveyLocation->survey_type !== 'drone')
                     <div class="accordion-item">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed accent-amber" type="button" data-bs-toggle="collapse" data-bs-target="#panelTime">
@@ -246,7 +246,7 @@
                     @endif
 
                     <!-- 6. DRONE MAPPING -->
-                    @if($project->survey_type === 'drone')
+                    @if($surveyLocation->survey_type === 'drone')
                     <div class="accordion-item" id="droneMappingAccordionItem" style="display: none;">
                         <h2 class="accordion-header">
                             <button class="accordion-button collapsed accent-green" type="button" data-bs-toggle="collapse" data-bs-target="#panelDrone">
@@ -288,7 +288,7 @@
 
             <!-- MAP FLOATING ACTIONS REMOVED (Moved to sidebar) -->
 
-            @if($project->survey_type === 'drone')
+            @if($surveyLocation->survey_type === 'drone')
             <!-- FLOATING MISSION ESTIMATE (Drone) -->
             <div class="position-absolute" style="z-index: 1000; top: 15px; left: 50%; transform: translateX(-50%); pointer-events: none;">
                 <div class="bg-white rounded shadow-sm border p-2 d-flex gap-3 align-items-center" style="pointer-events: auto; background-color: rgba(255,255,255,0.95) !important;">
@@ -611,7 +611,7 @@
             // 12. Time estimation reactivity (handled by inline onchange in HTML)
 
             // Drone Mapping UI Initialization
-            window.isDroneMode = '{{ $project->survey_type }}' === 'drone';
+            window.isDroneMode = '{{ $surveyLocation->survey_type }}' === 'drone';
             window.EQUIPMENT_DB_URL = "{{ url('/admin/equipment') }}";
             if (window.isDroneMode && typeof DroneUI !== 'undefined') {
                 const savedParams = {!! json_encode($surveyLocation->droneMappingParameters) !!};

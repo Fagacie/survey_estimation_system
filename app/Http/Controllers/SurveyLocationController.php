@@ -21,11 +21,13 @@ class SurveyLocationController extends Controller
         $this->authorizeProject($project);
 
         $request->validate([
-            'name' => 'required|string|max:255'
+            'name' => 'required|string|max:255',
+            'survey_type' => 'required|in:sbes,drone',
         ]);
 
         $project->surveyLocations()->create([
-            'name' => $request->name
+            'name' => $request->name,
+            'survey_type' => $request->survey_type,
         ]);
 
         return redirect()->back()->with('success', 'Survey area created successfully.');
