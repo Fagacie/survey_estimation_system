@@ -16,7 +16,7 @@
         <div class="page-header-wrapper">
             <h2 class="page-header">
                 <i class="bi bi-clipboard-data"></i>
-                DATA MANAGEMENT
+                MODELLING CATALOG
             </h2>
 
             <!-- CREATE NEW ITEM BUTTON -->

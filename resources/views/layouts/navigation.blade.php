@@ -16,6 +16,16 @@
                                 style="border-bottom-width: 2px; padding-top: 2px; font-weight: 500; font-size: 0.95rem; color: {{ request()->routeIs('projects.*') ? '#0f172a' : '#64748b' }}; border-color: {{ request()->routeIs('projects.*') ? '#3b82f6' : 'transparent' }};">
                         {{ __('Projects') }}
                     </x-nav-link>
+                    
+                    <x-nav-link :href="route('admin.index')" :active="request()->routeIs('admin.index') || request()->routeIs('newItem') || request()->routeIs('items.*')" 
+                                style="border-bottom-width: 2px; padding-top: 2px; font-weight: 500; font-size: 0.95rem; color: {{ request()->routeIs('admin.index') || request()->routeIs('newItem') || request()->routeIs('items.*') ? '#0f172a' : '#64748b' }}; border-color: {{ request()->routeIs('admin.index') || request()->routeIs('newItem') || request()->routeIs('items.*') ? '#3b82f6' : 'transparent' }};">
+                        {{ __('Modelling Catalog') }}
+                    </x-nav-link>
+                    
+                    <x-nav-link :href="route('admin.equipment.index')" :active="request()->routeIs('admin.equipment.*')" 
+                                style="border-bottom-width: 2px; padding-top: 2px; font-weight: 500; font-size: 0.95rem; color: {{ request()->routeIs('admin.equipment.*') ? '#0f172a' : '#64748b' }}; border-color: {{ request()->routeIs('admin.equipment.*') ? '#3b82f6' : 'transparent' }};">
+                        {{ __('Drone Mapping Equipment') }}
+                    </x-nav-link>
 
                 </div>
             </div>
@@ -76,6 +86,12 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('dashboard')" :active="request()->routeIs('projects.*')" style="color: {{ request()->routeIs('projects.*') ? '#3b82f6' : '#475569' }};">
                 {{ __('Projects') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('admin.index')" :active="request()->routeIs('admin.index') || request()->routeIs('newItem') || request()->routeIs('items.*')" style="color: {{ request()->routeIs('admin.index') || request()->routeIs('newItem') || request()->routeIs('items.*') ? '#3b82f6' : '#475569' }};">
+                {{ __('Modelling Catalog') }}
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('admin.equipment.index')" :active="request()->routeIs('admin.equipment.*')" style="color: {{ request()->routeIs('admin.equipment.*') ? '#3b82f6' : '#475569' }};">
+                {{ __('Drone Mapping Equipment') }}
             </x-responsive-nav-link>
         </div>
 

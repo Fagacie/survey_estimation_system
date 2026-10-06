@@ -190,7 +190,7 @@
     
     <div class="page-container mt-4">
         <div class="mb-5">
-            <h1 class="display-5 fw-bold mb-2" style="color: #111; letter-spacing: -0.03em;">Equipment Database</h1>
+            <h1 class="display-5 fw-bold mb-2" style="color: #111; letter-spacing: -0.03em;">Drone Mapping Equipment</h1>
             <div class="text-muted" style="font-size: 0.95rem;">Manage Drones and Cameras for Drone Mapping Operations</div>
         </div>
 
