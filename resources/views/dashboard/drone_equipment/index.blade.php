@@ -1,10 +1,13 @@
 <x-app-layout containerClass="w-full px-8 py-8 bg-slate-50 relative min-h-screen">
     <x-slot name="header">Admin - Drone Equipment</x-slot>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <style>
+        .equipment-page {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
         .page-container {
             max-width: 1400px;
             margin: 0 auto;
@@ -186,12 +189,130 @@
             padding: 1.5rem;
             background: #fafafa;
         }
+
+        /* Final equipment workspace overrides. */
+        .equipment-page .equipment-eyebrow {
+            color: #087f78;
+            font-size: .68rem;
+            font-weight: 800;
+            letter-spacing: .13em;
+            text-transform: uppercase;
+        }
+
+        .equipment-page .equipment-title {
+            margin: 6px 0 0;
+            color: #122033;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 0;
+        }
+
+        .equipment-page .equipment-subtitle {
+            margin: 8px 0 0;
+            color: #68788b;
+            font-size: .9rem;
+        }
+
+        .equipment-page .custom-card {
+            border-color: #dfe7ee;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(18, 32, 51, .04);
+        }
+
+        .equipment-page .equipment-registers {
+            display: grid;
+            gap: 24px;
+        }
+
+        .equipment-page .equipment-register {
+            min-width: 0;
+        }
+
+        .equipment-page .custom-card-header {
+            padding: 18px 20px;
+            background: #fff;
+            border-bottom-color: #eef2f5;
+        }
+
+        .equipment-page .custom-card-title {
+            color: #122033;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+        }
+
+        .equipment-page .custom-card-title i {
+            color: #087f78 !important;
+        }
+
+        .equipment-page .btn-outline-dark-minimal {
+            border-color: #b7d9d5;
+            border-radius: 6px;
+            color: #087f78;
+        }
+
+        .equipment-page .btn-outline-dark-minimal:hover {
+            border-color: #087f78;
+            background: #087f78;
+        }
+
+        .equipment-page .clean-table th {
+            padding: 12px 14px;
+            color: #68788b;
+            background: #f4f7f9;
+            border-bottom-color: #dfe7ee;
+            font-size: .64rem;
+            letter-spacing: .1em;
+        }
+
+        .equipment-page .clean-table td {
+            padding: 16px 14px;
+            color: #526579;
+            border-bottom-color: #eef2f5;
+            font-size: .82rem;
+        }
+
+        .equipment-page .clean-table tbody tr:hover {
+            background: #f0f8f7;
+        }
+
+        .equipment-page .status-badge {
+            border: 0;
+            border-radius: 999px;
+            font-size: .64rem;
+            letter-spacing: .08em;
+        }
+
+        .equipment-page .status-active {
+            color: #087f78;
+            background: #e9f7f5;
+        }
+
+        .equipment-page .status-inactive {
+            color: #64748b;
+            background: #f1f5f9;
+        }
+
+        .equipment-page .action-btn {
+            color: #68788b;
+        }
+
+        .equipment-page .action-btn:hover {
+            color: #087f78;
+        }
+
+        @media (max-width: 640px) {
+            .equipment-page .equipment-title { font-size: 1.65rem; }
+            .equipment-page .custom-card-header { align-items: flex-start; gap: 12px; }
+        }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/drone-equipment.css') }}?v={{ filemtime(public_path('css/drone-equipment.css')) }}">
     
-    <div class="page-container mt-4">
+    <div class="page-container equipment-page mt-4">
         <div class="mb-5">
-            <h1 class="display-5 fw-bold mb-2" style="color: #111; letter-spacing: -0.03em;">Drone Mapping Equipment</h1>
-            <div class="text-muted" style="font-size: 0.95rem;">Manage Drones and Cameras for Drone Mapping Operations</div>
+            <div class="equipment-eyebrow">Flight operations</div>
+            <h1 class="equipment-title">Drone Mapping Equipment</h1>
+            <div class="equipment-subtitle">Manage the aircraft and cameras available for mapping missions.</div>
         </div>
 
         @if(session('success'))
@@ -209,9 +330,9 @@
             </div>
         @endif
 
-        <div class="row">
+        <div class="equipment-registers">
             <!-- DRONES SECTION -->
-            <div class="col-lg-5 mb-5">
+            <div class="equipment-register mb-5">
                 <div class="custom-card">
                     <div class="custom-card-header">
                         <h4 class="custom-card-title"><i class="fa-solid fa-plane-up me-2" style="color:#888;"></i> Drones</h4>
@@ -258,7 +379,7 @@
             </div>
 
             <!-- CAMERAS SECTION -->
-            <div class="col-lg-7 mb-5">
+            <div class="equipment-register mb-5">
                 <div class="custom-card">
                     <div class="custom-card-header">
                         <h4 class="custom-card-title"><i class="fa-solid fa-camera me-2" style="color:#888;"></i> Cameras</h4>

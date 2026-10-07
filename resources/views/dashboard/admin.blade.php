@@ -2,22 +2,26 @@
     <x-slot name="header">Admin - Data Management</x-slot>
 
     <!-- Bootstrap & Icons -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.13.1/font/bootstrap-icons.min.css">
     
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/module-item.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ filemtime(public_path('css/admin.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/module-item.css') }}?v={{ filemtime(public_path('css/module-item.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/modelling-catalog.css') }}?v={{ filemtime(public_path('css/modelling-catalog.css')) }}">
 
     <!-- MAIN WRAPPER TO CENTER CONTENT -->
-    <div class="admin-container">
+    <div class="admin-container catalog-page">
 
         <!-- PAGE TITLE & BUTTON -->
         <div class="page-header-wrapper">
-            <h2 class="page-header">
+            <div>
+                <div class="catalog-kicker">Reference data</div>
+                <h2 class="page-header">
                 <i class="bi bi-clipboard-data"></i>
-                MODELLING CATALOG
-            </h2>
+                    Modelling Catalog
+                </h2>
+                <p class="catalog-subtitle">Manage reusable survey services, categories, and internal rates.</p>
+            </div>
 
             <!-- CREATE NEW ITEM BUTTON -->
             <a href="{{ route('newItem') }}">

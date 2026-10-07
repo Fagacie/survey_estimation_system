@@ -1,6 +1,8 @@
 <x-app-layout containerClass="w-full px-8 py-8">
     <x-slot name="header">{{ $project->name }}</x-slot>
+    <link rel="stylesheet" href="{{ asset('css/project-overview.css') }}?v={{ filemtime(public_path('css/project-overview.css')) }}">
 
+    <div class="project-overview-page">
     <div class="w-full max-w-5xl mx-auto">
         
         <div class="mb-4">
@@ -24,6 +26,7 @@
 
         <!-- 1. PROJECT HEADER -->
         <div class="mb-8">
+            <p class="project-overview-eyebrow">Project workspace / survey operations</p>
             <h1 class="text-3xl font-bold text-slate-900 tracking-tight mb-1">{{ $project->name }}</h1>
             <div class="text-sm font-medium text-slate-500">Project Code: {{ $project->number ?? 'N/A' }}</div>
             
@@ -239,4 +242,5 @@
             myModal.show();
         }
     </script>
+</div>
 </x-app-layout>

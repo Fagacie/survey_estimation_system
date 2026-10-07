@@ -1,11 +1,14 @@
 <x-app-layout containerClass="w-full px-8 py-8 bg-slate-50 relative min-h-screen">
     <x-slot name="header">Quotation History</x-slot>
     
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
+        .quotation-history-page {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
         /* Base Overrides */
         body {
             color: #334155;
@@ -13,20 +16,22 @@
         }
 
         .history-container {
-            max-width: none !important;
-            margin: 0 !important;
+            width: 100%;
+            max-width: 1440px;
+            margin: 0 auto !important;
         }
 
         /* Page Heading */
         .page-header-wrapper {
-            margin-bottom: 24px;
+            margin-bottom: 28px;
         }
 
         .page-header-title {
-            font-size: 1.5rem;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
             font-weight: 700;
             color: #0f172a;
-            letter-spacing: -0.02em;
+            letter-spacing: 0;
             margin-bottom: 4px;
         }
 
@@ -40,9 +45,9 @@
         .filter-card-custom {
             background: #ffffff;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
+            border-radius: 14px;
             padding: 20px;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 24px rgba(18, 32, 51, 0.05);
             margin-bottom: 24px;
         }
 
@@ -61,12 +66,12 @@
         .filter-input, .filter-select {
             width: 100%;
             height: 42px;
-            border: 1px solid #cbd5e1;
+            border: 1px solid transparent;
             border-radius: 8px;
             padding: 8px 14px;
             font-size: 0.875rem;
             color: #1e293b;
-            background-color: #ffffff;
+            background-color: #f8fafc;
             transition: all 0.2s ease;
         }
 
@@ -74,15 +79,16 @@
             outline: none;
             border-color: #0d9488;
             box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
+            background-color: #ffffff;
         }
 
         /* Table Design */
         .table-card {
             background: #ffffff;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
+            border-radius: 14px;
             overflow: hidden;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+            box-shadow: 0 8px 24px rgba(18, 32, 51, 0.05);
         }
 
         .custom-project-table {
@@ -105,7 +111,7 @@
         }
 
         .custom-project-table tbody td {
-            padding: 16px 20px;
+            padding: 20px 20px;
             font-size: 0.875rem;
             color: #334155;
             border-bottom: 1px solid #f1f5f9;
@@ -118,7 +124,39 @@
         }
 
         .custom-project-table tbody tr:hover td {
-            background-color: #f8fafc;
+            background-color: #f0f8f7;
+        }
+
+        .custom-project-table tbody tr {
+            transition: background-color .18s ease;
+        }
+
+        .quotation-history-page .action-circle-btn {
+            border-color: #dfe7ee;
+            color: #68788b;
+        }
+
+        .quotation-history-page .action-circle-btn:hover {
+            border-color: #8ed8d1;
+            color: #087f78;
+            background: #e9f7f5;
+        }
+
+        .quotation-history-page .action-circle-btn.delete-btn:hover {
+            border-color: #fca5a5;
+            color: #dc2626;
+            background: #fef2f2;
+        }
+
+        .quotation-history-page .modal-card {
+            border: 1px solid #dfe7ee;
+        }
+
+        @media (max-width: 768px) {
+            .page-header-title { font-size: 1.65rem; }
+            .filter-card-custom { padding: 16px; }
+            .table-card { overflow-x: auto; }
+            .custom-project-table { min-width: 860px; }
         }
 
         .project-code-text {
@@ -238,14 +276,17 @@
             font-size: 0.875rem;
         }
     </style>
+    <link rel="stylesheet" href="{{ asset('css/quotation-history.css') }}?v={{ filemtime(public_path('css/quotation-history.css')) }}">
 
     <!-- Main Content Layout Wrapper -->
+    <div class="quotation-history-page">
     <div class="history-container">
 
         <!-- Page Heading Section -->
         <div class="page-header-wrapper">
+            <p class="history-eyebrow">Commercial records / quotations</p>
             <h2 class="page-header-title">Quotation History</h2>
-            <p class="page-header-subtitle">Search, view, and manage all previous project estimations and quotations.</p>
+            <p class="page-header-subtitle">Review estimates, open quotation workspaces, and move approved work into invoicing.</p>
         </div>
         
         <!-- Search Input and Filter Bar -->
@@ -319,6 +360,7 @@
         <!-- History Data Table Container -->
         <div class="table-card">
             <table class="custom-project-table" id="quotationHistoryTable">
+                <caption class="sr-only">Quotation history register</caption>
                 <thead>
                     <tr>
                         <th style="width: 60px;">#</th>
@@ -342,6 +384,7 @@
                         data-code="{{ strtolower($codeVal) }}" 
                         data-date="{{ $formattedDate }}" 
                         data-month="{{ $monthVal }}"
+                        data-type="{{ strtolower($item->project?->project_type ?? '') }}"
                         data-location="{{ strtolower($locationVal) }}">
                         
                         <!-- Row Index -->
@@ -413,6 +456,7 @@
         </div>
 
     </div>
+    </div>
 
     <!-- Hidden Confirmation Modal Pop-up for Deleting Records -->
     <div id="deleteModalOverlay" class="modal-overlay">
@@ -472,12 +516,12 @@
 
                 rows.forEach(row => {
                     const rowText = row.innerText.toLowerCase();
-                    const rowCode = row.getAttribute('data-code') || '';
+                    const rowType = row.getAttribute('data-type') || '';
                     const rowLocation = row.getAttribute('data-location') || '';   // NEW
                     const rowMonth = row.getAttribute('data-month') || '';
 
                     const matchesSearch = query === '' || rowText.includes(query);
-                    const matchesType = selectedType === '' || rowCode.includes(selectedType);
+                    const matchesType = selectedType === '' || rowType === selectedType;
                     const matchesLocation = selectedLocation === '' || rowLocation === selectedLocation;   // NEW
                     const matchesMonth = selectedMonth === '' || rowMonth === selectedMonth;
 

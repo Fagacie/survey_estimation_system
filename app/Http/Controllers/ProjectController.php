@@ -29,6 +29,14 @@ class ProjectController extends Controller
             $query->where('status', $request->status);
         }
 
+        if ($request->filled('project_type')) {
+            $query->where('project_type', $request->project_type);
+        }
+
+        if ($request->filled('location')) {
+            $query->where('location', $request->location);
+        }
+
         if ($request->filled('date_range')) {
             $now = now();
             switch ($request->date_range) {
@@ -86,7 +94,14 @@ class ProjectController extends Controller
             'missing_cost' => $missingCostCount,
         ];
 
-        return view('projects.index', compact('projects', 'metrics', 'overview', 'attention'));
+        return view('projects.index', [
+            'projects' => $projects,
+            'metrics' => $metrics,
+            'overview' => $overview,
+            'attention' => $attention,
+            'projectTypes' => \App\Models\Project::TYPES,
+            'locations' => \App\Models\Project::LOCATIONS,
+        ]);
     }
 
     /**

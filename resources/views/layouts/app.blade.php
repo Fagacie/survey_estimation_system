@@ -90,8 +90,8 @@
                     <!-- Sidebar Header / Logo -->
                     <div class="ises-sidebar-brand flex items-center h-16 flex-shrink-0" :class="sidebarOpen ? 'px-4 justify-between' : 'justify-center'">
                         <a href="{{ route('projects.index') }}" class="flex items-center gap-3 ises-brand overflow-hidden whitespace-nowrap" title="Survey Projects">
-                            <span class="ises-brand-mark"><i class="fa-solid fa-compass-drafting"></i></span>
-                            <span x-show="sidebarOpen" class="ises-brand-copy"><strong>ISES</strong><small>Survey Operations</small></span>
+                            <img x-show="sidebarOpen" src="{{ asset('images/logo.jpeg') }}" alt="Eco Hydrotech Solutions" class="ises-brand-logo">
+                            <span x-show="!sidebarOpen" class="ises-brand-mark"><img src="{{ asset('images/logo.png') }}" alt="Eco Hydrotech"></span>
                         </a>
                         
                         <!-- Toggle Button Integrated into Sidebar Header -->
@@ -134,13 +134,15 @@
                             </div>
                         </div>
 
+                    </div>
+
                     <!-- Sidebar Footer -->
-                    <div class="border-t border-slate-800 flex-shrink-0 flex flex-col">
+                    <div class="ises-sidebar-footer border-t border-slate-800 flex-shrink-0 flex flex-col">
                         
                         <!-- User Info -->
                         @auth
                             <div class="ises-sidebar-user p-3 flex items-center justify-center transition-all bg-white" :class="sidebarOpen ? '' : 'flex-col gap-2'">
-                                <a href="{{ route('profile.edit') }}" title="Profile" class="ises-avatar flex items-center justify-center font-semibold text-xs flex-shrink-0 transition-colors bg-rose-600 rounded-full text-white">
+                                    <a href="{{ route('profile.edit') }}" title="Profile" class="ises-avatar flex items-center justify-center font-semibold text-xs flex-shrink-0 transition-colors rounded-full text-white">
                                     {{ substr(auth()->user()->name, 0, 1) }}
                                 </a>
                                 <div x-show="sidebarOpen" class="flex-1 min-w-0 ml-3">

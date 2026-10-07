@@ -1,0 +1,38 @@
+/* INOS project intake form. */
+.create-project-page {
+    --create-ink: #122033;
+    --create-muted: #68788b;
+    --create-line: #dfe7ee;
+    --create-canvas: #f4f7f9;
+    --create-blue: #0b5c8e;
+    --create-blue-soft: #edf6fb;
+    max-width: 1120px;
+    margin: 0 auto;
+}
+
+.create-project-page > .mb-8 { margin-bottom: 1.7rem !important; padding-bottom: 1.3rem; border-bottom-color: var(--create-line); }
+.create-project-eyebrow { margin: 0 0 .55rem; color: var(--create-blue); font-size: .68rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.create-project-page h1 { color: var(--create-ink); font-family: 'Space Grotesk', sans-serif; letter-spacing: 0; }
+.create-project-page .max-w-4xl { max-width: none; border: 1px solid var(--create-line); border-radius: 0; box-shadow: none; background: #fff; }
+.create-project-page .max-w-4xl > form > div:first-child { padding: 2rem 2.2rem; }
+.create-project-page h2 { display: flex; align-items: center; gap: .7rem; padding-bottom: .7rem; border-bottom: 1px solid var(--create-line); color: var(--create-ink); font-family: 'Space Grotesk', sans-serif; }
+.create-project-page h2 span { width: 28px; height: 28px; border-radius: 50%; color: var(--create-blue); background: var(--create-blue-soft); }
+.create-project-page label { color: #526579; font-size: .72rem; letter-spacing: .02em; }
+.create-project-page input,
+.create-project-page select,
+.create-project-page textarea { border-color: var(--create-line); border-radius: 0; color: var(--create-ink); background: #fff; box-shadow: none; }
+.create-project-page input:focus,
+.create-project-page select:focus,
+.create-project-page textarea:focus { border-color: #78aec9; box-shadow: 0 0 0 3px rgba(11, 92, 142, .1); outline: 0; }
+.create-project-page input::placeholder,
+.create-project-page textarea::placeholder { color: #9aabb8; }
+.create-project-page .bg-slate-50.p-6 { padding: 1.2rem 2.2rem; border-top-color: var(--create-line); background: #fbfcfd; }
+.create-project-page button[type="submit"] { border: 1px solid var(--create-blue); border-radius: 5px; background: var(--create-blue); box-shadow: none; }
+.create-project-page button[type="submit"]:hover { border-color: #08456b; background: #08456b; }
+.create-project-page a[href*="projects.index"] { border-radius: 5px; border-color: var(--create-line); box-shadow: none; }
+.create-project-page a[href*="projects.index"]:hover { border-color: #78aec9; color: var(--create-blue); background: var(--create-blue-soft); }
+
+@media (max-width: 640px) {
+    .create-project-page .max-w-4xl > form > div:first-child { padding: 1.25rem; }
+    .create-project-page .bg-slate-50.p-6 { padding: 1rem 1.25rem; }
+}

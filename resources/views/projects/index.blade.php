@@ -1,206 +1,147 @@
-<x-app-layout containerClass="w-full px-8 py-8">
+<x-app-layout containerClass="w-full px-4 py-6 sm:px-8 sm:py-8">
+<link rel="stylesheet" href="{{ asset('css/projects-dashboard.css') }}?v={{ filemtime(public_path('css/projects-dashboard.css')) }}">
+<div class="projects-dashboard">
     
     <!-- 1. PAGE HEADER -->
-    <div class="flex flex-col md:flex-row justify-between md:items-center gap-4 mb-5 pb-4 border-b border-slate-200">
+    <header class="projects-dashboard-header">
         <div>
-            <h1 class="text-xl font-bold text-slate-900 tracking-tight flex items-center gap-3">
-                Project Control Room 
-                <span class="text-[10px] bg-slate-100 text-slate-500 px-2 py-0.5 rounded-full border border-slate-200 tracking-widest uppercase font-semibold">{{ now()->format('d M Y') }}</span>
-            </h1>
-            <div class="text-xs font-medium text-slate-500 mt-1">Manage survey planning, mapping data, and quotations.</div>
+            <p class="projects-dashboard-eyebrow">Operations / project register</p>
+            <h1>Survey Projects</h1>
+            <p class="projects-dashboard-intro">Coordinate project setup, survey planning, and estimation from one operational workspace.</p>
         </div>
-        <div>
-            <a href="{{ route('projects.create') }}" class="inline-flex items-center gap-1.5 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md text-xs font-semibold transition-colors shadow-sm">
-                <i class="fa-solid fa-plus"></i> New Project
-            </a>
+        <div class="projects-dashboard-header-tools">
+            <span class="projects-dashboard-date">{{ now()->format('d M Y') }}</span>
+            <a href="{{ route('projects.create') }}" class="projects-dashboard-primary"><i class="fa-solid fa-plus"></i> New project</a>
         </div>
-    </div>
+    </header>
 
     @if(session('success'))
-        <div class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-4 mb-8 flex items-start gap-3 text-sm">
-            <i class="fa-solid fa-circle-check mt-0.5 text-emerald-600"></i>
-            <span class="font-medium">{{ session('success') }}</span>
+        <div class="projects-dashboard-feedback" role="status">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>{{ session('success') }}</span>
         </div>
     @endif
 
-    <!-- 2. CORE METRICS (Ultra-clean and minimal) -->
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm flex flex-col justify-center relative overflow-hidden group">
-            <div class="text-[11px] font-bold tracking-wider text-gray-500 uppercase mb-1">Total Projects</div>
-            <div class="text-3xl font-black text-gray-900 leading-none">{{ $metrics['total'] }}</div>
-            <i class="fa-solid fa-layer-group absolute right-5 top-1/2 -translate-y-1/2 text-4xl text-slate-100 group-hover:scale-110 transition-transform"></i>
+    <section class="projects-dashboard-overview" aria-label="Project overview">
+        <div class="projects-dashboard-overview-lead">
+            <span class="projects-dashboard-overview-label">Portfolio overview</span>
+            <strong>{{ $metrics['total'] }}</strong>
+            <span>total projects in your workspace</span>
         </div>
-        
-        <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm flex flex-col justify-center relative overflow-hidden group">
-            <div class="text-[11px] font-bold tracking-wider text-gray-500 uppercase mb-1">Drafts</div>
-            <div class="text-3xl font-black text-gray-900 leading-none">{{ $metrics['draft'] }}</div>
-            <i class="fa-solid fa-pen-ruler absolute right-5 top-1/2 -translate-y-1/2 text-4xl text-slate-100 group-hover:scale-110 transition-transform"></i>
-        </div>
-
-        <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm flex flex-col justify-center relative overflow-hidden group">
-            <div class="text-[11px] font-bold tracking-wider text-gray-500 uppercase mb-1">Mapped Areas</div>
-            <div class="text-3xl font-black text-gray-900 leading-none">{{ $metrics['mapped'] }}</div>
-            <i class="fa-solid fa-map-location-dot absolute right-5 top-1/2 -translate-y-1/2 text-4xl text-slate-100 group-hover:scale-110 transition-transform"></i>
-        </div>
-
-        <div class="bg-white border border-gray-200 rounded-lg p-5 shadow-sm flex flex-col justify-center relative overflow-hidden group">
-            <div class="text-[11px] font-bold tracking-wider text-gray-500 uppercase mb-1">Quotations</div>
-            <div class="text-3xl font-black text-gray-900 leading-none">{{ $metrics['quotations'] }}</div>
-            <i class="fa-solid fa-file-invoice-dollar absolute right-5 top-1/2 -translate-y-1/2 text-4xl text-slate-100 group-hover:scale-110 transition-transform"></i>
-        </div>
-    </div>
+        <dl class="projects-dashboard-overview-metrics">
+            <div><dt>Drafts</dt><dd>{{ $metrics['draft'] }}</dd></div>
+            <div><dt>Mapped areas</dt><dd>{{ $metrics['mapped'] }}</dd></div>
+            <div><dt>Quotations</dt><dd>{{ $metrics['quotations'] }}</dd></div>
+        </dl>
+    </section>
 
     @if($metrics['total'] > 0)
-        <!-- 3. ATTENTION REQUIRED (Operational Alerts - Scannable text list) -->
         @if($attention['missing_boundaries'] > 0 || $attention['missing_lines'] > 0 || $attention['missing_parameters'] > 0 || $attention['missing_cost'] > 0)
-            <div class="bg-white border border-gray-200 rounded-lg mb-8 shadow-sm">
-                <div class="px-5 py-4 border-b border-gray-100 flex items-center gap-2">
-                    <i class="fa-solid fa-triangle-exclamation text-amber-500 text-sm"></i>
-                    <h3 class="text-sm font-bold text-slate-800">Action Required</h3>
+            <section class="projects-dashboard-queue" aria-labelledby="attention-title">
+                <div class="projects-dashboard-section-heading">
+                    <div><p class="projects-dashboard-eyebrow">Next actions</p><h2 id="attention-title">Needs attention</h2></div>
+                    <span>{{ collect($attention)->sum() }} open checks</span>
                 </div>
-                <div class="p-0">
-                    <ul class="divide-y divide-slate-100 m-0">
-                        @if($attention['missing_boundaries'] > 0)
-                            <li class="px-5 py-2.5 flex justify-between items-center text-sm hover:bg-slate-50 transition-colors">
-                                <span class="text-slate-600">Projects missing boundaries</span>
-                                <span class="font-bold text-slate-900">{{ $attention['missing_boundaries'] }}</span>
-                            </li>
-                        @endif
-                        @if($attention['missing_lines'] > 0)
-                            <li class="px-5 py-2.5 flex justify-between items-center text-sm hover:bg-slate-50 transition-colors">
-                                <span class="text-slate-600">Projects pending survey line generation</span>
-                                <span class="font-bold text-slate-900">{{ $attention['missing_lines'] }}</span>
-                            </li>
-                        @endif
-                        @if($attention['missing_parameters'] > 0)
-                            <li class="px-5 py-2.5 flex justify-between items-center text-sm hover:bg-slate-50 transition-colors">
-                                <span class="text-slate-600">Projects with missing survey parameters</span>
-                                <span class="font-bold text-slate-900">{{ $attention['missing_parameters'] }}</span>
-                            </li>
-                        @endif
-                        @if($attention['missing_cost'] > 0)
-                            <li class="px-5 py-2.5 flex justify-between items-center text-sm hover:bg-slate-50 transition-colors">
-                                <span class="text-slate-600">Projects awaiting final cost estimation</span>
-                                <span class="font-bold text-slate-900">{{ $attention['missing_cost'] }}</span>
-                            </li>
-                        @endif
-                    </ul>
+                <div class="projects-dashboard-queue-grid">
+                    @if($attention['missing_boundaries'] > 0)
+                        <div><i class="fa-solid fa-draw-polygon"></i><span>Missing boundaries</span><strong>{{ $attention['missing_boundaries'] }}</strong></div>
+                    @endif
+                    @if($attention['missing_lines'] > 0)
+                        <div><i class="fa-solid fa-route"></i><span>Pending survey lines</span><strong>{{ $attention['missing_lines'] }}</strong></div>
+                    @endif
+                    @if($attention['missing_parameters'] > 0)
+                        <div><i class="fa-solid fa-sliders"></i><span>Missing parameters</span><strong>{{ $attention['missing_parameters'] }}</strong></div>
+                    @endif
+                    @if($attention['missing_cost'] > 0)
+                        <div><i class="fa-solid fa-calculator"></i><span>Awaiting cost estimation</span><strong>{{ $attention['missing_cost'] }}</strong></div>
+                    @endif
                 </div>
-            </div>
+            </section>
         @endif
 
-        <!-- 4. PROJECTS TABLE WORKSPACE -->
-        <div class="bg-white border border-gray-200 rounded-lg mb-12 shadow-sm">
-            
-            <!-- Table Controls -->
-            <div class="px-5 py-4 border-b border-gray-100 flex flex-wrap justify-between items-center gap-4">
-                <div><h3 class="text-base font-bold text-slate-800 mb-1">Survey portfolio</h3><p class="text-xs text-slate-500 m-0">Latest projects and their current handoff point</p></div>
-                
-                <form method="GET" action="{{ route('projects.index') }}" class="flex flex-wrap gap-3 w-full md:w-auto">
-                    <!-- Search Input -->
-                    <div class="relative">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <i class="fa-solid fa-search text-slate-400 text-sm"></i>
-                        </div>
-                        <input type="text" name="search" class="w-full md:w-64 pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-md text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow shadow-sm" placeholder="Search projects..." value="{{ request('search') }}">
-                    </div>
+        <section class="projects-dashboard-register" aria-labelledby="register-title">
+            <div class="projects-dashboard-register-header">
+                <div><p class="projects-dashboard-eyebrow">Work queue</p><h2 id="register-title">Project register</h2><p>Search and filter projects before opening a workspace.</p></div>
+                <span class="projects-dashboard-result-count">{{ $projects->total() }} results</span>
+            </div>
+            <form method="GET" action="{{ route('projects.index') }}" class="projects-dashboard-filters">
+                <label class="projects-dashboard-search"><i class="fa-solid fa-magnifying-glass"></i><input type="search" name="search" aria-label="Search projects" placeholder="Search name, code, or client" value="{{ request('search') }}"></label>
                     
-                    <!-- Status Filter -->
-                    <div class="relative">
-                        <select name="status" class="w-full md:w-40 pl-3 pr-8 py-2 appearance-none bg-white border border-slate-200 rounded-md text-sm text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow shadow-sm cursor-pointer" onchange="this.form.submit()">
+                    <label class="projects-dashboard-select"><span>Status</span><select name="status" aria-label="Filter by status" onchange="this.form.submit()">
                             <option value="">All Statuses</option>
                             <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
                             <option value="planned" {{ request('status') === 'planned' ? 'selected' : '' }}>In Progress</option>
                             <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <i class="fa-solid fa-chevron-down text-slate-400 text-[10px]"></i>
-                        </div>
-                    </div>
+                        </select></label>
 
-                    <!-- Date Range Filter -->
-                    <div class="relative">
-                        <select name="date_range" class="w-full md:w-40 pl-3 pr-8 py-2 appearance-none bg-white border border-slate-200 rounded-md text-sm text-slate-700 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow shadow-sm cursor-pointer" onchange="this.form.submit()">
+                    <label class="projects-dashboard-select"><span>Type</span><select name="project_type" aria-label="Filter by project type" onchange="this.form.submit()">
+                            <option value="">All Project Types</option>
+                            @foreach($projectTypes as $code => $label)
+                                <option value="{{ $code }}" {{ request('project_type') === $code ? 'selected' : '' }}>{{ $code }} · {{ $label }}</option>
+                            @endforeach
+                        </select></label>
+
+                    <label class="projects-dashboard-select"><span>Location</span><select name="location" aria-label="Filter by location" onchange="this.form.submit()">
+                            <option value="">All Locations</option>
+                            @foreach($locations as $location)
+                                <option value="{{ $location }}" {{ request('location') === $location ? 'selected' : '' }}>{{ $location }}</option>
+                            @endforeach
+                        </select></label>
+
+                    <label class="projects-dashboard-select"><span>Created</span><select name="date_range" aria-label="Filter by date range" onchange="this.form.submit()">
                             <option value="">All Time</option>
                             <option value="last_30_days" {{ request('date_range') === 'last_30_days' ? 'selected' : '' }}>Last 30 Days</option>
                             <option value="this_month" {{ request('date_range') === 'this_month' ? 'selected' : '' }}>This Month</option>
                             <option value="this_year" {{ request('date_range') === 'this_year' ? 'selected' : '' }}>This Year</option>
-                        </select>
-                        <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                            <i class="fa-regular fa-calendar text-slate-400 text-[11px]"></i>
-                        </div>
-                    </div>
+                        </select></label>
 
-                    @if(request('search') || request('status') || request('date_range'))
-                        <a href="{{ route('projects.index') }}" class="px-4 py-2 bg-slate-50 hover:bg-slate-100 text-slate-600 border border-slate-200 rounded-md text-sm font-medium transition-colors flex items-center gap-2 shadow-sm">
-                            <i class="fa-solid fa-xmark text-xs"></i> Clear
-                        </a>
+                    @if(request('search') || request('status') || request('project_type') || request('location') || request('date_range'))
+                        <a href="{{ route('projects.index') }}" class="projects-dashboard-clear"><i class="fa-solid fa-xmark"></i> Clear</a>
                     @endif
                     <button type="submit" class="hidden">Filter</button>
-                </form>
-            </div>
+            </form>
 
             <!-- Table Data (Dense) -->
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse text-sm">
+            <div class="projects-dashboard-table-wrap">
+                <table class="projects-dashboard-table">
+                    <caption class="sr-only">Survey project register</caption>
                     <thead>
                         <tr class="bg-slate-50/50 border-b border-slate-200 text-slate-500">
-                            <th class="px-5 py-3 font-bold uppercase tracking-wider text-[11px]">Code</th>
-                            <th class="px-5 py-3 font-bold uppercase tracking-wider text-[11px]">Project Details</th>
-                            <th class="px-5 py-3 font-bold uppercase tracking-wider text-[11px]">Client</th>
-                            <th class="px-5 py-3 font-bold uppercase tracking-wider text-[11px]">Status</th>
-                            <th class="px-5 py-3 font-bold uppercase tracking-wider text-[11px]">Updated</th>
-                            <th class="px-5 py-3 font-bold uppercase tracking-wider text-[11px] text-right">Actions</th>
+                            <th scope="col">Project</th><th scope="col">Survey details</th><th scope="col">Client</th><th scope="col">Type</th><th scope="col" class="projects-dashboard-actions-heading">Actions</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         @forelse($projects as $project)
                             <tr class="hover:bg-slate-50 transition-colors group">
-                                <td class="px-5 py-3 align-middle">
-                                    <span class="font-mono text-slate-500 text-xs">
+                                <td>
+                                    <span class="projects-dashboard-project-code">
                                         {{ $project->number ?? 'PRJ-' . str_pad($project->project_Id, 4, '0', STR_PAD_LEFT) }}
                                     </span>
                                 </td>
-                                <td class="px-5 py-3 align-middle">
-                                    <div class="font-semibold text-slate-800">{{ $project->name }}</div>
-                                    <div class="text-[11px] text-slate-500 flex items-center mt-0.5">
+                                <td>
+                                    <div class="projects-dashboard-project-name">{{ $project->name }}</div>
+                                    <div class="projects-dashboard-project-meta">
                                         <i class="fa-regular fa-clock mr-1 opacity-70"></i> {{ $project->period ?? 'Unspecified' }}
                                     </div>
                                 </td>
-                                <td class="px-5 py-3 align-middle">
-                                    <span class="text-slate-700 font-medium text-xs">{{ $project->client?->company_name ?? '-' }}</span>
+                                <td><span class="projects-dashboard-client">{{ $project->client?->company_name ?? 'No client assigned' }}</span>
                                 </td>
-                                <td class="px-5 py-3 align-middle">
-                                    @if($project->status === 'draft')
-                                        <div class="flex items-center gap-1.5 text-slate-600 text-xs font-medium">
-                                            <div class="w-1.5 h-1.5 rounded-full bg-slate-400"></div> Draft
-                                        </div>
-                                    @elseif($project->status === 'planned')
-                                        <div class="flex items-center gap-1.5 text-blue-700 text-xs font-medium">
-                                            <div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div> In Progress
-                                        </div>
-                                    @else
-                                        <div class="flex items-center gap-1.5 text-emerald-700 text-xs font-medium">
-                                            <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div> Completed
-                                        </div>
-                                    @endif
+                                <td><span class="projects-dashboard-type">
+                                        {{ $projectTypes[$project->project_type] ?? $project->project_type ?? 'Not set' }}
+                                    </span>
                                 </td>
-                                <td class="px-5 py-3 align-middle text-slate-500 text-xs font-medium">
-                                    {{ $project->updated_at->format('d-m-Y') }}
-                                </td>
-                                <td class="px-5 py-3 align-middle text-right whitespace-nowrap">
-                                    <div class="flex items-center justify-end gap-1">
-                                        <a href="{{ route('projects.show', $project->project_Id) }}" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-blue-600 hover:bg-blue-50 transition-all" title="View">
+                                <td class="projects-dashboard-actions"><div>
+                                        <a href="{{ route('projects.show', $project->project_Id) }}" class="projects-dashboard-action" title="Open project"><i class="fa-solid fa-arrow-up-right-from-square"></i><span>Open</span>
                                             <i class="fa-solid fa-arrow-right font-light"></i>
                                         </a>
-                                        <a href="{{ route('projects.edit', $project->project_Id) }}" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-all" title="Edit">
+                                        <a href="{{ route('projects.edit', $project->project_Id) }}" class="projects-dashboard-action projects-dashboard-action-muted" title="Edit project"><i class="fa-solid fa-pen"></i><span>Edit</span>
                                             <i class="fa-solid fa-pen font-light text-sm"></i>
                                         </a>
                                         <form action="{{ route('projects.destroy', $project->project_Id) }}" method="POST" class="inline-block form-delete m-0">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-red-600 hover:bg-red-50 transition-all btn-delete-action" title="Delete">
-                                                <i class="fa-solid fa-trash-can font-light text-sm"></i>
+                                            <button type="button" class="projects-dashboard-action projects-dashboard-action-danger btn-delete-action" title="Delete project">
+                                                <i class="fa-solid fa-trash-can"></i><span>Delete</span>
                                             </button>
                                         </form>
                                     </div>
@@ -208,7 +149,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center py-10 bg-white">
+                                <td colspan="5" class="text-center py-10 bg-white">
                                     <div class="text-slate-500 mb-2 font-medium">No projects found.</div>
                                     <a href="{{ route('projects.index') }}" class="text-blue-600 hover:text-blue-700 text-sm font-medium">Clear Filters</a>
                                 </td>
@@ -223,21 +164,21 @@
                     {{ $projects->links('pagination::tailwind') }}
                 </div>
             @endif
-        </div>
+        </section>
 
     @else
         <!-- Empty State -->
-        <div class="text-center py-20 bg-white border border-slate-200 mt-8 shadow-sm">
-            <i class="fa-solid fa-layer-group text-3xl text-slate-300 mb-4 font-light"></i>
-            <h3 class="text-lg font-bold text-slate-800 mb-2">No projects yet</h3>
-            <p class="text-slate-500 mb-6 mx-auto max-w-md text-sm">
+        <section class="projects-dashboard-empty">
+            <i class="fa-solid fa-layer-group"></i>
+            <h2>No projects yet</h2>
+            <p>
                 Create your first survey estimation project to begin tracking boundaries, lines, and costs.
             </p>
-            <a href="{{ route('projects.create') }}" class="inline-flex items-center gap-2 bg-[#0052cc] hover:bg-blue-700 text-white px-6 py-2.5 text-sm font-medium transition-colors border border-transparent shadow-sm">
-                <i class="fa-solid fa-plus font-light"></i> Create Project
+            <a href="{{ route('projects.create') }}" class="projects-dashboard-primary"><i class="fa-solid fa-plus"></i> Create project
             </a>
-        </div>
+        </section>
     @endif
+</div>
 
     <!-- Scripts -->
     <script>

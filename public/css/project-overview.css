@@ -1,0 +1,39 @@
+/* INOS project workspace. */
+.project-overview-page {
+    --overview-ink: #122033;
+    --overview-muted: #68788b;
+    --overview-line: #dfe7ee;
+    --overview-canvas: #f4f7f9;
+    --overview-blue: #0b5c8e;
+    --overview-blue-soft: #edf6fb;
+    max-width: 1240px;
+    margin: 0 auto;
+}
+
+.project-overview-page .project-overview-eyebrow { margin: 0 0 .55rem; color: var(--overview-blue); font-size: .68rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.project-overview-page h1 { color: var(--overview-ink); font-family: 'Space Grotesk', sans-serif; letter-spacing: 0; }
+.project-overview-page .max-w-5xl { max-width: none; }
+.project-overview-page .inline-flex { box-shadow: none; }
+.project-overview-page .grid.bg-white { border: 1px solid var(--overview-line); border-radius: 0; box-shadow: none; background: #fff; }
+.project-overview-page .grid.bg-white > div { padding: 1.15rem 1.3rem; }
+.project-overview-page .grid.bg-white .text-\[10px\] { color: var(--overview-muted); letter-spacing: .12em; }
+.project-overview-page .grid.bg-white .text-sm { color: var(--overview-ink); }
+.project-overview-page h2 { color: var(--overview-ink); font-family: 'Space Grotesk', sans-serif; letter-spacing: .1em; }
+.project-overview-page .bg-white.border.rounded-lg.shadow-sm { border-color: var(--overview-line); border-radius: 0; box-shadow: none; }
+.project-overview-page .bg-white.border.rounded-lg.shadow-sm > ul > li { padding: 1.1rem 1.3rem; }
+.project-overview-page .bg-white.border.rounded-lg.shadow-sm > ul > li:hover { background: #f5fbfd; }
+.project-overview-page .bg-blue-600 { background: var(--overview-blue) !important; }
+.project-overview-page .hover\\:bg-blue-700:hover { background: #08456b !important; }
+.project-overview-page .text-blue-600 { color: var(--overview-blue) !important; }
+.project-overview-page .text-teal-600 { color: var(--overview-blue) !important; }
+.project-overview-page .bg-teal-50 { background: var(--overview-blue-soft) !important; }
+.project-overview-page .text-teal-700,
+.project-overview-page .text-teal-800 { color: var(--overview-blue) !important; }
+.project-overview-page .border-teal-400:hover { border-color: #78aec9 !important; }
+.project-overview-page .grid.grid-cols-1.md\\:grid-cols-3 > * { border-color: var(--overview-line); }
+.project-overview-page .group:hover { box-shadow: 0 8px 18px rgba(11, 92, 142, .08); }
+.project-overview-page .modal-content { border-radius: 0 !important; border: 1px solid var(--overview-line) !important; }
+
+@media (max-width: 640px) {
+    .project-overview-page h1 { font-size: 1.8rem; }
+}

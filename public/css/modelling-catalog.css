@@ -1,0 +1,55 @@
+/* INOS modelling catalog register. */
+.catalog-page {
+    --catalog-ink: #122033;
+    --catalog-muted: #68788b;
+    --catalog-line: #dfe7ee;
+    --catalog-soft-line: #eef2f5;
+    --catalog-canvas: #f4f7f9;
+    --catalog-blue: #0b5c8e;
+    --catalog-blue-soft: #edf6fb;
+    max-width: 1440px;
+    margin: 0 auto;
+}
+
+.catalog-page .page-header-wrapper { align-items: flex-end; margin-bottom: 1.7rem; }
+.catalog-page .catalog-kicker { margin-bottom: .55rem; color: var(--catalog-blue); }
+.catalog-page .page-header { margin: 0; color: var(--catalog-ink) !important; font-family: 'Space Grotesk', sans-serif !important; font-size: 2.2rem !important; letter-spacing: 0; text-transform: none !important; }
+.catalog-page .page-header i { color: var(--catalog-blue) !important; }
+.catalog-page .catalog-subtitle { margin: .5rem 0 0; color: var(--catalog-muted); font-size: .9rem; }
+.catalog-page .create-button { border: 1px solid var(--catalog-blue) !important; border-radius: 6px !important; background: var(--catalog-blue) !important; box-shadow: none !important; font-size: .78rem !important; }
+.catalog-page .create-button:hover { border-color: #08456b !important; background: #08456b !important; }
+
+.catalog-page > .bg-white.border { display: grid; grid-template-columns: minmax(0, 1fr) 280px; align-items: end; gap: 1rem; margin-bottom: 1.5rem !important; padding: 1rem 1.2rem !important; border: 1px solid var(--catalog-line) !important; border-radius: 0 !important; box-shadow: none !important; background: #fff !important; }
+.catalog-page > .bg-white.border > div:first-child { min-width: 0; }
+.catalog-page > .bg-white.border label { color: var(--catalog-muted) !important; font-size: .62rem !important; letter-spacing: .12em; }
+.catalog-page > .bg-white.border input,
+.catalog-page > .bg-white.border select { height: 38px; border: 1px solid transparent !important; border-radius: 0 !important; background: var(--catalog-canvas) !important; box-shadow: none !important; }
+.catalog-page > .bg-white.border input:focus,
+.catalog-page > .bg-white.border select:focus { border-color: #78aec9 !important; box-shadow: 0 0 0 3px rgba(11, 92, 142, .1) !important; background: #fff !important; }
+
+.catalog-page .catalog-module { margin-top: 1.5rem; }
+.catalog-page .catalog-module h2 { margin-bottom: .65rem; color: var(--catalog-ink); font-family: 'Space Grotesk', sans-serif; font-size: .72rem; letter-spacing: .14em; }
+.catalog-page .catalog-module .table-card { border: 1px solid var(--catalog-line); border-radius: 0; box-shadow: none; background: #fff; }
+.catalog-page .catalog-module .table-card table { table-layout: fixed; }
+.catalog-page .catalog-module .table-card thead { background: #fbfcfd; }
+.catalog-page .catalog-module .table-card th { height: 48px; padding: .7rem 1rem; border-bottom: 1px solid var(--catalog-line); color: var(--catalog-muted); font-size: .61rem; letter-spacing: .11em; }
+.catalog-page .catalog-module .table-card td { height: 64px; padding: .85rem 1rem; border-bottom: 1px solid var(--catalog-soft-line); color: #526579; font-size: .78rem; }
+.catalog-page .catalog-module .table-card tbody tr { transition: background .16s ease; }
+.catalog-page .catalog-module .table-card tbody tr:hover { background: #f5fbfd; }
+.catalog-page .catalog-module .table-card td:nth-child(2) { color: var(--catalog-ink); font-weight: 700; text-align: left; }
+.catalog-page .catalog-module .table-card td:nth-child(3),
+.catalog-page .catalog-module .table-card td:nth-child(4),
+.catalog-page .catalog-module .table-card td:nth-child(6) { text-align: left; }
+.catalog-page .catalog-module .rate-badge { border-radius: 3px; color: var(--catalog-blue); background: var(--catalog-blue-soft); font-size: .7rem; }
+.catalog-page .catalog-module .action-button { width: 30px; height: 30px; border-radius: 4px; }
+.catalog-page .catalog-module .edit-button:hover { color: var(--catalog-blue); background: var(--catalog-blue-soft); }
+.catalog-page .catalog-module .delete-button:hover { color: #b42318; background: #fff1f0; }
+
+@media (max-width: 720px) {
+    .catalog-page .page-header { font-size: 1.7rem !important; }
+    .catalog-page .page-header-wrapper { align-items: flex-start; }
+    .catalog-page > .bg-white.border { display: block; }
+    .catalog-page > .bg-white.border > div + div { width: 100%; margin-top: 1rem; }
+    .catalog-page .catalog-module .table-card { overflow-x: auto; }
+    .catalog-page .catalog-module .table-card table { min-width: 900px; }
+}

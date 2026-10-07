@@ -6,6 +6,18 @@
     margin-top: 30px;
 }
 
+.catalog-module {
+    margin-top: 32px;
+}
+
+.catalog-module h2 {
+    color: #122033;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: .82rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+}
+
 .data-group h2 {
     margin-bottom: 10px;
     color: #353943;
@@ -14,9 +26,12 @@
 }
 
 .table-card {
-    padding: 16px;
-    background: #edf6fd;
+    padding: 0;
+    background: #fff;
+    border: 1px solid #dfe7ee;
     border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(18, 32, 51, .04);
+    overflow: hidden;
 }
 
 /* Table Structure */
@@ -26,22 +41,22 @@
     border-spacing: 0;
     table-layout: fixed;
     background: white;
-    border: 1px solid #82888f;
-    border-radius: 7px;
+    border: 0;
+    border-radius: 0;
     overflow: hidden;
 }
 
 .table-card thead {
-    background: #dce7ff;
+    background: #f4f7f9;
 }
 
 .table-card th {
-    height: 55px;
-    padding: 7px;
-    border-right: 1px solid #c2c9d1;
-    border-bottom: 1px solid #aeb7c0;
-    color: #4c4d4e;
-    font-size: 12px;
+    height: 52px;
+    padding: 7px 12px;
+    border-right: 0;
+    border-bottom: 1px solid #dfe7ee;
+    color: #68788b;
+    font-size: 10px;
     font-weight: 700;
     text-align: center;
 }
@@ -51,12 +66,12 @@
 }
 
 .table-card td {
-    height: 72px;
-    padding: 10px;
-    border-right: 1px solid #c2c9d1;
-    border-bottom: 1px solid #c2c9d1;
-    color: #444b55;
-    font-size: 14px;
+    height: 68px;
+    padding: 14px 12px;
+    border-right: 0;
+    border-bottom: 1px solid #eef2f5;
+    color: #526579;
+    font-size: 13px;
     font-weight: 400;
     text-align: center;
     vertical-align: middle;
@@ -79,7 +94,7 @@
 }
 
 .table-card tbody tr:hover {
-    background: #fafcff;
+    background: #f0f8f7;
 }
 
 .table-card tbody tr.deleting {
@@ -120,8 +135,8 @@
 .rate-badge {
     padding: 5px 8px;
     border-radius: 4px;
-    background: #eeeeff;
-    color: #6865dc;
+    background: #e9f7f5;
+    color: #087f78;
     font-size: 11px;
 }
 
@@ -185,4 +200,51 @@
     .table-card table {
         min-width: 850px;
     }
+}
+
+/* Final catalog table overrides. */
+.catalog-module .table-card {
+    padding: 0;
+    background: #fff;
+    border: 1px solid #dfe7ee;
+    border-radius: 10px;
+    box-shadow: 0 6px 18px rgba(18, 32, 51, .04);
+    overflow: hidden;
+}
+
+.catalog-module .table-card table {
+    border: 0;
+    border-radius: 0;
+}
+
+.catalog-module .table-card thead {
+    background: #f4f7f9;
+}
+
+.catalog-module .table-card th {
+    height: 52px;
+    padding: 7px 12px;
+    border-right: 0;
+    border-bottom: 1px solid #dfe7ee;
+    color: #68788b;
+    font-size: 10px;
+    letter-spacing: .1em;
+}
+
+.catalog-module .table-card td {
+    height: 68px;
+    padding: 14px 12px;
+    border-right: 0;
+    border-bottom: 1px solid #eef2f5;
+    color: #526579;
+    font-size: 13px;
+}
+
+.catalog-module .table-card tbody tr:hover {
+    background: #f0f8f7;
+}
+
+.catalog-module .rate-badge {
+    background: #e9f7f5;
+    color: #087f78;
 }

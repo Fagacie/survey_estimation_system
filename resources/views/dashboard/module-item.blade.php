@@ -1,4 +1,4 @@
-<section class="data-group" data-module="{{ strtolower($title ?? '') }}">
+<section class="data-group catalog-module" data-module="{{ strtolower($title ?? '') }}">
     <!-- GROUP HEADER -->
     <div class="d-flex justify-content-between align-items-center mb-2">
         <h2>

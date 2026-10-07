@@ -1,10 +1,13 @@
 <x-app-layout containerClass="w-full px-8 py-8">
+    <link rel="stylesheet" href="{{ asset('css/create-project.css') }}?v={{ filemtime(public_path('css/create-project.css')) }}">
+    <div class="create-project-page">
     
     <!-- HEADER -->
     <div class="mb-8 border-b border-slate-200 pb-5 flex flex-col md:flex-row justify-between md:items-end gap-4">
         <div>
+            <p class="create-project-eyebrow">Project intake / setup</p>
             <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Create New Project</h1>
-            <p class="text-sm font-medium text-slate-500 mt-1">Set up project configuration and select the operational workflow.</p>
+            <p class="text-sm font-medium text-slate-500 mt-1">Capture the project context before moving into survey planning and estimation.</p>
         </div>
         <div>
             <a href="{{ route('projects.index') }}" class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-600 px-4 py-2 rounded-lg text-sm font-semibold border border-slate-200 transition-colors shadow-sm">
@@ -123,4 +126,5 @@
         </form>
     </div>
 
+</div>
 </x-app-layout>

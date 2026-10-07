@@ -102,3 +102,99 @@
     color: #26446f;
     margin-bottom: 12px;
 }
+
+/* Final catalog overrides are kept at the end so legacy admin selectors cannot win. */
+.catalog-page .page-header-wrapper .page-header {
+    color: #122033 !important;
+    font-family: 'Space Grotesk', sans-serif !important;
+    font-size: 2rem !important;
+    text-transform: none !important;
+}
+
+.catalog-page .page-header-wrapper .page-header i {
+    color: #087f78 !important;
+}
+
+.catalog-page .create-button {
+    background-color: #087f78 !important;
+    border-radius: 7px !important;
+}
+
+.catalog-page .create-button:hover {
+    background-color: #066b65 !important;
+}
+
+/* Modelling catalog visual system. */
+.catalog-page {
+    max-width: 1440px;
+}
+
+.catalog-kicker {
+    color: #087f78;
+    font-size: .68rem;
+    font-weight: 800;
+    letter-spacing: .13em;
+    text-transform: uppercase;
+}
+
+.catalog-page .page-header-wrapper {
+    margin-bottom: 28px;
+}
+
+.catalog-page .page-header {
+    color: #122033;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 2rem;
+    letter-spacing: 0;
+    line-height: 1.1;
+    text-transform: none;
+}
+
+.catalog-page .page-header i {
+    color: #087f78;
+    font-size: 1.7rem;
+}
+
+.catalog-subtitle {
+    margin: 8px 0 0;
+    color: #68788b;
+    font-size: .9rem;
+}
+
+.catalog-page .create-button {
+    border-radius: 7px !important;
+    background: #087f78 !important;
+    box-shadow: 0 6px 14px rgba(8, 127, 120, .18);
+    font-size: .8rem !important;
+    padding: 11px 17px !important;
+}
+
+.catalog-page .create-button:hover {
+    background: #066b65 !important;
+}
+
+.catalog-page .bg-white.border {
+    border-color: #dfe7ee !important;
+    border-radius: 12px !important;
+    box-shadow: 0 6px 18px rgba(18, 32, 51, .04) !important;
+}
+
+.catalog-page input,
+.catalog-page select {
+    border-color: transparent !important;
+    border-radius: 6px !important;
+    background: #f8fafc !important;
+    box-shadow: none !important;
+}
+
+.catalog-page input:focus,
+.catalog-page select:focus {
+    border-color: #0f9f96 !important;
+    background: #fff !important;
+    box-shadow: 0 0 0 3px rgba(15, 159, 150, .13) !important;
+}
+
+@media (max-width: 640px) {
+    .catalog-page .page-header { font-size: 1.65rem; }
+    .catalog-page .page-header-wrapper { align-items: flex-start; }
+}

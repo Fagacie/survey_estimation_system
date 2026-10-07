@@ -1,0 +1,56 @@
+/* INOS quotation register. Scoped to avoid changing legacy commercial views. */
+.quotation-history-page {
+    --history-ink: #122033;
+    --history-muted: #68788b;
+    --history-line: #dfe7ee;
+    --history-soft-line: #eef2f5;
+    --history-canvas: #f4f7f9;
+    --history-blue: #0b5c8e;
+    --history-blue-soft: #edf6fb;
+    max-width: 1440px;
+    margin: 0 auto;
+}
+
+.quotation-history-page .history-container { max-width: none; }
+.quotation-history-page .page-header-wrapper { margin-bottom: 1.7rem; }
+.quotation-history-page .history-eyebrow { margin: 0 0 .55rem; color: var(--history-blue); font-size: .68rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.quotation-history-page .page-header-title { margin-bottom: .5rem; color: var(--history-ink); font-family: 'Space Grotesk', sans-serif; font-size: 2.2rem; letter-spacing: 0; }
+.quotation-history-page .page-header-subtitle { max-width: 650px; color: var(--history-muted); font-size: .9rem; line-height: 1.55; }
+
+.quotation-history-page .filter-card-custom {
+    display: grid;
+    align-items: end;
+    margin-bottom: 1.35rem;
+    padding: 1.15rem 1.3rem;
+    border: 1px solid var(--history-line);
+    border-radius: 0;
+    box-shadow: none;
+    background: #fff;
+}
+.quotation-history-page .filter-card-custom .row { width: 100%; margin: 0; }
+.quotation-history-page .filter-label { color: var(--history-muted); font-size: .62rem; letter-spacing: .12em; }
+.quotation-history-page .filter-input,
+.quotation-history-page .filter-select { height: 40px; border: 1px solid transparent; border-radius: 0; color: var(--history-ink); background: var(--history-canvas); box-shadow: none; }
+.quotation-history-page .filter-input:focus,
+.quotation-history-page .filter-select:focus { border-color: #78aec9; box-shadow: 0 0 0 3px rgba(11, 92, 142, .1); background: #fff; }
+
+.quotation-history-page .table-card { border: 1px solid var(--history-line); border-radius: 0; box-shadow: none; background: #fff; }
+.quotation-history-page .custom-project-table { border-collapse: collapse; }
+.quotation-history-page .custom-project-table thead th { padding: .75rem 1.2rem; border-bottom: 1px solid var(--history-line); color: var(--history-muted); background: #fbfcfd; font-size: .62rem; letter-spacing: .12em; }
+.quotation-history-page .custom-project-table tbody td { padding: 1.05rem 1.2rem; border-bottom: 1px solid var(--history-soft-line); color: var(--history-muted); font-size: .8rem; }
+.quotation-history-page .custom-project-table tbody tr { transition: background-color .16s ease; }
+.quotation-history-page .custom-project-table tbody tr:hover td { background: #f5fbfd; }
+.quotation-history-page .project-code-text { color: var(--history-blue); font-family: 'Space Grotesk', sans-serif; font-size: .72rem; font-weight: 700; }
+.quotation-history-page .project-title-text { color: var(--history-ink); font-size: .86rem; }
+.quotation-history-page .project-sub-info { color: var(--history-muted); font-size: .7rem; }
+.quotation-history-page .client-name { color: #526579 !important; font-size: .78rem; }
+.quotation-history-page .action-circle-btn { width: 34px; height: 34px; border-color: var(--history-line); color: var(--history-muted); }
+.quotation-history-page .action-circle-btn:hover { border-color: #78aec9; color: var(--history-blue); background: var(--history-blue-soft); }
+.quotation-history-page .action-circle-btn.delete-btn:hover { border-color: #fca5a5; color: #b42318; background: #fff1f0; }
+
+@media (max-width: 768px) {
+    .quotation-history-page .page-header-title { font-size: 1.7rem; }
+    .quotation-history-page .filter-card-custom { padding: 1rem; }
+    .quotation-history-page .table-card { overflow-x: auto; }
+    .quotation-history-page .custom-project-table { min-width: 860px; }
+}
