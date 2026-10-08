@@ -8,7 +8,11 @@ class ProjectEstimationService
 {
     public function calculate(Project $project): array
     {
-        $project->loadMissing(['surveyLocations.sbesParameters', 'surveyLocations.droneMappingParameters']);
+        if ($project->relationLoaded('surveyLocations')) {
+            $project->surveyLocations->loadMissing(['sbesParameters', 'droneMappingParameters']);
+        } else {
+            $project->loadMissing(['surveyLocations.sbesParameters', 'surveyLocations.droneMappingParameters']);
+        }
 
         $distanceNm = 0.0;
         $surveyHours = 0.0;

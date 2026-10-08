@@ -16,8 +16,11 @@ class DroneEstimationService
      */
     public function calculate(Project $project): array
     {
-        // Load the drone mapping parameters if not already loaded
-        $project->loadMissing('surveyLocations.droneMappingParameters');
+        if ($project->relationLoaded('surveyLocations')) {
+            $project->surveyLocations->loadMissing('droneMappingParameters');
+        } else {
+            $project->loadMissing('surveyLocations.droneMappingParameters');
+        }
 
         $totalFlightDistance = 0.0;
         $totalSurveyHours = 0.0;

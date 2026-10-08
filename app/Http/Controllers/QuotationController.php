@@ -71,14 +71,20 @@ class QuotationController extends Controller
 
             if ($request->filled('location_id')) {
                 $prefillProject->unsetRelation('surveyLocations');
-                $prefillProject->load('surveyLocations');
-                $prefillProject->setRelation(
-                    'surveyLocations', 
-                    $prefillProject->surveyLocations->where('id', $request->location_id)->values()
-                );
+                $prefillProject->load([
+                    'surveyLocations' => function ($query) use ($request) {
+                        $query->where('survey_locations.id', $request->location_id);
+                    },
+                    'surveyLocations.sbesParameters',
+                    'surveyLocations.droneMappingParameters'
+                ]);
             } else {
                 $prefillProject->unsetRelation('surveyLocations');
-                $prefillProject->load('surveyLocations');
+                $prefillProject->load([
+                    'surveyLocations',
+                    'surveyLocations.sbesParameters',
+                    'surveyLocations.droneMappingParameters'
+                ]);
             }
 
             $estimation = $this->estimationService->calculate($prefillProject);
@@ -88,7 +94,7 @@ class QuotationController extends Controller
                 // Default quotation items for the survey type(s) this project has
         $surveyDefaults = [];
         if ($prefillProject) {
-            $prefillProject->loadMissing(['surveyLocations.sbesParameters', 'surveyLocations.droneMappingParameters']);
+            // Relations are already loaded correctly based on location_id filter above
 
             $surveyTypes = [];
             if ($prefillProject->surveyLocations->contains(fn ($loc) => ($loc->survey_type === 'sbes' || $loc->survey_type === 'single_beam' || $loc->survey_type === null) && !$loc->droneMappingParameters)) {
