@@ -197,10 +197,10 @@
         <hr class="quote-hr">
 
         <!-- BILL TO & INVOICE DETAILS GRID -->
-        <table class="w-100 mb-4" style="border-collapse: separate; border-spacing: 12px 0; margin-left: -12px;">
+        <table class="w-100 mb-4">
             <tr>
-                <td style="width: 50%; vertical-align: top; padding: 0;">
-                    <div class="meta-box" style="height: 100%;">
+                <td style="width: 48%; vertical-align: top; padding: 0;">
+                    <div class="meta-box">
                         <div class="info-title">BILL TO</div>
                         <strong>{{ $invoice->quotation->project->client->company_name ?? '-' }}</strong><br>
                         <div>{!! nl2br(e($invoice->quotation->project->client->client_address ?? '-')) !!}</div>
@@ -210,8 +210,9 @@
                         </div>
                     </div>
                 </td>
-                <td style="width: 50%; vertical-align: top; padding: 0;">
-                    <div class="meta-box" style="height: 100%;">
+                <td style="width: 4%;"></td>
+                <td style="width: 48%; vertical-align: top; padding: 0;">
+                    <div class="meta-box">
                         <table class="w-100">
                             <tr>
                                 <td style="width: 50%; vertical-align: top; padding-bottom: 8px;">
