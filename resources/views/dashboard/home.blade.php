@@ -203,16 +203,8 @@
                                 <div class="text-lg font-bold text-emerald-900">{{ number_format($estimation['drone_survey_hours'] ?? 0, 2) }} hr</div>
                             </div>
                             <div>
-                                <div class="text-xs text-emerald-600/70 uppercase tracking-wider font-semibold mb-0.5">MOB/DEMOB</div>
-                                <div class="text-lg font-bold text-emerald-900">{{ number_format($estimation['mod_demod_days'] ?? 0, 2) }} days</div>
-                            </div>
-                            <div>
-                                <div class="text-xs text-emerald-600/70 uppercase tracking-wider font-semibold mb-0.5">Weather standby</div>
-                                <div class="text-lg font-bold text-emerald-900">{{ number_format($estimation['weather_days'] ?? 0, 2) }} days</div>
-                            </div>
-                            <div>
                                 <div class="text-xs text-emerald-600/70 uppercase tracking-wider font-semibold mb-0.5">Total duration</div>
-                                <div class="text-lg font-bold text-emerald-900">{{ number_format(($estimation['drone_total_days'] ?? 0) + ($estimation['mod_demod_days'] ?? 0) + ($estimation['weather_days'] ?? 0), 2) }} days</div>
+                                <div class="text-lg font-bold text-emerald-900">{{ number_format($estimation['drone_total_days'] ?? 0, 2) }} days</div>
                             </div>
                         </div>
                     </div>
