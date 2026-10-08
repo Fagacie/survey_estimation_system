@@ -126,41 +126,95 @@
             </div>
 
             @if($estimation)
-                <div class="bg-blue-50/50 rounded-xl shadow-sm border border-blue-100 p-5 mb-6 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <div>
-                        <div class="text-xs font-bold text-blue-800 uppercase tracking-wider mb-1">Survey estimation snapshot</div>
-                        <div class="text-sm text-blue-600/80">Calculated from the saved survey areas for this project.</div>
+                @php
+                    $hasHydrographic = false;
+                    $hasDrone = false;
+                    if ($prefillProject && $prefillProject->surveyLocations) {
+                        $hasHydrographic = $prefillProject->surveyLocations->contains(fn ($loc) => $loc->sbesParameters);
+                        $hasDrone = $prefillProject->surveyLocations->contains(fn ($loc) => $loc->droneMappingParameters);
+                    }
+                    // Fallback to Hydrographic if nothing detected but estimation is passed
+                    if (!$hasHydrographic && !$hasDrone) {
+                        $hasHydrographic = true;
+                    }
+                @endphp
+
+                <div class="flex flex-col gap-4 mb-6">
+                    <!-- Hydrographic Snapshot -->
+                    @if($hasHydrographic)
+                    <div class="bg-blue-50/50 rounded-xl shadow-sm border border-blue-100 p-5 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div>
+                            <div class="text-xs font-bold text-blue-800 uppercase tracking-wider mb-1">Hydrographic Survey Snapshot</div>
+                            <div class="text-sm text-blue-600/80">Calculated from the saved survey areas for this project.</div>
+                        </div>
+                        <div class="flex gap-6 text-right flex-wrap">
+                            <div>
+                                <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">Distance</div>
+                                <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['distance_nm'], 4) }} NM</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">Survey hours</div>
+                                <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['survey_hours'], 2) }}</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">Execution days</div>
+                                <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['execution_days'], 2) }} days</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">MOB/DEMOB</div>
+                                <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['mod_demod_days'] ?? 0, 2) }} days</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">Weather standby</div>
+                                <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['weather_days'] ?? 0, 2) }} days</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">Patch test</div>
+                                <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['patch_test_days'] ?? 0, 2) }} days</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">Total duration</div>
+                                <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['total_days'], 2) }} days</div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="flex gap-6 text-right">
+                    @endif
+
+                    <!-- Drone Mapping Snapshot -->
+                    @if($hasDrone)
+                    <div class="bg-emerald-50/50 rounded-xl shadow-sm border border-emerald-100 p-5 flex flex-col md:flex-row justify-between items-center gap-4">
                         <div>
-                            <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">Distance</div>
-                            <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['distance_nm'], 4) }} NM</div>
+                            <div class="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-1">Drone Mapping Snapshot</div>
+                            <div class="text-sm text-emerald-600/80">Calculated from the saved drone flight parameters.</div>
                         </div>
-                        <div>
-                            <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">Survey hours</div>
-                            <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['survey_hours'], 2) }}</div>
-                        </div>
-                        <div>
-                            <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">Execution days</div>
-                            <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['execution_days'], 2) }} days</div>
-                        </div>
-                        <div>
-                            <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">MOB/DEMOB</div>
-                            <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['mod_demod_days'] ?? 0, 2) }} days</div>
-                        </div>
-                        <div>
-                            <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">Weather standby</div>
-                            <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['weather_days'] ?? 0, 2) }} days</div>
-                        </div>
-                        <div>
-                            <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">Patch test</div>
-                            <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['patch_test_days'] ?? 0, 2) }} days</div>
-                        </div>
-                        <div>
-                            <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">Total duration</div>
-                            <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['total_days'], 2) }} days</div>
+                        <div class="flex gap-6 text-right flex-wrap">
+                            <div>
+                                <div class="text-xs text-emerald-600/70 uppercase tracking-wider font-semibold mb-0.5">Flight Distance</div>
+                                <div class="text-lg font-bold text-emerald-900">{{ number_format($estimation['drone_total_flight_distance_m'] ?? 0, 0) }} m</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-emerald-600/70 uppercase tracking-wider font-semibold mb-0.5">Total Images</div>
+                                <div class="text-lg font-bold text-emerald-900">{{ number_format($estimation['drone_total_images'] ?? 0, 0) }}</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-emerald-600/70 uppercase tracking-wider font-semibold mb-0.5">Survey hours</div>
+                                <div class="text-lg font-bold text-emerald-900">{{ number_format($estimation['drone_survey_hours'] ?? 0, 2) }} hr</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-emerald-600/70 uppercase tracking-wider font-semibold mb-0.5">MOB/DEMOB</div>
+                                <div class="text-lg font-bold text-emerald-900">{{ number_format($estimation['mod_demod_days'] ?? 0, 2) }} days</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-emerald-600/70 uppercase tracking-wider font-semibold mb-0.5">Weather standby</div>
+                                <div class="text-lg font-bold text-emerald-900">{{ number_format($estimation['weather_days'] ?? 0, 2) }} days</div>
+                            </div>
+                            <div>
+                                <div class="text-xs text-emerald-600/70 uppercase tracking-wider font-semibold mb-0.5">Total duration</div>
+                                <div class="text-lg font-bold text-emerald-900">{{ number_format(($estimation['drone_total_days'] ?? 0) + ($estimation['mod_demod_days'] ?? 0) + ($estimation['weather_days'] ?? 0), 2) }} days</div>
+                            </div>
                         </div>
                     </div>
+                    @endif
                 </div>
             @endif
 
