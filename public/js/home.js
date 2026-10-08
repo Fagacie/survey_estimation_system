@@ -31,6 +31,91 @@ window.addItemRow = function (module_Id, category_Id, btnElement = null) {
 };
 
 // ==================================================================
+// GLOBAL ADD CUSTOM ITEM FUNCTION
+// ==================================================================
+window.addCustomItemRow = function (module_Id, category_Id, btnElement = null) {
+    let container = null;
+
+    if (btnElement) {
+        const sectionBlock = btnElement.closest('.section-card, .section-block');
+        if (sectionBlock) {
+            container = sectionBlock.querySelector('.section-items-container, .item-list');
+        }
+    }
+
+    if (!container) {
+        container = document.getElementById(`container-${module_Id}-${category_Id}`);
+    }
+
+    if (!container) {
+        console.error('Target item container not found for custom item:', module_Id, category_Id);
+        return;
+    }
+
+    const newCard = createCustomItemCard(module_Id, category_Id);
+    container.appendChild(newCard);
+
+    calculateItemTotal(newCard);
+    calculateAllTotals();
+};
+
+function createCustomItemCard(module_Id, category_Id) {
+    const uniqueIndex = Date.now() + '_' + Math.floor(Math.random() * 1000);
+
+    const htmlString = `
+        <div class="card quotation-item-card p-3 mb-3 bg-white border position-relative rounded" data-item-row="true" data-custom-item="true" data-unique-id="item_${uniqueIndex}">
+            <button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 m-2 remove-item-btn btn-delete-item" title="Delete Item">
+                <i class="fa-solid fa-trash"></i>
+            </button>
+
+            <div class="row g-3">
+                <div class="col-md-12 col-lg-4">
+                    <label class="form-label fw-bold text-uppercase">CUSTOM ITEM NAME</label>
+                    <input type="text" class="form-control form-control-sm custom-item-name" maxlength="255" placeholder="Type item name...">
+                </div>
+
+                <div class="col-6 col-md-3 col-lg-2">
+                    <label class="form-label fw-bold text-uppercase">RATE (MYR)</label>
+                    <input type="number" step="0.01" class="form-control form-control-sm item-rate input-daily-rate" value="0.00">
+                </div>
+
+                <div class="col-6 col-md-3 col-lg-2">
+                    <label class="form-label fw-bold text-uppercase">UNIT QTY</label>
+                    <input type="number" class="form-control form-control-sm item-qty input-unit-qty" value="1" min="1">
+                </div>
+
+                <div class="col-6 col-md-3 col-lg-2">
+                    <label class="form-label fw-bold text-uppercase">DAY / SAMPLE</label>
+                    <input type="number" class="form-control form-control-sm item-days input-days" value="1" min="1">
+                </div>
+
+                <div class="col-6 col-md-3 col-lg-2">
+                    <label class="form-label fw-bold text-uppercase">MARK-UP (%)</label>
+                    <input type="number" step="0.01" class="form-control form-control-sm item-markup input-markup" value="0">
+                </div>
+            </div>
+
+            <div class="item-card-footer d-flex justify-content-between align-items-center mt-3 pt-2 border-top">
+                <span class="text-uppercase text-muted small fw-bold">LINE ITEM TOTAL</span>
+                <span class="fw-bold text-dark fs-6 line-item-total line-total">MYR 0.00</span>
+            </div>
+
+            <input type="hidden" class="input-module-id">
+            <input type="hidden" class="input-section-id">
+        </div>
+    `;
+
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = htmlString.trim();
+    const card = wrapper.firstElementChild;
+
+    card.querySelector('.input-module-id').value = module_Id || '';
+    card.querySelector('.input-section-id').value = category_Id || '';
+
+    return card;
+}
+
+// ==================================================================
 // PAYMENT TERMS STATE
 // ==================================================================
 const defaultPaymentTerms = [
@@ -315,6 +400,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Loop through dynamic item cards on page
             const items = [];
+            let missingCustomName = false;
             const cardElements = document.querySelectorAll('.quotation-item-card, .item-card, tbody tr.item-row');
 
             cardElements.forEach((card, index) => {
@@ -325,19 +411,35 @@ document.addEventListener('DOMContentLoaded', function () {
                 const rate     = card.querySelector('.item-rate, .input-daily-rate, [name*="daily_rate"]')?.value;
                 const markup   = card.querySelector('.item-markup, .input-markup, [name*="mark_up"]')?.value || 0;
 
-                if (moduleId && itemId && qty && days && rate) {
+                const isCustom = card.dataset.customItem === 'true';
+                const customName = isCustom ? (card.querySelector('.custom-item-name')?.value || '').trim() : '';
+                const categoryId = card.querySelector('.input-section-id')?.value || '';
+
+                if (isCustom && !customName) {
+                    missingCustomName = true;
+                    return;
+                }
+
+                if (moduleId && (itemId || customName) && qty && days && rate) {
                     items.push({
-                        module_id:  parseInt(moduleId, 10),
-                        item_id: parseInt(itemId, 10),
-                        unit_qty:   parseInt(qty, 10),
-                        days:       parseInt(days, 10),
-                        daily_rate: parseFloat(rate),
-                        mark_up:    parseFloat(markup)
+                        module_id:   parseInt(moduleId, 10),
+                        item_id:     itemId ? parseInt(itemId, 10) : null,
+                        custom_name: customName || null,
+                        category_id: categoryId ? parseInt(categoryId, 10) : null,
+                        unit_qty:    parseInt(qty, 10),
+                        days:        parseInt(days, 10),
+                        daily_rate:  parseFloat(rate),
+                        mark_up:     parseFloat(markup)
                     });
                 } else {
                     console.warn(`Card at index ${index} skipped due to missing inputs:`, { moduleId, itemId, qty, days, rate });
                 }
             });
+
+            if (missingCustomName) {
+                alert('Please type a name for every custom item before saving.');
+                return;
+            }
 
             if (items.length === 0) {
                 alert('Please select or add at least one valid line item before saving.');
@@ -469,6 +571,16 @@ document.addEventListener('DOMContentLoaded', function () {
             window.addItemRow(module_Id, category_Id, addBtn);
         }
 
+        const customBtn = e.target.closest('.add-custom-item-btn');
+        if (customBtn) {
+            e.preventDefault();
+            const sectionCard = customBtn.closest('.section-card') || customBtn.closest('.section-block');
+            const module_Id = customBtn.getAttribute('data-module-id') || (sectionCard ? sectionCard.getAttribute('data-module-id') : null);
+            const category_Id = customBtn.getAttribute('data-section-id') || (sectionCard ? sectionCard.getAttribute('data-section-id') : null);
+
+            window.addCustomItemRow(module_Id, category_Id, customBtn);
+        }
+
         const removeBtn = e.target.closest('.remove-item-btn');
         if (removeBtn) {
             const itemCard = removeBtn.closest('.quotation-item-card');
@@ -500,6 +612,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (e.target.matches('.item-name, .select-item')) {
             handleItemSelectChange(e.target);
+        }
+
+        if (e.target.matches('.item-days-source')) {
+            applyDaysSource(e.target);
         }
     });
 
@@ -657,6 +773,8 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    applySurveyDefaults();    
+
     document.querySelectorAll('.quotation-item-card').forEach(card => calculateItemTotal(card));
     calculateAllTotals();
     updateLastSavedTimestamp();
@@ -674,7 +792,7 @@ function createItemCard(module_Id, category_Id) {
         <div class="card quotation-item-card p-3 mb-3 bg-white border position-relative rounded" data-item-row="true" data-unique-id="item_${uniqueIndex}">
             <!-- DELETE TRASH ICON -->
             <button type="button" class="btn btn-sm text-danger position-absolute top-0 end-0 m-2 remove-item-btn btn-delete-item" title="Delete Item">
-                <i class="bi bi-trash-fill fs-6"></i>
+                <i class="fa-solid fa-trash"></i>
             </button>
 
             <div class="row g-3">
@@ -696,7 +814,7 @@ function createItemCard(module_Id, category_Id) {
 
                 <!-- DAILY RATE -->
                 <div class="col-6 col-md-3 col-lg-2">
-                    <label class="form-label fw-bold text-uppercase">DAILY RATE (MYR)</label>
+                    <label class="form-label fw-bold text-uppercase">RATE (MYR)</label>
                     <input type="number" step="0.01" name="items[${uniqueIndex}][daily_rate]" id="items_${uniqueIndex}_daily_rate" class="form-control form-control-sm item-rate input-daily-rate" value="0.00">
                 </div>
 
@@ -708,7 +826,12 @@ function createItemCard(module_Id, category_Id) {
 
                 <!-- DAYS -->
                 <div class="col-6 col-md-3 col-lg-2">
-                    <label class="form-label fw-bold text-uppercase">DAYS</label>
+                    <label class="form-label fw-bold text-uppercase">DAY/SAMPLE</label>
+                    <select class="form-select form-select-sm mb-1 item-days-source">
+                        <option value="default" selected>Default (1)</option>
+                        <option value="execution">Execution days</option>
+                        <option value="total">Total duration</option>
+                    </select>
                     <input type="number" name="items[${uniqueIndex}][days]" id="items_${uniqueIndex}_days" class="form-control form-control-sm item-days input-days" value="1" min="1">
                 </div>
 
@@ -753,10 +876,15 @@ function createItemCard(module_Id, category_Id) {
     // Assign a unique ID to the card for easier debugging if needed
     card.dataset.uniqueId = 'item_' + uniqueIndex;
 
-    const daysInput = card.querySelector('.item-days, .input-days');
-    const estimatedDays = Number(window.projectEstimation?.total_days || 0);
-    if (daysInput && estimatedDays > 0) {
-        daysInput.value = Math.max(1, Math.ceil(estimatedDays));
+    // Show the rounded numbers in the dropdown labels (DAYS itself starts at 1)
+    const est = window.projectEstimation || {};
+    const execOpt = card.querySelector('.item-days-source option[value="execution"]');
+    const totalOpt = card.querySelector('.item-days-source option[value="total"]');
+    if (execOpt && Number(est.execution_days) > 0) {
+        execOpt.textContent = `Execution days (${Math.max(1, Math.ceil(est.execution_days))})`;
+    }
+    if (totalOpt && Number(est.total_days) > 0) {
+        totalOpt.textContent = `Total duration (${Math.max(1, Math.ceil(est.total_days))})`;
     }
 
     populateServicesDropdown(card, module_Id, category_Id);
@@ -911,6 +1039,28 @@ function handleItemSelectChange(itemSelect) {
             unitDisplaySpan.classList.add('d-none');
         }
     }
+}
+
+function applyDaysSource(selectEl) {
+    const card = selectEl.closest('.quotation-item-card');
+    if (!card) return;
+
+    const daysInput = card.querySelector('.item-days, .input-days');
+    if (!daysInput) return;
+
+    const est = window.projectEstimation || {};
+    let days = 1; // "default"
+
+    if (selectEl.value === 'execution') {
+        days = Math.ceil(Number(est.execution_days || 0));
+    } else if (selectEl.value === 'total') {
+        days = Math.ceil(Number(est.total_days || 0));
+    }
+
+    daysInput.value = Math.max(1, days);
+
+    calculateItemTotal(card);
+    calculateAllTotals();
 }
 
 function calculateItemTotal(card) {
@@ -1176,6 +1326,7 @@ function renderQuotationPreview() {
 
     let tableRowsHtml = '';
     let hasRows = false;
+    let moduleNo = 0;
 
     document.querySelectorAll('.tab-pane').forEach(tabPane => {
         const tabId = tabPane.getAttribute('id');
@@ -1190,16 +1341,29 @@ function renderQuotationPreview() {
         tabPane.querySelectorAll('.quotation-item-card').forEach(card => {
             const itemSelect = card.querySelector('.select-item, .item-name');
             const selectedOption = itemSelect ? itemSelect.options[itemSelect.selectedIndex] : null;
-            if (!selectedOption || !selectedOption.value) return; // skip cards with no item chosen
+            const isCustom = card.dataset.customItem === 'true';
+            const customName = isCustom ? (card.querySelector('.custom-item-name')?.value || '').trim() : '';
 
-            const itemName = selectedOption.textContent.trim();
-            const unitText = selectedOption.dataset.unit ? ` / ${selectedOption.dataset.unit}` : '';
+            if (isCustom) {
+                if (!customName) return; // skip custom rows with no name
+            } else if (!selectedOption || !selectedOption.value) {
+                return; // skip cards with no item chosen
+            }
+
+            const itemName = isCustom ? customName : selectedOption.textContent.trim();
+            const unitText = (!isCustom && selectedOption.dataset.unit) ? ` / ${selectedOption.dataset.unit}` : '';
 
             const qty = card.querySelector('.item-qty, .input-unit-qty')?.value || '0';
             const days = card.querySelector('.item-days, .input-days')?.value || '0';
-            const rate = card.querySelector('.item-rate, .input-daily-rate')?.value || '0.00';
-            const total = (card.querySelector('.line-total, .line-item-total')?.textContent || 'RM 0.00')
-                .replace('MYR', 'RM');
+
+            const baseRate = parseFloat(card.querySelector('.item-rate, .input-daily-rate')?.value) || 0;
+            const markupPct = parseFloat(card.querySelector('.item-markup, .input-markup')?.value) || 0;
+
+            // Unit price the client sees = rate after markup
+            const rate = Math.round(baseRate * (1 + markupPct / 100) * 100) / 100;
+            const qtyNum = parseFloat(qty) || 0;
+            const daysNum = parseFloat(days) || 0;
+            const total = `RM ${formatMoney(rate * qtyNum * daysNum)}`;
 
             // Look up the service (and category) names from the catalog tree
             const serviceSelect = card.querySelector('.select-service, .item-category');
@@ -1228,8 +1392,7 @@ function renderQuotationPreview() {
                 }
             }
 
-            // Middle heading row: service name (falls back to category if no service)
-            const groupLabel = serviceName || categoryName || '';
+            const groupLabel = categoryName || '';
 
             if (!groups.has(groupLabel)) groups.set(groupLabel, []);
             groups.get(groupLabel).push({ itemName, unitText, qty, days, rate, total });
@@ -1238,32 +1401,31 @@ function renderQuotationPreview() {
         if (groups.size === 0) return; // no selected items in this module
 
         hasRows = true;
+        moduleNo++;
 
-        // Module heading row
         tableRowsHtml += `
             <tr class="quote-module-row">
-                <td colspan="5" class="quote-module-cell">${esc(moduleName)}</td>
+                <td colspan="5" class="quote-module-cell">${moduleNo}. ${esc(moduleName)}</td>
             </tr>
         `;
 
+        let groupNo = 0;
         groups.forEach((rows, groupLabel) => {
-            // Service heading row
-            if (groupLabel) {
-                tableRowsHtml += `
-                    <tr class="quote-service-row">
-                        <td colspan="5" class="quote-service-cell">${esc(groupLabel.toUpperCase())}</td>
-                    </tr>
-                `;
-            }
+            groupNo++;
+            tableRowsHtml += `
+                <tr class="quote-service-row">
+                    <td colspan="5" class="quote-service-cell">${toRoman(groupNo)}) ${esc((groupLabel || '-').toUpperCase())}</td>
+                </tr>
+            `;
 
             // Item rows
             rows.forEach(r => {
                 tableRowsHtml += `
                     <tr>
-                        <td class="quote-item-cell">${esc(r.itemName)}</td>
+                        <td class="quote-item-cell"><div class="d-flex"><span class="me-2">&bull;</span><span>${esc(r.itemName)}</span></div></td>
                         <td class="text-center">${esc(r.qty)}</td>
                         <td class="text-center">${esc(r.days)}</td>
-                        <td class="text-end">${formatMoney(parseFloat(r.rate))}${esc(r.unitText)}</td>
+                        <td class="text-end">${formatMoney(r.rate)}${esc(r.unitText)}</td>
                         <td class="text-end fw-bold">${esc(r.total)}</td>
                     </tr>
                 `;
@@ -1283,6 +1445,91 @@ function renderQuotationPreview() {
     }
 }
 
+// ==================================================================
+// AUTO-ADD DEFAULT ITEMS FOR THE PROJECT'S SURVEY TYPE
+// ==================================================================
+function applySurveyDefaults() {
+    const defaults = Array.isArray(window.surveyDefaults) ? window.surveyDefaults : [];
+    if (defaults.length === 0) return;
+
+    const modulesArray = Array.isArray(window.adminModulesTree)
+        ? window.adminModulesTree
+        : Object.values(window.adminModulesTree || {});
+
+    // days_rule (database) -> option value of the "DAY/SAMPLE" dropdown on the card
+    const daysRuleToSource = { fixed: 'default', execution: 'execution', total: 'total' };
+
+    defaults.forEach(d => {
+        const moduleId   = String(d.module_id ?? '').trim();
+        const categoryId = String(d.category_id ?? '').trim();
+        const itemId     = String(d.item_id ?? '').trim();
+
+        // 1. Find the box where this item must be added
+        let container = document.getElementById(`container-${moduleId}-${categoryId}`);
+        if (!container) {
+            const section = document.querySelector(
+                `.section-card[data-module-id="${moduleId}"][data-section-id="${categoryId}"], ` +
+                `.section-block[data-module-id="${moduleId}"][data-section-id="${categoryId}"]`
+            );
+            if (section) {
+                container = section.querySelector('.section-items-container, .item-list');
+            }
+        }
+        if (!container) {
+            console.warn('applySurveyDefaults: container not found for item', d);
+            return;
+        }
+
+        // 2. Find which service this item belongs to (from the catalog tree)
+        let serviceId = d.service_id ? String(d.service_id) : '';
+        const moduleData = modulesArray.find(m => String(m.module_id ?? '').trim() === moduleId);
+        const categoryData = moduleData && Array.isArray(moduleData.categories)
+            ? moduleData.categories.find(c => String(c.category_id ?? '').trim() === categoryId)
+            : null;
+        if (categoryData && Array.isArray(categoryData.services)) {
+            const service = categoryData.services.find(s =>
+                Array.isArray(s.items) && s.items.some(i => String(i.item_id).trim() === itemId)
+            );
+            if (service) serviceId = String(service.service_id);
+        }
+
+        // 3. Create the card and add it to the page
+        const card = createItemCard(moduleId, categoryId);
+        container.appendChild(card);
+
+        // 4. Choose the service, then the item (this also fills the rate)
+        const serviceSelect = card.querySelector('.select-service');
+        const itemSelect = card.querySelector('.select-item');
+        if (!serviceSelect || !itemSelect) return;
+
+        serviceSelect.value = serviceId;
+        handleServiceChange(serviceSelect);
+
+        itemSelect.value = itemId;
+        if (itemSelect.value !== itemId) {
+            console.warn('applySurveyDefaults: item not found in dropdown, skipped', d);
+            card.remove();
+            return;
+        }
+        handleItemSelectChange(itemSelect);
+
+        // 5. Quantity
+        const qtyInput = card.querySelector('.item-qty');
+        if (qtyInput) qtyInput.value = Math.max(1, parseInt(d.default_qty, 10) || 1);
+
+        // 6. Days rule (fixed = 1, execution days, or total duration)
+        const daysSelect = card.querySelector('.item-days-source');
+        if (daysSelect) {
+            daysSelect.value = daysRuleToSource[d.days_rule] || 'default';
+            applyDaysSource(daysSelect);
+        }
+
+        calculateItemTotal(card);
+    });
+
+    calculateAllTotals();
+}
+
 function setAddressHtml(id, rawValue) {
     const el = document.getElementById(id);
     if (!el) return;
@@ -1295,4 +1542,12 @@ function setAddressHtml(id, rawValue) {
 
 function formatMoney(amount) {
     return (amount || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+}
+
+function toRoman(n) {
+    let out = '';
+    [[10, 'x'], [9, 'ix'], [5, 'v'], [4, 'iv'], [1, 'i']].forEach(([val, sym]) => {
+        while (n >= val) { out += sym; n -= val; }
+    });
+    return out;
 }

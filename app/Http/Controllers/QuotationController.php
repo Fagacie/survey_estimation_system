@@ -11,6 +11,7 @@ use App\Models\QtInvoiceItem;
 use App\Models\PaymentTerm;
 use App\Models\Signatory;
 use App\Services\Calculation\ProjectEstimationService;
+use App\Models\SurveyDefaultItem;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -60,6 +61,7 @@ class QuotationController extends Controller
 
         $prefillProject = null;
         $estimation = null;
+        $surveyDefaults = [];
         if ($request->filled('project_id')) {
             $prefillProject = auth()->user()->projects()
                 ->with(['client', 'modellingSummary'])
@@ -69,12 +71,45 @@ class QuotationController extends Controller
             \Illuminate\Support\Facades\Log::info('QuotationController@index - Prefill Project fetched');
         }
 
+                // Default quotation items for the survey type(s) this project has
+        $surveyDefaults = [];
+        if ($prefillProject) {
+            $prefillProject->loadMissing(['surveyLocations.sbesParameters', 'surveyLocations.droneMappingParameters']);
+
+            $surveyTypes = [];
+            if ($prefillProject->surveyLocations->contains(fn ($loc) => $loc->sbesParameters)) {
+                $surveyTypes[] = 'single_beam';
+            }
+            if ($prefillProject->surveyLocations->contains(fn ($loc) => $loc->droneMappingParameters)) {
+                $surveyTypes[] = 'drone_mapping';
+            }
+
+            if (!empty($surveyTypes)) {
+                $surveyDefaults = SurveyDefaultItem::with('item')
+                    ->whereIn('survey_type', $surveyTypes)
+                    ->orderBy('sort_order')
+                    ->get()
+                    ->unique('item_id')   // an item shared by two survey types is only added once
+                    ->filter(fn ($d) => $d->item)
+                    ->map(fn ($d) => [
+                        'item_id'     => $d->item_id,
+                        'module_id'   => $d->item->module_id,
+                        'category_id' => $d->item->category_id,
+                        'service_id'  => $d->item->service_id,
+                        'default_qty' => $d->default_qty,
+                        'days_rule'   => $d->days_rule,
+                    ])
+                    ->values()
+                    ->all();
+            }
+        }
+
         // People who can be chosen under "Signed by", and the default (first person added)
         $signatories   = Signatory::orderBy('name')->get();
         $defaultSigner = Signatory::orderBy('id')->first();
 
         \Illuminate\Support\Facades\Log::info('QuotationController@index - Returning View at ' . (microtime(true) - $start) . 's');
-        return view('dashboard.home', compact('modules', 'adminModulesTree', 'prefillProject', 'estimation', 'signatories', 'defaultSigner'));
+        return view('dashboard.home', compact('modules', 'adminModulesTree', 'prefillProject', 'estimation', 'signatories', 'defaultSigner', 'surveyDefaults'));
     }
 
     public function store(Request $request)
@@ -98,7 +133,9 @@ class QuotationController extends Controller
             'signatory_id'        => 'nullable|integer|exists:signatories,id',   // Signed by
             'items'               => 'required|array|min:1',
             'items.*.module_id'   => 'required',
-            'items.*.item_id'      => 'required|integer|exists:items,item_id',
+            'items.*.item_id'     => 'required_without:items.*.custom_name|nullable|integer|exists:items,item_id',
+            'items.*.custom_name' => 'required_without:items.*.item_id|nullable|string|max:255',
+            'items.*.category_id' => 'nullable|integer',
             'items.*.unit_qty'    => 'required|integer|min:1',
             'items.*.days'        => 'nullable|integer|min:1',
             'items.*.daily_rate'  => 'nullable|numeric|min:0',
@@ -191,14 +228,14 @@ class QuotationController extends Controller
                 foreach ($validated['items'] as $item) {
                     $qty    = (int) $item['unit_qty'];
                     $days   = (int) ($item['days'] ?? max(1, ceil($estimation['total_days'])));
-                    $catalogItem = Item::findOrFail($item['item_id']);
+                    $catalogItem = !empty($item['item_id']) ? Item::findOrFail($item['item_id']) : null;
                     $rate   = array_key_exists('daily_rate', $item) && $item['daily_rate'] !== null
                         ? (float) $item['daily_rate']
-                        : (float) $catalogItem->internal_rate;
+                        : (float) ($catalogItem ? $catalogItem->internal_rate : 0);
                     $markup = isset($item['mark_up']) ? (float) $item['mark_up'] : 0.00;
 
-                    $lineBase = $qty * $days * $rate;
-                    $grandTotal += $lineBase + ($lineBase * ($markup / 100));
+                    $unitPrice = round($rate * (1 + $markup / 100), 2);
+                    $grandTotal += $unitPrice * $qty * $days;
                 }
 
                 // 5. Generate Project-Scoped Quotation Number
@@ -258,24 +295,26 @@ class QuotationController extends Controller
                 foreach ($validated['items'] as $item) {
                     $qty    = (int) $item['unit_qty'];
                     $days   = (int) ($item['days'] ?? max(1, ceil($estimation['total_days'])));
-                    $catalogItem = Item::findOrFail($item['item_id']);
+                    $catalogItem = !empty($item['item_id']) ? Item::findOrFail($item['item_id']) : null;
                     $rate   = array_key_exists('daily_rate', $item) && $item['daily_rate'] !== null
                         ? (float) $item['daily_rate']
                         : (float) $catalogItem->internal_rate;
                     $markup = isset($item['mark_up']) ? (float) $item['mark_up'] : 0.00;
 
-                    $lineBase  = $qty * $days * $rate;
-                    $lineTotal = $lineBase + ($lineBase * ($markup / 100));
+                    $unitPrice = round($rate * (1 + $markup / 100), 2);
+                    $lineTotal = round($unitPrice * $qty * $days, 2);
 
                     QtInvoiceItem::create([
-                        'quotation_id' => $quotation->quotation_Id,
-                        'module_id'    => $item['module_id'],
-                        'catalog_item_id' => $item['item_id'],
-                        'unit_qty'     => $qty,
-                        'days'         => $days,
-                        'daily_rate'   => $rate,
-                        'mark_up'      => $markup,
-                        'line_total'   => $lineTotal,
+                        'quotation_id'     => $quotation->quotation_Id,
+                        'module_id'        => $item['module_id'],
+                        'catalog_item_id'  => $item['item_id'] ?? null,
+                        'custom_item_name' => empty($item['item_id']) ? trim($item['custom_name']) : null,
+                        'category_id'      => empty($item['item_id']) ? ($item['category_id'] ?? null) : null,
+                        'unit_qty'         => $qty,
+                        'days'             => $days,
+                        'daily_rate'       => $rate,
+                        'mark_up'          => $markup,
+                        'line_total'       => $lineTotal,
                     ]);
                 }
 
@@ -322,6 +361,7 @@ class QuotationController extends Controller
     {
         $quotation = QtInvoice::with([
             'items',
+            'items.category',
             'items.catalogItem.category',
             'items.catalogItem.service',
             'project.client',

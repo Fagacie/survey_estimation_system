@@ -406,33 +406,33 @@
                                                 <td colspan="5" class="quote-module-cell">{{ $loop->iteration }}. {{ $moduleName }}</td>
                                             </tr>
 
-                                            @php
-                                                $groups = $moduleLines->groupBy(fn($l) =>
-                                                    ($l->catalogItem->category->category_name ?? '') . '|' . ($l->catalogItem->service->service_name ?? '')
-                                                );
-                                            @endphp
+                                        @php
+                                            $groups = $moduleLines->groupBy(fn($l) => $l->catalogItem->category->category_name ?? $l->category->category_name ?? '');
+                                        @endphp
 
-                                            @foreach($groups as $groupLines)
-                                                @php
-                                                    $first = $groupLines->first();
-                                                    $label = collect([
-                                                        $first->catalogItem->category->category_name ?? '',
-                                                        $first->catalogItem->service->service_name ?? '',
-                                                    ])->filter()->unique()->implode(' - ');
-                                                @endphp
+                                        @foreach($groups as $categoryName => $groupLines)
+                                            @php $label = $categoryName; 
+                                        @endphp
 
                                                 <tr class="quote-service-row">
-                                                    <td colspan="5" class="quote-service-cell">{{ $toRoman($loop->iteration) }}) {{ $label ?: '-' }}</td>
+                                                    <td colspan="5" class="quote-service-cell">{{ $toRoman($loop->iteration) }}) {{ mb_strtoupper($label ?: '-') }}</td>
                                                 </tr>
 
                                                 @foreach($groupLines as $line)
+                                                        @php
+                                                            // Unit price the client sees = rate after markup
+                                                            $unitPrice = round($line->daily_rate * (1 + ($line->mark_up ?? 0) / 100), 2);
+                                                        @endphp
                                                     <tr>
                                                         <td class="quote-item-cell">
-                                                            <div class="d-flex"><span class="me-2">&bull;</span><span>{{ $line->catalogItem->item_name ?? 'Service Item' }}</span></div>
+                                                            <div class="d-flex">
+                                                                <span class="me-2">&bull;</span>
+                                                                <span>{{ $line->catalogItem->item_name ?? $line->custom_item_name ?? 'Service Item' }}</span>
+                                                            </div>
                                                         </td>
                                                         <td class="text-center">{{ $line->unit_qty }}</td>
                                                         <td class="text-center">{{ $line->days }}</td>
-                                                        <td class="text-end">{{ number_format($line->daily_rate, 2) }}</td>
+                                                        <td class="text-end">{{ number_format($unitPrice, 2) }}</td>
                                                         <td class="text-end">{{ number_format($line->line_total, 2) }}</td>
                                                     </tr>
                                                 @endforeach

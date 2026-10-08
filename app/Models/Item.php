@@ -30,7 +30,7 @@ class Item extends Model
     // Automatically link to Category
     public function category()
     {
-        return $this->belongsTo(Category::class, 'category_id');
+        return $this->belongsTo(Category::class, 'category_id', 'category_id');
     }
 
     // Automatically link to Service
