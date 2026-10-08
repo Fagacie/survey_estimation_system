@@ -68,6 +68,15 @@ class QuotationController extends Controller
                 ->with(['client', 'modellingSummary'])
                 ->whereKey($request->project_id)
                 ->firstOrFail();
+
+            if ($request->filled('location_id')) {
+                $prefillProject->load(['surveyLocations' => function ($query) use ($request) {
+                    $query->where('id', $request->location_id);
+                }]);
+            } else {
+                $prefillProject->load('surveyLocations');
+            }
+
             $estimation = $this->estimationService->calculate($prefillProject);
             \Illuminate\Support\Facades\Log::info('QuotationController@index - Prefill Project fetched');
         }
