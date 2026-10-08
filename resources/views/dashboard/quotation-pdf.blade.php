@@ -303,8 +303,8 @@
                                 </td>
                                 <td class="text-center">{{ $line->unit_qty }}</td>
                                 <td class="text-center">{{ $line->days }}</td>
-                                <td class="text-end">{{ number_format($line->daily_rate, 2) }}</td>
-                                <td class="text-end">{{ number_format($line->line_total, 2) }}</td>
+                                <td class="text-end">{{ number_format((float)($line->daily_rate ?? 0), 2) }}</td>
+                                <td class="text-end">{{ number_format((float)($line->line_total ?? 0), 2) }}</td>
                             </tr>
                         @endforeach
                     @endforeach
@@ -318,7 +318,7 @@
 
         <!-- TOTALS CALCULATION -->
         @php
-            $subtotal = $quotation->grand_total;
+            $subtotal = (float)($quotation->grand_total ?? 0);
             $sst = $subtotal * 0.08;
             $finalTotal = $subtotal + $sst;
         @endphp
@@ -377,10 +377,10 @@
                                 <td class="quote-item-cell">
                                     &bull; {{ $line->catalogItem->name ?? 'Item' }}
                                 </td>
-                                <td class="text-center">{{ rtrim(rtrim(number_format($line->unit_qty, 2, '.', ''), '0'), '.') }}</td>
-                                <td class="text-center">{{ rtrim(rtrim(number_format($line->days, 2, '.', ''), '0'), '.') }}</td>
-                                <td class="text-end">{{ number_format($line->line_total / $units, 2) }}</td>
-                                <td class="text-end">{{ number_format($line->line_total, 2) }}</td>
+                                <td class="text-center">{{ rtrim(rtrim(number_format((float)($line->unit_qty ?? 0), 2, '.', ''), '0'), '.') }}</td>
+                                <td class="text-center">{{ rtrim(rtrim(number_format((float)($line->days ?? 0), 2, '.', ''), '0'), '.') }}</td>
+                                <td class="text-end">{{ number_format((float)($line->line_total ?? 0) / $units, 2) }}</td>
+                                <td class="text-end">{{ number_format((float)($line->line_total ?? 0), 2) }}</td>
                             </tr>
                         @endforeach
                     @endforeach
@@ -391,23 +391,23 @@
                 <table class="quote-totals-table">
                     <tr>
                         <td>Modelling Subtotal</td>
-                        <td class="text-end">RM {{ number_format($mdlSummary->client_subtotal, 2) }}</td>
+                        <td class="text-end">RM {{ number_format((float)($mdlSummary->client_subtotal ?? 0), 2) }}</td>
                     </tr>
                     @if($mdlSummary->contingency_amount > 0)
                     <tr>
                         <td>Contingency {{ $mdlSummary->contingency_percent }}%</td>
-                        <td class="text-end">RM {{ number_format($mdlSummary->contingency_amount, 2) }}</td>
+                        <td class="text-end">RM {{ number_format((float)($mdlSummary->contingency_amount ?? 0), 2) }}</td>
                     </tr>
                     @endif
                     @if($mdlSummary->tax_amount > 0)
                     <tr>
                         <td>SST {{ $mdlSummary->tax_percent }}%</td>
-                        <td class="text-end">RM {{ number_format($mdlSummary->tax_amount, 2) }}</td>
+                        <td class="text-end">RM {{ number_format((float)($mdlSummary->tax_amount ?? 0), 2) }}</td>
                     </tr>
                     @endif
                     <tr class="quote-grand-total-row">
                         <td>Modelling Total</td>
-                        <td class="text-end">RM {{ number_format($mdlSummary->grand_total, 2) }}</td>
+                        <td class="text-end">RM {{ number_format((float)($mdlSummary->grand_total ?? 0), 2) }}</td>
                     </tr>
                 </table>
             </div>

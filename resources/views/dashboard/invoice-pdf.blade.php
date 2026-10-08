@@ -274,15 +274,15 @@
                         <small class="text-muted">Pursuant to Quotation Ref. {{ $invoice->quotation->quotation_no }}</small>
                     </td>
                     <td class="text-center">1</td>
-                    <td class="text-end fw-bold">{{ number_format($invoice->paymentTerm->amount, 2) }}</td>
+                    <td class="text-end fw-bold">{{ number_format((float)($invoice->paymentTerm->amount ?? 0), 2) }}</td>
                 </tr>
                 <tr>
                     <td colspan="3" class="text-end fw-bold">Subtotal</td>
-                    <td class="text-end fw-bold">{{ number_format($invoice->paymentTerm->amount, 2) }}</td>
+                    <td class="text-end fw-bold">{{ number_format((float)($invoice->paymentTerm->amount ?? 0), 2) }}</td>
                 </tr>
                 <tr class="table-light">
                     <td colspan="3" class="text-end fw-bold">TOTAL DUE</td>
-                    <td class="text-end fw-bold">{{ number_format($invoice->paymentTerm->amount, 2) }}</td>
+                    <td class="text-end fw-bold">{{ number_format((float)($invoice->paymentTerm->amount ?? 0), 2) }}</td>
                 </tr>
             </tbody>
         </table>

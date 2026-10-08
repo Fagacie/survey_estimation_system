@@ -88,7 +88,7 @@ class InvoiceController extends Controller
         $pdf = Pdf::loadView('dashboard.invoice-pdf', compact('invoice', 'signatories'))
                   ->setPaper('A4', 'portrait');
 
-        $safeInvoiceNo = str_replace(['/', '\\'], '-', $invoice->invoice_no ?? 'Unknown');
+        $safeInvoiceNo = str_replace(['/', '\\'], '-', $invoice->invoice_number ?? 'Unknown');
         return $pdf->download('Invoice_' . $safeInvoiceNo . '.pdf');
     }
 

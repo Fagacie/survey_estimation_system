@@ -51,16 +51,16 @@
     <h2>Survey Summary</h2>
     <table class="summary">
         <tr>
-            <td><span class="value">{{ number_format($duration['distance_nm'], 4) }}</span>Distance (NM)</td>
-            <td><span class="value">{{ number_format($duration['survey_hours'], 2) }}</span>Survey Hours</td>
-            <td><span class="value">{{ number_format($duration['execution_days'], 2) }}</span>Execution Days</td>
-            <td><span class="value">{{ number_format($duration['total_days'], 2) }}</span>Total Duration</td>
+            <td><span class="value">{{ number_format((float)($duration['distance_nm'] ?? 0), 4) }}</span>Distance (NM)</td>
+            <td><span class="value">{{ number_format((float)($duration['survey_hours'] ?? 0), 2) }}</span>Survey Hours</td>
+            <td><span class="value">{{ number_format((float)($duration['execution_days'] ?? 0), 2) }}</span>Execution Days</td>
+            <td><span class="value">{{ number_format((float)($duration['total_days'] ?? 0), 2) }}</span>Total Duration</td>
         </tr>
     </table>
 
     <table class="data">
-        <tr><td class="label">Weather Standby</td><td>{{ number_format($duration['weather_days'], 2) }} days</td><td class="label">MOB/DEMOB</td><td>{{ number_format($duration['mod_demod_days'], 2) }} days</td></tr>
-        <tr><td class="label">Patch Test</td><td>{{ number_format($duration['patch_test_days'], 2) }} days</td><td class="label">Survey Areas</td><td>{{ $locations->count() }}</td></tr>
+        <tr><td class="label">Weather Standby</td><td>{{ number_format((float)($duration['weather_days'] ?? 0), 2) }} days</td><td class="label">MOB/DEMOB</td><td>{{ number_format((float)($duration['mod_demod_days'] ?? 0), 2) }} days</td></tr>
+        <tr><td class="label">Patch Test</td><td>{{ number_format((float)($duration['patch_test_days'] ?? 0), 2) }} days</td><td class="label">Survey Areas</td><td>{{ $locations->count() }}</td></tr>
     </table>
     @endif
 
@@ -87,16 +87,16 @@
                 <h4>Mission Estimate</h4>
                 <table class="data">
                     <tr><td class="label">Flight Lines</td><td>{{ $location['flight_lines'] }}</td><td class="label">Total Images</td><td>{{ $location['total_images'] }}</td></tr>
-                    <tr><td class="label">Total Distance</td><td>{{ number_format($location['distance_m'], 0) }} m</td><td class="label">Pure Flight Time</td><td>{{ $location['pure_flight_time_s'] > 0 ? gmdate('H:i:s', $location['pure_flight_time_s']) : '00:00:00' }}</td></tr>
-                    <tr><td class="label">Estimated Sorties</td><td>{{ $location['sortie_count'] }}</td><td class="label">Boundary Area</td><td>{{ number_format($location['boundary_area'], 2) }} m&sup2;</td></tr>
+                    <tr><td class="label">Total Distance</td><td>{{ number_format((float)($location['distance_m'] ?? 0), 0) }} m</td><td class="label">Pure Flight Time</td><td>{{ $location['pure_flight_time_s'] > 0 ? gmdate('H:i:s', $location['pure_flight_time_s']) : '00:00:00' }}</td></tr>
+                    <tr><td class="label">Estimated Sorties</td><td>{{ $location['sortie_count'] }}</td><td class="label">Boundary Area</td><td>{{ number_format((float)($location['boundary_area'] ?? 0), 2) }} m&sup2;</td></tr>
                 </table>
                 
                 <h4>Survey Area Map</h4>
             @else
                 <table class="data">
-                    <tr><td class="label">Distance</td><td>{{ number_format($location['distance_nm'], 4) }} NM</td><td class="label">Survey Hours</td><td>{{ number_format($location['survey_hours'], 2) }}</td></tr>
-                    <tr><td class="label">Execution Days</td><td>{{ number_format($location['execution_days'], 2) }}</td><td class="label">Survey Lines</td><td>{{ $location['line_count'] }} ({{ $location['main_line_count'] }} main, {{ $location['cross_line_count'] }} cross)</td></tr>
-                    <tr><td class="label">Boundaries</td><td>{{ $location['boundary_count'] }}</td><td class="label">Boundary Area</td><td>{{ number_format($location['boundary_area'], 2) }} m&sup2;</td></tr>
+                    <tr><td class="label">Distance</td><td>{{ number_format((float)($location['distance_nm'] ?? 0), 4) }} NM</td><td class="label">Survey Hours</td><td>{{ number_format((float)($location['survey_hours'] ?? 0), 2) }}</td></tr>
+                    <tr><td class="label">Execution Days</td><td>{{ number_format((float)($location['execution_days'] ?? 0), 2) }}</td><td class="label">Survey Lines</td><td>{{ $location['line_count'] }} ({{ $location['main_line_count'] }} main, {{ $location['cross_line_count'] }} cross)</td></tr>
+                    <tr><td class="label">Boundaries</td><td>{{ $location['boundary_count'] }}</td><td class="label">Boundary Area</td><td>{{ number_format((float)($location['boundary_area'] ?? 0), 2) }} m&sup2;</td></tr>
                 </table>
             @endif
 
