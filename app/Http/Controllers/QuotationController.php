@@ -78,10 +78,10 @@ class QuotationController extends Controller
             $prefillProject->loadMissing(['surveyLocations.sbesParameters', 'surveyLocations.droneMappingParameters']);
 
             $surveyTypes = [];
-            if ($prefillProject->surveyLocations->contains(fn ($loc) => $loc->sbesParameters)) {
+            if ($prefillProject->surveyLocations->contains(fn ($loc) => ($loc->survey_type === 'sbes' || $loc->survey_type === 'single_beam' || $loc->survey_type === null) && !$loc->droneMappingParameters)) {
                 $surveyTypes[] = 'single_beam';
             }
-            if ($prefillProject->surveyLocations->contains(fn ($loc) => $loc->droneMappingParameters)) {
+            if ($prefillProject->surveyLocations->contains(fn ($loc) => $loc->survey_type === 'drone' || $loc->survey_type === 'drone_mapping' || $loc->droneMappingParameters)) {
                 $surveyTypes[] = 'drone_mapping';
             }
 

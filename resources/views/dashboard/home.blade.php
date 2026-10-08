@@ -130,8 +130,8 @@
                     $hasHydrographic = false;
                     $hasDrone = false;
                     if ($prefillProject && $prefillProject->surveyLocations) {
-                        $hasHydrographic = $prefillProject->surveyLocations->contains(fn ($loc) => $loc->sbesParameters);
-                        $hasDrone = $prefillProject->surveyLocations->contains(fn ($loc) => $loc->droneMappingParameters);
+                        $hasHydrographic = $prefillProject->surveyLocations->contains(fn ($loc) => ($loc->survey_type === 'sbes' || $loc->survey_type === 'single_beam' || $loc->survey_type === null) && !$loc->droneMappingParameters);
+                        $hasDrone = $prefillProject->surveyLocations->contains(fn ($loc) => $loc->survey_type === 'drone' || $loc->survey_type === 'drone_mapping' || $loc->droneMappingParameters);
                     }
                     // Fallback to Hydrographic if nothing detected but estimation is passed
                     if (!$hasHydrographic && !$hasDrone) {
