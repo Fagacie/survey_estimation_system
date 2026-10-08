@@ -169,7 +169,7 @@
         <table class="w-100 mb-2">
             <tr>
                 <td style="width: 40%; vertical-align: top;">
-                    <img src="{{ $getImg('images/logo.jpeg') }}" style="max-height: 100px;">
+                    <img src="{{ $getImg('images/logo.jpeg') }}" height="80">
                 </td>
                 <td style="width: 60%; vertical-align: top;" class="text-end quote-meta">
                     <strong>ECO HYDROTECH SOLUTIONS SDN. BHD. (1688434-T)</strong><br>
@@ -288,8 +288,7 @@
             </tbody>
         </table>
 
-        <!-- PAGE 2: PAYMENT TERMS AND SIGNATURE -->
-        <div class="page-break"></div>
+        <!-- PAYMENT TERMS AND SIGNATURE -->
 
         <table class="w-100 mt-4 mb-4" style="background-color: #ffffff; border: 1px solid #d8dde3; border-radius: 4px;">
             <tr>
