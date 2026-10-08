@@ -20,6 +20,12 @@
                     data-section-id="{{ $category->category_id ?? $category->id }}">
                 <i class="bi bi-plus-lg me-1"></i> ADD ITEM
             </button>
+            <button type="button"
+                    class="btn btn-sm btn-outline-secondary fw-bold text-uppercase add-custom-item-btn"
+                    data-module-id="{{ $module->module_id ?? $module->id }}"
+                    data-section-id="{{ $category->category_id ?? $category->id }}">
+                <i class="fa-solid fa-pen me-1"></i> CUSTOM ITEM
+            </button>
         </div>
     </div>
 

@@ -10,13 +10,15 @@ class QtInvoiceItem extends Model
     protected $primaryKey = 'item_id'; // Set custom primary key
 
     protected $fillable = [
-        'quotation_id', 
-        'module_id', 
-        'catalog_item_id', 
-        'unit_qty', 
-        'days', 
-        'daily_rate', 
-        'mark_up', 
+        'quotation_id',
+        'module_id',
+        'catalog_item_id',
+        'custom_item_name',
+        'category_id',
+        'unit_qty',
+        'days',
+        'daily_rate',
+        'mark_up',
         'line_total'];
 
     public function quotation()
@@ -33,5 +35,9 @@ class QtInvoiceItem extends Model
     {
         return $this->belongsTo(Item::class, 'catalog_item_id', 'item_id');
     }
-
+    
+        public function category()
+    {
+        return $this->belongsTo(Category::class, 'category_id', 'category_id');
+    }
 }
