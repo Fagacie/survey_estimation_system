@@ -2,28 +2,46 @@ document.addEventListener("DOMContentLoaded", function () {
     const searchInput = document.getElementById("searchInput");
     const createButton = document.getElementById("createButton");
 
-    // =========================================================
-    // 1. Real-time Search Filter Logic
-    // =========================================================
-    if (searchInput) {
-        searchInput.addEventListener("input", function () {
-            const searchValue = searchInput.value.toLowerCase().trim();
-            const rows = document.querySelectorAll(".data-body tr");
+    const moduleFilter = document.getElementById("moduleFilter");
 
-            rows.forEach(function (row) {
-                // Ignore empty placeholder rows during search filtering
-                if (row.classList.contains("empty-row")) {
-                    return;
-                }
+    // =========================================================
+    // 1. Real-time Search & Module Filter Logic
+    // =========================================================
+    function applyFilters() {
+        const searchValue = searchInput ? searchInput.value.toLowerCase().trim() : "";
+        const moduleValue = moduleFilter ? moduleFilter.value.toLowerCase() : "";
 
-                const rowText = row.textContent.toLowerCase();
-                if (rowText.includes(searchValue)) {
-                    row.style.display = "";
-                } else {
-                    row.style.display = "none";
-                }
-            });
+        // First, filter modules (sections)
+        const sections = document.querySelectorAll(".data-group");
+        sections.forEach(function (section) {
+            const sectionModule = section.dataset.module || "";
+            if (moduleValue === "" || sectionModule === moduleValue) {
+                section.style.display = "";
+            } else {
+                section.style.display = "none";
+            }
         });
+
+        // Then, filter rows by search text
+        const rows = document.querySelectorAll(".data-body tr");
+        rows.forEach(function (row) {
+            if (row.classList.contains("empty-row")) return;
+
+            const rowText = row.textContent.toLowerCase();
+            if (rowText.includes(searchValue)) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener("input", applyFilters);
+    }
+    
+    if (moduleFilter) {
+        moduleFilter.addEventListener("change", applyFilters);
     }
 
     // =========================================================

@@ -161,6 +161,7 @@ function syncPaymentTermsValue() {
 // 2. DOM CONTENT LOADED LISTENERS & EVENT DELEGATION
 // ==================================================================
 document.addEventListener('DOMContentLoaded', function () {
+    let currentSavedQuotationId = null;
 
     function updateLastSavedTimestamp() {
         const now = new Date();
@@ -514,6 +515,10 @@ document.addEventListener('DOMContentLoaded', function () {
                             if (numHidden) numHidden.value = result.project_number;
                             if (numPrefix) numPrefix.value = result.project_number.split('/').slice(0, -1).join('/') + '/';
                         }
+                        
+                        if (result.quotation_id) {
+                            currentSavedQuotationId = result.quotation_id;
+                        }
 
                         showModal(); 
                     } else {
@@ -542,20 +547,30 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 3. "Print / Export PDF" — Switch to Preview mode and trigger print
+    // 3. "Download PDF" — Just download the PDF, stay on the edit form
     if (confirmQuotationSaveBtn) {
         confirmQuotationSaveBtn.addEventListener('click', function () {
             hideModal();
-            renderQuotationPreview();
 
-            if (editFormContainer && previewModeContainer) {
-                editFormContainer.classList.add('d-none');
-                previewModeContainer.classList.remove('d-none');
+            if (currentSavedQuotationId) {
+                const downloadUrl = `/quotations/${currentSavedQuotationId}/download`;
+                window.location.href = downloadUrl;
+            } else {
+                alert('Quotation has not been saved yet. Please try again.');
             }
+        });
+    }
 
-            setTimeout(function () {
-                window.print();
-            }, 150);
+    // 4. Download PDF from Preview mode
+    const previewDownloadPdfBtn = document.getElementById('previewDownloadPdfBtn');
+    if (previewDownloadPdfBtn) {
+        previewDownloadPdfBtn.addEventListener('click', function() {
+            if (currentSavedQuotationId) {
+                const downloadUrl = `/quotations/${currentSavedQuotationId}/download`;
+                window.location.href = downloadUrl;
+            } else {
+                alert('Please click "SAVE / DOWNLOAD" and save the quotation first before you can download the final PDF from preview mode.');
+            }
         });
     }
 

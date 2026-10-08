@@ -40,8 +40,8 @@
     --ises-line: #dfe7ee;
     --ises-paper: #ffffff;
     --ises-canvas: #f4f7f9;
-    --ises-teal: #087f78;
-    --ises-teal-soft: #e5f4f1;
+    --ises-teal: #0052cc;
+    --ises-teal-soft: #f0f5ff;
     font-family: 'DM Sans', sans-serif;
     background: var(--ises-canvas);
     color: var(--ises-ink);
@@ -60,7 +60,7 @@
     background: #fbfcfd;
     color: var(--ises-muted);
     border-right: 1px solid var(--ises-line);
-    box-shadow: 8px 0 24px rgba(18, 32, 51, .035);
+    box-shadow: none;
 }
 
 .ises-sidebar-brand {
@@ -78,9 +78,9 @@
     display: grid;
     place-items: center;
     border-radius: 9px;
-    background: var(--ises-teal);
+    background: #122033;
     color: white;
-    box-shadow: 0 5px 12px rgba(8, 127, 120, .22);
+    box-shadow: none;
 }
 
 .ises-brand-copy {
@@ -110,9 +110,9 @@
 
 .ises-nav-link:hover,
 .ises-nav-link.active {
-    color: var(--ises-ink);
+    color: var(--ises-teal);
     background: var(--ises-teal-soft);
-    border-left-color: var(--ises-teal);
+    border-left-color: transparent;
 }
 
 .ises-nav-link i {
@@ -121,22 +121,21 @@
 
 .ises-sidebar-user {
     border-top: 1px solid var(--ises-line);
-    background: #f5f8fa;
+    background: transparent;
 }
 
 .ises-avatar {
     width: 34px;
     height: 34px;
-    border-radius: 9px;
-    background: var(--ises-ink);
+    border-radius: 50%;
+    background: #e11d48;
     color: white;
     text-decoration: none;
 }
 
 .ises-topbar {
-    background: rgba(255, 255, 255, .92);
+    background: #ffffff;
     border-bottom: 1px solid var(--ises-line);
-    backdrop-filter: blur(10px);
 }
 
 .ises-app main {
@@ -168,8 +167,8 @@
     padding: 28px 30px;
     border: 1px solid #dfe7ee;
     border-radius: 14px;
-    background: linear-gradient(118deg, #ffffff 0%, #f8fbfb 62%, #e4f3f0 100%);
-    box-shadow: 0 12px 32px rgba(18, 32, 51, .045);
+    background: #ffffff;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .02);
 }
 
 .dashboard-hero::after {
@@ -214,7 +213,7 @@
     border: 1px solid #dfe7ee;
     border-radius: 11px;
     background: #fff;
-    box-shadow: 0 6px 18px rgba(18, 32, 51, .035);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, .02);
 }
 
 .dashboard-stat i {

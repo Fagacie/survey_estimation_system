@@ -1,6 +1,8 @@
-<x-app-layout containerClass="w-full px-8 py-8 bg-slate-50 relative min-h-screen">
-    <x-slot name="header">Quotation #{{ $quotation->quotation_no }}</x-slot>
-
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Quotation #{{ $quotation->quotation_no }}</title>
+    <meta charset="utf-8">
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -172,46 +174,6 @@
         .quote-totals-table tr:not(.quote-grand-total-row) td:last-child { background-color: #f0f0f0 !important; }
         .quote-grand-total-row td { background-color: #1c6e7a !important; color: #ffffff !important; font-weight: 700; }
 
-                /* ===== Combined totals bars (Survey + Modelling + Grand Total) ===== */
-        /* CHANGE THE FONT SIZES HERE */
-        :root {
-            --total-font-survey: 0.9rem;
-            --total-font-modelling: 0.9rem;
-            --total-font-grand: 1rem;
-        }
-
-        table.quote-summary-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        table.quote-summary-table td {
-            background-color: #ececec !important;
-            color: #504f4f !important;
-            font-weight: 500;
-            padding: 0.2rem 0.45rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.4);
-        }
-
-        table.quote-summary-table td.qs-label {
-            text-align: left;
-        }
-
-        table.quote-summary-table td.qs-amount {
-            text-align: right;
-            white-space: nowrap;
-            width: 1%;
-        }
-
-        table.quote-summary-table tr.qs-survey td    { font-size: var(--total-font-survey); }
-        table.quote-summary-table tr.qs-modelling td { font-size: var(--total-font-modelling); }
-        table.quote-summary-table tr.qs-grand td {
-            font-size: var(--total-font-grand);
-            padding-top: 0.5rem;
-            padding-bottom: 0.5rem;
-            border-bottom: none;
-        }
-
         .quote-section-heading { color: #1c53a0; font-weight: 700; font-size: 0.9rem; margin-bottom: 0.5rem; }
         .quote-two-col { font-size: 0.85rem; line-height: 1.3; }
         .quote-two-col strong { font-weight: 700; }
@@ -283,7 +245,6 @@
             /* Avoid breaking items mid-element */
             .quote-title-row,
             .quote-box,
-            table.quote-summary-table,
             .quote-box-light,
             .quote-totals-table,
             .quote-two-col,
@@ -303,18 +264,9 @@
             }
         }
     </style>
-
+</head>
+<body onload="window.print()">
     <div class="max-w-7xl mx-auto">
-        <!-- ACTION BAR (HIDDEN IN PRINT VIEW) -->
-        <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 no-print sticky top-4 z-50">
-            <a href="{{ url('/history') }}" class="px-4 py-2 rounded-lg text-sm font-bold border border-slate-300 hover:bg-slate-50 transition-colors text-slate-700">
-                <i class="fa-solid fa-arrow-left mr-2"></i> BACK TO HISTORY
-            </a>
-            <a href="{{ route('quotations.download', $quotation->quotation_Id) }}" target="_blank" class="px-5 py-2.5 rounded-lg text-sm font-bold bg-teal-600 text-white hover:bg-teal-500 shadow-sm transition-colors inline-block">
-                <i class="fa-solid fa-file-pdf mr-2"></i> DOWNLOAD PDF
-            </a>
-        </div>
-
         <!-- A4 PAGE CONTAINER -->
         <div class="page-container">
 
@@ -406,33 +358,33 @@
                                                 <td colspan="5" class="quote-module-cell">{{ $loop->iteration }}. {{ $moduleName }}</td>
                                             </tr>
 
-                                        @php
-                                            $groups = $moduleLines->groupBy(fn($l) => $l->catalogItem->category->category_name ?? $l->category->category_name ?? '');
-                                        @endphp
+                                            @php
+                                                $groups = $moduleLines->groupBy(fn($l) =>
+                                                    ($l->catalogItem->category->category_name ?? '') . '|' . ($l->catalogItem->service->service_name ?? '')
+                                                );
+                                            @endphp
 
-                                        @foreach($groups as $categoryName => $groupLines)
-                                            @php $label = $categoryName; 
-                                        @endphp
+                                            @foreach($groups as $groupLines)
+                                                @php
+                                                    $first = $groupLines->first();
+                                                    $label = collect([
+                                                        $first->catalogItem->category->category_name ?? '',
+                                                        $first->catalogItem->service->service_name ?? '',
+                                                    ])->filter()->unique()->implode(' - ');
+                                                @endphp
 
                                                 <tr class="quote-service-row">
-                                                    <td colspan="5" class="quote-service-cell">{{ $toRoman($loop->iteration) }}) {{ mb_strtoupper($label ?: '-') }}</td>
+                                                    <td colspan="5" class="quote-service-cell">{{ $toRoman($loop->iteration) }}) {{ $label ?: '-' }}</td>
                                                 </tr>
 
                                                 @foreach($groupLines as $line)
-                                                        @php
-                                                            // Unit price the client sees = rate after markup
-                                                            $unitPrice = round($line->daily_rate * (1 + ($line->mark_up ?? 0) / 100), 2);
-                                                        @endphp
                                                     <tr>
                                                         <td class="quote-item-cell">
-                                                            <div class="d-flex">
-                                                                <span class="me-2">&bull;</span>
-                                                                <span>{{ $line->catalogItem->item_name ?? $line->custom_item_name ?? 'Service Item' }}</span>
-                                                            </div>
+                                                            <div class="d-flex"><span class="me-2">&bull;</span><span>{{ $line->catalogItem->item_name ?? 'Service Item' }}</span></div>
                                                         </td>
                                                         <td class="text-center">{{ $line->unit_qty }}</td>
                                                         <td class="text-center">{{ $line->days }}</td>
-                                                        <td class="text-end">{{ number_format($unitPrice, 2) }}</td>
+                                                        <td class="text-end">{{ number_format($line->daily_rate, 2) }}</td>
                                                         <td class="text-end">{{ number_format($line->line_total, 2) }}</td>
                                                     </tr>
                                                 @endforeach
@@ -447,9 +399,9 @@
 
                                 <!-- TOTALS CALCULATION -->
                                 @php
-                                    $subtotal   = $quotation->survey_total;
-                                    $sst        = round($subtotal * 0.08, 2);
-                                    $finalTotal = $subtotal + $sst;   // survey total incl. SST
+                                    $subtotal = $quotation->grand_total;
+                                    $sst = $subtotal * 0.08;
+                                    $finalTotal = $subtotal + $sst;
                                 @endphp
 
                                 <div class="d-flex justify-content-end mb-4">
@@ -478,7 +430,7 @@
                                         : collect();
                                 @endphp
 
-                                @if($mdlSummary && $mdlGroups->isNotEmpty() && ($quotation->modelling_total ?? 0) > 0)
+                                @if($mdlSummary && $mdlGroups->isNotEmpty())
                                 <div class="quote-modelling-block mb-4">
                                     <h6 class="quote-section-heading">MODELLING</h6>
                                     <div class="mb-2" style="font-size: 0.85rem;">
@@ -541,23 +493,6 @@
                                         </table>
                                     </div>
                                 </div>
-                                @endif
-
-                                @if(($quotation->modelling_total ?? 0) > 0)
-                                <table class="quote-summary-table mb-4">
-                                    <tr class="qs-survey">
-                                        <td class="qs-label">Survey Total (incl. SST 8%)</td>
-                                        <td class="qs-amount">RM {{ number_format($finalTotal, 2) }}</td>
-                                    </tr>
-                                    <tr class="qs-modelling">
-                                        <td class="qs-label">Modelling Total</td>
-                                        <td class="qs-amount">RM {{ number_format($quotation->modelling_total, 2) }}</td>
-                                    </tr>
-                                    <tr class="qs-grand">
-                                        <td class="qs-label">GRAND TOTAL</td>
-                                        <td class="qs-amount">RM {{ number_format($quotation->grand_total, 2) }}</td>
-                                    </tr>
-                                </table>
                                 @endif
 
                                 <!-- ADDITIONAL NOTES (hidden when empty) -->
@@ -625,8 +560,5 @@
         </div>
 
     </div> <!-- end .max-w-7xl -->
-
-    @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-    @endpush
-</x-app-layout>
+</body>
+</html>
