@@ -71,19 +71,18 @@ class QuotationController extends Controller
 
             if ($request->filled('location_id')) {
                 $prefillProject->unsetRelation('surveyLocations');
-                $prefillProject->load([
-                    'surveyLocations' => function ($query) use ($request) {
-                        $query->where('survey_locations.id', $request->location_id)
-                              ->with(['sbesParameters', 'droneMappingParameters']);
-                    }
-                ]);
+                $prefillProject->load(['surveyLocations.sbesParameters', 'surveyLocations.droneMappingParameters']);
+                
+                // STRICT IN-MEMORY FILTERING
+                $filtered = $prefillProject->surveyLocations->filter(function ($loc) use ($request) {
+                    return $loc->id == $request->location_id;
+                })->values();
+                
+                $prefillProject->unsetRelation('surveyLocations');
+                $prefillProject->setRelation('surveyLocations', $filtered);
             } else {
                 $prefillProject->unsetRelation('surveyLocations');
-                $prefillProject->load([
-                    'surveyLocations' => function ($query) {
-                        $query->with(['sbesParameters', 'droneMappingParameters']);
-                    }
-                ]);
+                $prefillProject->load(['surveyLocations.sbesParameters', 'surveyLocations.droneMappingParameters']);
             }
 
             $estimation = $this->estimationService->calculate($prefillProject);
