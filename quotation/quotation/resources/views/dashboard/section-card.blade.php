@@ -58,7 +58,7 @@
 
             <!-- DAILY RATE -->
             <div class="col-6 col-md-3 col-lg-2">
-                <label class="form-label fw-bold text-uppercase">DAILY RATE (MYR)</label>
+                <label class="form-label fw-bold text-uppercase">RATE (MYR)</label>
                 <input type="number" step="0.01" name="items[__INDEX__][daily_rate]" class="form-control form-control-sm item-rate input-daily-rate" value="0.00">
             </div>
 

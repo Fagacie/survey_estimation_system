@@ -141,6 +141,22 @@
                             <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['survey_hours'], 2) }}</div>
                         </div>
                         <div>
+                            <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">Execution days</div>
+                            <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['execution_days'], 2) }} days</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">MOB/DEMOB</div>
+                            <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['mod_demod_days'] ?? 0, 2) }} days</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">Weather standby</div>
+                            <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['weather_days'] ?? 0, 2) }} days</div>
+                        </div>
+                        <div>
+                            <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">Patch test</div>
+                            <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['patch_test_days'] ?? 0, 2) }} days</div>
+                        </div>
+                        <div>
                             <div class="text-xs text-blue-600/70 uppercase tracking-wider font-semibold mb-0.5">Total duration</div>
                             <div class="text-lg font-bold text-blue-900">{{ number_format($estimation['total_days'], 2) }} days</div>
                         </div>
@@ -237,8 +253,8 @@
                                             @foreach($items as $line)
                                                 <tr>
                                                     <td>{{ $line->catalogItem->name ?? 'Item' }}</td>
-                                                    <td class="text-end">{{ $line->unit_qty }}</td>
-                                                    <td class="text-end">{{ $line->days }}</td>
+                                                    <td class="text-end">{{ (float) $line->unit_qty }}</td>
+                                                    <td class="text-end">{{ (float) $line->days }}</td>
                                                     <td class="text-end">{{ number_format($line->daily_rate, 2) }}</td>
                                                     <td class="text-end">{{ number_format($line->mark_up, 2) }}</td>
                                                     <td class="text-end fw-bold">{{ number_format($line->line_total, 2) }}</td>
@@ -456,7 +472,7 @@
 
                 <!-- DAILY RATE -->
                 <div class="col-6 col-md-3 col-lg-2">
-                    <label class="form-label fw-bold text-uppercase">DAILY RATE (MYR)</label>
+                    <label class="form-label fw-bold text-uppercase">RATE (MYR)</label>
                     <input type="number" step="0.01" name="items[__INDEX__][daily_rate]" class="form-control form-control-sm item-rate input-daily-rate" value="0.00">
                 </div>
 
@@ -521,6 +537,7 @@
         <script>
             window.adminModulesTree = @json($adminModulesTree ?? []);
             window.projectEstimation = @json($estimation ?? null);
+            window.surveyDefaults = @json($surveyDefaults ?? []);
             window.signatories = @json($signatoriesForJs);
             window.defaultSignatoryId = @json(optional($defaultSigner)->id);
             window.signatoryStoreUrl = "{{ route('signatories.store') }}";
