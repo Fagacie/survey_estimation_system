@@ -11,7 +11,7 @@
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             color: #212529;
-            margin-top: 2.5cm;
+            margin-top: 1.2cm;
             margin-bottom: 2.0cm;
             margin-left: 1.5cm;
             margin-right: 1.5cm;
@@ -25,7 +25,7 @@
             top: 0cm;
             left: 0cm;
             right: 0cm;
-            height: 2.2cm;
+            height: 1.2cm;
         }
 
         footer {
