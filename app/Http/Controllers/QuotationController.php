@@ -73,17 +73,16 @@ class QuotationController extends Controller
                 $prefillProject->unsetRelation('surveyLocations');
                 $prefillProject->load([
                     'surveyLocations' => function ($query) use ($request) {
-                        $query->where('survey_locations.id', $request->location_id);
-                    },
-                    'surveyLocations.sbesParameters',
-                    'surveyLocations.droneMappingParameters'
+                        $query->where('survey_locations.id', $request->location_id)
+                              ->with(['sbesParameters', 'droneMappingParameters']);
+                    }
                 ]);
             } else {
                 $prefillProject->unsetRelation('surveyLocations');
                 $prefillProject->load([
-                    'surveyLocations',
-                    'surveyLocations.sbesParameters',
-                    'surveyLocations.droneMappingParameters'
+                    'surveyLocations' => function ($query) {
+                        $query->with(['sbesParameters', 'droneMappingParameters']);
+                    }
                 ]);
             }
 

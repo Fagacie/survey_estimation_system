@@ -142,13 +142,6 @@
                 @endphp
 
                 <div class="flex flex-col gap-4 mb-6">
-                    <!-- DEBUG INFO -->
-                    <div class="bg-red-500 text-white p-2 text-center text-xs font-bold">
-                        DEBUG: Requested Location ID: {{ request('location_id') ?? 'NONE' }} | 
-                        Loaded Locations Count: {{ $prefillProject ? $prefillProject->surveyLocations->count() : 0 }} |
-                        HasHydro: {{ $hasHydrographic ? 'YES' : 'NO' }} |
-                        HasDrone: {{ $hasDrone ? 'YES' : 'NO' }}
-                    </div>
                     <!-- Hydrographic Snapshot -->
                     @if($hasHydrographic)
                     <div class="bg-blue-50/50 rounded-xl shadow-sm border border-blue-100 p-5 flex flex-col md:flex-row justify-between items-center gap-4">
@@ -230,9 +223,12 @@
             <!-- MODULE TABS & SECTIONS -->
             <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden mb-6">
                 <ul class="custom-nav-tabs bg-slate-50 border-b border-slate-200" id="moduleTabs" role="tablist">
+                    @php $firstTab = true; @endphp
                     @foreach($modules as $index => $module)
+                        @if($module->module_name === 'Survey' && !($hasHydrographic ?? false)) @continue @endif
+                        @if($module->module_name === 'Drone Mapping' && !($hasDrone ?? false)) @continue @endif
                     <li class="nav-item">
-                        <button class="nav-link {{ $index === 0 ? 'active' : '' }}"
+                        <button class="nav-link {{ $firstTab ? 'active' : '' }}"
                                 id="tab-{{ $module->module_id }}"
                                 data-bs-toggle="tab"
                                 data-bs-target="#module-{{ $module->module_id }}"
@@ -242,6 +238,7 @@
                             <i class="fa-solid fa-folder-open mr-1 opacity-70"></i> {{ strtoupper($module->module_name) }}
                         </button>
                     </li>
+                    @php $firstTab = false; @endphp
                     @endforeach
 
                     @if($prefillProject && $prefillProject->modellingSummary)
@@ -256,8 +253,11 @@
                 </ul>
 
                 <div class="tab-content p-6" id="categoryTabsContent">
+                    @php $firstTabContent = true; @endphp
                     @foreach($modules as $index => $module)
-                    <div class="tab-pane fade {{ $index === 0 ? 'show active' : '' }}" 
+                        @if($module->module_name === 'Survey' && !($hasHydrographic ?? false)) @continue @endif
+                        @if($module->module_name === 'Drone Mapping' && !($hasDrone ?? false)) @continue @endif
+                    <div class="tab-pane fade {{ $firstTabContent ? 'show active' : '' }}" 
                          id="module-{{ $module->module_id }}" 
                          role="tabpanel"
                          aria-labelledby="tab-{{ $module->module_id }}">
@@ -270,6 +270,7 @@
                             ])
                         @endforeach
                     </div>
+                    @php $firstTabContent = false; @endphp
                     @endforeach
 
                     @if($prefillProject && $prefillProject->modellingSummary)
