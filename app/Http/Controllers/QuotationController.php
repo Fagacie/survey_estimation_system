@@ -70,10 +70,14 @@ class QuotationController extends Controller
                 ->firstOrFail();
 
             if ($request->filled('location_id')) {
-                $prefillProject->load(['surveyLocations' => function ($query) use ($request) {
-                    $query->where('id', $request->location_id);
-                }]);
+                $prefillProject->unsetRelation('surveyLocations');
+                $prefillProject->load('surveyLocations');
+                $prefillProject->setRelation(
+                    'surveyLocations', 
+                    $prefillProject->surveyLocations->where('id', $request->location_id)->values()
+                );
             } else {
+                $prefillProject->unsetRelation('surveyLocations');
                 $prefillProject->load('surveyLocations');
             }
 

@@ -142,6 +142,13 @@
                 @endphp
 
                 <div class="flex flex-col gap-4 mb-6">
+                    <!-- DEBUG INFO -->
+                    <div class="bg-red-500 text-white p-2 text-center text-xs font-bold">
+                        DEBUG: Requested Location ID: {{ request('location_id') ?? 'NONE' }} | 
+                        Loaded Locations Count: {{ $prefillProject ? $prefillProject->surveyLocations->count() : 0 }} |
+                        HasHydro: {{ $hasHydrographic ? 'YES' : 'NO' }} |
+                        HasDrone: {{ $hasDrone ? 'YES' : 'NO' }}
+                    </div>
                     <!-- Hydrographic Snapshot -->
                     @if($hasHydrographic)
                     <div class="bg-blue-50/50 rounded-xl shadow-sm border border-blue-100 p-5 flex flex-col md:flex-row justify-between items-center gap-4">
