@@ -47,6 +47,8 @@
                 
                 <div class="project-grid">
                     <input type="hidden" id="project_id" name="project_id" value="{{ $prefillProject?->project_Id ?? '' }}">
+                    <input type="hidden" name="location_id" value="{{ request('location_id') }}">
+                    <input type="hidden" name="module" value="{{ request('module') }}">
                     
                     <div>
                         <label for="project" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Project Name</label>

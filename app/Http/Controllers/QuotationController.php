@@ -231,6 +231,14 @@ class QuotationController extends Controller
                     throw new \RuntimeException('A valid project is required to create a quotation.');
                 }
 
+                if ($request->filled('location_id')) {
+                    $project->load(['surveyLocations' => function ($query) use ($request) {
+                        $query->where('id', $request->location_id);
+                    }]);
+                } else {
+                    $project->load('surveyLocations');
+                }
+
                 $estimation = $this->estimationService->calculate($project);
 
                 // 4. Calculate Survey Subtotal (before SST)
@@ -288,6 +296,9 @@ class QuotationController extends Controller
                 // 7. Create Quotation Header
                 $quotation = QtInvoice::create([
                     'project_Id'      => $projectId,
+                    'survey_location_id' => $request->input('location_id'),
+                    'module_type'     => $request->input('module'),
+                    'snapshot_data'   => $estimation,
                     'quotation_no'    => $quotationNo,
                     'grand_total'     => $combinedTotal,
                     'survey_total'    => $surveySubtotal,

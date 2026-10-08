@@ -11,7 +11,10 @@ class QtInvoice extends Model
     protected $primaryKey = 'quotation_Id'; // Set custom primary key
 
     protected $fillable = [
-        'project_Id', 
+        'project_Id',
+        'survey_location_id',
+        'module_type',
+        'snapshot_data',
         'quotation_no', 
         'payment_terms',
         'additional_notes',
@@ -29,6 +32,7 @@ class QtInvoice extends Model
         'grand_total' => 'decimal:2',
         'survey_total' => 'decimal:2',
         'modelling_total' => 'decimal:2',
+        'snapshot_data' => 'array',
         'survey_distance_nm' => 'decimal:4',
         'survey_hours' => 'decimal:2',
         'survey_duration_days' => 'decimal:2',
