@@ -33,6 +33,11 @@ class ProjectEstimationService
 
                 $hours = $speed > 0 ? $distance / $speed : 0.0;
                 $days = $hoursPerDay > 0 ? $hours / $hoursPerDay : 0.0;
+                
+                // Round up to nearest whole day for quotation purposes
+                if ($days > 0) {
+                    $days = ceil($days);
+                }
 
                 $distanceNm += $distance;
                 $surveyHours += $hours;

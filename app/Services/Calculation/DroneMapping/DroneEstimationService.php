@@ -51,6 +51,8 @@ class DroneEstimationService
             $totalImages += $images;
         }
 
+        $droneTotalDays = $totalSurveyHours > 0 ? ceil($totalSurveyHours / 8) : 0;
+
         // Return the drone-specific calculated metrics
         return [
             'drone_total_flight_distance_m' => round($totalFlightDistance, 2),
@@ -58,8 +60,8 @@ class DroneEstimationService
             'drone_total_images' => $totalImages,
             // We pass through these for compatibility if the parent service expects them,
             // though they might not be utilized the same way.
-            'execution_days' => round($totalSurveyHours / 8, 2), // Assuming 8hr workday for reporting
-            'total_days' => round($totalSurveyHours / 8, 2),
+            'execution_days' => $droneTotalDays,
+            'total_days' => $droneTotalDays,
         ];
     }
 }
