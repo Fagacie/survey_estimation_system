@@ -299,7 +299,7 @@
                         @foreach($groupLines as $line)
                             <tr>
                                 <td class="quote-item-cell">
-                                    &bull; {{ $line->catalogItem->item_name ?? 'Service Item' }}
+                                    &bull; {{ $line->catalogItem->item_name ?? $line->custom_item_name ?? 'Service Item' }}
                                 </td>
                                 <td class="text-center">{{ $line->unit_qty }}</td>
                                 <td class="text-center">{{ $line->days }}</td>

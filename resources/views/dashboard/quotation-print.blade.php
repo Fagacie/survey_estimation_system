@@ -380,7 +380,7 @@
                                                 @foreach($groupLines as $line)
                                                     <tr>
                                                         <td class="quote-item-cell">
-                                                            <div class="d-flex"><span class="me-2">&bull;</span><span>{{ $line->catalogItem->item_name ?? 'Service Item' }}</span></div>
+                                                            <div class="d-flex"><span class="me-2">&bull;</span><span>{{ $line->catalogItem->item_name ?? $line->custom_item_name ?? 'Service Item' }}</span></div>
                                                         </td>
                                                         <td class="text-center">{{ $line->unit_qty }}</td>
                                                         <td class="text-center">{{ $line->days }}</td>
