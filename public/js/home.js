@@ -442,7 +442,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 return;
             }
 
-            if (items.length === 0) {
+            // A project with saved Modelling can be saved even without survey items
+            const hasModelling = !!document.getElementById('preview-modelling-block');
+
+            if (items.length === 0 && !hasModelling) {
                 alert('Please select or add at least one valid line item before saving.');
                 return;
             }
@@ -497,7 +500,15 @@ document.addEventListener('DOMContentLoaded', function () {
                         body: JSON.stringify(payload)
                     });
 
-                    const result = await response.json();
+                    const rawText = await response.text();
+                    let result;
+                    try {
+                        result = JSON.parse(rawText);
+                    } catch (e) {
+                        console.error(`Server returned non-JSON (status ${response.status}, redirected: ${response.redirected}):`, rawText.slice(0, 500));
+                        alert(`Server error (status ${response.status}${response.redirected ? ', redirected' : ''}). Check storage/logs/laravel.log for the real error.`);
+                        return;
+                    }
 
                     if (response.ok && result.success) {
                         updateLastSavedTimestamp();
@@ -1458,6 +1469,19 @@ function renderQuotationPreview() {
                 </tr>
             `;
     }
+
+    // ---------- SHOW / HIDE SECTIONS (survey vs modelling) ----------
+    const hasSurvey    = hasRows;
+    const hasModelling = !!document.getElementById('preview-modelling-block');
+
+    // Modelling only -> hide the empty survey table and its totals.
+    // Nothing at all -> keep the survey table so the "No items" message still shows.
+    const surveySection = document.getElementById('preview-survey-section');
+    if (surveySection) surveySection.classList.toggle('d-none', !hasSurvey && hasModelling);
+
+    // Summary box (Survey Total / Modelling Total / GRAND TOTAL) only when BOTH exist
+    const summaryTable = document.getElementById('preview-summary-table');
+    if (summaryTable) summaryTable.classList.toggle('d-none', !(hasSurvey && hasModelling));
 }
 
 // ==================================================================

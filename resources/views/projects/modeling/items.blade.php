@@ -1,4 +1,51 @@
 <x-app-layout containerClass="w-full px-6 md:px-12 py-6">
+
+    <style>
+        [x-cloak] { display: none !important; }
+
+        /* Wrapper: puts edit + delete side by side */
+        .act-wrap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        /* Base icon button */
+        .act-btn {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            color: #64748b;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+        }
+
+        /* Edit: soft teal on hover */
+        .act-edit:hover {
+            background: #f0fdfa;
+            border-color: #5eead4;
+            color: #0f766e;
+        }
+
+        /* Delete: soft red on hover */
+        .act-del:hover {
+            background: #fef2f2;
+            border-color: #fca5a5;
+            color: #dc2626;
+        }
+    </style>
+
     <div class="font-sans text-slate-800 antialiased"
          x-data="itemsPage()"
          x-cloak>
@@ -52,7 +99,7 @@
             <table class="w-full text-sm">
                 <thead class="bg-slate-50 text-xs font-bold uppercase tracking-wider text-slate-400">
                     <tr>
-                        <th class="text-left px-5 py-3">Item</th>
+                        <th class="text-left px-5 py-3" style="width: 40%;">Item</th>
                         <th class="text-left px-5 py-3">Work package</th>
                         <th class="text-right px-5 py-3">Cost to client</th>
                         <th class="text-right px-5 py-3">Actions</th>
@@ -63,7 +110,7 @@
                         <tr>
                             <td class="px-5 py-3 font-medium text-slate-800">{{ $item->name }}</td>
                             <td class="px-5 py-3 text-slate-500">{{ $item->work_package }}</td>
-                            <td class="px-5 py-3 text-right font-semibold text-slate-700">RM {{ number_format($item->client_cost, 2) }}</td>
+                            <td class="px-5 py-3 text-right font-semibold text-slate-700 whitespace-nowrap">RM {{ number_format($item->client_cost, 2) }}</td>
                             <td class="px-5 py-3 text-right">
                                 <div class="act-wrap">
                                     <button type="button" class="act-btn act-edit" title="Edit"
@@ -167,9 +214,7 @@
                         </div>
                         <div class="flex justify-between text-sm font-semibold text-slate-700">
                             <span>Cost to client</span>
-                            <div class="flex justify-between text-sm font-semibold text-slate-700">
                             <span x-text="'RM ' + ((form.qty * form.rate * form.days) / (1 - (form.markup / 100) || 1)).toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})"></span>
-                        </div>
                         </div>
                     </div>
 

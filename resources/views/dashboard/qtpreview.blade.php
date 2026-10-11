@@ -403,41 +403,47 @@
                             <div><strong id="preview-pic_no">-</strong></div>
                         </div>
 
-                        <!-- ITEMS TABLE -->
-                        <table class="table quote-table mb-2">
-                            <thead>
-                                <tr>
-                                    <th>Description</th>
-                                    <th class="text-center" style="width: 80px;">Quantity</th>
-                                    <th class="text-center" style="width: 80px;">Day/Sample</th>
-                                    <th class="text-end" style="width: 120px;">Unit Price(RM)</th>
-                                    <th class="text-end" style="width: 130px;">Total(RM)</th>
-                                </tr>
-                            </thead>
-                            <tbody id="preview-table-body">
-                                <tr>
-                                    <td colspan="5" class="text-center text-muted py-4">No items added to the quotation yet.</td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <!-- ===== SURVEY SECTION (items table + totals) — hidden by home.js when there are no survey items but modelling exists ===== -->
+                        <div id="preview-survey-section">
 
-                        <!-- TOTALS -->
-                        <div class="d-flex justify-content-end mb-4">
-                            <table class="quote-totals-table">
-                                <tr>
-                                    <td>Subtotal</td>
-                                    <td class="text-end" id="preview-subtotal">RM 0.00</td>
-                                </tr>
-                                <tr>
-                                    <td>SST 8%</td>
-                                    <td class="text-end" id="preview-sst">RM 0.00</td>
-                                </tr>
-                                <tr class="quote-grand-total-row">
-                                    <td>Grand Total</td>
-                                    <td class="text-end preview-grand-total">RM 0.00</td>
-                                </tr>
+                            <!-- ITEMS TABLE -->
+                            <table class="table quote-table mb-2">
+                                <thead>
+                                    <tr>
+                                        <th>Description</th>
+                                        <th class="text-center" style="width: 80px;">Quantity</th>
+                                        <th class="text-center" style="width: 80px;">Day/Sample</th>
+                                        <th class="text-end" style="width: 120px;">Unit Price(RM)</th>
+                                        <th class="text-end" style="width: 130px;">Total(RM)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="preview-table-body">
+                                    <tr>
+                                        <td colspan="5" class="text-center text-muted py-4">No items added to the quotation yet.</td>
+                                    </tr>
+                                </tbody>
                             </table>
+
+                            <!-- TOTALS -->
+                            <div class="d-flex justify-content-end mb-4">
+                                <table class="quote-totals-table">
+                                    <tr>
+                                        <td>Subtotal</td>
+                                        <td class="text-end" id="preview-subtotal">RM 0.00</td>
+                                    </tr>
+                                    <tr>
+                                        <td>SST 8%</td>
+                                        <td class="text-end" id="preview-sst">RM 0.00</td>
+                                    </tr>
+                                    <tr class="quote-grand-total-row">
+                                        <td>Grand Total</td>
+                                        <td class="text-end preview-grand-total">RM 0.00</td>
+                                    </tr>
+                                </table>
+                            </div>
+
                         </div>
+                        <!-- ===== END SURVEY SECTION ===== -->
 
                         {{-- ===== MODELLING (separate table, read-only, from saved Modelling Builder data) ===== --}}
                         @php
@@ -448,7 +454,7 @@
                         @endphp
 
                         @if($mdlSummary && $mdlGroups->isNotEmpty())
-                        <div class="quote-modelling-block mb-4">
+                        <div id="preview-modelling-block" class="quote-modelling-block mb-4">
                             <h6 class="quote-section-heading">MODELLING</h6>
                             <div class="quote-details-strip mb-2">
                                 <span>Package: <strong>{{ $mdlSummary->package_name ?? 'Custom selection' }}</strong></span>
@@ -510,8 +516,9 @@
                         </div>
                         @endif
 
+                        {{-- Summary box: hidden by default, home.js shows it only when BOTH survey and modelling exist --}}
                         @if($mdlSummary && $mdlGroups->isNotEmpty())
-                        <table class="quote-summary-table mb-4">
+                        <table id="preview-summary-table" class="quote-summary-table mb-4 d-none">
                             <tr class="qs-survey">
                                 <td class="qs-label">Survey Total (incl. SST 8%)</td>
                                 <td class="qs-amount" id="preview-combined-survey">RM 0.00</td>
