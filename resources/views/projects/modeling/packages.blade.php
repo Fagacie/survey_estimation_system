@@ -1,4 +1,51 @@
 <x-app-layout containerClass="w-full px-6 md:px-12 py-6">
+
+    <style>
+        [x-cloak] { display: none !important; }
+
+        /* Wrapper: puts edit + delete side by side */
+        .act-wrap {
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        /* Base icon button */
+        .act-btn {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 34px;
+            height: 34px;
+            padding: 0;
+            line-height: 1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            color: #64748b;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+        }
+
+        /* Edit: soft teal on hover */
+        .act-edit:hover {
+            background: #f0fdfa;
+            border-color: #5eead4;
+            color: #0f766e;
+        }
+
+        /* Delete: soft red on hover */
+        .act-del:hover {
+            background: #fef2f2;
+            border-color: #fca5a5;
+            color: #dc2626;
+        }
+    </style>
+
     <div class="font-sans text-slate-800 antialiased" x-data="{ showModal: false, editing: null }" x-cloak>
 
         <!-- Header -->
@@ -14,7 +61,7 @@
 
         <div class="flex justify-end mb-6">
             <button @click="showModal = true; editing = null"
-                class="px-5 py-2.5 rounded-lg bg-teal-600 text-white font-semibold shadow-sm hover:bg-teal-800 transition-all">
+                class="px-5 py-2.5 rounded-lg bg-teal-600 text-white font-semibold shadow-sm hover:bg-teal-700 transition-all">
                 New package
             </button>
         </div>

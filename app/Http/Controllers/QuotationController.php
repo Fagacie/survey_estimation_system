@@ -149,7 +149,7 @@ class QuotationController extends Controller
             'payment_terms.*.condition'   => 'nullable|string|max:255',
             'additional_notes' => 'nullable|string',
             'signatory_id'        => 'nullable|integer|exists:signatories,id',   // Signed by
-            'items'               => 'required|array|min:1',
+            'items'               => 'nullable|array',
             'items.*.module_id'   => 'required',
             'items.*.item_id'     => 'required_without:items.*.custom_name|nullable|integer|exists:items,item_id',
             'items.*.custom_name' => 'required_without:items.*.item_id|nullable|string|max:255',
@@ -249,9 +249,18 @@ class QuotationController extends Controller
 
                 $estimation = $this->estimationService->calculate($project);
 
+                $items = $validated['items'] ?? [];
+
+                // No survey items is only allowed when the project has saved Modelling
+                if (empty($items) && !$project->modellingSummary) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'items' => 'Add at least one survey item, or save Modelling for this project first.',
+                    ]);
+                }
+
                 // 4. Calculate Survey Subtotal (before SST)
                 $grandTotal = 0.00;
-                foreach ($validated['items'] as $item) {
+                foreach ($items as $item) {
                     $qty    = (int) $item['unit_qty'];
                     $days   = (int) ($item['days'] ?? max(1, ceil($estimation['total_days'])));
                     $catalogItem = !empty($item['item_id']) ? Item::findOrFail($item['item_id']) : null;
@@ -321,7 +330,7 @@ class QuotationController extends Controller
                 ]);
 
                 // 8. Create Line Items
-                foreach ($validated['items'] as $item) {
+                foreach ($items as $item) {
                     $qty    = (int) $item['unit_qty'];
                     $days   = (int) ($item['days'] ?? max(1, ceil($estimation['total_days'])));
                     $catalogItem = !empty($item['item_id']) ? Item::findOrFail($item['item_id']) : null;
@@ -378,12 +387,15 @@ class QuotationController extends Controller
                 'message'        => 'Quotation successfully saved to database!'
             ], 200);
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            throw $e;   // Laravel turns this into a 422 JSON response
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
                 'message' => 'Database error: ' . $e->getMessage()
             ], 500);
         }
+        
     }
 
     public function show(\Illuminate\Http\Request $request, $id)
