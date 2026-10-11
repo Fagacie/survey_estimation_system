@@ -11,12 +11,12 @@
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             color: #212529;
-            margin-top: 1.2cm;
-            margin-bottom: 2.0cm;
-            margin-left: 1.5cm;
-            margin-right: 1.5cm;
-            font-size: 13px;
-            line-height: 1.4;
+            margin-top: 1.0cm;
+            margin-bottom: 1.6cm;
+            margin-left: 1.4cm;
+            margin-right: 1.4cm;
+            font-size: 12px;
+            line-height: 1.35;
         }
 
         /* Fixed Header and Footer */
@@ -72,16 +72,16 @@
         .quote-hr {
             border: 0;
             border-bottom: 2px solid #212529;
-            margin: 10px 0 15px 0;
+            margin: 6px 0 10px 0;
         }
 
         /* Boxes */
         .quote-box {
             background-color: #dfeefc;
             border-radius: 4px;
-            padding: 10px 15px;
-            margin-bottom: 15px;
-            font-size: 12px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            font-size: 11.5px;
         }
         
         .quote-box-light {
@@ -91,7 +91,7 @@
         .quote-box-label {
             font-weight: 700;
             color: #1c53a0;
-            font-size: 12px;
+            font-size: 11.5px;
             text-transform: uppercase;
         }
 
@@ -104,16 +104,16 @@
             background-color: #1c6e7a;
             color: #ffffff;
             font-weight: 600;
-            font-size: 12px;
-            padding: 6px 10px;
+            font-size: 11.5px;
+            padding: 5px 8px;
             border: none;
             text-align: left;
         }
         
         .quote-table tbody td {
             background-color: #f5f5f5;
-            padding: 6px 10px;
-            font-size: 12px;
+            padding: 5px 8px;
+            font-size: 11.5px;
             border: none;
         }
 
@@ -121,15 +121,17 @@
             background-color: #d6e9ec !important;
             color: #1c6e7a;
             font-weight: 700;
-            font-size: 13px;
+            font-size: 12px;
             text-transform: uppercase;
-            padding: 8px 10px;
+            padding: 6px 8px;
         }
 
         .quote-service-row td {
             font-weight: 600;
             padding-left: 20px;
             background-color: #ececec !important;
+            padding-top: 4px;
+            padding-bottom: 4px;
         }
 
         .quote-item-cell {
@@ -137,14 +139,14 @@
         }
 
         .quote-totals-table {
-            width: 280px;
-            font-size: 13px;
+            width: 270px;
+            font-size: 12px;
             float: right;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
         }
         
         .quote-totals-table td {
-            padding: 5px 10px;
+            padding: 4px 8px;
         }
         
         .quote-totals-table tr:not(.quote-grand-total-row) td:last-child {
@@ -160,9 +162,14 @@
         .quote-section-heading {
             color: #1c53a0;
             font-weight: 700;
-            font-size: 14px;
-            margin-bottom: 10px;
+            font-size: 12.5px;
+            margin-bottom: 6px;
             margin-top: 0;
+        }
+
+        .signature-block {
+            page-break-inside: avoid;
+            margin-top: 15px;
         }
 
         .page-break {
@@ -206,7 +213,7 @@
         <table class="w-100 mb-2">
             <tr>
                 <td style="width: 40%; vertical-align: top;">
-                    <img src="{{ $getImg('images/logo.jpeg') }}" height="80">
+                    <img src="{{ $getImg('images/logo.jpeg') }}" height="60">
                 </td>
                 <td style="width: 60%; vertical-align: top;" class="text-end quote-meta">
                     <strong>ECO HYDROTECH SOLUTIONS SDN. BHD. (1688434-T)</strong><br>
@@ -239,10 +246,10 @@
             <div class="mt-1" style="white-space: pre-line;">{{ $quotation->project->client->client_address ?? '-' }}</div>
         </div>
 
-        <p class="mb-3">Dear Sir/Madam,</p>
+        <p class="mb-2">Dear Sir/Madam,</p>
 
         <!-- PROJECT BOX -->
-        <div class="quote-box mb-4">
+        <div class="quote-box mb-2">
             <div class="quote-box-label">PROJECT</div>
             <div class="mt-1 fw-bold">{{ $quotation->project->name ?? '-' }}</div>
             <div class="mt-1"><strong>{{ $quotation->project->pic_name ?? '-' }}</strong></div>
@@ -424,7 +431,7 @@
 
         <!-- PAYMENT TERMS AND SIGNATURE -->
 
-        <table class="w-100 mt-4 mb-4">
+        <table class="w-100 mt-2 mb-2" style="page-break-inside: avoid;">
             <tr>
                 <td style="width: 50%; vertical-align: top; padding-right: 20px;">
                     <h6 class="quote-section-heading">Payment Terms</h6>
@@ -452,11 +459,11 @@
         </table>
 
         <!-- SIGNATURE BLOCK -->
-        <div style="margin-top: 40px;">
-            <p class="mb-4">Yours sincerely,</p>
+        <div class="signature-block">
+            <p class="mb-1">Yours sincerely,</p>
             @if(isset($signer) && $signer->signature_path)
                 @if(file_exists(public_path($signer->signature_path)))
-                    <img src="{{ $getImg($signer->signature_path) }}" style="max-height: 80px; margin-bottom: 10px;">
+                    <img src="{{ $getImg($signer->signature_path) }}" style="max-height: 55px; margin-bottom: 5px;">
                 @endif
             @endif
             <p class="mb-0 fw-bold">{{ $signer->name ?? '-' }}</p>

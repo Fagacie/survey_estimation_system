@@ -11,12 +11,12 @@
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             color: #212529;
-            margin-top: 1.2cm;
-            margin-bottom: 2.0cm;
-            margin-left: 1.5cm;
-            margin-right: 1.5cm;
-            font-size: 13px;
-            line-height: 1.4;
+            margin-top: 1.0cm;
+            margin-bottom: 1.6cm;
+            margin-left: 1.4cm;
+            margin-right: 1.4cm;
+            font-size: 12px;
+            line-height: 1.35;
         }
 
         /* Fixed Header and Footer */
@@ -316,12 +316,12 @@
             </tr>
         </table>
 
-        <div style="margin-top: 30px;">
-            <p class="mb-4">Yours sincerely,</p>
+        <div class="signature-block" style="margin-top: 15px; page-break-inside: avoid;">
+            <p class="mb-1">Yours sincerely,</p>
             
             @if(isset($invoice->signatory) && $invoice->signatory->signature_path)
                 @if(file_exists(public_path($invoice->signatory->signature_path)))
-                    <img src="{{ $getImg($invoice->signatory->signature_path) }}" style="max-height: 80px; margin-bottom: 10px;">
+                    <img src="{{ $getImg($invoice->signatory->signature_path) }}" style="max-height: 55px; margin-bottom: 5px;">
                 @endif
             @endif
             
