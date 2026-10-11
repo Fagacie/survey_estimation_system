@@ -117,14 +117,18 @@ class SurveyLocationController extends Controller
 
         \Log::info("saveParameters validation passed: " . json_encode($data));
 
-        $surveyLocation->sbesParameters()->updateOrCreate(
-            ['survey_location_id' => $surveyLocation->id],
-            [
-                'project_id' => $project->project_Id, // Support both just in case
-                'survey_speed_knots' => $data['sbes']['survey_speed_knots'] ?? 4.0,
-                'working_hours_per_day' => $data['sbes']['working_hours_per_day'] ?? 8.0,
-            ]
-        );
+        if ($surveyLocation->survey_type !== 'drone') {
+            $surveyLocation->sbesParameters()->updateOrCreate(
+                ['survey_location_id' => $surveyLocation->id],
+                [
+                    'project_id' => $project->project_Id, // Support both just in case
+                    'survey_speed_knots' => $data['sbes']['survey_speed_knots'] ?? 4.0,
+                    'working_hours_per_day' => $data['sbes']['working_hours_per_day'] ?? 8.0,
+                ]
+            );
+        } else {
+            $surveyLocation->sbesParameters()->delete();
+        }
 
         if (!empty($data['drone']['camera_model']) || !empty($data['drone']['drone_model'])) {
             $surveyLocation->droneMappingParameters()->updateOrCreate(

@@ -272,7 +272,7 @@
                 <button class="btn-save-planning-trigger btn btn-dark w-100 mb-2 fw-bold d-flex justify-content-center align-items-center gap-2">
                     <i class="fa-solid fa-floppy-disk"></i> Save Map Planning
                 </button>
-                <a href="{{ route('projects.report.preview', $project->project_Id) }}" class="btn btn-outline-secondary w-100 mb-2 fw-semibold d-flex justify-content-center align-items-center gap-2">
+                <a href="{{ route('projects.report.preview', ['project' => $project->project_Id, 'location_id' => $surveyLocation->id]) }}" class="btn btn-outline-secondary w-100 mb-2 fw-semibold d-flex justify-content-center align-items-center gap-2">
                     <i class="fa-solid fa-file-lines"></i> Survey Report
                 </a>
                 <a href="{{ route('projects.show', $project->project_Id) }}" class="btn btn-outline-secondary w-100 fw-semibold d-flex justify-content-center align-items-center gap-2">

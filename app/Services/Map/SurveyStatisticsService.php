@@ -34,14 +34,16 @@ class SurveyStatisticsService
 
         $adcpCount = $surveyLocation->surveyLines()->where('type', 'adcp_marker')->count();
 
-        // Save the total distance to sbes_parameters for cost calculation
-        $surveyLocation->sbesParameters()->updateOrCreate(
-            ['survey_location_id' => $surveyLocation->id],
-            [
-                'project_id' => $project->project_Id,
-                'total_distance_nm' => round($totalDistanceNM, 4)
-            ]
-        );
+        // Save the total distance to sbes_parameters for cost calculation only if not drone
+        if ($surveyLocation->survey_type !== 'drone') {
+            $surveyLocation->sbesParameters()->updateOrCreate(
+                ['survey_location_id' => $surveyLocation->id],
+                [
+                    'project_id' => $project->project_Id,
+                    'total_distance_nm' => round($totalDistanceNM, 4)
+                ]
+            );
+        }
 
         return [
             'total_distance'  => round($totalDistanceNM, 4),  // in NM

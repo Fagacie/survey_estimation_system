@@ -48,7 +48,14 @@
 
         <!-- 2. ACTIVE WORKFLOWS -->
         <div class="mb-10">
-            <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-4">Active Modules</h2>
+            <div class="flex items-center justify-between mb-4">
+                <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Active Modules</h2>
+                @if($project->surveyLocations->count() > 1)
+                    <a href="{{ route('projects.report.preview', $project->project_Id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 rounded text-xs font-bold transition-colors shadow-sm">
+                        <i class="fa-solid fa-file-lines text-slate-500"></i> Full Project Report (All Areas)
+                    </a>
+                @endif
+            </div>
             
             <div class="bg-white border border-slate-200 rounded-lg shadow-sm">
                 <ul class="divide-y divide-slate-100">

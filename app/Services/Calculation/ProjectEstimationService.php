@@ -22,6 +22,10 @@ class ProjectEstimationService
         $droneResult = $droneService->calculate($project);
 
         foreach ($project->surveyLocations as $location) {
+            if ($location->survey_type === 'drone') {
+                continue;
+            }
+
             $sbesParams = $location->sbesParameters;
             if ($sbesParams) {
                 $distance = (float) ($sbesParams->total_distance_nm ?? 0);

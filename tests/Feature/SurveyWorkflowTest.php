@@ -73,4 +73,61 @@ class SurveyWorkflowTest extends TestCase
             ->assertSee('2.00')
             ->assertDontSee('Itemized Cost Quotation');
     }
+
+    public function test_drone_mapping_report_isolation_and_distinct_metrics(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::create([
+            'created_by' => $user->id,
+            'number' => 'REPORT-DRONE',
+            'name' => 'Mixed Survey Project',
+            'status' => 'draft',
+        ]);
+        $sbesLoc = SurveyLocation::create([
+            'project_id' => $project->project_Id,
+            'name' => 'Pantai UMT',
+            'survey_type' => 'sbes',
+            'status' => 'Mapped',
+        ]);
+        SbesParameter::create([
+            'project_id' => $project->project_Id,
+            'survey_location_id' => $sbesLoc->id,
+            'total_distance_nm' => 100,
+            'survey_speed_knots' => 5,
+            'working_hours_per_day' => 8,
+        ]);
+
+        $droneLoc = SurveyLocation::create([
+            'project_id' => $project->project_Id,
+            'name' => 'Near UMT',
+            'survey_type' => 'drone',
+            'status' => 'Mapped',
+        ]);
+        \App\Models\DroneMappingParameter::create([
+            'survey_location_id' => $droneLoc->id,
+            'drone_model' => 'DJI Matrice 350 RTK',
+            'camera_model' => 'DJI Zenmuse P1',
+            'altitude_m' => 100,
+            'gsd_cm' => 1.83,
+            'speed_ms' => 10,
+            'total_flight_distance_m' => 12397,
+            'total_images' => 618,
+            'sortie_count' => 1,
+            'estimated_duration_hours' => 0.34,
+        ]);
+
+        // Request specifically the drone report
+        $response = $this->actingAs($user)->get(route('projects.report.preview', [
+            'project' => $project->project_Id,
+            'location_id' => $droneLoc->id,
+            'raw' => 1,
+        ]));
+
+        $response->assertOk()
+            ->assertSee('DRONE MAPPING SURVEY REPORT')
+            ->assertSee('DJI Matrice 350 RTK')
+            ->assertSee('Near UMT')
+            ->assertDontSee('Pantai UMT')
+            ->assertDontSee('Sounding Distance');
+    }
 }
