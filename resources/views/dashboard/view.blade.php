@@ -377,6 +377,28 @@
                                     <div><strong>{{ $quotation->project->pic_no ?? '-' }}</strong></div>
                                 </div>
 
+                                {{-- ===== Work out what this quotation contains (survey / modelling) ===== --}}
+                                @php
+                                    $mdlProject = $quotation->project;
+                                    $mdlSummary = $mdlProject ? $mdlProject->modellingSummary : null;
+                                    $mdlGroups = $mdlSummary
+                                        ? $mdlProject->modellingItems()->with(['catalogModule', 'catalogItem'])->get()->groupBy('catalog_module_id')
+                                        : collect();
+
+                                    $hasModelling = $mdlSummary && $mdlGroups->isNotEmpty() && ($quotation->modelling_total ?? 0) > 0;
+                                    $hasSurvey    = $quotation->items->isNotEmpty();
+
+                                    // Hide the survey table only when there is modelling but no survey items.
+                                    // If there is nothing at all, still show the survey table ("No items added").
+                                    $showSurvey   = $hasSurvey || !$hasModelling;
+
+                                    // Survey totals (kept outside the @if because the summary box uses $finalTotal)
+                                    $subtotal   = $quotation->survey_total;
+                                    $sst        = round($subtotal * 0.08, 2);
+                                    $finalTotal = $subtotal + $sst;   // survey total incl. SST
+                                @endphp
+
+                                @if($showSurvey)
                                 <!-- ITEMS TABLE -->
                                 <table class="table quote-table mb-2">
                                     <thead>
@@ -445,13 +467,7 @@
                                     </tbody>
                                 </table>
 
-                                <!-- TOTALS CALCULATION -->
-                                @php
-                                    $subtotal   = $quotation->survey_total;
-                                    $sst        = round($subtotal * 0.08, 2);
-                                    $finalTotal = $subtotal + $sst;   // survey total incl. SST
-                                @endphp
-
+                                <!-- TOTALS -->
                                 <div class="d-flex justify-content-end mb-4">
                                     <table class="quote-totals-table">
                                         <tr>
@@ -468,17 +484,10 @@
                                         </tr>
                                     </table>
                                 </div>
+                                @endif
 
                                 {{-- ===== MODELLING (separate table, read-only, from saved Modelling Builder data) ===== --}}
-                                @php
-                                    $mdlProject = $quotation->project;
-                                    $mdlSummary = $mdlProject ? $mdlProject->modellingSummary : null;
-                                    $mdlGroups = $mdlSummary
-                                        ? $mdlProject->modellingItems()->with(['catalogModule', 'catalogItem'])->get()->groupBy('catalog_module_id')
-                                        : collect();
-                                @endphp
-
-                                @if($mdlSummary && $mdlGroups->isNotEmpty() && ($quotation->modelling_total ?? 0) > 0)
+                                @if($hasModelling)
                                 <div class="quote-modelling-block mb-4">
                                     <h6 class="quote-section-heading">MODELLING</h6>
                                     <div class="mb-2" style="font-size: 0.85rem;">
@@ -543,7 +552,8 @@
                                 </div>
                                 @endif
 
-                                @if(($quotation->modelling_total ?? 0) > 0)
+                                {{-- Summary box: only when BOTH survey and modelling exist --}}
+                                @if($hasSurvey && $hasModelling)
                                 <table class="quote-summary-table mb-4">
                                     <tr class="qs-survey">
                                         <td class="qs-label">Survey Total (incl. SST 8%)</td>

@@ -126,7 +126,7 @@
                             <!-- Sub-navigation -->
                             <div x-show="itemsOpen && sidebarOpen" x-transition class="pl-11 pr-3 py-1 space-y-1">
                                 <a href="{{ route('admin.index') }}" class="ises-nav-link block px-3 py-2 text-[11px] font-medium transition-colors {{ request()->routeIs('admin.index', 'newItem') ? 'active' : '' }}">
-                                    Modelling Catalog
+                                    Item Catalog
                                 </a>
                                 <a href="{{ route('admin.equipment.index') }}" class="ises-nav-link block px-3 py-2 text-[11px] font-medium transition-colors {{ request()->routeIs('admin.equipment.*') ? 'active' : '' }}">
                                     Drone Mapping Equipment

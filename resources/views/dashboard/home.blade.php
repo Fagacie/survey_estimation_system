@@ -29,13 +29,25 @@
     </style>
 
     <div class="max-w-7xl mx-auto">
-        <div id="quotationBuilderHeader" class="flex items-center gap-3 mb-8 print:hidden">
-            <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 shadow-sm border border-teal-100">
-                <i class="fa-solid fa-file-invoice-dollar text-xl"></i>
-            </div>
-            <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Quotation Builder</h1>
-        </div>
+@php
+    // Back to the SAME project's overview page. If no project is loaded, go to the projects list.
+    $backUrl = $prefillProject
+        ? route('projects.show', $prefillProject->project_Id)
+        : route('projects.index');
+@endphp
 
+<div id="quotationBuilderHeader" class="flex items-center gap-3 mb-8 print:hidden">
+    <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 shadow-sm border border-teal-100">
+        <i class="fa-solid fa-file-invoice-dollar text-xl"></i>
+    </div>
+    <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Quotation Builder</h1>
+
+    <a href="{{ $backUrl }}"
+       class="ml-auto px-4 py-2 rounded-lg text-sm font-bold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition-colors"
+       style="text-decoration: none;">
+        <i class="fa-solid fa-arrow-left mr-2"></i> BACK TO PROJECT
+    </a>
+</div>
         <!-- ================================================================== -->
         <!-- 1. EDIT FORM CONTAINER (Visible in Edit Mode) -->
         <!-- ================================================================== -->
