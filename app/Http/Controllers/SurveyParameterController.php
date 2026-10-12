@@ -17,7 +17,7 @@ class SurveyParameterController extends Controller
 
     public function store(StoreSurveyParameterRequest $request, string $id)
     {
-        $project = auth()->user()->projects()->findOrFail($id);
+        $project = Project::findOrFail($id);
         
         $this->parameterService->saveParameters($project, $request->validated());
 

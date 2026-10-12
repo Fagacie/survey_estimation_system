@@ -35,6 +35,13 @@
     <form method="POST" action="{{ route('signin') }}">
         @csrf
 
+        @if (session('success'))
+        <div class="success-box">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>{{ session('success') }}</span>
+        </div>
+        @endif
+
         @if ($errors->any())
         <div class="error-box">
             <ul>
@@ -43,7 +50,7 @@
                 @endforeach
             </ul>
         </div>
-            @endif
+        @endif
 
             <!--email-->
             <label>Email</label>
@@ -54,6 +61,7 @@
                 <input
                     type="email"
                     name="email"
+                    value="{{ old('email', session('registered_email')) }}"
                     placeholder="admin@gmail.com"
                     required>
                 </div>

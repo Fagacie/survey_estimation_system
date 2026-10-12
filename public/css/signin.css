@@ -16,6 +16,8 @@ label { display:block; margin:16px 0 7px; color:var(--ink); font-size:.72rem; fo
 #togglePassword { cursor:pointer; }
 .error-box { margin-bottom:14px; padding:11px 13px; border:1px solid #fecaca; border-radius:8px; background:#fff1f2; color:#be123c; font-size:.82rem; }
 .error-box ul { margin:0 0 0 17px; padding:0; }
+.success-box { display:flex; align-items:center; gap:10px; margin-bottom:14px; padding:11px 13px; border:1px solid #a7f3d0; border-radius:8px; background:#ecfdf5; color:#065f46; font-size:.84rem; line-height:1.4; font-weight:500; }
+.success-box i { color:#10b981; font-size:1.1rem; flex-shrink:0; }
 .forgot-password { margin:13px 0 22px; text-align:right; }
 .forgot-password a { color:var(--teal); font-size:.8rem; text-decoration:none; }
 .signin-btn, .signup-btn { display:flex; align-items:center; justify-content:center; gap:8px; width:100%; min-height:46px; border:0; border-radius:8px; font:600 .86rem 'DM Sans',sans-serif; cursor:pointer; transition:.2s; }

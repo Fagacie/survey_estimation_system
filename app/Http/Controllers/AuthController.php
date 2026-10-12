@@ -40,25 +40,30 @@ class AuthController extends Controller {
     public function signup(Request $request) {
         //validate form
         $request->validate([
-                'name' => 'required|string|max:255',
-                'email' => 'required|email|unique:users,email',
-                'password' => [
-                    'required',
-                    'min:8',
-                    'confirmed',
-                    'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$/'              
-                    ],
-            ]);
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email',
+            'password' => [
+                'required',
+                'min:8',
+                'confirmed',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[-_@$!%*?&#]).+$/'              
+            ],
+        ], [
+            'password.regex' => 'Password must contain at least 8 characters, an uppercase letter, a lowercase letter, a number, and a special character (-_@$!%*?&#).',
+        ]);
+
         //create user
         User::create([
             'name' => $request->name,
-            'email' =>$request->email,
+            'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+
         //go to sign in page    
         return redirect()
             ->route('signin')
-            ->with('success','Account created successfully. Please sign in.');
+            ->with('success', 'Account created successfully! Please sign in with your credentials.')
+            ->with('registered_email', $request->email);
     }
 
     //process sign out

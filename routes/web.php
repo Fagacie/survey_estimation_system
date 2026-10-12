@@ -80,6 +80,10 @@ Route::middleware('guest')->group(function () {
 
     Route::get('/signup', [AuthController::class, 'showSignup'])->name('signup');
     Route::post('/signup', [AuthController::class, 'signup']);
+
+    // Common URL variations
+    Route::get('/sign-up', fn () => redirect()->route('signup'));
+    Route::get('/sign-in', fn () => redirect()->route('signin'));
 });
 
 /*

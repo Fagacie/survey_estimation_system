@@ -124,7 +124,7 @@ function updateStrength() {
 
     if (/\d/.test(value)) score++;
 
-    if (/[-_@$!%*?&]/.test(value)) score++;
+    if (/[-_@$!%*?&#]/.test(value)) score++;
 
     const fill = document.getElementById("strengthFill");
 
@@ -258,7 +258,9 @@ form.addEventListener("submit", function (event) {
 
         event.preventDefault();
 
-        alert("Passwords do not match.");
+        validatePasswordMatch();
+
+        confirmPassword.focus();
 
         return;
 
@@ -273,12 +275,14 @@ form.addEventListener("submit", function (event) {
         !/[A-Z]/.test(password.value) ||
         !/[a-z]/.test(password.value) ||
         !/\d/.test(password.value) ||
-        !/[-_@$!%*?&]/.test(password.value)
+        !/[-_@$!%*?&#]/.test(password.value)
     ) {
 
         event.preventDefault();
 
-        alert("Please create a stronger password.");
+        password.focus();
+
+        updateStrength();
 
     }
 

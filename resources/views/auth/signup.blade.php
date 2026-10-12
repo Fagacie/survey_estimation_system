@@ -53,9 +53,10 @@
                 <input
                     type="text"
                     name="name"
+                    value="{{ old('name') }}"
                     placeholder="Enter your name"
                     required>
-                </div>
+            </div>
 
 
             <!--email-->
@@ -67,68 +68,69 @@
                 <input
                     type="email"
                     name="email"
+                    value="{{ old('email') }}"
                     placeholder="example@gmail.com"
                     required>
-                </div>
+            </div>
 
-                <!--password-->
-                <label>Password</label>
+            <!--password-->
+            <label>Password</label>
 
-                <div class="input-box">
-                    <i class="fa-solid fa-lock"></i>
+            <div class="input-box">
+                <i class="fa-solid fa-lock"></i>
 
-                    <input
+                <input
                     type="password"
                     id="password"
                     name="password"
                     placeholder="Enter your password"
                     minlength="8"
                     pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[-_@$!%*?&#]).{8,}$"
-                    title="Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character."
+                    title="Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character (-_@$!%*?&#)."
                     required>
 
-                    <i class="fa-regular fa-eye" id="togglePassword"></i>
+                <i class="fa-regular fa-eye" id="togglePassword"></i>
 
+            </div>
+
+            <p class="password-hint">
+                Minimum 8 characters with uppercase, lowercase, number and special character (-_@$!%*?&#).
+            </p>
+
+            <div class="strength-container">
+
+                <div class="strength-bar">
+                    <div id="strengthFill"></div>
                 </div>
 
-                <p class="password-hint">
-                    Minimum 8 characters with uppercase, lowercase, number and special character (-_@$!%*?&).
-                </p>
+                <span id="strengthText">
+                    Weak
+                </span>
 
-                <div class="strength-container">
+            </div>
 
-                    <div class="strength-bar">
-                        <div id="strengthFill"></div>
-                    </div>
+            <!--confirm password-->
+            <label>Confirm Password</label>
 
-                    <span id="strengthText">
-                        Weak
-                    </span>
-
-                </div>
-                <p id="passwordMatch" class="password-match"></p>
-
-                <!--confirm password-->
-                <label>Confirm Password</label>
-
-                <div class="input-box">
-                    
-                    <input
+            <div class="input-box">
+                <i class="fa-solid fa-lock"></i>
+                
+                <input
                     type="password"
                     id="confirmPassword"
                     name="password_confirmation"
                     placeholder="Confirm your password"
                     required>
 
-                    <i class="fa-regular fa-eye" id="toggleConfirmPassword"></i>
+                <i class="fa-regular fa-eye" id="toggleConfirmPassword"></i>
 
-                </div>
+            </div>
 
-                <p id="passwordMatch" class="password-match"></p>     
+            <p id="passwordMatch" class="password-match"></p>     
 
-                <button type="submit" class="signup-btn">
-                    SIGN UP
-                </button>
+            <button type="submit" class="signup-btn">
+                SIGN UP
+            </button>
 
                 <hr>
 

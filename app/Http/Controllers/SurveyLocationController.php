@@ -259,7 +259,7 @@ class SurveyLocationController extends Controller
 
     private function authorizeProject(Project $project): void
     {
-        abort_unless((int) $project->created_by === (int) auth()->id(), 404);
+        // Projects are shared across the company; all authenticated users have access
     }
 
     private function authorizeSurveyLocation(Project $project, SurveyLocation $surveyLocation): void

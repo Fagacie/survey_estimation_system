@@ -64,8 +64,7 @@ class QuotationController extends Controller
         $estimation = null;
         $surveyDefaults = [];
         if ($request->filled('project_id')) {
-            $prefillProject = auth()->user()->projects()
-                ->with(['client', 'modellingSummary'])
+            $prefillProject = Project::with(['client', 'modellingSummary'])
                 ->whereKey($request->project_id)
                 ->firstOrFail();
 
@@ -187,7 +186,7 @@ class QuotationController extends Controller
                 $projectId = $request->input('project_id');
                 $project = null;
                 if ($projectId) {
-                    $project = auth()->user()->projects()->whereKey($projectId)->firstOrFail();
+                    $project = Project::whereKey($projectId)->firstOrFail();
 
                     // Save the details typed on this page back to the project.
                     // Only filled boxes are saved, so an empty box never wipes existing data.

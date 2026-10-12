@@ -37,8 +37,7 @@ class ReportController extends Controller
 
     private function compile(string $id, ?string $locationId = null): array
     {
-        $project = auth()->user()->projects()
-            ->with(['client', 'surveyLocations.boundaries', 'surveyLocations.surveyLines', 'surveyLocations.sbesParameters', 'surveyLocations.droneMappingParameters'])
+        $project = Project::with(['client', 'surveyLocations.boundaries', 'surveyLocations.surveyLines', 'surveyLocations.sbesParameters', 'surveyLocations.droneMappingParameters'])
             ->findOrFail($id);
 
         $allLocations = $project->surveyLocations;

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\CatalogItem;
 use App\Models\CatalogModule;
 use App\Models\Package;
+use App\Models\Project;
 use App\Models\ProjectModellingItem;
 use App\Models\ProjectModellingSummary;
 use Illuminate\Http\Request;
@@ -162,15 +163,13 @@ class ModellingController extends Controller
         $project = null;
 
         if ($request->filled('project_id')) {
-            $project = auth()->user()->projects()
-                ->with('client')
+            $project = Project::with('client')
                 ->whereKey($request->project_id)
                 ->firstOrFail();
 
             session(['modeling_project_id' => $project->project_Id]);
         } elseif (session()->has('modeling_project_id')) {
-            $project = auth()->user()->projects()
-                ->with('client')
+            $project = Project::with('client')
                 ->whereKey(session('modeling_project_id'))
                 ->first();
 
@@ -224,8 +223,8 @@ class ModellingController extends Controller
             'tax_percent'         => 'required|numeric|min:0|max:100',
         ]);
 
-        // Ownership check: the project must belong to the logged-in user
-        $project = auth()->user()->projects()->whereKey($validated['project_id'])->firstOrFail();
+        // The project is accessible to all company users
+        $project = Project::whereKey($validated['project_id'])->firstOrFail();
 
         DB::transaction(function () use ($validated, $project) {
             // A project only has one Modelling configuration, so clear the old one first
@@ -285,7 +284,7 @@ class ModellingController extends Controller
 
     public function destroyQuote(Request $request, $projectId)
     {
-        $project = auth()->user()->projects()->whereKey($projectId)->firstOrFail();
+        $project = Project::whereKey($projectId)->firstOrFail();
 
         ProjectModellingItem::where('project_Id', $project->project_Id)->delete();
         ProjectModellingSummary::where('project_Id', $project->project_Id)->delete();

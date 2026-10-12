@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Project;
 
 class ProjectController extends Controller
 {
@@ -11,8 +12,8 @@ class ProjectController extends Controller
      */
     public function index(Request $request)
     {
-        // 1. Base Query for Projects with Filtering
-        $query = auth()->user()->projects()->latest();
+        // 1. Base Query for Projects with Filtering (Shared Company-wide)
+        $query = Project::with('client')->latest();
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -56,22 +57,22 @@ class ProjectController extends Controller
         $projects = $query->paginate(10);
 
         // 2. Core KPIs
-        $totalSbes = auth()->user()->projects()->count();
+        $totalSbes = Project::count();
         $metrics = [
             'total' => $totalSbes,
-            'draft' => auth()->user()->projects()->where('status', 'draft')->count(),
-            'planned' => auth()->user()->projects()->where('status', 'planned')->count(),
-            'completed' => auth()->user()->projects()->where('status', 'completed')->count(),
-            'mapped' => auth()->user()->projects()->whereHas('surveyLocations', fn ($q) => $q->where('status', 'Mapped'))->count(),
-            'quotations' => auth()->user()->projects()->has('lineItems')->count(),
+            'draft' => Project::where('status', 'draft')->count(),
+            'planned' => Project::where('status', 'planned')->count(),
+            'completed' => Project::where('status', 'completed')->count(),
+            'mapped' => Project::whereHas('surveyLocations', fn ($q) => $q->where('status', 'Mapped'))->count(),
+            'quotations' => Project::has('lineItems')->count(),
         ];
 
         // (SurveyStatistic table was removed, distance is calculated live in the map UI)
         $totalDistance = 0;
 
-        $projectsWithLines = auth()->user()->projects()->has('surveyLines')->count();
-        $projectsAwaitingPlanning = auth()->user()->projects()->doesntHave('boundaries')->count();
-        $projectsWithCost = auth()->user()->projects()->has('lineItems')->count();
+        $projectsWithLines = Project::has('surveyLines')->count();
+        $projectsAwaitingPlanning = Project::doesntHave('boundaries')->count();
+        $projectsWithCost = Project::has('lineItems')->count();
 
         $overview = [
             'total_distance' => round($totalDistance, 2),
@@ -82,10 +83,10 @@ class ProjectController extends Controller
 
         // 4. Requires Attention Metrics
         // Projects that are active/draft but missing key steps
-        $missingBoundariesCount = auth()->user()->projects()->where('status', '!=', 'completed')->doesntHave('boundaries')->count();
-        $missingLinesCount = auth()->user()->projects()->where('status', '!=', 'completed')->has('boundaries')->doesntHave('surveyLines')->count();
+        $missingBoundariesCount = Project::where('status', '!=', 'completed')->doesntHave('boundaries')->count();
+        $missingLinesCount = Project::where('status', '!=', 'completed')->has('boundaries')->doesntHave('surveyLines')->count();
         $missingParamsCount = 0; // Removed this metric for now
-        $missingCostCount = auth()->user()->projects()->where('status', '!=', 'completed')->doesntHave('lineItems')->count();
+        $missingCostCount = Project::where('status', '!=', 'completed')->doesntHave('lineItems')->count();
 
         $attention = [
             'missing_boundaries' => $missingBoundariesCount,
@@ -178,14 +179,14 @@ class ProjectController extends Controller
      */
     public function show(string $id)
     {
-        $project = auth()->user()->projects()->findOrFail($id);
+        $project = Project::findOrFail($id);
         $project->load('surveyLocations');
         return view('projects.overview', compact('project'));
     }
 
     public function updateAllowances(Request $request, string $id)
     {
-        $project = auth()->user()->projects()->findOrFail($id);
+        $project = Project::findOrFail($id);
         
         $data = $request->validate([
             'weather_days' => 'nullable|numeric|min:0',
@@ -207,7 +208,7 @@ class ProjectController extends Controller
      */
     public function edit($id)
     {
-        $project = auth()->user()->projects()->findOrFail($id);
+        $project = Project::findOrFail($id);
         return view('projects.edit', compact('project'));
     }
 
@@ -216,8 +217,7 @@ class ProjectController extends Controller
      */
     public function update(\App\Http\Requests\UpdateProjectRequest $request, string $id)
     {
-        // Only the owner's projects can be updated (same rule as the other methods)
-        $project = auth()->user()->projects()->findOrFail($id);
+        $project = Project::findOrFail($id);
         $validated = $request->validated();
 
         $userId = auth()->id();
@@ -282,7 +282,7 @@ class ProjectController extends Controller
      */
     public function destroy(string $id)
     {
-        $project = auth()->user()->projects()->findOrFail($id);
+        $project = Project::findOrFail($id);
         $project->delete();
         
         return redirect()->route('projects.index')->with('success', 'Project deleted successfully.');

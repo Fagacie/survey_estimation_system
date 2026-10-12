@@ -14,8 +14,9 @@ label { display:block; margin:14px 0 7px; color:var(--ink); font-size:.72rem; fo
 .input-box input { flex:1; min-width:0; padding:0 11px; border:0; outline:0; background:transparent; color:var(--ink); font:inherit; }
 .input-box i { color:var(--muted); font-size:.9rem; cursor:pointer; }
 .error-box { margin-bottom:14px; padding:11px 13px; border:1px solid #fecaca; border-radius:8px; background:#fff1f2; color:#be123c; font-size:.82rem; }
-.error-box ul { margin:0 0 0 17px; padding:0; }
-.password-hint, .password-match { color:var(--muted); font-size:.72rem; line-height:1.4; }
+.password-hint, .password-match { color:var(--muted); font-size:.72rem; line-height:1.4; margin: 6px 0 0; }
+.password-match.valid { color: #10b981; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+.password-match.invalid { color: #ef4444; font-weight: 600; display: flex; align-items: center; gap: 4px; }
 .strength-container { display:flex; align-items:center; gap:8px; margin-top:8px; color:var(--muted); font-size:.72rem; }
 .strength-bar { height:4px; flex:1; overflow:hidden; background:#e5e7eb; border-radius:99px; }
 #strengthFill { height:100%; width:0; background:var(--teal); transition:.2s; }

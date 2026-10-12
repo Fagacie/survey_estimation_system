@@ -20,7 +20,7 @@ class MapController extends Controller
      */
     public function save(Request $request, string $id)
     {
-        $project = auth()->user()->projects()->findOrFail($id);
+        $project = Project::findOrFail($id);
         
         $request->validate([
             'boundaries' => 'nullable|array',
