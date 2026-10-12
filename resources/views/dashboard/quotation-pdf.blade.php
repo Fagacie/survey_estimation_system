@@ -11,7 +11,7 @@
         body {
             font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             color: #212529;
-            margin-top: 1.0cm;
+            margin-top: 2.35cm;
             margin-bottom: 1.6cm;
             margin-left: 1.4cm;
             margin-right: 1.4cm;
@@ -25,7 +25,7 @@
             top: 0cm;
             left: 0cm;
             right: 0cm;
-            height: 1.2cm;
+            height: 2.3cm;
         }
 
         footer {
@@ -242,9 +242,9 @@
         <table class="w-100 mb-2">
             <tr>
                 <td style="width: 40%; vertical-align: top;">
-                    <img src="{{ $getImg('images/logo.jpeg') }}" height="60">
+                    <img src="{{ $getImg('images/logo.jpeg') }}" height="65">
                 </td>
-                <td style="width: 60%; vertical-align: top;" class="text-end quote-meta">
+                <td style="width: 60%; vertical-align: top; font-size: 11px; line-height: 1.2; color: #212529;" class="text-end">
                     <strong>ECO HYDROTECH SOLUTIONS SDN. BHD. (1688434-T)</strong><br>
                     Institute of Oceanography and Environment<br>
                     Universiti Malaysia Terengganu<br>
