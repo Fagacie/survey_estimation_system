@@ -336,7 +336,7 @@
                 <div class="custom-card">
                     <div class="custom-card-header">
                         <h4 class="custom-card-title"><i class="fa-solid fa-plane-up me-2" style="color:#888;"></i> Drones</h4>
-                        <button class="btn-outline-dark-minimal" data-bs-toggle="modal" data-bs-target="#droneModal" onclick="openDroneModal()">+ Add Drone</button>
+                        <button type="button" class="btn-outline-dark-minimal" onclick="openDroneModal()">+ Add Drone</button>
                     </div>
                     <div class="table-responsive">
                         <table class="clean-table">
@@ -364,7 +364,9 @@
                                         </form>
                                     </td>
                                     <td class="text-end">
-                                        <button class="action-btn" onclick="openDroneModal({{ $drone->toJson() }})"><i class="fa-solid fa-pen"></i></button>
+                                        <button type="button" class="action-btn" data-drone="{{ json_encode($drone) }}" onclick="openDroneModal(this)" title="Edit {{ $drone->name }}">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
                                     </td>
                                 </tr>
                                 @empty
@@ -383,7 +385,7 @@
                 <div class="custom-card">
                     <div class="custom-card-header">
                         <h4 class="custom-card-title"><i class="fa-solid fa-camera me-2" style="color:#888;"></i> Cameras</h4>
-                        <button class="btn-outline-dark-minimal" data-bs-toggle="modal" data-bs-target="#cameraModal" onclick="openCameraModal()">+ Add Camera</button>
+                        <button type="button" class="btn-outline-dark-minimal" onclick="openCameraModal()">+ Add Camera</button>
                     </div>
                     <div class="table-responsive">
                         <table class="clean-table">
@@ -417,7 +419,9 @@
                                         </form>
                                     </td>
                                     <td class="text-end">
-                                        <button class="action-btn" onclick="openCameraModal({{ $camera->toJson() }})"><i class="fa-solid fa-pen"></i></button>
+                                        <button type="button" class="action-btn" data-camera="{{ json_encode($camera) }}" onclick="openCameraModal(this)" title="Edit {{ $camera->name }}">
+                                            <i class="fa-solid fa-pen"></i>
+                                        </button>
                                     </td>
                                 </tr>
                                 @empty
@@ -513,7 +517,7 @@
                         
                         <div class="mb-4">
                             <label class="input-label">Min Photo Interval (sec) <span class="text-lowercase fw-normal text-muted">— optional</span></label>
-                            <input type="number" step="0.01" name="min_photo_interval_sec" id="camera_min_photo_interval_sec" class="minimal-input" min="0.1" placeholder="Leave empty if unknown">
+                            <input type="number" step="0.01" name="min_photo_interval_sec" id="camera_min_photo_interval_sec" class="minimal-input" min="0.01" placeholder="Leave empty if unknown">
                         </div>
                         
                         <div class="form-check mt-2">
@@ -531,48 +535,104 @@
     </div>
 
     @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        function openDroneModal(drone = null) {
+        function openDroneModal(source = null) {
             const form = document.getElementById('droneForm');
-            if (drone) {
+            let drone = null;
+            if (source instanceof HTMLElement) {
+                try {
+                    drone = JSON.parse(source.getAttribute('data-drone') || '{}');
+                } catch (e) {
+                    console.error('Failed to parse drone JSON:', e);
+                }
+            } else if (source && typeof source === 'object') {
+                drone = source;
+            }
+
+            if (drone && drone.id) {
                 document.getElementById('droneModalTitle').innerText = 'Edit Drone';
-                form.action = `/admin/equipment/drone/${drone.id}`;
+                form.action = "{{ url('admin/equipment/drone') }}/" + drone.id;
                 document.getElementById('droneMethod').value = 'PUT';
-                document.getElementById('drone_name').value = drone.name;
-                document.getElementById('drone_usable_flight_time_min').value = drone.usable_flight_time_min;
-                document.getElementById('drone_is_active').checked = drone.is_active;
+                document.getElementById('drone_name').value = drone.name || '';
+                document.getElementById('drone_usable_flight_time_min').value = drone.usable_flight_time_min || '';
+                document.getElementById('drone_is_active').checked = Boolean(drone.is_active && drone.is_active !== '0');
             } else {
                 document.getElementById('droneModalTitle').innerText = 'Add Drone';
-                form.action = `/admin/equipment/drone`;
+                form.action = "{{ route('admin.equipment.drone.store') }}";
                 document.getElementById('droneMethod').value = 'POST';
                 form.reset();
                 document.getElementById('drone_is_active').checked = true;
             }
+
+            const modalEl = document.getElementById('droneModal');
+            if (window.bootstrap && window.bootstrap.Modal) {
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            } else {
+                modalEl.classList.add('show');
+                modalEl.style.display = 'block';
+            }
         }
 
-        function openCameraModal(camera = null) {
+        function openCameraModal(source = null) {
             const form = document.getElementById('cameraForm');
-            if (camera) {
+            let camera = null;
+            if (source instanceof HTMLElement) {
+                try {
+                    camera = JSON.parse(source.getAttribute('data-camera') || '{}');
+                } catch (e) {
+                    console.error('Failed to parse camera JSON:', e);
+                }
+            } else if (source && typeof source === 'object') {
+                camera = source;
+            }
+
+            if (camera && camera.id) {
                 document.getElementById('cameraModalTitle').innerText = 'Edit Camera';
-                form.action = `/admin/equipment/camera/${camera.id}`;
+                form.action = "{{ url('admin/equipment/camera') }}/" + camera.id;
                 document.getElementById('cameraMethod').value = 'PUT';
-                document.getElementById('camera_name').value = camera.name;
-                document.getElementById('camera_sensor_width_mm').value = camera.sensor_width_mm;
-                document.getElementById('camera_sensor_height_mm').value = camera.sensor_height_mm;
-                document.getElementById('camera_focal_length_mm').value = camera.focal_length_mm;
-                document.getElementById('camera_image_width_px').value = camera.image_width_px;
-                document.getElementById('camera_image_height_px').value = camera.image_height_px;
-                document.getElementById('camera_min_photo_interval_sec').value = camera.min_photo_interval_sec || '';
-                document.getElementById('camera_is_active').checked = camera.is_active;
+                document.getElementById('camera_name').value = camera.name || '';
+                document.getElementById('camera_sensor_width_mm').value = camera.sensor_width_mm ?? '';
+                document.getElementById('camera_sensor_height_mm').value = camera.sensor_height_mm ?? '';
+                document.getElementById('camera_focal_length_mm').value = camera.focal_length_mm ?? '';
+                document.getElementById('camera_image_width_px').value = camera.image_width_px ?? '';
+                document.getElementById('camera_image_height_px').value = camera.image_height_px ?? '';
+                document.getElementById('camera_min_photo_interval_sec').value = camera.min_photo_interval_sec ?? '';
+                document.getElementById('camera_is_active').checked = Boolean(camera.is_active && camera.is_active !== '0');
             } else {
                 document.getElementById('cameraModalTitle').innerText = 'Add Camera';
-                form.action = `/admin/equipment/camera`;
+                form.action = "{{ route('admin.equipment.camera.store') }}";
                 document.getElementById('cameraMethod').value = 'POST';
                 form.reset();
                 document.getElementById('camera_is_active').checked = true;
             }
+
+            const modalEl = document.getElementById('cameraModal');
+            if (window.bootstrap && window.bootstrap.Modal) {
+                bootstrap.Modal.getOrCreateInstance(modalEl).show();
+            } else {
+                modalEl.classList.add('show');
+                modalEl.style.display = 'block';
+            }
         }
+
+        // Fallback for modal dismiss buttons if Bootstrap JS handler is not caught
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('[data-bs-dismiss="modal"]').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const modal = this.closest('.modal');
+                    if (modal) {
+                        if (window.bootstrap && window.bootstrap.Modal) {
+                            const inst = bootstrap.Modal.getInstance(modal);
+                            if (inst) inst.hide();
+                        }
+                        modal.classList.remove('show');
+                        modal.style.display = 'none';
+                        const backdrops = document.querySelectorAll('.modal-backdrop');
+                        backdrops.forEach(function(b) { b.remove(); });
+                    }
+                });
+            });
+        });
     </script>
     @endpush
 </x-app-layout>

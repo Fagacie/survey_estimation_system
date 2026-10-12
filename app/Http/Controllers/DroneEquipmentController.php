@@ -21,7 +21,7 @@ class DroneEquipmentController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:100',
             'usable_flight_time_min' => 'required|integer|min:1',
-            'is_active' => 'boolean'
+            'is_active' => 'nullable|boolean'
         ]);
 
         $validated['is_active'] = $request->has('is_active');
@@ -35,7 +35,7 @@ class DroneEquipmentController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:100',
             'usable_flight_time_min' => 'required|integer|min:1',
-            'is_active' => 'boolean'
+            'is_active' => 'nullable|boolean'
         ]);
 
         $validated['is_active'] = $request->has('is_active');
@@ -59,8 +59,8 @@ class DroneEquipmentController extends Controller
             'focal_length_mm' => 'required|numeric|gt:0',
             'image_width_px' => 'required|integer|gt:0',
             'image_height_px' => 'required|integer|gt:0',
-            'min_photo_interval_sec' => 'nullable|numeric|gt:0',
-            'is_active' => 'boolean'
+            'min_photo_interval_sec' => 'nullable|numeric|gte:0',
+            'is_active' => 'nullable|boolean'
         ]);
 
         $validated['is_active'] = $request->has('is_active');
@@ -78,8 +78,8 @@ class DroneEquipmentController extends Controller
             'focal_length_mm' => 'required|numeric|gt:0',
             'image_width_px' => 'required|integer|gt:0',
             'image_height_px' => 'required|integer|gt:0',
-            'min_photo_interval_sec' => 'nullable|numeric|gt:0',
-            'is_active' => 'boolean'
+            'min_photo_interval_sec' => 'nullable|numeric|gte:0',
+            'is_active' => 'nullable|boolean'
         ]);
 
         $validated['is_active'] = $request->has('is_active');
