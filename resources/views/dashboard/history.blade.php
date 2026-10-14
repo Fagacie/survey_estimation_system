@@ -355,6 +355,15 @@
                     </select>
                 </div>
             </div>
+            <div class="history-filter-footer">
+                <span id="historyResultsCount" class="history-results-count" aria-live="polite">
+                    {{ $quotations->count() }} records
+                </span>
+                <button type="button" id="clearHistoryFilters" class="history-clear-filters">
+                    <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                    Clear filters
+                </button>
+            </div>
         </div>
 
         <!-- History Data Table Container -->
@@ -426,16 +435,16 @@
                         <!-- Actions -->
                         <td>
                             <div class="action-buttons-group">
-                                <a href="{{ route('quotations.show', $item->quotation_Id) }}" class="action-circle-btn" title="View Details">
+                                <a href="{{ route('quotations.show', $item->quotation_Id) }}" class="action-circle-btn" title="View Details" aria-label="View quotation details">
                                     <i class="bi bi-arrow-right"></i>
                                 </a>
                                 
-                                <a href="{{ route('quotations.invoice', $item->quotation_Id) }}" class="action-circle-btn" title="Generate Invoice">
+                                <a href="{{ route('quotations.invoice', $item->quotation_Id) }}" class="action-circle-btn" title="Generate Invoice" aria-label="Generate invoice">
                                     <i class="bi bi-file-earmark-text"></i>
                                 </a>
 
                                 <button type="button" class="action-circle-btn delete-btn" 
-                                        title="Delete" 
+                                        title="Delete" aria-label="Delete quotation" 
                                         data-id="{{ $item->quotation_Id }}" 
                                         data-delete-url="{{ route('quotations.destroy', $item->quotation_Id) }}">
                                     <i class="bi bi-trash3"></i>
@@ -506,38 +515,54 @@
             const typeFilter = document.getElementById('typeFilter');
             const locationFilter = document.getElementById('locationFilter');   // NEW
             const monthFilter = document.getElementById('monthFilter');
-            const rows = document.querySelectorAll('.quotation-row');
+            const clearFiltersButton = document.getElementById('clearHistoryFilters');
+            const resultsCount = document.getElementById('historyResultsCount');
+            const rows = Array.from(document.querySelectorAll('.quotation-row'));
 
             function filterTable() {
                 const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
                 const selectedType = typeFilter ? typeFilter.value.toLowerCase().trim() : '';
-                const selectedLocation = locationFilter ? locationFilter.value.toLowerCase().trim() : '';   // NEW
+                const selectedLocation = locationFilter ? locationFilter.value.toLowerCase().trim() : '';
                 const selectedMonth = monthFilter ? monthFilter.value.trim() : '';
+                let visibleCount = 0;
 
                 rows.forEach(row => {
                     const rowText = row.innerText.toLowerCase();
                     const rowType = row.getAttribute('data-type') || '';
-                    const rowLocation = row.getAttribute('data-location') || '';   // NEW
+                    const rowLocation = row.getAttribute('data-location') || '';
                     const rowMonth = row.getAttribute('data-month') || '';
 
                     const matchesSearch = query === '' || rowText.includes(query);
                     const matchesType = selectedType === '' || rowType === selectedType;
-                    const matchesLocation = selectedLocation === '' || rowLocation === selectedLocation;   // NEW
+                    const matchesLocation = selectedLocation === '' || rowLocation === selectedLocation;
                     const matchesMonth = selectedMonth === '' || rowMonth === selectedMonth;
+                    const isVisible = matchesSearch && matchesType && matchesLocation && matchesMonth;
 
-                    if (matchesSearch && matchesType && matchesLocation && matchesMonth) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
+                    row.style.display = isVisible ? '' : 'none';
+                    if (isVisible) visibleCount++;
                 });
+
+                if (resultsCount) {
+                    resultsCount.textContent = visibleCount + (visibleCount === 1 ? ' record' : ' records');
+                }
             }
 
+            function clearHistoryFilters() {
+                if (searchInput) searchInput.value = '';
+                if (typeFilter) typeFilter.value = '';
+                if (locationFilter) locationFilter.value = '';
+                if (monthFilter) monthFilter.value = '';
+                filterTable();
+            }
             // Event Listeners for Filters
             if (searchInput) searchInput.addEventListener('keyup', filterTable);
             if (typeFilter) typeFilter.addEventListener('change', filterTable);
             if (locationFilter) locationFilter.addEventListener('change', filterTable);   // NEW
             if (monthFilter) monthFilter.addEventListener('change', filterTable);
+            if (clearFiltersButton) clearFiltersButton.addEventListener('click', clearHistoryFilters);
+
+            // Initialize count and keep it synchronized with the active filters.
+            filterTable();
 
             // Modal logic for Delete button
             const deleteOverlay = document.getElementById('deleteModalOverlay');
