@@ -1216,3 +1216,168 @@ body {
 #drone-ui-container .row{--bs-gutter-x:.65rem}#drone-ui-container [style*="border-bottom: 1px solid var(--sb-border)"]{border-bottom-color:#e7edf3!important}
 @media(max-width:700px){.workspace-sidebar{top:74px;left:8px;bottom:8px;width:min(390px,calc(100vw - 16px))}.metric-strip{padding:9px}.metric-strip .metric-grid{gap:4px}.metric-strip .metric-item{padding:7px 2px}.metric-strip .metric-label{font-size:.54rem}.metric-strip .metric-value{font-size:.78rem}.ws-accordion .accordion-item{margin:6px}.ws-accordion .accordion-body{padding:10px}#drone-ui-container>.accordion-body{padding:10px!important}.workspace-sidebar>.p-3.border-t{padding:8px!important}}
 @media(prefers-reduced-motion:reduce){.workspace-sidebar *,.ws-accordion * ,#drone-ui-container *{transition:none!important;animation:none!important}}
+
+
+/* Survey-planning correction pass: restore map-tool clearance and sharpen hierarchy. */
+.workspace-sidebar {
+    left: 16px;
+    width: 370px;
+    border-radius: 8px;
+    box-shadow: 0 5px 18px rgba(20, 43, 73, .10);
+}
+.workspace-sidebar .metric-strip {
+    padding: 10px 12px;
+}
+.workspace-sidebar .metric-strip .metric-item {
+    border-radius: 4px;
+    box-shadow: none;
+}
+.workspace-sidebar .sidebar-content {
+    scrollbar-width: thin;
+    scrollbar-color: #c3d0dc transparent;
+}
+.ws-accordion .accordion-item {
+    margin: 7px 8px;
+    border-radius: 5px;
+    box-shadow: none;
+}
+.ws-accordion .accordion-button,
+.ws-accordion .accordion-button:not(.collapsed) {
+    min-height: 46px;
+    padding: 9px 11px;
+    font-size: .81rem;
+}
+.ws-accordion .accordion-body {
+    padding: 12px;
+}
+.form-control-panel,
+.ws-accordion .form-select.form-control-panel {
+    min-height: 36px;
+    border-radius: 4px;
+    font-size: .79rem;
+}
+.btn-ws {
+    min-height: 38px;
+    border-radius: 4px;
+    letter-spacing: .005em;
+}
+#btn-generate-main,
+#btn-generate-cross,
+#btn_generate_drone_lines {
+    min-height: 40px;
+}
+#btn-generate-main,
+#btn_generate_drone_lines {
+    background: #175f91;
+    border-color: #175f91;
+    color: #fff;
+}
+#btn-generate-main:hover,
+#btn_generate_drone_lines:hover {
+    background: #10486f;
+    border-color: #10486f;
+}
+#btn-generate-cross {
+    border: 1px solid #cddbe7;
+    background: #f5f8fb;
+    color: #294a67;
+}
+#btn-clear-lines,
+#btn_clear_drone_lines {
+    border-radius: 4px;
+}
+.workspace-sidebar > .p-3.border-t {
+    padding: 9px 10px !important;
+}
+.workspace-sidebar > .p-3.border-t .btn {
+    min-height: 37px;
+    border-radius: 4px;
+    margin-bottom: 6px !important;
+}
+.workspace-sidebar > .p-3.border-t .btn-save-planning-trigger {
+    font-weight: 800;
+    letter-spacing: .01em;
+}
+
+/* The map toolbar must begin beyond the actual sidebar edge. */
+.leaflet-left .leaflet-control {
+    margin-left: 400px;
+}
+.leaflet-top .leaflet-control {
+    margin-top: 82px;
+}
+
+/* Keep drawing controls and map visible on narrow screens by making the
+   planning sidebar a bottom sheet rather than a full-height map cover. */
+@media (max-width: 700px) {
+    .workspace-container {
+        height: calc(100dvh - 64px) !important;
+        min-height: 420px;
+    }
+    .workspace-sidebar {
+        top: auto;
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+        width: auto;
+        height: min(54dvh, 470px);
+        max-height: calc(100% - 118px);
+        border-radius: 7px;
+    }
+    .workspace-sidebar .metric-strip {
+        padding: 7px 9px;
+    }
+    .workspace-sidebar .metric-strip .metric-grid {
+        gap: 4px;
+    }
+    .workspace-sidebar .metric-strip .metric-item {
+        padding: 6px 2px;
+    }
+    .workspace-sidebar .metric-strip .metric-label {
+        font-size: .52rem;
+    }
+    .workspace-sidebar .metric-strip .metric-value {
+        font-size: .75rem;
+    }
+    .workspace-sidebar .sidebar-content {
+        min-height: 0;
+        overscroll-behavior: contain;
+    }
+    .ws-accordion .accordion-item {
+        margin: 5px 6px;
+    }
+    .ws-accordion .accordion-body {
+        padding: 10px;
+    }
+    .workspace-sidebar > .p-3.border-t {
+        padding: 7px 8px !important;
+    }
+    .workspace-sidebar > .p-3.border-t .btn {
+        min-height: 34px;
+        padding: 7px 9px;
+        font-size: .74rem;
+    }
+    .leaflet-left .leaflet-control {
+        margin-left: 10px;
+    }
+    .leaflet-top .leaflet-control {
+        margin-top: 76px;
+    }
+    .map-basemap-control {
+        max-width: calc(100vw - 20px);
+        flex-wrap: wrap;
+    }
+    .map-layer-control {
+        min-width: 145px;
+        padding: 8px 10px;
+    }
+}
+@media (max-width: 380px) {
+    .workspace-sidebar {
+        height: 57dvh;
+        max-height: calc(100% - 108px);
+    }
+    .workspace-sidebar > .p-3.border-t .btn {
+        font-size: .7rem;
+    }
+}
