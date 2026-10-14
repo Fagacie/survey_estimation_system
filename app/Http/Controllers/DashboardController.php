@@ -20,6 +20,28 @@ class DashboardController extends Controller
             'quotations' => Project::has('lineItems')->count(),
         ];
 
+        $statusBreakdown = Project::query()
+            ->selectRaw("COALESCE(NULLIF(status, ''), 'draft') as label, COUNT(*) as total")
+            ->groupBy('status')
+            ->orderByDesc('total')
+            ->get()
+            ->map(fn ($row) => [
+                'label' => \\Illuminate\\Support\\Str::headline($row->label),
+                'key' => strtolower($row->label),
+                'total' => (int) $row->total,
+            ]);
+
+        $projectTypeBreakdown = Project::query()
+            ->selectRaw('project_type as label, COUNT(*) as total')
+            ->groupBy('project_type')
+            ->orderByDesc('total')
+            ->get()
+            ->map(fn ($row) => [
+                'label' => Project::TYPES[$row->label] ?? ($row->label ?: 'Not set'),
+                'key' => $row->label,
+                'total' => (int) $row->total,
+            ]);
+
         $recentProjects = Project::with('client')->latest('updated_at')->limit(5)->get();
 
         $attentionBase = fn () => Project::with('client')->where('status', '!=', 'completed');
@@ -47,6 +69,6 @@ class DashboardController extends Controller
             ],
         ])->filter(fn ($item) => $item['count'] > 0)->values();
 
-        return view('dashboard.index', compact('metrics', 'recentProjects', 'attentionItems'));
+        return view('dashboard.index', compact('metrics', 'recentProjects', 'attentionItems', 'statusBreakdown', 'projectTypeBreakdown'));
     }
 }
