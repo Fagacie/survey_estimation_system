@@ -133,14 +133,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/projects/{project}/report/preview', [\App\Http\Controllers\ReportController::class, 'preview'])->name('projects.report.preview');
     Route::get('/projects/{project}/report/pdf', [\App\Http\Controllers\ReportController::class, 'download'])->name('projects.report.pdf');
 
-    // 1. Home / Dashboard Route
+    // Dashboard and project register are separate destinations.
     Route::get('/home', function () {
-        return redirect()->route('projects.index');
+        return redirect()->route('dashboard');
     })->name('home');
 
-    Route::get('/dashboard', function () {
-        return redirect()->route('projects.index');
-    })->name('dashboard');
+    Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
+        ->name('dashboard');
 
     // 2. Quotation Routes
     Route::get('/quotation', [QuotationController::class, 'index'])->name('quotation.index');
