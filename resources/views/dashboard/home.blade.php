@@ -158,7 +158,7 @@
                 <div class="flex flex-col gap-4 mb-6">
                     <!-- Hydrographic Snapshot -->
                     @if($hasHydrographic)
-                    <div class="bg-blue-50/50 rounded-xl shadow-sm border border-blue-100 p-5 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="quotation-snapshot quotation-snapshot-hydrographic bg-blue-50/50 rounded-xl shadow-sm border border-blue-100 p-5 flex flex-col md:flex-row justify-between items-center gap-4">
                         <div>
                             <div class="text-xs font-bold text-blue-800 uppercase tracking-wider mb-1">Hydrographic Survey Snapshot</div>
                             <div class="text-sm text-blue-600/80">Calculated from the saved survey areas for this project.</div>
@@ -198,7 +198,7 @@
 
                     <!-- Drone Mapping Snapshot -->
                     @if($hasDrone)
-                    <div class="bg-emerald-50/50 rounded-xl shadow-sm border border-emerald-100 p-5 flex flex-col md:flex-row justify-between items-center gap-4">
+                    <div class="quotation-snapshot quotation-snapshot-drone bg-emerald-50/50 rounded-xl shadow-sm border border-emerald-100 p-5 flex flex-col md:flex-row justify-between items-center gap-4">
                         <div>
                             <div class="text-xs font-bold text-emerald-800 uppercase tracking-wider mb-1">Drone Mapping Snapshot</div>
                             <div class="text-sm text-emerald-600/80">Calculated from the saved drone flight parameters.</div>
@@ -435,7 +435,7 @@
             </div>
 
             <!-- STICKY BOTTOM SUMMARY BAR -->
-            <div class="sticky-bottom-summary flex flex-wrap justify-between items-center gap-4">
+            <div class="sticky-bottom-summary quotation-grand-total flex flex-wrap justify-between items-center gap-4">
                 <div class="flex-1 overflow-x-auto pr-4">
                     <span class="text-sm font-bold text-teal-600 uppercase tracking-wider all-modules-list">ALL MODULES</span>
                 </div>
