@@ -1,9 +1,9 @@
 <?php
 
-namespace App\\Http\\Controllers;
+namespace App\Http\Controllers;
 
-use App\\Models\\Project;
-use Illuminate\\View\\View;
+use App\Models\Project;
+use Illuminate\View\View;
 
 class DashboardController extends Controller
 {
