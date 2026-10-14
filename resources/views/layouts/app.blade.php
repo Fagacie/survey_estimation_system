@@ -38,6 +38,7 @@
         <link rel="stylesheet" href="{{ asset('css/ises-redesign.css') }}?v={{ filemtime(public_path('css/ises-redesign.css')) }}">
         <link rel="stylesheet" href="{{ asset('css/ises-page-overrides.css') }}?v={{ filemtime(public_path('css/ises-page-overrides.css')) }}">
         @stack('styles')
+        <link rel="stylesheet" href="{{ asset('css/ises-final-overrides.css') }}?v={{ filemtime(public_path('css/ises-final-overrides.css')) }}">
 
         <style>
             @media print {
@@ -91,9 +92,12 @@
                     
                     <!-- Sidebar Header / Logo -->
                     <div class="ises-sidebar-brand flex items-center h-16 flex-shrink-0" :class="sidebarOpen ? 'px-4 justify-between' : 'justify-center'">
-                        <a href="{{ route('dashboard') }}" class="ises-brand-name overflow-hidden whitespace-nowrap" title="Eco HydroTech dashboard">
-                            <span x-show="sidebarOpen" class="ises-brand-wordmark">Eco <strong>HydroTech</strong></span>
-                            <span x-show="!sidebarOpen" class="ises-brand-compact" aria-label="Eco HydroTech">EH</span>
+                        <a href="{{ route('dashboard') }}" class="ises-brand-name overflow-hidden whitespace-nowrap" title="Eco HydroTech Solutions dashboard">
+                            <span x-show="sidebarOpen" class="ises-brand-full">
+                                <span class="ises-brand-symbol" aria-hidden="true"><i class="fa-solid fa-water"></i></span>
+                                <span class="ises-brand-type"><span><span>Eco</span> <strong>HydroTech</strong></span><small>Solutions</small></span>
+                            </span>
+                            <span x-show="!sidebarOpen" class="ises-brand-compact" aria-label="Eco HydroTech Solutions">EH</span>
                         </a>
                         
                         <!-- Toggle Button Integrated into Sidebar Header -->
@@ -225,7 +229,5 @@
         </style>
         
         @stack('scripts')
-        {{-- Final cascade intentionally follows view-level CSS so the redesign is visible across legacy screens. --}}
-        <link rel="stylesheet" href="{{ asset('css/ises-final-overrides.css') }}?v={{ filemtime(public_path('css/ises-final-overrides.css')) }}">
     </body>
 </html>
