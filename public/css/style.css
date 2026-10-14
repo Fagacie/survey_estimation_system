@@ -1381,3 +1381,120 @@ body {
         font-size: .7rem;
     }
 }
+
+
+/* Map Planning top navigation: clear hierarchy and a dependable project return action */
+.map-workspace-topbar {
+    min-height: 64px;
+    padding-inline: 24px !important;
+    gap: 18px;
+    background: #fff;
+    border-bottom: 1px solid #dbe3ec;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.025);
+}
+.map-topbar-leading {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+.map-back-project {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    min-height: 36px;
+    padding: 0 13px;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    background: #fff;
+    color: #334155;
+    font-size: 13px;
+    font-weight: 650;
+    text-decoration: none;
+    white-space: nowrap;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.map-back-project:hover {
+    color: #0f3b66;
+    background: #f1f7fc;
+    border-color: #94b8d8;
+}
+.map-back-project:focus-visible {
+    outline: 3px solid rgba(37, 99, 235, .25);
+    outline-offset: 2px;
+}
+.map-topbar-divider {
+    width: 1px;
+    height: 30px;
+    flex: 0 0 1px;
+    background: #dbe3ec;
+}
+.map-topbar-context {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+    min-width: 0;
+}
+.map-topbar-eyebrow {
+    color: #64748b;
+    font-size: 9px;
+    font-weight: 750;
+    letter-spacing: .12em;
+    line-height: 1.2;
+}
+.map-topbar-section {
+    color: #0f2742;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.25;
+    white-space: nowrap;
+}
+.map-topbar-page-title {
+    overflow: hidden;
+    color: #475569;
+    font-size: 13px;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    padding-left: 14px;
+    border-left: 1px solid #e2e8f0;
+    min-width: 0;
+}
+.map-topbar-trailing {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: 0 0 auto;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+.map-topbar-live-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #16a34a;
+    box-shadow: 0 0 0 3px #dcfce7;
+}
+@media (max-width: 767px) {
+    .map-workspace-topbar {
+        padding-inline: 12px !important;
+        gap: 10px;
+    }
+    .map-topbar-leading { gap: 10px !important; }
+    .map-back-project {
+        min-height: 34px;
+        padding-inline: 9px;
+        gap: 6px;
+        font-size: 12px;
+    }
+    .map-topbar-divider { display: none; }
+    .map-topbar-context { display: none; }
+    .map-topbar-page-title {
+        padding-left: 10px;
+        font-size: 12px;
+    }
+    .map-topbar-trailing { font-size: 0; gap: 0; }
+    .map-topbar-live-dot { width: 7px; height: 7px; }
+}
