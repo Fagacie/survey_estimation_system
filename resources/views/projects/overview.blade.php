@@ -148,20 +148,20 @@
                                 </div>
                                 <div class="text-[11px] text-slate-500 font-medium">Added {{ $location->created_at->format('M d, Y') }}</div>
                             </div>
-                            <div class="flex flex-col sm:flex-row items-center gap-3">
-                                <a href="{{ route('projects.report.preview', ['project' => $project->project_Id, 'location_id' => $location->id]) }}" class="text-sm font-semibold text-teal-600 hover:text-teal-800 transition-colors flex items-center gap-1">
-                                    Report <i class="fa-solid fa-file-pdf text-[10px] ml-0.5"></i>
+                            <div class="project-overview-row-actions">
+                                <a href="{{ route('projects.report.preview', ['project' => $project->project_Id, 'location_id' => $location->id]) }}" class="project-overview-action project-overview-action-secondary">
+                                    <i class="fa-regular fa-file-pdf" aria-hidden="true"></i><span>Report</span>
                                 </a>
-                                <a href="{{ route('projects.surveys.map', [$project->project_Id, $location->id]) }}" class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
-                                    Open Map <i class="fa-solid fa-arrow-right text-[10px] ml-0.5"></i>
+                                <a href="{{ route('projects.surveys.map', [$project->project_Id, $location->id]) }}" class="project-overview-action project-overview-action-secondary">
+                                    <i class="fa-solid fa-map" aria-hidden="true"></i><span>Open map</span>
                                 </a>
-                                <a href="{{ route('quotation.index', ['project_id' => $project->project_Id, 'module' => $location->survey_type, 'location_id' => $location->id]) }}" class="inline-flex justify-center items-center px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold transition-colors shadow-sm">
-                                    Proceed to Quotation
+                                <a href="{{ route('quotation.index', ['project_id' => $project->project_Id, 'module' => $location->survey_type, 'location_id' => $location->id]) }}" class="project-overview-action project-overview-action-primary">
+                                    <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i><span>Quotation</span>
                                 </a>
                                 <form action="{{ route('projects.surveys.destroy', [$project->project_Id, $location->id]) }}" method="POST" class="m-0" onsubmit="return confirm('Delete this survey area?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-sm font-semibold text-red-500 hover:text-red-700 transition-colors ml-2"><i class="fa-solid fa-trash"></i></button>
+                                    <button type="submit" class="project-overview-action-delete" aria-label="Delete survey area {{ $location->name }}" title="Delete survey area"><i class="fa-regular fa-trash-can" aria-hidden="true"></i></button>
                                 </form>
                             </div>
                         </li>
@@ -183,17 +183,17 @@
                                     RM {{ number_format($summary->grand_total, 2) }}
                                 </div>
                             </div>
-                            <div class="flex flex-col sm:flex-row items-center gap-3">
-                                <a href="{{ route('projects.modeling.builder', ['project_id' => $project->project_Id]) }}" class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
-                                    Edit Modules <i class="fa-solid fa-arrow-right text-[10px] ml-0.5"></i>
+                            <div class="project-overview-row-actions">
+                                <a href="{{ route('projects.modeling.builder', ['project_id' => $project->project_Id]) }}" class="project-overview-action project-overview-action-secondary">
+                                    <i class="fa-solid fa-sliders" aria-hidden="true"></i><span>Edit modules</span>
                                 </a>
-                                <a href="{{ route('quotation.index', ['project_id' => $project->project_Id, 'module' => 'modelling']) }}" class="inline-flex justify-center items-center px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold transition-colors shadow-sm">
-                                    Proceed to Quotation
+                                <a href="{{ route('quotation.index', ['project_id' => $project->project_Id, 'module' => 'modelling']) }}" class="project-overview-action project-overview-action-primary">
+                                    <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i><span>Quotation</span>
                                 </a>
                                 <form action="{{ route('projects.modeling.destroy', $project->project_Id) }}" method="POST" class="m-0" onsubmit="return confirm('Remove modelling data for this project?');">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="text-sm font-semibold text-red-500 hover:text-red-700 transition-colors ml-2"><i class="fa-solid fa-trash"></i></button>
+                                    <button type="submit" class="project-overview-action-delete" aria-label="Delete modelling package" title="Delete modelling package"><i class="fa-regular fa-trash-can" aria-hidden="true"></i></button>
                                 </form>
                             </div>
                         </li>
