@@ -52,6 +52,8 @@
             </div>
         </header>
 
+        @php $summary = $project->modellingSummary; @endphp
+
         <!-- ADD WORKFLOW: kept ahead of the workflow register for a clear next action -->
         <section class="project-overview-section project-overview-add mb-8">
             <div class="project-overview-section-heading flex items-center justify-between mb-4">
@@ -117,7 +119,7 @@
             </div>
             
             <div class="project-overview-workflow-table">
-                <div class="project-overview-workflow-table-head" aria-hidden="true"><span>Workflow</span><span>Status / details</span><span>Actions</span></div>
+                <div class="project-overview-workflow-table-head" aria-hidden="true"><span>Workflow</span><span>Actions</span></div>
                 <ul class="divide-y divide-slate-100">
                     
                     @php 
