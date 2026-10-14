@@ -128,3 +128,28 @@
     .ises-dashboard-metric-link { transition: none; }
     .ises-dashboard-metric-link:hover { transform: none; }
 }
+
+
+/* Interactive portfolio charts */
+.ises-dashboard-charts { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:1rem; margin-bottom:1.25rem; }
+.ises-dashboard-chart-card { min-width:0; margin:0; }
+.ises-dashboard-chart-card .ises-dashboard-section-heading { min-height:92px; }
+.ises-dashboard-chart-link,.ises-dashboard-chart-note { color:#315d88; font-size:.72rem; font-weight:750; text-decoration:none; white-space:nowrap; }
+.ises-dashboard-chart-link:hover { color:#173f67; }
+.ises-dashboard-chart-body { display:grid; grid-template-columns:minmax(140px,.85fr) minmax(140px,1fr); align-items:center; gap:1rem; padding:1.1rem 1.25rem 1.25rem; }
+.ises-dashboard-chart-canvas { position:relative; height:210px; min-width:0; }
+.ises-dashboard-type-chart-body { grid-template-columns:minmax(0,1fr); }
+.ises-dashboard-type-chart-canvas { position:relative; height:220px; min-width:0; }
+.ises-dashboard-chart-legend { display:flex; flex-direction:column; gap:.2rem; min-width:0; margin:0; padding:0; list-style:none; }
+.ises-dashboard-chart-legend li a { display:flex; align-items:center; justify-content:space-between; gap:.75rem; padding:.45rem .5rem; border-radius:5px; color:#52677d; font-size:.73rem; text-decoration:none; }
+.ises-dashboard-chart-legend li a:hover { color:#1e5689; background:#f3f7fb; }
+.ises-dashboard-chart-legend li strong { color:#14243a; font-size:.75rem; }
+.ises-dashboard-type-legend { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.15rem .6rem; }
+.ises-dashboard-chart-empty { padding:1.5rem; color:var(--dash-muted); font-size:.8rem; }
+@media (max-width:1050px) { .ises-dashboard-charts { grid-template-columns:1fr; } }
+@media (max-width:560px) {
+ .ises-dashboard-chart-body { grid-template-columns:minmax(0,1fr); }
+ .ises-dashboard-chart-canvas { max-width:260px; width:100%; margin:0 auto; }
+ .ises-dashboard-type-legend { grid-template-columns:1fr; }
+ .ises-dashboard-chart-card .ises-dashboard-section-heading { min-height:0; }
+}
