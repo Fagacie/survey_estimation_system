@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Project;
 use Illuminate\View\View;
+use Illuminate\Support\Str;
 
 class DashboardController extends Controller
 {
@@ -26,7 +27,7 @@ class DashboardController extends Controller
             ->orderByDesc('total')
             ->get()
             ->map(fn ($row) => [
-                'label' => \\Illuminate\\Support\\Str::headline($row->label),
+                'label' => Str::headline($row->label),
                 'key' => strtolower($row->label),
                 'total' => (int) $row->total,
             ]);
