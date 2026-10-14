@@ -28,7 +28,7 @@
 
     </style>
 
-    <div class="max-w-7xl mx-auto">
+    <div class="quotation-workspace max-w-7xl mx-auto">
 @php
     // Back to the SAME project's overview page. If no project is loaded, go to the projects list.
     $backUrl = $prefillProject
