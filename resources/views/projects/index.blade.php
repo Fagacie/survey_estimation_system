@@ -26,7 +26,7 @@
 
 
 
-    @if($metrics['total'] > 0)
+    @if($totalProjects > 0)
         <section class="projects-dashboard-register" aria-labelledby="register-title">
             <div class="projects-dashboard-register-header">
                 <div><p class="projects-dashboard-eyebrow">Work queue</p><h2 id="register-title">Project register</h2><p>Search and filter projects before opening a workspace.</p></div>
