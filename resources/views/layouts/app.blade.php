@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'ISES') }} — Eco Hydrotech</title>
+        <title>{{ config('app.name', 'Eco Hydrotech Solutions') }}</title>
 
         <!-- Google Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -198,7 +198,7 @@
                             @endif
                             <span class="map-topbar-divider" aria-hidden="true"></span>
                             <div class="map-topbar-context">
-                                <span class="map-topbar-eyebrow">ISES WORKSPACE</span>
+                                <span class="map-topbar-eyebrow">ECO HYDROTECH SOLUTIONS</span>
                                 <span class="map-topbar-section">Survey Planning</span>
                             </div>
                         @endunless
