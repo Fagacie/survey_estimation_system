@@ -38,7 +38,7 @@
                     <label class="projects-dashboard-select"><span>Status</span><select name="status" aria-label="Filter by status" onchange="this.form.submit()">
                             <option value="">All Statuses</option>
                             <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
-                            <option value="planned" {{ request('status') === 'planned' ? 'selected' : '' }}>In Progress</option>
+                            <option value="planned" {{ request('status') === 'planned' ? 'selected' : '' }}>Planned</option>
                             <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
                         </select></label>
 
