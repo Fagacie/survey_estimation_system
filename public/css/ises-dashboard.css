@@ -91,3 +91,40 @@
  .ises-dashboard-table { min-width:720px; }
 }
 @media (max-width:420px) { .ises-dashboard-metrics { grid-template-columns:1fr 1fr; } .ises-dashboard-date { font-size:.68rem; } }
+
+
+/* Interactive dashboard cards and primary quick-access placement. */
+.ises-dashboard-quick-links { margin: 0 0 1rem; }
+.ises-dashboard-metric-link {
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color .16s ease, background-color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+.ises-dashboard-metric-link:hover {
+    color: inherit;
+    border-color: #a9c5df;
+    background: #f8fbff;
+    box-shadow: 0 5px 16px rgba(20, 43, 73, .08);
+    transform: translateY(-2px);
+}
+.ises-dashboard-metric-link:focus-visible,
+.ises-dashboard-quick-links a:focus-visible,
+.ises-dashboard-attention-card > a:focus-visible,
+.ises-dashboard-row-action a:focus-visible,
+.ises-dashboard-project-name:focus-visible {
+    outline: 3px solid rgba(36, 99, 166, .35);
+    outline-offset: 3px;
+}
+.ises-dashboard-metric-link::after {
+    content: "View projects";
+    margin-top: .55rem;
+    color: var(--dash-blue);
+    font-size: .68rem;
+    font-weight: 700;
+    opacity: .85;
+}
+@media (prefers-reduced-motion: reduce) {
+    .ises-dashboard-metric-link { transition: none; }
+    .ises-dashboard-metric-link:hover { transform: none; }
+}
