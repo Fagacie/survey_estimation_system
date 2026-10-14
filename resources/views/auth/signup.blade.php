@@ -1,156 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Create Account — ISES</title>
-
-        <link rel="stylesheet" href="{{ asset('css/signup.css') }}">
-
-        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-
-        <!--font-->
-        <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-</head>
-<body>
-    <div class="background">
-        <div class="signup-card">
-
-        <!--header-->
-        <div class="card-header">
-            <div class="header-title">
-            <i class= "fa-solid fa-user"></i>
-            <span>Create Account</span>
-        </div>
-
-            <p class="subtitle">
-            Enter your information to create a new account.
-        </p>
-    </div>
-
-    <!--body-->
-    <div class="card-body">
-
-    <form method="POST" action="{{ route('signup') }}">
-        @csrf
-
-        @if ($errors->any())
-        <div class="error-box">
-            <ul>
-                @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-            @endif
-
-            <!--name-->
-            <label>Name</label>
-            <div class="input-box">
-                <i class="fa-regular fa-user"></i>
-
-                <input
-                    type="text"
-                    name="name"
-                    value="{{ old('name') }}"
-                    placeholder="Enter your name"
-                    required>
-            </div>
-
-
-            <!--email-->
-            <label>Email</label>
-            
-            <div class="input-box">
-                <i class="fa-regular fa-envelope"></i>
-
-                <input
-                    type="email"
-                    name="email"
-                    value="{{ old('email') }}"
-                    placeholder="example@gmail.com"
-                    required>
-            </div>
-
-            <!--password-->
-            <label>Password</label>
-
-            <div class="input-box">
-                <i class="fa-solid fa-lock"></i>
-
-                <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Enter your password"
-                    minlength="8"
-                    pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[-_@$!%*?&#]).{8,}$"
-                    title="Password must contain at least 8 characters, one uppercase letter, one lowercase letter, one number, and one special character (-_@$!%*?&#)."
-                    required>
-
-                <i class="fa-regular fa-eye" id="togglePassword"></i>
-
-            </div>
-
-            <p class="password-hint">
-                Minimum 8 characters with uppercase, lowercase, number and special character (-_@$!%*?&#).
-            </p>
-
-            <div class="strength-container">
-
-                <div class="strength-bar">
-                    <div id="strengthFill"></div>
-                </div>
-
-                <span id="strengthText">
-                    Weak
-                </span>
-
-            </div>
-
-            <!--confirm password-->
-            <label>Confirm Password</label>
-
-            <div class="input-box">
-                <i class="fa-solid fa-lock"></i>
-                
-                <input
-                    type="password"
-                    id="confirmPassword"
-                    name="password_confirmation"
-                    placeholder="Confirm your password"
-                    required>
-
-                <i class="fa-regular fa-eye" id="toggleConfirmPassword"></i>
-
-            </div>
-
-            <p id="passwordMatch" class="password-match"></p>     
-
-            <button type="submit" class="signup-btn">
-                SIGN UP
-            </button>
-
-                <hr>
-
-                <div class="new-user">
-                    Already have an account?
-                </div>
-
-                <a href="/signin" class="signin-btn">
-                    SIGN IN
-                    <i class="fa-solid fa-arrow-right"></i>
-                </a>
-
-            </form>
-        </div>
-    </div>
-</div>
-
- <script src="{{ asset('js/signup.js') }}"></script>
-
-</body>
-</html>
-
-
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="csrf-token" content="{{ csrf_token() }}"><title>Create account — ISES</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"><link rel="stylesheet" href="{{ asset('css/ises-auth.css') }}?v={{ filemtime(public_path('css/ises-auth.css')) }}"></head>
+<body><div class="auth-shell"><aside class="auth-aside"><a class="auth-brand" href="{{ url('/') }}"><span class="auth-brand-mark"><i class="fa-solid fa-water"></i></span><span><strong>ISES</strong><small>Survey Estimation System</small></span></a>
+<div class="auth-aside-copy"><span class="auth-overline">INOS · ECO HYDROTECH</span><h1>A clearer view<br>of every survey.</h1><p>Create your account to access the survey planning and estimation workspace.</p>
+<div class="auth-feature-list"><div><i class="fa-solid fa-map-location-dot"></i><span>Keep project work organised</span></div><div><i class="fa-solid fa-chart-line"></i><span>Estimate time and cost consistently</span></div><div><i class="fa-solid fa-file-circle-check"></i><span>Maintain a clear project record</span></div></div></div><div class="auth-aside-foot">INSTITUTE OF OCEANOGRAPHY AND ENVIRONMENT</div></aside>
+<main class="auth-main"><section class="auth-card auth-card-signup" aria-labelledby="auth-title"><div class="auth-mobile-brand"><span class="auth-brand-mark"><i class="fa-solid fa-water"></i></span><strong>ISES</strong></div>
+<div class="auth-card-heading"><span class="auth-step">GET STARTED</span><h2 id="auth-title">Create your account</h2><p>Enter your details to set up your ISES access.</p></div>
+<form method="POST" action="{{ route('signup') }}">@csrf
+@if($errors->any())<div class="auth-alert auth-alert-error" role="alert"><i class="fa-solid fa-circle-exclamation"></i><ul>@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+<label for="name">Full name</label><div class="auth-input-wrap"><i class="fa-regular fa-user"></i><input id="name" type="text" name="name" value="{{ old('name') }}" placeholder="Enter your full name" autocomplete="name" required></div>
+<label for="email">Email address</label><div class="auth-input-wrap"><i class="fa-regular fa-envelope"></i><input id="email" type="email" name="email" value="{{ old('email') }}" placeholder="name@organisation.com" autocomplete="email" required></div>
+<label for="password">Password</label><div class="auth-input-wrap"><i class="fa-solid fa-lock"></i><input id="password" type="password" name="password" placeholder="Create a strong password" minlength="8" pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[-_@$!%*?&#]).{8,}$" title="Use at least 8 characters, including uppercase, lowercase, number and special character." autocomplete="new-password" required><button class="auth-password-toggle" type="button" id="togglePassword" aria-label="Show password"><i class="fa-regular fa-eye"></i></button></div>
+<p class="auth-help">At least 8 characters, with uppercase, lowercase, number and special character.</p><div class="strength-container"><div class="strength-bar"><div id="strengthFill"></div></div><span id="strengthText">Password strength</span></div>
+<label for="confirmPassword">Confirm password</label><div class="auth-input-wrap"><i class="fa-solid fa-lock"></i><input id="confirmPassword" type="password" name="password_confirmation" placeholder="Enter the password again" autocomplete="new-password" required><button class="auth-password-toggle" type="button" id="toggleConfirmPassword" aria-label="Show confirm password"><i class="fa-regular fa-eye"></i></button></div><p id="passwordMatch" class="password-match" aria-live="polite"></p>
+<button type="submit" class="auth-submit">Create account <i class="fa-solid fa-arrow-right"></i></button><div class="auth-switch"><span>Already registered?</span><a href="{{ route('signin') }}">Sign in</a></div></form></section></main></div><script src="{{ asset('js/signup.js') }}"></script></body></html>
