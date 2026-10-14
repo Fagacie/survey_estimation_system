@@ -46,7 +46,7 @@
         }
     </style>
 
-    <div class="font-sans text-slate-800 antialiased" x-data="{ showModal: false, editing: null }" x-cloak>
+    <div class="ises-modelling-page font-sans text-slate-800 antialiased" x-data="{ showModal: false, editing: null }" x-cloak>
 
         <!-- Header Section -->
         <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-8 border-b border-slate-200/60">
