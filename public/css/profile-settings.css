@@ -234,8 +234,7 @@
     font-size: 12px;
     line-height: 1.6;
 }
-.profile-settings-page button[type="submit"],
-.profile-settings-page button.inline-flex.items-center {
+.profile-settings-page button[type="submit"] {
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -251,8 +250,7 @@
     cursor: pointer;
     transition: background .15s, border-color .15s;
 }
-.profile-settings-page button[type="submit"]:hover,
-.profile-settings-page button.inline-flex.items-center:hover {
+.profile-settings-page button[type="submit"]:hover {
     border-color: #10496e;
     background: #10496e;
 }
@@ -302,8 +300,7 @@
 }
 .profile-danger-card .space-y-6 { margin-top: 16px; }
 .profile-danger-card > section > header { display: none; }
-.profile-danger-card button,
-.profile-danger-card button[type="submit"] {
+.profile-danger-card > section.space-y-6 > button {
     min-height: 37px;
     padding: 0 12px;
     border: 1px solid #e2bebe;
@@ -314,9 +311,18 @@
     font-weight: 750;
     box-shadow: none;
 }
-.profile-danger-card button:hover {
+.profile-danger-card > section.space-y-6 > button:hover {
     border-color: #d99e9e;
     background: #ffeded;
+}
+.profile-danger-card .fixed.inset-0 form button[type="submit"] {
+    border-color: #b42318;
+    background: #b42318;
+    color: #fff;
+}
+.profile-danger-card .fixed.inset-0 form button[type="submit"]:hover {
+    border-color: #8f1d14;
+    background: #8f1d14;
 }
 .profile-danger-card .fixed.inset-0 button,
 .profile-danger-card [role="dialog"] button {
