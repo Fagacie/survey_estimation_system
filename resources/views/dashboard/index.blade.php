@@ -18,32 +18,38 @@
             <div class="ises-dashboard-feedback" role="status"><i class="fa-solid fa-circle-check"></i>{{ session('success') }}</div>
         @endif
 
+        <section class="ises-dashboard-quick-links" aria-label="Other workspaces">
+            <a href="{{ route('quotations.history') }}"><span><i class="fa-solid fa-file-invoice-dollar"></i></span><div><strong>Quotation history</strong><small>Review saved estimates</small></div><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            <a href="{{ route('admin.equipment.index') }}"><span><i class="fa-solid fa-plane-up"></i></span><div><strong>Drone equipment</strong><small>Manage drones and cameras</small></div><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+            <a href="{{ route('projects.modeling.modules.index') }}"><span><i class="fa-solid fa-database"></i></span><div><strong>Modelling catalogue</strong><small>Maintain services and rates</small></div><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
+        </section>
+
         <section class="ises-dashboard-metrics" aria-label="Portfolio summary">
-            <article class="ises-dashboard-metric ises-dashboard-metric-primary">
+            <a class="ises-dashboard-metric ises-dashboard-metric-primary ises-dashboard-metric-link" href="{{ route('projects.index') }}" aria-label="View all projects">
                 <span class="ises-dashboard-metric-label">Total projects</span>
                 <strong>{{ $metrics['total'] }}</strong>
                 <span class="ises-dashboard-metric-note">Across your workspace</span>
-            </article>
-            <article class="ises-dashboard-metric">
+            </a>
+            <a class="ises-dashboard-metric ises-dashboard-metric-link" href="{{ route('projects.index', ['status' => 'draft']) }}" aria-label="View draft projects">
                 <span class="ises-dashboard-metric-label">Draft</span>
                 <strong>{{ $metrics['draft'] }}</strong>
                 <span class="ises-dashboard-metric-note">Still being prepared</span>
-            </article>
-            <article class="ises-dashboard-metric">
+            </a>
+            <a class="ises-dashboard-metric ises-dashboard-metric-link" href="{{ route('projects.index', ['status' => 'planned']) }}" aria-label="View planned projects">
                 <span class="ises-dashboard-metric-label">Planned</span>
                 <strong>{{ $metrics['planned'] }}</strong>
                 <span class="ises-dashboard-metric-note">Ready for next steps</span>
-            </article>
-            <article class="ises-dashboard-metric">
+            </a>
+            <a class="ises-dashboard-metric ises-dashboard-metric-link" href="{{ route('projects.index', ['survey_status' => 'Mapped']) }}" aria-label="View projects with mapped areas">
                 <span class="ises-dashboard-metric-label">Mapped areas</span>
                 <strong>{{ $metrics['mapped'] }}</strong>
                 <span class="ises-dashboard-metric-note">Projects with mapped surveys</span>
-            </article>
-            <article class="ises-dashboard-metric">
+            </a>
+            <a class="ises-dashboard-metric ises-dashboard-metric-link" href="{{ route('projects.index', ['has_quotation' => '1']) }}" aria-label="View projects with quotations">
                 <span class="ises-dashboard-metric-label">Quotations</span>
                 <strong>{{ $metrics['quotations'] }}</strong>
                 <span class="ises-dashboard-metric-note">Projects with cost items</span>
-            </article>
+            </a>
         </section>
 
         <section class="ises-dashboard-section ises-dashboard-attention">
@@ -119,10 +125,6 @@
             @endif
         </section>
 
-        <section class="ises-dashboard-quick-links" aria-label="Other workspaces">
-            <a href="{{ route('quotations.history') }}"><span><i class="fa-solid fa-file-invoice-dollar"></i></span><div><strong>Quotation history</strong><small>Review saved estimates</small></div><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-            <a href="{{ route('admin.equipment.index') }}"><span><i class="fa-solid fa-plane-up"></i></span><div><strong>Drone equipment</strong><small>Manage drones and cameras</small></div><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-            <a href="{{ route('projects.modeling.modules.index') }}"><span><i class="fa-solid fa-database"></i></span><div><strong>Modelling catalogue</strong><small>Maintain services and rates</small></div><i class="fa-solid fa-arrow-up-right-from-square"></i></a>
-        </section>
+
     </div>
 </x-app-layout>
