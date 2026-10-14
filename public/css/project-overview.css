@@ -171,3 +171,36 @@
  .project-overview-workflow-table-head { display:none; }
  .project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li { grid-template-columns:minmax(0,1fr); }
 }
+
+
+/* Final pass: remove accidental underlines and make workflow actions deliberate controls. */
+.project-overview-page a,
+.project-overview-page a:hover,
+.project-overview-page a:focus,
+.project-overview-page a:visited { text-decoration: none !important; }
+.project-overview-page .project-overview-section-heading a { text-decoration: none !important; }
+.project-overview-page .project-overview-row-actions { display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:.5rem;min-width:0; }
+.project-overview-page .project-overview-row-actions .project-overview-action { display:inline-flex;align-items:center;justify-content:center;gap:.45rem;min-height:35px;padding:.5rem .7rem;border:1px solid #d7e1eb;border-radius:5px;background:#fff;color:#3e5872 !important;font-size:.74rem;font-weight:700;line-height:1.1;white-space:nowrap;text-decoration:none !important;transition:background .15s,border-color .15s,color .15s; }
+.project-overview-page .project-overview-row-actions .project-overview-action i { font-size:.78rem;color:#66829b; }
+.project-overview-page .project-overview-row-actions .project-overview-action:hover { border-color:#a9c4da;background:#f5f9fc;color:#124f7a !important; }
+.project-overview-page .project-overview-row-actions .project-overview-action:hover i { color:#124f7a; }
+.project-overview-page .project-overview-row-actions .project-overview-action-primary { border-color:#175f91;background:#175f91;color:#fff !important; }
+.project-overview-page .project-overview-row-actions .project-overview-action-primary i { color:#fff; }
+.project-overview-page .project-overview-row-actions .project-overview-action-primary:hover { border-color:#10486f;background:#10486f;color:#fff !important; }
+.project-overview-page .project-overview-row-actions .project-overview-action-delete { display:inline-grid;place-items:center;width:35px;height:35px;padding:0;border:1px solid #e7d3d1;border-radius:5px;background:#fff;color:#a43b37;cursor:pointer; }
+.project-overview-page .project-overview-row-actions .project-overview-action-delete:hover { border-color:#d8aaa6;background:#fff5f4;color:#8f2925; }
+.project-overview-page .project-overview-row-actions .project-overview-action-delete:focus-visible { outline:3px solid rgba(164,59,55,.2);outline-offset:2px; }
+.project-overview-page .project-overview-workflow-table-head { grid-template-columns:minmax(0,1fr) auto; }
+.project-overview-page .project-overview-workflow-table-head span:last-child { text-align:right;padding-right:2.9rem; }
+.project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li { grid-template-columns:minmax(250px,.8fr) minmax(0,1.2fr); }
+@media(max-width:1100px) {
+ .project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li { grid-template-columns:minmax(0,1fr); }
+ .project-overview-page .project-overview-row-actions { justify-content:flex-start; }
+ .project-overview-page .project-overview-workflow-table-head { display:none; }
+}
+@media(max-width:520px) {
+ .project-overview-page .project-overview-row-actions { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%; }
+ .project-overview-page .project-overview-row-actions .project-overview-action { width:100%; }
+ .project-overview-page .project-overview-row-actions .project-overview-action-primary { grid-column:1 / span 2; }
+ .project-overview-page .project-overview-row-actions .project-overview-action-delete { grid-column:1 / span 2;width:100%; }
+}
