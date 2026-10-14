@@ -95,11 +95,32 @@ class ProjectController extends Controller
             'missing_cost' => $missingCostCount,
         ];
 
+        // Keep attention checks tied to real projects so each item opens the relevant workspace.
+        $attentionBase = fn () => Project::with('client')->where('status', '!=', 'completed');
+        $attentionItems = collect([
+            [
+                'label' => 'Missing boundaries',
+                'icon' => 'fa-solid fa-draw-polygon',
+                'projects' => $attentionBase()->doesntHave('boundaries')->latest()->get(),
+            ],
+            [
+                'label' => 'Pending survey lines',
+                'icon' => 'fa-solid fa-route',
+                'projects' => $attentionBase()->has('boundaries')->doesntHave('surveyLines')->latest()->get(),
+            ],
+            [
+                'label' => 'Awaiting cost estimation',
+                'icon' => 'fa-solid fa-calculator',
+                'projects' => $attentionBase()->doesntHave('lineItems')->latest()->get(),
+            ],
+        ])->filter(fn ($item) => $item['projects']->isNotEmpty())->values();
+
         return view('projects.index', [
             'projects' => $projects,
             'metrics' => $metrics,
             'overview' => $overview,
             'attention' => $attention,
+            'attentionItems' => $attentionItems,
             'projectTypes' => \App\Models\Project::TYPES,
             'locations' => \App\Models\Project::LOCATIONS,
         ]);
