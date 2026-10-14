@@ -170,39 +170,42 @@
             <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative bg-white print:overflow-visible">
                 
                 <!-- TOP UTILITY HEADER -->
-                <!-- Removed branding, removed hamburger (handled in sidebar), clean white BG, 1px bottom border -->
-                <header class="ises-topbar h-16 flex items-center justify-between px-8 z-10 flex-shrink-0 print:hidden">
-                    <div class="flex items-center gap-3">
+                <header class="ises-topbar map-workspace-topbar h-16 flex items-center justify-between px-8 z-10 flex-shrink-0 print:hidden">
+                    <div class="map-topbar-leading flex items-center gap-4 min-w-0">
                         @unless($hideSidebar ?? false)
-                            <!-- Hamburger only visible on mobile -->
-                            <button @click="sidebarOpen = true" class="text-slate-500 hover:text-slate-800 focus:outline-none p-1.5 rounded hover:bg-slate-100 transition-colors lg:hidden mr-2">
+                            <button @click="sidebarOpen = true" aria-label="Open navigation" class="text-slate-500 hover:text-slate-800 focus:outline-none p-1.5 rounded hover:bg-slate-100 transition-colors lg:hidden mr-2">
                                 <i class="fa-solid fa-bars"></i>
                             </button>
                         @else
-                            <!-- If sidebar is completely hidden (e.g. Map View) -->
                             @if(request()->route('project'))
                                 @php
                                     $project = request()->route('project');
                                     $projectId = is_object($project) ? $project->project_Id : $project;
                                 @endphp
-                                <a href="{{ route('projects.show', $projectId) }}" class="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors font-medium text-sm">
-                                    <i class="fa-solid fa-arrow-left text-xs"></i> Back to Project
+                                <a href="{{ route('projects.show', $projectId) }}" class="map-back-project">
+                                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                                    <span>Back to Project</span>
                                 </a>
                             @else
-                                <a href="{{ route('dashboard') }}" class="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors font-medium text-sm">
-                                    <i class="fa-solid fa-arrow-left text-xs"></i> Dashboard
+                                <a href="{{ route('dashboard') }}" class="map-back-project">
+                                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                                    <span>Dashboard</span>
                                 </a>
                             @endif
-                            <div class="h-4 w-px bg-slate-300 mx-3"></div>
-                            <span class="text-sm font-medium text-slate-800 tracking-wide">Map Engine</span>
-                        @endunless
-                        
-                        <!-- Page Title / Breadcrumb (Dynamic) -->
-                        @if(isset($header))
-                            <div class="text-sm font-medium text-slate-600">
-                                {{ $header }}
+                            <span class="map-topbar-divider" aria-hidden="true"></span>
+                            <div class="map-topbar-context">
+                                <span class="map-topbar-eyebrow">ISES WORKSPACE</span>
+                                <span class="map-topbar-section">Survey Planning</span>
                             </div>
+                        @endunless
+
+                        @if(isset($header))
+                            <div class="map-topbar-page-title">{{ $header }}</div>
                         @endif
+                    </div>
+                    <div class="map-topbar-trailing">
+                        <span class="map-topbar-live-dot" aria-hidden="true"></span>
+                        <span>Map workspace</span>
                     </div>
                 </header>
 
