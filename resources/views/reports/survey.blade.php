@@ -45,8 +45,8 @@
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 0.04em;
-            margin: 12px 0 6px 0;
-            padding-bottom: 4px;
+            margin: 9px 0 5px 0;
+            padding-bottom: 3px;
             page-break-after: avoid;
             break-after: avoid-page;
             border-bottom: 1.5px solid #0284c7;
@@ -74,7 +74,7 @@
         .doc-header-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 12px;
+            margin-bottom: 9px;
             background: #102b46;
             border-top: 4px solid #1685b5;
         }
@@ -230,8 +230,8 @@
         
         /* Area Card Block */
         .area-container {
-            margin-top: 8px;
-            margin-bottom: 10px;
+            margin-top: 5px;
+            margin-bottom: 6px;
             page-break-inside: auto;
             break-inside: auto;
         }
@@ -256,18 +256,19 @@
         
         /* Map Box */
         .map-box {
-            margin-top: 8px;
+            margin-top: 5px;
             text-align: center;
             page-break-inside: avoid;
+            break-inside: avoid;
             background: #f8fafc;
             border: 1px solid #cbd5e1;
-            padding: 6px;
+            padding: 4px;
             border-radius: 2px;
         }
         .map-box img {
             max-width: 100%;
             height: auto;
-            max-height: 300px;
+            max-height: 210px;
             display: block;
             margin: 0 auto;
             border: 1px solid #94a3b8;
