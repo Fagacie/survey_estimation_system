@@ -1,5 +1,7 @@
 <x-app-layout containerClass="w-full px-4 py-6 sm:px-8 sm:py-8">
+@push('styles')
 <link rel="stylesheet" href="{{ asset('css/projects-dashboard.css') }}?v={{ filemtime(public_path('css/projects-dashboard.css')) }}">
+@endpush
 <div class="projects-dashboard">
     
     <!-- 1. PAGE HEADER -->
