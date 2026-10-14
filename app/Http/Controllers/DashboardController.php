@@ -14,7 +14,6 @@ class DashboardController extends Controller
     {
         $metrics = [
             'total' => Project::count(),
-            'draft' => Project::where('status', 'draft')->count(),
             'planned' => Project::where('status', 'planned')->count(),
             'completed' => Project::where('status', 'completed')->count(),
             'mapped' => Project::whereHas('surveyLocations', fn ($query) => $query->where('status', 'Mapped'))->count(),
