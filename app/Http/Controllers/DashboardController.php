@@ -22,13 +22,13 @@ class DashboardController extends Controller
         ];
 
         $statusBreakdown = Project::query()
-            ->selectRaw("COALESCE(NULLIF(status, ''), 'draft') as label, COUNT(*) as total")
+            ->selectRaw("COALESCE(NULLIF(status, ''), 'draft') as label, status as status_key, COUNT(*) as total")
             ->groupBy('status')
             ->orderByDesc('total')
             ->get()
             ->map(fn ($row) => [
                 'label' => Str::headline($row->label),
-                'key' => strtolower($row->label),
+                'key' => $row->status_key ?: 'draft',
                 'total' => (int) $row->total,
             ]);
 
