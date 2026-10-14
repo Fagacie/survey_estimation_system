@@ -5,11 +5,7 @@
     <div class="project-overview-page">
     <div class="w-full max-w-5xl mx-auto">
         
-        <div class="mb-4">
-            <a href="{{ route('projects.index') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 rounded text-xs font-bold transition-colors shadow-sm">
-                &larr; Back
-            </a>
-        </div>
+        <div class="project-overview-breadcrumb"><a href="{{ route('projects.index') }}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to projects</a></div>
 
         @if(session('success'))
             <div class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-4 mb-8 flex items-start gap-3 text-sm rounded-md">
@@ -25,31 +21,41 @@
         @endif
 
         <!-- 1. PROJECT HEADER -->
-        <div class="mb-8">
-            <p class="project-overview-eyebrow">Project workspace / survey operations</p>
-            <h1 class="text-3xl font-bold text-slate-900 tracking-tight mb-1">{{ $project->name }}</h1>
-            <div class="text-sm font-medium text-slate-500">Project Code: {{ $project->number ?? 'N/A' }}</div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 bg-white border border-slate-200 rounded-lg mt-6 shadow-sm overflow-hidden">
-                <div class="p-5 border-b md:border-b-0 md:border-r border-slate-200">
-                    <div class="text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-1">Client</div>
-                    <div class="text-sm font-semibold text-slate-800">{{ $project->client?->company_name ?? 'N/A' }}</div>
+        <header class="project-overview-hero">
+            <div class="project-overview-hero-top">
+                <div class="project-overview-title-group">
+                    <p class="project-overview-eyebrow">Project workspace <span aria-hidden="true">/</span> survey operations</p>
+                    <h1>{{ $project->name }}</h1>
+                    <div class="project-overview-code"><i class="fa-solid fa-hashtag" aria-hidden="true"></i> {{ $project->number ?? 'Project code not assigned' }}</div>
+                    <div class="project-overview-badges">
+                        <span class="project-overview-status project-overview-status-{{ strtolower($project->status ?? 'draft') }}">{{ ucfirst($project->status ?? 'draft') }}</span>
+                        <span class="project-overview-type">{{ \App\Models\Project::TYPES[$project->project_type] ?? $project->project_type ?? 'Type not set' }}</span>
+                        @if($project->location)
+                            <span class="project-overview-location"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ $project->location }}</span>
+                        @endif
+                    </div>
                 </div>
-                <div class="p-5 border-b md:border-b-0 md:border-r border-slate-200">
-                    <div class="text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-1">Period</div>
-                    <div class="text-sm font-semibold text-slate-800">{{ $project->period ?? 'N/A' }}</div>
-                </div>
-                <div class="p-5">
-                    <div class="text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-1">Created</div>
-                    <div class="text-sm font-semibold text-slate-800">{{ $project->created_at->format('d M Y') }}</div>
+                <div class="project-overview-hero-actions">
+                    <a href="{{ route('projects.index') }}" class="project-overview-secondary-action"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Project register</a>
+                    <a href="{{ route('projects.edit', $project->project_Id) }}" class="project-overview-primary-action"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Edit project</a>
                 </div>
             </div>
-        </div>
+            <div class="project-overview-meta-grid">
+                <div class="project-overview-meta-item"><span>Client</span><strong>{{ $project->client?->company_name ?? 'No client assigned' }}</strong></div>
+                <div class="project-overview-meta-item"><span>Project period</span><strong>{{ $project->period ?: 'Not specified' }}</strong></div>
+                <div class="project-overview-meta-item"><span>Created</span><strong>{{ $project->created_at?->format('d M Y') ?? 'N/A' }}</strong></div>
+            </div>
+            <div class="project-overview-summary" aria-label="Project workflow summary">
+                <div class="project-overview-summary-item"><span class="project-overview-summary-icon"><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i></span><span><small>Survey areas</small><strong>{{ $project->surveyLocations->count() }}</strong></span></div>
+                <div class="project-overview-summary-item"><span class="project-overview-summary-icon"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></span><span><small>Mapped areas</small><strong>{{ $project->surveyLocations->where('status', 'Mapped')->count() }}</strong></span></div>
+                <div class="project-overview-summary-item"><span class="project-overview-summary-icon"><i class="fa-solid fa-cubes" aria-hidden="true"></i></span><span><small>Modelling</small><strong>{{ $project->modellingSummary ? 'Configured' : 'Not added' }}</strong></span></div>
+            </div>
+        </header>
 
         <!-- 2. ACTIVE WORKFLOWS -->
-        <div class="mb-10">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Active Modules</h2>
+        <section class="project-overview-section project-overview-workflows mb-10">
+            <div class="project-overview-section-heading flex items-center justify-between mb-4">
+                <div><p class="project-overview-section-kicker">Project activity</p><h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Active Workflows</h2><p class="project-overview-section-description">Open a survey area to continue planning, review its report, or prepare a quotation.</p></div>
                 @if($project->surveyLocations->count() > 1)
                     <a href="{{ route('projects.report.preview', $project->project_Id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 rounded text-xs font-bold transition-colors shadow-sm">
                         <i class="fa-solid fa-file-lines text-slate-500"></i> Full Project Report (All Areas)
@@ -146,12 +152,12 @@
 
                 </ul>
             </div>
-        </div>
+        </section>
 
         <!-- 3. ADD NEW MODULES -->
-        <div class="mb-8">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Add Workflow Module</h2>
+        <section class="project-overview-section project-overview-add mb-8">
+            <div class="project-overview-section-heading flex items-center justify-between mb-4">
+                <div><p class="project-overview-section-kicker">Expand this project</p><h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Add a Workflow</h2><p class="project-overview-section-description">Add a survey area or configure a modelling package for this project.</p></div>
                 <a href="{{ url('/admin/equipment') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 rounded text-[11px] font-bold uppercase tracking-wider transition-colors shadow-sm">
                     <i class="fa-solid fa-database"></i> Equipment Database
                 </a>
@@ -197,7 +203,7 @@
                 @endif
                 
             </div>
-        </div>
+        </section>
 
     </div>
 
