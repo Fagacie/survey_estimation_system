@@ -22,63 +22,11 @@
         </div>
     @endif
 
-    <section class="projects-dashboard-overview" aria-label="Project overview">
-        <div class="projects-dashboard-overview-lead">
-            <span class="projects-dashboard-overview-label">Portfolio overview</span>
-            <strong>{{ $metrics['total'] }}</strong>
-            <span>total projects in your workspace</span>
-        </div>
-        <dl class="projects-dashboard-overview-metrics">
-            <div><dt>Drafts</dt><dd>{{ $metrics['draft'] }}</dd></div>
-            <div><dt>Mapped areas</dt><dd>{{ $metrics['mapped'] }}</dd></div>
-            <div><dt>Quotations</dt><dd>{{ $metrics['quotations'] }}</dd></div>
-        </dl>
-    </section>
 
-    <nav class="projects-dashboard-shortcuts" aria-label="Quick access">
-        <a href="{{ route('quotations.history') }}" class="projects-dashboard-shortcut">
-            <span class="projects-dashboard-shortcut-icon"><i class="fa-solid fa-file-invoice-dollar"></i></span>
-            <span><strong>Quotation history</strong><small>Review previous estimates</small></span>
-            <i class="fa-solid fa-arrow-up-right-from-square projects-dashboard-shortcut-arrow"></i>
-        </a>
-        <a href="{{ route('admin.equipment.index') }}" class="projects-dashboard-shortcut">
-            <span class="projects-dashboard-shortcut-icon"><i class="fa-solid fa-plane-up"></i></span>
-            <span><strong>Drone equipment</strong><small>Manage mapping equipment</small></span>
-            <i class="fa-solid fa-arrow-up-right-from-square projects-dashboard-shortcut-arrow"></i>
-        </a>
-        <a href="{{ route('admin.index') }}" class="projects-dashboard-shortcut">
-            <span class="projects-dashboard-shortcut-icon"><i class="fa-solid fa-database"></i></span>
-            <span><strong>Modelling catalogue</strong><small>Maintain services and rates</small></span>
-            <i class="fa-solid fa-arrow-up-right-from-square projects-dashboard-shortcut-arrow"></i>
-        </a>
-    </nav>
+
+
 
     @if($metrics['total'] > 0)
-        @if(collect($attentionItems)->contains(fn ($item) => $item['projects']->isNotEmpty()))
-            <section class="projects-dashboard-queue" aria-labelledby="attention-title">
-                <div class="projects-dashboard-section-heading">
-                    <div><p class="projects-dashboard-eyebrow">Next actions</p><h2 id="attention-title">Needs attention</h2></div>
-                    <span>{{ collect($attentionItems)->sum(fn ($item) => $item['projects']->count()) }} open checks</span>
-                </div>
-                <div class="projects-dashboard-queue-grid">
-                    @foreach($attentionItems as $attentionItem)
-                        <div class="projects-dashboard-attention-item">
-                            <span class="projects-dashboard-attention-label"><i class="{{ $attentionItem['icon'] }}"></i>{{ $attentionItem['label'] }}</span>
-                            <strong>{{ $attentionItem['projects']->count() }}</strong>
-                            <div class="projects-dashboard-attention-projects">
-                                @foreach($attentionItem['projects'] as $attentionProject)
-                                    <a href="{{ route('projects.show', $attentionProject->project_Id) }}" title="Open {{ $attentionProject->name }}">
-                                        <span>{{ $attentionProject->name }}</span>
-                                        <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
-                                    </a>
-                                @endforeach
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </section>
-        @endif
-
         <section class="projects-dashboard-register" aria-labelledby="register-title">
             <div class="projects-dashboard-register-header">
                 <div><p class="projects-dashboard-eyebrow">Work queue</p><h2 id="register-title">Project register</h2><p>Search and filter projects before opening a workspace.</p></div>
@@ -115,7 +63,18 @@
                             <option value="this_year" {{ request('date_range') === 'this_year' ? 'selected' : '' }}>This Year</option>
                         </select></label>
 
-                    @if(request('search') || request('status') || request('project_type') || request('location') || request('date_range'))
+                    <label class="projects-dashboard-select"><span>Survey areas</span><select name="survey_status" aria-label="Filter by survey area" onchange="this.form.submit()">
+                            <option value="">Any survey state</option>
+                            <option value="Mapped" {{ request('survey_status') === 'Mapped' ? 'selected' : '' }}>Mapped areas</option>
+                        </select></label>
+
+                    <label class="projects-dashboard-select"><span>Quotation</span><select name="has_quotation" aria-label="Filter by quotation status" onchange="this.form.submit()">
+                            <option value="">Any quotation state</option>
+                            <option value="1" {{ request('has_quotation') === '1' ? 'selected' : '' }}>Has quotation</option>
+                            <option value="0" {{ request('has_quotation') === '0' ? 'selected' : '' }}>No quotation</option>
+                        </select></label>
+
+                    @if(request('search') || request('status') || request('project_type') || request('location') || request('date_range') || request('survey_status') || request('has_quotation'))
                         <a href="{{ route('projects.index') }}" class="projects-dashboard-clear"><i class="fa-solid fa-xmark"></i> Clear</a>
                     @endif
                     <button type="submit" class="hidden">Filter</button>
