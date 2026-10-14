@@ -153,3 +153,26 @@
  .ises-dashboard-type-legend { grid-template-columns:1fr; }
  .ises-dashboard-chart-card .ises-dashboard-section-heading { min-height:0; }
 }
+
+
+/* Quotation value analytics */
+.ises-dashboard-financial { margin-bottom:1.25rem; }
+.ises-dashboard-financial-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0; border-bottom:1px solid #edf1f5; }
+.ises-dashboard-financial-metric { display:flex; flex-direction:column; align-items:flex-start; gap:.35rem; min-width:0; padding:1.15rem 1.25rem; border-right:1px solid #edf1f5; }
+.ises-dashboard-financial-metric:last-child { border-right:0; }
+.ises-dashboard-financial-metric > span { color:#63768b; font-size:.67rem; font-weight:800; letter-spacing:.07em; text-transform:uppercase; }
+.ises-dashboard-financial-metric > strong { color:#14243a; font-size:clamp(1.1rem,1.8vw,1.55rem); font-weight:750; letter-spacing:-.025em; overflow-wrap:anywhere; }
+.ises-dashboard-financial-metric > small { color:var(--dash-muted); font-size:.72rem; line-height:1.45; }
+.ises-dashboard-quotation-trend { padding:1.1rem 1.25rem 1.25rem; }
+.ises-dashboard-quotation-trend-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; margin-bottom:.5rem; }
+.ises-dashboard-quotation-trend-heading h3 { margin:0 0 .25rem; color:var(--dash-ink); font-size:.9rem; font-weight:750; }
+.ises-dashboard-quotation-trend-heading p { margin:0; color:var(--dash-muted); font-size:.74rem; }
+.ises-dashboard-quotation-trend-heading > span { color:#63768b; font-size:.68rem; font-weight:800; }
+.ises-dashboard-quotation-chart-wrap { position:relative; height:270px; min-width:0; }
+@media (max-width:720px) {
+ .ises-dashboard-financial-metrics { grid-template-columns:1fr; }
+ .ises-dashboard-financial-metric { border-right:0; border-bottom:1px solid #edf1f5; padding:.9rem 1rem; }
+ .ises-dashboard-financial-metric:last-child { border-bottom:0; }
+ .ises-dashboard-quotation-trend { padding:1rem; }
+ .ises-dashboard-quotation-chart-wrap { height:240px; }
+}
