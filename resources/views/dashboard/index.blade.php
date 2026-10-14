@@ -295,7 +295,7 @@
                                 <p>{{ $item['description'] }}</p>
                             </div>
                             <strong>{{ $item['count'] }}</strong>
-                            <a href="{{ route('projects.index', ['attention' => $item['key']]) }}" aria-label="Review projects: {{ $item['label'] }}"><i class="fa-solid fa-arrow-right"></i></a>
+                            <a class="ises-dashboard-attention-action" href="{{ route('projects.index', ['attention' => $item['key']]) }}" aria-label="Review projects: {{ $item['label'] }}">Review <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
                         </article>
                     @endforeach
                 </div>
