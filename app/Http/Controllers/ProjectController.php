@@ -66,12 +66,11 @@ class ProjectController extends Controller
 
         $projects = $query->paginate(10)->withQueryString();
 
+        $totalProjects = Project::count();
+
         return view('projects.index', [
             'projects' => $projects,
-            'metrics' => $metrics,
-            'overview' => $overview,
-            'attention' => $attention,
-            'attentionItems' => $attentionItems,
+            'totalProjects' => $totalProjects,
             'projectTypes' => \App\Models\Project::TYPES,
             'locations' => \App\Models\Project::LOCATIONS,
         ]);
