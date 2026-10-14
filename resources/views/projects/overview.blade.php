@@ -3,7 +3,7 @@
     <link rel="stylesheet" href="{{ asset('css/project-overview.css') }}?v={{ filemtime(public_path('css/project-overview.css')) }}">
 
     <div class="project-overview-page">
-    <div class="w-full max-w-5xl mx-auto">
+    <div class="project-overview-content">
         
         <div class="project-overview-breadcrumb"><a href="{{ route('projects.index') }}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to projects</a></div>
 
@@ -52,10 +52,63 @@
             </div>
         </header>
 
-        <!-- 2. ACTIVE WORKFLOWS -->
+        <!-- ADD WORKFLOW: kept ahead of the workflow register for a clear next action -->
+        <section class="project-overview-section project-overview-add mb-8">
+            <div class="project-overview-section-heading flex items-center justify-between mb-4">
+                <div><p class="project-overview-section-kicker">Expand this project</p><h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Add a Workflow</h2><p class="project-overview-section-description">Add a survey area or configure a modelling package for this project.</p></div>
+                <a href="{{ url('/admin/equipment') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 rounded text-[11px] font-bold uppercase tracking-wider transition-colors shadow-sm">
+                    <i class="fa-solid fa-database"></i> Equipment Database
+                </a>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                <!-- Add SBES -->
+                <button type="button" onclick="openSurveyModal('sbes')" class="flex flex-col items-center justify-center p-6 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-teal-400 hover:shadow-md transition-all group">
+                    <div class="w-12 h-12 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center mb-3 group-hover:bg-teal-100 transition-colors">
+                        <i class="fa-solid fa-water text-xl"></i>
+                    </div>
+                    <div class="font-bold text-slate-800 text-sm mb-1">Single Beam (SBES)</div>
+                    <div class="text-xs text-slate-500 text-center">Add a hydrographic survey area.</div>
+                </button>
+
+                <!-- Add Drone -->
+                <button type="button" onclick="openSurveyModal('drone')" class="flex flex-col items-center justify-center p-6 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-blue-400 hover:shadow-md transition-all group">
+                    <div class="w-12 h-12 rounded-full bg-slate-50 text-slate-500 flex items-center justify-center mb-3 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
+                        <i class="fa-solid fa-plane-up text-xl"></i>
+                    </div>
+                    <div class="font-bold text-slate-800 text-sm mb-1">Drone Mapping</div>
+                    <div class="text-xs text-slate-500 text-center">Add an aerial survey area.</div>
+                </button>
+
+                <!-- Add Modelling -->
+                @if(!$summary)
+                <a href="{{ route('projects.modeling.builder', ['project_id' => $project->project_Id]) }}" class="flex flex-col items-center justify-center p-6 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-indigo-400 hover:shadow-md transition-all group">
+                    <div class="w-12 h-12 rounded-full bg-slate-50 text-slate-500 flex items-center justify-center mb-3 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
+                        <i class="fa-solid fa-cubes text-xl"></i>
+                    </div>
+                    <div class="font-bold text-slate-800 text-sm mb-1">3D Modelling</div>
+                    <div class="text-xs text-slate-500 text-center">Configure processing and models.</div>
+                </a>
+                @else
+                <div class="flex flex-col items-center justify-center p-6 bg-slate-50 border border-slate-200 rounded-lg shadow-sm opacity-60">
+                    <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mb-3">
+                        <i class="fa-solid fa-cubes text-xl"></i>
+                    </div>
+                    <div class="font-bold text-slate-600 text-sm mb-1">3D Modelling</div>
+                    <div class="text-xs text-slate-500 text-center">Already added to project.</div>
+                </div>
+                @endif
+                
+            </div>
+        </section>
+
+
+
+        <!-- ACTIVE WORKFLOWS -->
         <section class="project-overview-section project-overview-workflows mb-10">
             <div class="project-overview-section-heading flex items-center justify-between mb-4">
-                <div><p class="project-overview-section-kicker">Project activity</p><h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Active Workflows</h2><p class="project-overview-section-description">Open a survey area to continue planning, review its report, or prepare a quotation.</p></div>
+                <div><p class="project-overview-section-kicker">Survey register</p><h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Active Workflows</h2><p class="project-overview-section-description">Manage survey areas and modelling packages, with each action kept beside its workflow.</p></div>
                 @if($project->surveyLocations->count() > 1)
                     <a href="{{ route('projects.report.preview', $project->project_Id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 rounded text-xs font-bold transition-colors shadow-sm">
                         <i class="fa-solid fa-file-lines text-slate-500"></i> Full Project Report (All Areas)
@@ -63,7 +116,8 @@
                 @endif
             </div>
             
-            <div class="bg-white border border-slate-200 rounded-lg shadow-sm">
+            <div class="project-overview-workflow-table">
+                <div class="project-overview-workflow-table-head" aria-hidden="true"><span>Workflow</span><span>Status / details</span><span>Actions</span></div>
                 <ul class="divide-y divide-slate-100">
                     
                     @php 
@@ -151,57 +205,6 @@
                     @endif
 
                 </ul>
-            </div>
-        </section>
-
-        <!-- 3. ADD NEW MODULES -->
-        <section class="project-overview-section project-overview-add mb-8">
-            <div class="project-overview-section-heading flex items-center justify-between mb-4">
-                <div><p class="project-overview-section-kicker">Expand this project</p><h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Add a Workflow</h2><p class="project-overview-section-description">Add a survey area or configure a modelling package for this project.</p></div>
-                <a href="{{ url('/admin/equipment') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 rounded text-[11px] font-bold uppercase tracking-wider transition-colors shadow-sm">
-                    <i class="fa-solid fa-database"></i> Equipment Database
-                </a>
-            </div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                
-                <!-- Add SBES -->
-                <button type="button" onclick="openSurveyModal('sbes')" class="flex flex-col items-center justify-center p-6 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-teal-400 hover:shadow-md transition-all group">
-                    <div class="w-12 h-12 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center mb-3 group-hover:bg-teal-100 transition-colors">
-                        <i class="fa-solid fa-water text-xl"></i>
-                    </div>
-                    <div class="font-bold text-slate-800 text-sm mb-1">Single Beam (SBES)</div>
-                    <div class="text-xs text-slate-500 text-center">Add a hydrographic survey area.</div>
-                </button>
-
-                <!-- Add Drone -->
-                <button type="button" onclick="openSurveyModal('drone')" class="flex flex-col items-center justify-center p-6 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-blue-400 hover:shadow-md transition-all group">
-                    <div class="w-12 h-12 rounded-full bg-slate-50 text-slate-500 flex items-center justify-center mb-3 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
-                        <i class="fa-solid fa-plane-up text-xl"></i>
-                    </div>
-                    <div class="font-bold text-slate-800 text-sm mb-1">Drone Mapping</div>
-                    <div class="text-xs text-slate-500 text-center">Add an aerial survey area.</div>
-                </button>
-
-                <!-- Add Modelling -->
-                @if(!$summary)
-                <a href="{{ route('projects.modeling.builder', ['project_id' => $project->project_Id]) }}" class="flex flex-col items-center justify-center p-6 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-indigo-400 hover:shadow-md transition-all group">
-                    <div class="w-12 h-12 rounded-full bg-slate-50 text-slate-500 flex items-center justify-center mb-3 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
-                        <i class="fa-solid fa-cubes text-xl"></i>
-                    </div>
-                    <div class="font-bold text-slate-800 text-sm mb-1">3D Modelling</div>
-                    <div class="text-xs text-slate-500 text-center">Configure processing and models.</div>
-                </a>
-                @else
-                <div class="flex flex-col items-center justify-center p-6 bg-slate-50 border border-slate-200 rounded-lg shadow-sm opacity-60">
-                    <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mb-3">
-                        <i class="fa-solid fa-cubes text-xl"></i>
-                    </div>
-                    <div class="font-bold text-slate-600 text-sm mb-1">3D Modelling</div>
-                    <div class="text-xs text-slate-500 text-center">Already added to project.</div>
-                </div>
-                @endif
-                
             </div>
         </section>
 
