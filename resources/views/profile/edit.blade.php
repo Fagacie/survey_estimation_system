@@ -1,5 +1,8 @@
-<x-app-layout containerClass="px-0">
+@push('styles')
     <link rel="stylesheet" href="{{ asset('css/profile-settings.css') }}?v={{ filemtime(public_path('css/profile-settings.css')) }}">
+@endpush
+
+<x-app-layout containerClass="px-0">
 
     <div class="profile-settings-page">
         <section class="profile-settings-header">
