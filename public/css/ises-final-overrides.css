@@ -1,0 +1,101 @@
+/* Final cascade layer for legacy page-level styles. Loaded after view CSS intentionally. */
+:root {
+  --ises-surface: #ffffff;
+  --ises-border: #dce5ee;
+  --ises-ink: #17283f;
+  --ises-muted: #68798d;
+  --ises-blue: #2463a6;
+  --ises-blue-dark: #1d518a;
+  --ises-canvas: #f4f7fb;
+  --ises-radius: 12px;
+  --ises-elevation: 0 3px 14px rgba(20, 43, 73, .055);
+}
+.ises-app main { color: var(--ises-ink); background: var(--ises-canvas) !important; }
+.ises-app main > :is(.projects-dashboard,.create-project-page,.project-overview-page,.quotation-history-page,.equipment-page,.catalog-page,.admin-container,.history-container,.item-container) {
+  max-width: 1540px; margin-left: auto; margin-right: auto;
+}
+.ises-app main :is(.projects-dashboard,.create-project-page,.project-overview-page,.quotation-history-page,.equipment-page,.catalog-page,.admin-container,.history-container,.item-container) :is(h1,h2,h3,h4,.page-header,.page-header-title,.equipment-title,.custom-card-title) {
+  color: var(--ises-ink) !important; font-family: var(--ises-display); letter-spacing: -.025em;
+}
+.ises-app main :is(.projects-dashboard,.create-project-page,.project-overview-page,.quotation-history-page,.equipment-page,.catalog-page,.admin-container,.history-container,.item-container) :is(p,.text-slate-500,.text-gray-500,.equipment-subtitle,.catalog-subtitle,.page-header-subtitle) {
+  color: var(--ises-muted);
+}
+.ises-app main :is(.projects-dashboard,.create-project-page,.project-overview-page,.quotation-history-page,.equipment-page,.catalog-page,.admin-container,.history-container,.item-container) :is(.bg-white.rounded-xl,.bg-white.rounded-lg,.custom-card,.table-card,.filter-card-custom,.filter-card,.summary-card,.projects-dashboard-overview,.projects-dashboard-register,.projects-dashboard-queue,.equipment-register,.catalog-module) {
+  background: var(--ises-surface) !important; border: 1px solid var(--ises-border) !important;
+  border-radius: var(--ises-radius) !important; box-shadow: var(--ises-elevation) !important;
+}
+.ises-app main :is(.projects-dashboard,.create-project-page,.project-overview-page,.quotation-history-page,.equipment-page,.catalog-page,.admin-container,.history-container,.item-container) :is(.bg-white.border,.border-slate-200,.border-gray-200) {
+  border-color: var(--ises-border);
+}
+.ises-app main :is(.projects-dashboard,.create-project-page,.project-overview-page,.quotation-history-page,.equipment-page,.catalog-page,.admin-container,.history-container,.item-container) :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]),select,textarea,.form-control,.form-select,.filter-input,.filter-select) {
+  min-height: 41px; border: 1px solid #cbd7e3; border-radius: 8px; background-color: #fff;
+  color: var(--ises-ink); box-shadow: none; font: 400 13px/1.4 var(--ises-font); transition: border-color .15s, box-shadow .15s;
+}
+.ises-app main :is(.projects-dashboard,.create-project-page,.project-overview-page,.quotation-history-page,.equipment-page,.catalog-page,.admin-container,.history-container,.item-container) :is(input:not([type=checkbox]):not([type=radio]):not([type=hidden]),select,textarea,.form-control,.form-select,.filter-input,.filter-select):focus {
+  border-color: #77a3cd; outline: 0; box-shadow: 0 0 0 3px rgba(36,99,166,.12);
+}
+.ises-app main :is(.projects-dashboard,.create-project-page,.project-overview-page,.quotation-history-page,.equipment-page,.catalog-page,.admin-container,.history-container,.item-container) :is(button[type=submit],.btn-primary,.create-button,.projects-dashboard-primary,.btn-dark-minimal,.ctrl-btn-primary) {
+  background: var(--ises-blue) !important; border: 1px solid var(--ises-blue) !important; border-radius: 8px !important; color: #fff !important;
+  box-shadow: none !important; font-weight: 700; transition: background .15s, transform .15s;
+}
+.ises-app main :is(.projects-dashboard,.create-project-page,.project-overview-page,.quotation-history-page,.equipment-page,.catalog-page,.admin-container,.history-container,.item-container) :is(button[type=submit],.btn-primary,.create-button,.projects-dashboard-primary,.btn-dark-minimal,.ctrl-btn-primary):hover {
+  background: var(--ises-blue-dark) !important; border-color: var(--ises-blue-dark) !important; transform: translateY(-1px);
+}
+.ises-app main :is(.projects-dashboard,.create-project-page,.project-overview-page,.quotation-history-page,.equipment-page,.catalog-page,.admin-container,.history-container,.item-container) :is(table,.table,.clean-table,.custom-project-table) {
+  width: 100%; border-color: var(--ises-border); border-collapse: separate; border-spacing: 0; background: #fff;
+}
+.ises-app main :is(.projects-dashboard,.create-project-page,.project-overview-page,.quotation-history-page,.equipment-page,.catalog-page,.admin-container,.history-container,.item-container) :is(table,.table,.clean-table,.custom-project-table) thead th {
+  background: #f5f8fc !important; color: #68798d !important; border-bottom: 1px solid var(--ises-border);
+  font-size: 10px; font-weight: 750; letter-spacing: .075em; text-transform: uppercase; white-space: nowrap;
+}
+.ises-app main :is(.projects-dashboard,.create-project-page,.project-overview-page,.quotation-history-page,.equipment-page,.catalog-page,.admin-container,.history-container,.item-container) :is(table,.table,.clean-table,.custom-project-table) tbody td {
+  border-bottom: 1px solid #edf1f5; color: #40536a; font-size: 13px; vertical-align: middle;
+}
+.ises-app main :is(.projects-dashboard,.create-project-page,.project-overview-page,.quotation-history-page,.equipment-page,.catalog-page,.admin-container,.history-container,.item-container) :is(table,.table,.clean-table,.custom-project-table) tbody tr:hover td {
+  background: #f6f9fd;
+}
+.ises-app main :is(.projects-dashboard,.create-project-page,.project-overview-page,.quotation-history-page,.equipment-page,.catalog-page,.admin-container,.history-container,.item-container) :is(.bg-teal-600,.bg-teal-700,.text-teal-600,.text-teal-700) {
+  --tw-bg-opacity: 1; --tw-text-opacity: 1;
+}
+.ises-app main .projects-dashboard .projects-dashboard-overview { overflow: hidden; }
+.ises-app main .projects-dashboard .projects-dashboard-overview-lead strong { color: var(--ises-ink); }
+.ises-app main .projects-dashboard .projects-dashboard-register-header,
+.ises-app main .projects-dashboard .projects-dashboard-section-heading { gap: 16px; }
+.ises-app main .projects-dashboard .projects-dashboard-filters { padding: 18px; background: #fff; border-bottom: 1px solid var(--ises-border); }
+.ises-app main .projects-dashboard .projects-dashboard-search { border: 1px solid #cbd7e3; border-radius: 8px; background: #fff; }
+.ises-app main .projects-dashboard .projects-dashboard-search input { border: 0; box-shadow: none; }
+.ises-app main .project-overview-page { padding-bottom: 36px; }
+.ises-app main .project-overview-page .grid.bg-white { border-radius: 12px; box-shadow: var(--ises-elevation); }
+.ises-app main .project-overview-page .bg-white.border.rounded-lg.shadow-sm { border-radius: 12px; box-shadow: var(--ises-elevation); }
+.ises-app main .quotation-history-page .filter-card-custom { padding: 20px; }
+.ises-app main .quotation-history-page .filter-input,
+.ises-app main .quotation-history-page .filter-select { background: #fff; border-color: #cbd7e3; border-radius: 8px; color: var(--ises-ink); }
+.ises-app main .quotation-history-page .table-card,
+.ises-app main .equipment-page .custom-card,
+.ises-app main .catalog-page .table-card { overflow: hidden; }
+.ises-app main .equipment-page .custom-card-header { background: #f8fafc; }
+.ises-app main .catalog-page .catalog-kicker,
+.ises-app main .equipment-page .equipment-eyebrow,
+.ises-app main .projects-dashboard .projects-dashboard-eyebrow { color: var(--ises-blue); }
+.ises-app main .item-container .banner { border: 1px solid var(--ises-border); border-radius: 12px; background: #edf4fb; }
+.ises-app main .item-container .content-wrapper { border: 1px solid var(--ises-border); border-radius: 12px; background: #fff; }
+.ises-app main .item-container .back-button { background: var(--ises-blue) !important; border-radius: 8px !important; box-shadow: none !important; }
+.ises-app main .admin-container .data-group { margin-top: 26px; }
+.ises-app main .admin-container .table-card { margin-top: 12px; }
+.ises-app main .admin-container .catalog-module h2 { letter-spacing: -.01em; }
+.ises-app main .admin-container .table-card tbody tr:hover td { background: #f6f9fd; }
+.ises-app main .admin-container .action-button { border-radius: 7px; }
+.ises-app main .admin-container .action-button.edit-button:hover { background: #eaf2fb; color: var(--ises-blue); }
+.ises-app main .admin-container .action-button.delete-button:hover { background: #fff0f0; color: #b42318; }
+.ises-app main .projects-dashboard .projects-dashboard-primary,
+.ises-app main .create-project-page button[type=submit] { display: inline-flex; align-items: center; justify-content: center; gap: 8px; text-decoration: none; }
+@media (max-width: 760px) {
+  .ises-app main { overflow-x: hidden; }
+  .ises-app main :is(.history-container,.item-container) { width: 100%; padding-inline: 14px; }
+  .ises-app main :is(.page-header-wrapper,.projects-dashboard-register-header) { align-items: flex-start; flex-direction: column; }
+  .ises-app main :is(.table-responsive,.table-card) { max-width: 100%; overflow-x: auto; }
+  .ises-app main :is(.projects-dashboard,.create-project-page,.project-overview-page,.quotation-history-page,.equipment-page,.catalog-page,.admin-container) { padding-inline: 14px; }
+}
+@media print {
+  .ises-app main :is(.projects-dashboard,.create-project-page,.project-overview-page,.quotation-history-page,.equipment-page,.catalog-page,.admin-container,.history-container,.item-container) :is(.bg-white.rounded-xl,.bg-white.rounded-lg,.custom-card,.table-card,.filter-card-custom,.filter-card,.summary-card,.projects-dashboard-overview,.projects-dashboard-register,.projects-dashboard-queue,.equipment-register,.catalog-module) { box-shadow: none !important; }
+}
