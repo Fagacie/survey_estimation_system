@@ -91,9 +91,9 @@
                     
                     <!-- Sidebar Header / Logo -->
                     <div class="ises-sidebar-brand flex items-center h-16 flex-shrink-0" :class="sidebarOpen ? 'px-4 justify-between' : 'justify-center'">
-                        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 ises-brand overflow-hidden whitespace-nowrap" title="Dashboard">
-                            <img x-show="sidebarOpen" src="{{ asset('images/logo.jpeg') }}" alt="Eco Hydrotech Solutions" class="ises-brand-logo">
-                            <span x-show="!sidebarOpen" class="ises-brand-mark"><img src="{{ asset('images/logo.png') }}" alt="Eco Hydrotech"></span>
+                        <a href="{{ route('dashboard') }}" class="ises-brand-name overflow-hidden whitespace-nowrap" title="Eco HydroTech dashboard">
+                            <span x-show="sidebarOpen" class="ises-brand-wordmark">Eco <strong>HydroTech</strong></span>
+                            <span x-show="!sidebarOpen" class="ises-brand-compact" aria-label="Eco HydroTech">EH</span>
                         </a>
                         
                         <!-- Toggle Button Integrated into Sidebar Header -->
@@ -143,12 +143,12 @@
                     </div>
 
                     <!-- Sidebar Footer -->
-                    <div class="ises-sidebar-footer border-t border-slate-800 flex-shrink-0 flex flex-col">
+                    <div class="ises-sidebar-footer flex-shrink-0 flex flex-col">
                         
                         <!-- User Info -->
                         @auth
-                            <div class="ises-sidebar-user p-3 flex items-center justify-center transition-all bg-white" :class="sidebarOpen ? '' : 'flex-col gap-2'">
-                                    <a href="{{ route('profile.edit') }}" title="Profile" class="ises-avatar flex items-center justify-center font-semibold text-xs flex-shrink-0 transition-colors rounded-full text-white">
+                            <div class="ises-sidebar-user p-3 flex items-center transition-all" :class="sidebarOpen ? '' : 'flex-col gap-2'">
+                                    <a href="{{ route('profile.edit') }}" title="Profile" class="ises-avatar flex items-center justify-center font-semibold text-xs flex-shrink-0 transition-colors">
                                     {{ substr(auth()->user()->name, 0, 1) }}
                                 </a>
                                 <div x-show="sidebarOpen" class="flex-1 min-w-0 ml-3">
