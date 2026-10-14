@@ -1,5 +1,7 @@
 <x-app-layout containerClass="w-full px-4 py-6 sm:px-8 sm:py-8">
-    <link rel="stylesheet" href="{{ asset('css/ises-dashboard.css') }}?v={{ filemtime(public_path('css/ises-dashboard.css')) }}">
+    @push('styles')
+        <link rel="stylesheet" href="{{ asset('css/ises-dashboard.css') }}?v={{ filemtime(public_path('css/ises-dashboard.css')) }}">
+    @endpush
 
     <div class="ises-dashboard">
         <header class="ises-dashboard-header">
@@ -29,11 +31,6 @@
                 <span class="ises-dashboard-metric-label">Total projects</span>
                 <strong>{{ $metrics['total'] }}</strong>
                 <span class="ises-dashboard-metric-note">Across your workspace</span>
-            </a>
-            <a class="ises-dashboard-metric ises-dashboard-metric-link" href="{{ route('projects.index', ['status' => 'draft']) }}" aria-label="View draft projects">
-                <span class="ises-dashboard-metric-label">Draft</span>
-                <strong>{{ $metrics['draft'] }}</strong>
-                <span class="ises-dashboard-metric-note">Still being prepared</span>
             </a>
             <a class="ises-dashboard-metric ises-dashboard-metric-link" href="{{ route('projects.index', ['status' => 'planned']) }}" aria-label="View planned projects">
                 <span class="ises-dashboard-metric-label">Planned</span>
