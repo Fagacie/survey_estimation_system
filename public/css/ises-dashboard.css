@@ -21,7 +21,7 @@
 .ises-dashboard-secondary { color:#244b73; background:#fff; border-color:var(--dash-line); }
 .ises-dashboard-secondary:hover { color:#174e7b; border-color:#b8cfe1; background:#f8fbfe; }
 .ises-dashboard-feedback { display:flex; gap:.6rem; align-items:center; margin-bottom:1rem; padding:.8rem 1rem; border:1px solid #bfe4d0; border-radius:8px; color:#17603d; background:#f0faf4; font-size:.85rem; }
-.ises-dashboard-metrics { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:.8rem; margin-bottom:1.25rem; }
+.ises-dashboard-metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.8rem; margin-bottom:1.25rem; }
 .ises-dashboard-metric { display:flex; flex-direction:column; align-items:flex-start; min-width:0; padding:1.1rem 1.15rem; border:1px solid var(--dash-line); border-radius:10px; background:#fff; box-shadow:0 3px 12px rgba(20,43,73,.035); }
 .ises-dashboard-metric-primary { border-top:3px solid var(--dash-blue); padding-top:calc(1.1rem - 2px); }
 .ises-dashboard-metric-label { color:#5d7086; font-size:.68rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
