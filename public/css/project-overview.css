@@ -37,3 +37,61 @@
 @media (max-width: 640px) {
     .project-overview-page h1 { font-size: 1.8rem; }
 }
+
+
+/* Project details workspace refinement: strong hierarchy, useful actions, responsive workflow cards. */
+.project-overview-page { max-width: 1480px; color: #17283f; }
+.project-overview-page .project-overview-breadcrumb { margin: 0 0 1rem; }
+.project-overview-page .project-overview-breadcrumb a { display:inline-flex;align-items:center;gap:.5rem;padding:.45rem 0;color:#52647a;font-size:.78rem;font-weight:700;text-decoration:none; }
+.project-overview-page .project-overview-breadcrumb a:hover { color:#2463a6; }
+.project-overview-hero { margin-bottom:2rem;padding:clamp(1.15rem,2.5vw,2rem);border:1px solid #dfe7ee;border-radius:12px;background:#fff;box-shadow:0 4px 18px rgba(20,43,73,.045); }
+.project-overview-hero-top { display:flex;align-items:flex-start;justify-content:space-between;gap:1.5rem; }
+.project-overview-title-group { min-width:0; }
+.project-overview-page .project-overview-eyebrow { margin-bottom:.55rem;font-size:.68rem;letter-spacing:.13em; }
+.project-overview-page .project-overview-title-group h1 { margin:0;overflow-wrap:anywhere;font-size:clamp(1.65rem,2.5vw,2.35rem);font-weight:700;line-height:1.15;letter-spacing:-.035em; }
+.project-overview-code { margin-top:.65rem;color:#65768a;font-size:.82rem;font-weight:600; }
+.project-overview-code i { margin-right:.2rem;color:#8797a9; }
+.project-overview-badges { display:flex;flex-wrap:wrap;align-items:center;gap:.45rem;margin-top:.9rem; }
+.project-overview-status,.project-overview-type,.project-overview-location { display:inline-flex;align-items:center;gap:.35rem;padding:.32rem .6rem;border:1px solid #dfe7ee;border-radius:5px;color:#53657a;background:#f8fafc;font-size:.7rem;font-weight:700;line-height:1.2; }
+.project-overview-status-draft { color:#79551b;border-color:#f1dfb6;background:#fffbeb; }
+.project-overview-status-planned { color:#205b91;border-color:#cfe1f2;background:#f0f7fd; }
+.project-overview-status-completed { color:#17684e;border-color:#c6e7d8;background:#effaf4; }
+.project-overview-hero-actions { display:flex;flex:0 0 auto;flex-wrap:wrap;justify-content:flex-end;gap:.55rem; }
+.project-overview-secondary-action,.project-overview-primary-action { display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:38px;padding:.55rem .8rem;border:1px solid #dfe7ee;border-radius:6px;font-size:.77rem;font-weight:700;text-decoration:none;transition:background .16s,border-color .16s,color .16s; }
+.project-overview-secondary-action { color:#455970;background:#fff; }
+.project-overview-secondary-action:hover { color:#1d518a;border-color:#b8cfe1;background:#f7fbff; }
+.project-overview-primary-action { color:#fff;border-color:#2463a6;background:#2463a6; }
+.project-overview-primary-action:hover { color:#fff;border-color:#1d518a;background:#1d518a; }
+.project-overview-meta-grid { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:1.4rem;border:1px solid #e3e9ef;border-radius:8px;background:#fbfcfe; }
+.project-overview-meta-item { display:flex;flex-direction:column;gap:.3rem;min-width:0;padding:.85rem 1rem; }
+.project-overview-meta-item + .project-overview-meta-item { border-left:1px solid #e3e9ef; }
+.project-overview-meta-item span { color:#758499;font-size:.64rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase; }
+.project-overview-meta-item strong { color:#25384e;font-size:.83rem;font-weight:700;overflow-wrap:anywhere; }
+.project-overview-summary { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;margin-top:.85rem; }
+.project-overview-summary-item { display:flex;align-items:center;gap:.7rem;min-width:0;padding:.8rem .9rem;border:1px solid #e3e9ef;border-radius:8px;background:#fff; }
+.project-overview-summary-icon { display:grid;flex:0 0 36px;width:36px;height:36px;place-items:center;border-radius:7px;color:#2463a6;background:#eef5fc; }
+.project-overview-summary-item > span:last-child { display:flex;flex-direction:column;gap:.1rem;min-width:0; }
+.project-overview-summary-item small { color:#748397;font-size:.68rem;font-weight:600; }
+.project-overview-summary-item strong { color:#1a2d43;font-size:.92rem;font-weight:800;overflow-wrap:anywhere; }
+.project-overview-page .project-overview-section { margin-bottom:2rem; }
+.project-overview-page .project-overview-section-heading { align-items:flex-start;gap:1rem; }
+.project-overview-section-heading > div { min-width:0; }
+.project-overview-section-kicker { margin:0 0 .25rem;color:#2463a6;font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase; }
+.project-overview-page .project-overview-section-heading h2 { margin:0;font-size:1.12rem;font-weight:700;letter-spacing:-.02em;text-transform:none; }
+.project-overview-section-description { margin:.3rem 0 0;color:#6b7b8e;font-size:.8rem;line-height:1.5; }
+.project-overview-page .project-overview-workflows > .bg-white.border.rounded-lg.shadow-sm { overflow:hidden;border-radius:10px; }
+.project-overview-page .project-overview-workflows > .bg-white.border.rounded-lg.shadow-sm > ul > li { gap:1.25rem;padding:1.15rem 1.2rem; }
+.project-overview-page .project-overview-workflows > .bg-white.border.rounded-lg.shadow-sm > ul > li > div:first-child { flex:1 1 260px;min-width:0; }
+.project-overview-page .project-overview-workflows > .bg-white.border.rounded-lg.shadow-sm > ul > li > div:last-child { flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:.5rem .8rem; }
+.project-overview-page .project-overview-workflows > .bg-white.border.rounded-lg.shadow-sm > ul > li > div:last-child a { white-space:nowrap; }
+.project-overview-page .project-overview-workflows > .bg-white.border.rounded-lg.shadow-sm > ul > li > div:last-child form { margin-left:.1rem; }
+.project-overview-page .project-overview-workflows > .bg-white.border.rounded-lg.shadow-sm > ul > li > div:last-child form button { display:inline-grid;width:34px;height:34px;place-items:center;margin:0;border:1px solid #f1d5d3;border-radius:6px;background:#fff; }
+.project-overview-page .project-overview-workflows > .bg-white.border.rounded-lg.shadow-sm > ul > li > div:last-child form button:hover { background:#fff5f4; }
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\:grid-cols-3 > button,.project-overview-page .project-overview-add .grid.grid-cols-1.md\:grid-cols-3 > a,.project-overview-page .project-overview-add .grid.grid-cols-1.md\:grid-cols-3 > div { min-height:176px;border-radius:9px;box-shadow:none;transition:border-color .16s,background .16s,transform .16s; }
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\:grid-cols-3 > button:hover,.project-overview-page .project-overview-add .grid.grid-cols-1.md\:grid-cols-3 > a:hover { transform:translateY(-2px); }
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\:grid-cols-3 > button:focus-visible,.project-overview-page .project-overview-add .grid.grid-cols-1.md\:grid-cols-3 > a:focus-visible,.project-overview-page .project-overview-hero a:focus-visible { outline:3px solid rgba(36,99,166,.28);outline-offset:3px; }
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\:grid-cols-3 > button > div:first-child,.project-overview-page .project-overview-add .grid.grid-cols-1.md\:grid-cols-3 > a > div:first-child { border-radius:8px; }
+.project-overview-page .modal-content { border-radius:10px !important; }
+@media (max-width:900px) { .project-overview-hero-top { flex-direction:column; }.project-overview-hero-actions { justify-content:flex-start; }.project-overview-page .project-overview-workflows > .bg-white.border.rounded-lg.shadow-sm > ul > li > div:last-child { justify-content:flex-start; } }
+@media (max-width:640px) { .project-overview-hero { padding:1rem; }.project-overview-meta-grid { grid-template-columns:1fr; }.project-overview-meta-item + .project-overview-meta-item { border-top:1px solid #e3e9ef;border-left:0; }.project-overview-summary { grid-template-columns:1fr; }.project-overview-hero-actions { width:100%; }.project-overview-hero-actions a { flex:1 1 auto; }.project-overview-page .project-overview-section-heading { flex-direction:column; } }
+@media (prefers-reduced-motion:reduce) { .project-overview-page * { transition:none !important; } }
