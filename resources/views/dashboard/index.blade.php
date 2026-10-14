@@ -38,14 +38,14 @@
                 <span class="ises-dashboard-metric-note">Ready for next steps</span>
             </a>
             <a class="ises-dashboard-metric ises-dashboard-metric-link" href="{{ route('projects.index', ['survey_status' => 'Mapped']) }}" aria-label="View projects with mapped areas">
-                <span class="ises-dashboard-metric-label">Mapped areas</span>
+                <span class="ises-dashboard-metric-label">Mapped projects</span>
                 <strong>{{ $metrics['mapped'] }}</strong>
                 <span class="ises-dashboard-metric-note">Projects with mapped surveys</span>
             </a>
             <a class="ises-dashboard-metric ises-dashboard-metric-link" href="{{ route('projects.index', ['has_quotation' => '1']) }}" aria-label="View projects with quotations">
-                <span class="ises-dashboard-metric-label">Quotations</span>
+                <span class="ises-dashboard-metric-label">Costed projects</span>
                 <strong>{{ $metrics['quotations'] }}</strong>
-                <span class="ises-dashboard-metric-note">Projects with cost items</span>
+                <span class="ises-dashboard-metric-note">Projects with saved cost items</span>
             </a>
         </section>
 
