@@ -221,7 +221,5 @@
         </div> <!-- end #invoiceSlip -->
 
     </div> <!-- end .invoice-page-wrap -->
-
-    </div> <!-- end .invoice-page-wrap -->
 </body>
 </html>
