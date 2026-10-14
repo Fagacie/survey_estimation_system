@@ -45,8 +45,10 @@
             font-weight: bold;
             text-transform: uppercase;
             letter-spacing: 0.04em;
-            margin: 16px 0 8px 0;
+            margin: 12px 0 6px 0;
             padding-bottom: 4px;
+            page-break-after: avoid;
+            break-after: avoid-page;
             border-bottom: 1.5px solid #0284c7;
         }
         h3 {
@@ -228,16 +230,19 @@
         
         /* Area Card Block */
         .area-container {
-            margin-top: 14px;
-            margin-bottom: 14px;
-            page-break-inside: avoid;
+            margin-top: 8px;
+            margin-bottom: 10px;
+            page-break-inside: auto;
+            break-inside: auto;
         }
         .area-header-bar {
             background: #f1f5f9;
             border: 1px solid #cbd5e1;
             border-left: 4px solid #0284c7;
-            padding: 6px 10px;
+            padding: 5px 9px;
             margin-bottom: 6px;
+            page-break-after: avoid;
+            break-after: avoid-page;
         }
         .area-header-bar-drone {
             border-left-color: #059669;
@@ -262,7 +267,7 @@
         .map-box img {
             max-width: 100%;
             height: auto;
-            max-height: 380px;
+            max-height: 300px;
             display: block;
             margin: 0 auto;
             border: 1px solid #94a3b8;
@@ -289,7 +294,7 @@
         }
 
         .footer {
-            margin-top: 20px;
+            margin-top: 12px;
             padding-top: 6px;
             border-top: 1px solid #e2e8f0;
             font-size: 8px;
