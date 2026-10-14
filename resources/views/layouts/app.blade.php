@@ -117,14 +117,14 @@
                             <i class="fa-solid fa-map-location-dot w-5 text-center text-sm"></i>
                             <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Survey Projects</span>
                         </a>
-                        <a href="{{ route('quotations.history') }}" title="Quotation History" class="ises-nav-link flex items-center px-3 py-2.5 transition-all group {{ request()->routeIs('quotations.*') ? 'active' : '' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
+                        <a href="{{ route('quotations.history') }}" title="Quotation History" class="ises-nav-link flex items-center px-3 py-2.5 transition-all group {{ request()->routeIs('quotations.*', 'quotation.*') ? 'active' : '' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
                             <i class="fa-solid fa-file-invoice-dollar w-5 text-center text-sm"></i>
                             <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Quotation History</span>
                         </a>
 
 
                         <!-- Database Management Navigation Dropdown -->
-                        <div x-data="{ itemsOpen: {{ request()->routeIs('admin.index', 'newItem', 'admin.equipment.*') ? 'true' : 'false' }} }" class="w-full">
+                        <div x-data="{ itemsOpen: {{ request()->routeIs('admin.index', 'newItem', 'admin.equipment.*', 'projects.modeling.*') ? 'true' : 'false' }} }" class="w-full">
                             <button @click="itemsOpen = !itemsOpen" title="Database Management" class="ises-nav-link flex items-center justify-between px-3 py-2.5 transition-all group w-full focus:outline-none border-none outline-none bg-transparent {{ request()->routeIs('admin.index', 'newItem', 'admin.equipment.*') ? 'active' : '' }}" :class="sidebarOpen ? '' : 'justify-center'">
                                 <div class="flex items-center gap-3">
                                     <i class="fa-solid fa-database w-5 text-center text-sm"></i>
@@ -135,7 +135,7 @@
                             
                             <!-- Sub-navigation -->
                             <div x-show="itemsOpen && sidebarOpen" x-transition class="pl-11 pr-3 py-1 space-y-1">
-                                <a href="{{ route('admin.index') }}" class="ises-nav-link block px-3 py-2 text-[11px] font-medium transition-colors {{ request()->routeIs('admin.index', 'newItem') ? 'active' : '' }}">
+                                <a href="{{ route('admin.index') }}" class="ises-nav-link block px-3 py-2 text-[11px] font-medium transition-colors {{ request()->routeIs('admin.index', 'newItem', 'projects.modeling.modules.*', 'projects.modeling.items.*', 'projects.modeling.packages.*') ? 'active' : '' }}">
                                     Item Catalog
                                 </a>
                                 <a href="{{ route('admin.equipment.index') }}" class="ises-nav-link block px-3 py-2 text-[11px] font-medium transition-colors {{ request()->routeIs('admin.equipment.*') ? 'active' : '' }}">
@@ -198,7 +198,7 @@
                             @endif
                             <span class="map-topbar-divider" aria-hidden="true"></span>
                             <div class="map-topbar-context">
-                                <span class="map-topbar-eyebrow">ECO HYDROTECH SOLUTIONS</span>
+                                <span class="map-topbar-eyebrow">SURVEY WORKSPACE</span>
                                 <span class="map-topbar-section">Survey Planning</span>
                             </div>
                         @endunless
