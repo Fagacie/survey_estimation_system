@@ -163,3 +163,29 @@
  .projects-dashboard-overview { margin-top:1rem; }
  .projects-dashboard-queue-grid { grid-template-columns:1fr; }
 }
+
+
+/* Keep the project register focused on finding and managing records. */
+.projects-dashboard-filters {
+    grid-template-columns: minmax(220px, 1.35fr) repeat(3, minmax(125px, 1fr));
+}
+.projects-dashboard-search { grid-column: span 1; }
+.projects-dashboard-clear { justify-self: start; align-self: center; }
+.projects-dashboard-register { margin-top: 1.35rem; }
+.projects-dashboard-action:focus-visible,
+.projects-dashboard-primary:focus-visible,
+.projects-dashboard-clear:focus-visible,
+.projects-dashboard-filters select:focus-visible,
+.projects-dashboard-filters input:focus-visible {
+    outline: 3px solid rgba(11, 92, 142, .28);
+    outline-offset: 2px;
+}
+@media (max-width: 1100px) {
+    .projects-dashboard-filters { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .projects-dashboard-search { grid-column: 1 / -1; }
+}
+@media (max-width: 640px) {
+    .projects-dashboard-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .projects-dashboard-search,
+    .projects-dashboard-clear { grid-column: 1 / -1; }
+}
