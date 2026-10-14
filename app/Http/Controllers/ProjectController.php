@@ -163,8 +163,12 @@ class ProjectController extends Controller
      */
     public function show(string $id)
     {
-        $project = Project::findOrFail($id);
-        $project->load('surveyLocations');
+        $project = Project::with([
+            'client',
+            'surveyLocations',
+            'modellingSummary',
+            'modellingItems',
+        ])->findOrFail($id);
         return view('projects.overview', compact('project'));
     }
 
