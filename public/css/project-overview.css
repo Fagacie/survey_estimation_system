@@ -163,3 +163,11 @@
  .project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li { padding: .9rem; }
  .project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li > div:last-child { gap: .5rem; }
 }
+
+/* The register rows have two content groups: workflow identity and action controls. */
+.project-overview-workflow-table-head { grid-template-columns: minmax(0,1fr) minmax(390px,1.5fr); }
+.project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li { grid-template-columns: minmax(0,1fr) minmax(390px,1.5fr); }
+@media (max-width:1100px) {
+ .project-overview-workflow-table-head { display:none; }
+ .project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li { grid-template-columns:minmax(0,1fr); }
+}
