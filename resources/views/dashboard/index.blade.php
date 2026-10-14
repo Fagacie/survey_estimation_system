@@ -164,6 +164,118 @@
             </script>
         @endpush
 
+        <section class="ises-dashboard-section ises-dashboard-financial" aria-label="Quotation value overview">
+            <div class="ises-dashboard-section-heading">
+                <div>
+                    <p class="ises-dashboard-eyebrow">Commercial overview</p>
+                    <h2>Quotation value</h2>
+                    <p>Saved quotation totals, not collected revenue.</p>
+                </div>
+                <a class="ises-dashboard-secondary" href="{{ route('quotations.history') }}">Open quotation history <i class="fa-solid fa-arrow-right"></i></a>
+            </div>
+
+            <div class="ises-dashboard-financial-metrics">
+                <article class="ises-dashboard-financial-metric">
+                    <span>Total quoted value</span>
+                    <strong>MYR {{ number_format($quotationStats['total_value'], 2) }}</strong>
+                    <small>Across {{ number_format($quotationStats['count']) }} saved quotations</small>
+                </article>
+                <article class="ises-dashboard-financial-metric">
+                    <span>Average quotation</span>
+                    <strong>MYR {{ number_format($quotationStats['average_value'], 2) }}</strong>
+                    <small>Average value per saved quotation</small>
+                </article>
+                <article class="ises-dashboard-financial-metric">
+                    <span>This month</span>
+                    <strong>MYR {{ number_format($quotationStats['this_month_value'], 2) }}</strong>
+                    <small>{{ number_format($quotationStats['this_month_count']) }} quotations created this month</small>
+                </article>
+            </div>
+
+            <div class="ises-dashboard-quotation-trend">
+                <div class="ises-dashboard-quotation-trend-heading">
+                    <div><h3>Last six months</h3><p>Monthly quotation value and count.</p></div>
+                    <span>MYR</span>
+                </div>
+                <div class="ises-dashboard-quotation-chart-wrap">
+                    <canvas id="quotationValueChart" role="img" aria-label="Bar chart showing quotation value by month"></canvas>
+                </div>
+            </div>
+        </section>
+
+        @push('scripts')
+            <script>
+                (() => {
+                    const canvas = document.getElementById('quotationValueChart');
+                    const rows = @json($quotationMonthly);
+                    if (!window.Chart || !canvas || !rows.length) return;
+
+                    new Chart(canvas, {
+                        data: {
+                            labels: rows.map(row => row.label),
+                            datasets: [
+                                {
+                                    type: 'bar',
+                                    label: 'Quoted value (MYR)',
+                                    data: rows.map(row => row.value),
+                                    yAxisID: 'value',
+                                    backgroundColor: '#4d83b8',
+                                    hoverBackgroundColor: '#2463a6',
+                                    borderRadius: 3,
+                                    maxBarThickness: 34
+                                },
+                                {
+                                    type: 'line',
+                                    label: 'Quotation count',
+                                    data: rows.map(row => row.count),
+                                    yAxisID: 'count',
+                                    borderColor: '#2d8a83',
+                                    backgroundColor: '#2d8a83',
+                                    pointRadius: 3,
+                                    pointHoverRadius: 5,
+                                    tension: .25
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { mode: 'index', intersect: false },
+                            plugins: {
+                                legend: { position: 'bottom', labels: { usePointStyle: true, boxWidth: 7, padding: 18 } },
+                                tooltip: {
+                                    callbacks: {
+                                        label: context => context.dataset.yAxisID === 'value'
+                                            ? ' ' + context.dataset.label + ': MYR ' + Number(context.raw).toLocaleString('en-MY', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                            : ' ' + context.dataset.label + ': ' + context.raw
+                                    }
+                                }
+                            },
+                            scales: {
+                                value: {
+                                    type: 'linear',
+                                    position: 'left',
+                                    beginAtZero: true,
+                                    ticks: { callback: value => 'MYR ' + Number(value).toLocaleString('en-MY', { maximumFractionDigits: 0 }) },
+                                    grid: { color: '#edf1f5' },
+                                    border: { display: false }
+                                },
+                                count: {
+                                    type: 'linear',
+                                    position: 'right',
+                                    beginAtZero: true,
+                                    ticks: { precision: 0 },
+                                    grid: { drawOnChartArea: false },
+                                    border: { display: false }
+                                },
+                                x: { grid: { display: false }, border: { display: false } }
+                            }
+                        }
+                    });
+                })();
+            </script>
+        @endpush
+
         <section class="ises-dashboard-section ises-dashboard-attention">
             <div class="ises-dashboard-section-heading">
                 <div>
