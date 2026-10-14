@@ -361,3 +361,257 @@
         box-shadow: 8px 0 28px rgba(25, 49, 73, .12) !important;
     }
 }
+
+
+/* Dashboard refinement: four balanced metrics, stronger interaction and cleaner hierarchy. */
+.ises-dashboard {
+    max-width: 1480px;
+    padding-bottom: 30px;
+}
+.ises-dashboard-header {
+    align-items: center !important;
+    padding: 8px 0 22px !important;
+    margin-bottom: 20px !important;
+    border-bottom-color: #dce5ee !important;
+}
+.ises-dashboard-header h1 {
+    font-size: clamp(29px, 3vw, 38px) !important;
+    letter-spacing: -.045em !important;
+}
+.ises-dashboard-intro {
+    max-width: 560px;
+    font-size: 13px !important;
+    line-height: 1.65;
+}
+.ises-dashboard-header-actions { gap: 10px !important; }
+.ises-dashboard-date {
+    min-height: 42px;
+    border-radius: 7px !important;
+    background: #fff;
+}
+.ises-dashboard-primary {
+    min-height: 42px;
+    border-radius: 7px !important;
+    box-shadow: none !important;
+    transition: background .16s, box-shadow .16s, transform .16s !important;
+}
+.ises-dashboard-primary:hover {
+    box-shadow: 0 4px 12px rgba(36, 99, 166, .16) !important;
+    transform: translateY(-1px);
+}
+.ises-dashboard-quick-links {
+    gap: 12px !important;
+    margin-bottom: 20px !important;
+}
+.ises-dashboard-quick-links a {
+    min-height: 78px;
+    padding: 15px !important;
+    border-radius: 8px !important;
+    transition: border-color .16s, background .16s, transform .16s, box-shadow .16s !important;
+}
+.ises-dashboard-quick-links a:hover {
+    border-color: #b8cfe1 !important;
+    background: #fbfdff !important;
+    box-shadow: 0 5px 14px rgba(20, 43, 73, .055);
+    transform: translateY(-2px);
+}
+.ises-dashboard-quick-links a > span {
+    border: 1px solid #dce8f1;
+    background: #f0f6fa !important;
+    color: #2a6b96 !important;
+}
+.ises-dashboard-quick-links a strong { color: #213d55; font-size: 12px !important; }
+.ises-dashboard-quick-links a small { font-size: 11px !important; line-height: 1.45; }
+.ises-dashboard-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+    margin-bottom: 20px !important;
+}
+.ises-dashboard-metric {
+    position: relative;
+    min-height: 132px;
+    padding: 18px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 2px 7px rgba(20, 43, 73, .025) !important;
+}
+.ises-dashboard-metric-primary {
+    border-top: 1px solid #cbdbe8 !important;
+    border-left: 3px solid #2463a6 !important;
+    padding-top: 18px !important;
+}
+.ises-dashboard-metric-label {
+    font-size: 10px !important;
+    letter-spacing: .075em !important;
+}
+.ises-dashboard-metric strong {
+    margin: 12px 0 6px !important;
+    font-size: clamp(28px, 2.8vw, 36px) !important;
+    letter-spacing: -.045em;
+    line-height: 1 !important;
+}
+.ises-dashboard-metric-note {
+    font-size: 11px !important;
+    line-height: 1.5 !important;
+}
+.ises-dashboard-metric-link::after {
+    content: "View related projects  →" !important;
+    margin-top: auto !important;
+    padding-top: 12px;
+    font-size: 10px !important;
+    color: #2d6b97 !important;
+}
+.ises-dashboard-metric-link:hover {
+    border-color: #a9c5df !important;
+    background: #fbfdff !important;
+    box-shadow: 0 7px 18px rgba(20, 43, 73, .07) !important;
+    transform: translateY(-2px);
+}
+.ises-dashboard-section {
+    margin-bottom: 20px !important;
+    border-radius: 9px !important;
+    box-shadow: 0 2px 8px rgba(20, 43, 73, .025) !important;
+}
+.ises-dashboard-section-heading {
+    padding: 20px 22px !important;
+}
+.ises-dashboard-section-heading h2 { font-size: 17px !important; }
+.ises-dashboard-section-heading p:not(.ises-dashboard-eyebrow) {
+    margin-top: 4px;
+    font-size: 12px !important;
+    line-height: 1.6;
+}
+.ises-dashboard-count {
+    border-color: #dce5ee !important;
+    border-radius: 6px !important;
+    color: #50677c !important;
+    background: #f6f9fc !important;
+}
+.ises-dashboard-attention-grid {
+    gap: 10px !important;
+    padding: 16px !important;
+}
+.ises-dashboard-attention-card {
+    min-height: 84px;
+    border-radius: 7px !important;
+    transition: border-color .15s, background .15s;
+}
+.ises-dashboard-attention-card:hover {
+    border-color: #b9cfe0;
+    background: #fbfdff;
+}
+.ises-dashboard-attention-icon {
+    border: 1px solid #dce8f1;
+}
+.ises-dashboard-table th { padding: 13px 20px !important; }
+.ises-dashboard-table td { padding: 15px 20px !important; }
+.ises-dashboard-table tbody tr {
+    transition: background-color .14s ease;
+}
+.ises-dashboard-row-action a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 9px;
+    border: 1px solid #dce5ee;
+    border-radius: 5px;
+    background: #fff;
+    transition: background .15s, border-color .15s;
+}
+.ises-dashboard-row-action a:hover {
+    border-color: #b8cfe1;
+    background: #f1f7fb;
+}
+.ises-dashboard a:focus-visible {
+    outline: 3px solid rgba(36, 99, 166, .28) !important;
+    outline-offset: 3px;
+}
+@media (max-width: 1150px) {
+    .ises-dashboard-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+}
+@media (max-width: 720px) {
+    .ises-dashboard-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+    .ises-dashboard-header { align-items: flex-start !important; }
+    .ises-dashboard-header-actions { flex-wrap: wrap; }
+    .ises-dashboard-metric { min-height: 122px; padding: 14px !important; }
+    .ises-dashboard-section-heading { padding: 17px !important; }
+}
+@media (max-width: 420px) {
+    .ises-dashboard-metrics { grid-template-columns: minmax(0, 1fr) !important; }
+}
+
+/* Full company wordmark: typographic lockup, not a logo image or a generic initial badge. */
+.ises-brand-full {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+.ises-brand-symbol {
+    display: grid;
+    place-items: center;
+    width: 35px;
+    height: 35px;
+    flex: 0 0 35px;
+    border: 1px solid #d0e0ea;
+    border-radius: 7px;
+    background: #eaf3f8;
+    color: #21658c;
+    font-size: 15px;
+}
+.ises-brand-type {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    gap: 1px;
+    line-height: 1.15;
+}
+.ises-brand-type > span {
+    color: #4f7188;
+    font-family: 'Space Grotesk', 'DM Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 500;
+    letter-spacing: -.45px;
+}
+.ises-brand-type strong {
+    color: #173e5a;
+    font-weight: 750;
+}
+.ises-brand-type small {
+    color: #6d8496;
+    font-size: 9px;
+    font-weight: 750;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+}
+.ises-sidebar-brand { padding-inline: 15px !important; }
+.ises-sidebar .ises-nav-link {
+    position: relative;
+    min-height: 43px !important;
+    margin-bottom: 2px;
+    border-radius: 6px !important;
+    transition: color .15s, background-color .15s, border-color .15s !important;
+}
+.ises-sidebar .ises-nav-link.active {
+    border-color: #d6e4ef !important;
+    background: #e7f0f6 !important;
+    color: #164a6c !important;
+    box-shadow: inset 3px 0 #377fa9 !important;
+}
+.ises-sidebar .ises-nav-link.active i {
+    color: #286e99 !important;
+}
+.ises-sidebar .ises-nav-link:hover:not(.active) {
+    border-color: #e2eaf0 !important;
+    background: #edf2f6 !important;
+    color: #27485f !important;
+}
+.ises-sidebar .ises-nav-link:focus-visible {
+    outline: 2px solid #76a8c7 !important;
+    outline-offset: 1px;
+}
+.ises-sidebar .ises-sidebar-brand > button {
+    margin-left: 6px;
+}
+@media (max-width: 1023px) {
+    .ises-brand-type > span { font-size: 16px; }
+}
