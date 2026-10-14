@@ -94,7 +94,7 @@
                 <div class="ises-dashboard-table-wrap">
                     <table class="ises-dashboard-table">
                         <thead>
-                            <tr><th>Project</th><th>Client</th><th>Type</th><th>Status</th><th><span class="sr-only">Action</span></th></tr>
+                            <tr><th scope="col">Project</th><th scope="col">Client</th><th scope="col">Type</th><th scope="col">Status</th><th scope="col"><span class="sr-only">Action</span></th></tr>
                         </thead>
                         <tbody>
                             @foreach($recentProjects as $project)
