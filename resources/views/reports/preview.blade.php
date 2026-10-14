@@ -98,7 +98,7 @@
             border: 1px solid #cbd6e0;
             border-radius: 4px;
             background: #fff;
-            color: #243f58;
+            color: #243f58 !important;
             font-size: 0.8rem;
             font-weight: 700;
             text-decoration: none;
@@ -108,17 +108,17 @@
         .report-preview-button:hover {
             background: #f5f8fa;
             border-color: #91a6b8;
-            color: #102b46;
+            color: #102b46 !important;
         }
         .report-preview-button-primary {
-            background: #102b46;
-            border-color: #102b46;
-            color: #fff;
+            background: #102b46 !important;
+            border-color: #102b46 !important;
+            color: #fff !important;
         }
         .report-preview-button-primary:hover {
-            background: #1b4262;
-            border-color: #1b4262;
-            color: #fff;
+            background: #1b4262 !important;
+            border-color: #1b4262 !important;
+            color: #fff !important;
         }
         .report-preview-stage {
             padding: clamp(1rem, 3vw, 2.25rem) 1rem 3rem;
@@ -149,7 +149,7 @@
         .report-preview-frame {
             display: block;
             width: 100%;
-            height: 297mm;
+            height: 594mm;
             border: 0;
             background: #ffffff;
         }
@@ -168,7 +168,7 @@
             .report-preview-button { padding-inline: 0.55rem; }
             .report-preview-stage { padding: 1rem 0.5rem 2rem; }
             .report-preview-paper { width: 100%; }
-            .report-preview-frame { height: 220mm; }
+            .report-preview-frame { height: 594mm; }
             .report-preview-stage-head { padding-inline: 0.35rem; }
         }
         @media (prefers-reduced-motion: reduce) {
