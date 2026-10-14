@@ -615,3 +615,10 @@
 @media (max-width: 1023px) {
     .ises-brand-type > span { font-size: 16px; }
 }
+
+
+/* Brand preference: company name only, without decorative symbol. */
+.ises-brand-full { gap: 0 !important; }
+.ises-brand-symbol { display: none !important; }
+.ises-brand-type > span { font-size: 17px !important; }
+.ises-brand-type small { letter-spacing: .14em; }
