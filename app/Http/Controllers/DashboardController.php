@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Project;
+use App\Models\QtInvoice;
 use Illuminate\View\View;
 use Illuminate\Support\Str;
 
@@ -43,6 +44,25 @@ class DashboardController extends Controller
                 'total' => (int) $row->total,
             ]);
 
+        $quotationStats = [
+            'count' => QtInvoice::count(),
+            'total_value' => (float) QtInvoice::sum('grand_total'),
+            'average_value' => (float) (QtInvoice::count() ? QtInvoice::avg('grand_total') : 0),
+            'this_month_count' => QtInvoice::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->count(),
+            'this_month_value' => (float) QtInvoice::whereBetween('created_at', [now()->startOfMonth(), now()->endOfMonth()])->sum('grand_total'),
+        ];
+
+        $quotationMonthly = collect(range(5, 0))->map(function ($monthsAgo) {
+            $month = now()->startOfMonth()->subMonths($monthsAgo);
+            $query = QtInvoice::whereBetween('created_at', [$month->copy()->startOfMonth(), $month->copy()->endOfMonth()]);
+
+            return [
+                'label' => $month->format('M Y'),
+                'count' => (int) $query->count(),
+                'value' => (float) $query->sum('grand_total'),
+            ];
+        });
+
         $recentProjects = Project::with('client')->latest('updated_at')->limit(5)->get();
 
         $attentionBase = fn () => Project::with('client')->where('status', '!=', 'completed');
@@ -70,6 +90,6 @@ class DashboardController extends Controller
             ],
         ])->filter(fn ($item) => $item['count'] > 0)->values();
 
-        return view('dashboard.index', compact('metrics', 'recentProjects', 'attentionItems', 'statusBreakdown', 'projectTypeBreakdown'));
+        return view('dashboard.index', compact('metrics', 'recentProjects', 'attentionItems', 'statusBreakdown', 'projectTypeBreakdown', 'quotationStats', 'quotationMonthly'));
     }
 }
