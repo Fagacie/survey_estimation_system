@@ -10,9 +10,10 @@
         }
         @media screen {
             body {
-                padding: 14mm !important;
+                padding: 12mm 14mm 14mm !important;
                 margin: 0 auto;
-                max-width: 210mm;
+                width: 210mm;
+                max-width: 100%;
                 background: #ffffff;
             }
         }
