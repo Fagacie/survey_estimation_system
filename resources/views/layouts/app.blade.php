@@ -35,6 +35,8 @@
 
         <!-- Custom CSS -->
         <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ time() + 1 }}">
+        <link rel="stylesheet" href="{{ asset('css/ises-redesign.css') }}?v={{ filemtime(public_path('css/ises-redesign.css')) }}">
+        <link rel="stylesheet" href="{{ asset('css/ises-page-overrides.css') }}?v={{ filemtime(public_path('css/ises-page-overrides.css')) }}">
         @stack('styles')
 
         <style>
