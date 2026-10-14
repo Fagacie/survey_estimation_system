@@ -71,7 +71,7 @@
                                 <p>{{ $item['description'] }}</p>
                             </div>
                             <strong>{{ $item['count'] }}</strong>
-                            <a href="{{ route('projects.index') }}" aria-label="Review projects: {{ $item['label'] }}"><i class="fa-solid fa-arrow-right"></i></a>
+                            <a href="{{ route('projects.index', ['attention' => $item['key']]) }}" aria-label="Review projects: {{ $item['label'] }}"><i class="fa-solid fa-arrow-right"></i></a>
                         </article>
                     @endforeach
                 </div>
