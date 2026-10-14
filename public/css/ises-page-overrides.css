@@ -7,3 +7,41 @@
 @media(max-width:900px){.projects-dashboard-header{align-items:flex-start;flex-direction:column}.projects-dashboard-header-tools{width:100%;justify-content:space-between;flex-wrap:wrap}.projects-dashboard-overview{grid-template-columns:1fr}.projects-dashboard-overview-metrics>div{border-left:0;border-top:1px solid var(--ises-line)}}
 @media(max-width:560px){.projects-dashboard{padding:20px 14px 30px}.projects-dashboard-overview-lead{padding:18px}.projects-dashboard-overview-metrics>div{padding:15px 18px}.projects-dashboard-primary{width:100%;justify-content:center}}
 @media print{.projects-dashboard,.create-project-page,.project-overview-page{max-width:none!important;padding:0!important}.projects-dashboard-overview,.projects-dashboard-feedback{box-shadow:none!important}}
+
+/* Quotation workspace: calmer tab hierarchy and a clear persistent summary. */
+.ises-app .custom-nav-tabs{border-color:var(--ises-line);gap:4px}
+.ises-app .custom-nav-tabs .nav-link{padding:13px 16px;color:var(--ises-muted);border-bottom:2px solid transparent;font-size:12px;font-weight:650}
+.ises-app .custom-nav-tabs .nav-link:hover{color:var(--ises-ink);border-color:#b8cce0}
+.ises-app .custom-nav-tabs .nav-link.active{color:var(--ises-blue);border-color:var(--ises-blue);background:transparent}
+.ises-app .sticky-bottom-summary{border:1px solid var(--ises-line);border-radius:11px;box-shadow:var(--ises-shadow);padding:20px}
+.ises-app .bottom-bar{border:1px solid #263d5b;border-radius:11px;background:var(--ises-navy);box-shadow:0 8px 24px #142b4918}
+.ises-app .project-grid{gap:18px}
+/* Quotation history: table/filter surfaces share the system tokens. */
+.quotation-history-page .filter-card-custom,.quotation-history-page .table-card{border:1px solid var(--ises-line);border-radius:11px;background:#fff;box-shadow:var(--ises-shadow)}
+.quotation-history-page .page-header-wrapper{padding-bottom:18px;border-bottom:1px solid var(--ises-line)}
+.quotation-history-page .page-header-title{font-family:var(--ises-display);font-size:clamp(26px,2.5vw,34px)}
+.quotation-history-page .filter-label{color:var(--ises-ink-soft);font-size:11px;font-weight:700}
+.quotation-history-page .filter-select{min-height:40px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:var(--ises-ink);font-size:12px}
+.quotation-history-page .action-circle-btn{border:1px solid var(--ises-line);background:#fff;color:var(--ises-muted);transition:background .15s,color .15s}
+.quotation-history-page .action-circle-btn:hover{background:#edf4fb;color:var(--ises-blue)}
+.quotation-history-page .modal-card{border:1px solid var(--ises-line);border-radius:13px;box-shadow:0 20px 55px #142b4926}
+/* Drone/equipment register */
+.equipment-page .section-header{border-bottom:1px solid var(--ises-line)}
+.equipment-page .equipment-eyebrow{color:var(--ises-blue);font-size:10px;font-weight:750;letter-spacing:.12em;text-transform:uppercase}
+.equipment-page .equipment-title{font-family:var(--ises-display);font-size:clamp(26px,2.4vw,34px);letter-spacing:-.035em}
+.equipment-page .equipment-subtitle{max-width:720px;color:var(--ises-muted);font-size:13px;line-height:1.65}
+.equipment-page .custom-card{overflow:hidden;border:1px solid var(--ises-line);border-radius:11px;background:#fff;box-shadow:var(--ises-shadow)}
+.equipment-page .custom-card-header{padding:16px 20px;border-bottom:1px solid var(--ises-line);background:#fff}
+.equipment-page .custom-card-title{font-family:var(--ises-display);font-size:15px}
+.equipment-page .status-badge{border-radius:6px;font-size:10px;font-weight:700}
+.equipment-page .minimal-input{width:100%;padding:9px 11px}
+/* Catalogue and modelling actions use compact, consistent controls. */
+.ises-app .act-wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ises-app .act-btn{min-height:35px;padding:8px 12px;border:1px solid var(--ises-line);border-radius:8px;background:#fff;color:var(--ises-ink-soft);font-size:12px;font-weight:650;text-decoration:none}
+.ises-app .act-btn:hover{background:#edf4fb;border-color:#bfd2e5;color:var(--ises-blue)}
+/* Invoice controls are restyled on screen only. Document layout and print rules remain intact. */
+.invoice-page-wrap .invoice-controls{border:1px solid var(--ises-line);border-radius:11px;background:#fff;box-shadow:var(--ises-shadow)}
+.invoice-page-wrap .ctrl-btn{border-radius:8px;font-weight:650;transition:background .15s,border-color .15s}
+.invoice-page-wrap .ctrl-btn-primary{background:var(--ises-blue);border-color:var(--ises-blue)}
+.invoice-page-wrap .ctrl-btn-primary:hover{background:var(--ises-blue-hover);border-color:var(--ises-blue-hover)}
+@media(max-width:760px){.ises-app .sticky-bottom-summary{padding:14px}.ises-app .bottom-bar{gap:12px;flex-wrap:wrap;padding:14px}.quotation-history-page .page-header-title{font-size:25px}.equipment-page .custom-card-header{padding:13px 15px}}
