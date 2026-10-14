@@ -71,3 +71,26 @@
 .ises-app .equipment-page .custom-card-header{padding:16px 20px;border-bottom:1px solid var(--ises-line);background:#fff}
 @media(max-width:900px){.ises-app .projects-dashboard-header{align-items:flex-start;flex-direction:column}.ises-app .projects-dashboard-overview-metrics>div{border-left:0;border-top:1px solid var(--ises-line)}}
 @media(max-width:560px){.ises-app .projects-dashboard{padding:20px 14px 30px}.ises-app .projects-dashboard-overview-lead{padding:18px}.ises-app .projects-dashboard-overview-metrics>div{padding:15px 18px}}
+
+/* Reference-data catalog and item forms */
+.ises-app .catalog-page{max-width:var(--ises-page-width);color:var(--ises-ink)}
+.ises-app .catalog-page .catalog-kicker{color:var(--ises-blue);font-size:10px;font-weight:750;letter-spacing:.12em;text-transform:uppercase}
+.ises-app .catalog-page .page-header-wrapper{padding-bottom:20px;border-bottom:1px solid var(--ises-line)}
+.ises-app .catalog-page .page-header{font-family:var(--ises-display);font-size:clamp(25px,2.4vw,33px);letter-spacing:-.035em;color:var(--ises-ink)}
+.ises-app .catalog-page .create-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:39px;padding:9px 14px;border:1px solid var(--ises-blue);border-radius:8px;background:var(--ises-blue);color:#fff;font-size:12px;font-weight:700;text-decoration:none}
+.ises-app .catalog-page .create-button:hover{background:var(--ises-blue-hover);border-color:var(--ises-blue-hover);color:#fff}
+.ises-app .catalog-page .catalog-module,.ises-app .catalog-page>.bg-white.border{border-color:var(--ises-line);border-radius:11px;background:#fff;box-shadow:var(--ises-shadow)}
+.ises-app .catalog-page .catalog-module .table-card{overflow:hidden;border:1px solid var(--ises-line);border-radius:9px;background:#fff}
+.ises-app .catalog-page .catalog-module .table-card thead{background:#f7f9fc;color:var(--ises-muted)}
+.ises-app .catalog-page .catalog-module .table-card th{font-size:10px;font-weight:750;letter-spacing:.06em;text-transform:uppercase}
+.ises-app .catalog-page .catalog-module .table-card td{border-color:#edf1f5}
+.ises-app .catalog-page .catalog-module .action-button{border-radius:7px}
+.ises-app .catalog-page input:focus,.ises-app .catalog-page select:focus{border-color:#6b9ccc;box-shadow:0 0 0 3px #2463a61c;outline:0}
+.ises-app .item-container{max-width:980px;margin-inline:auto;color:var(--ises-ink)}
+.ises-app .item-container .page-header{font-family:var(--ises-display);font-size:clamp(25px,2.4vw,33px);letter-spacing:-.035em}
+.ises-app .item-container .banner{border-radius:11px;background:var(--ises-navy);color:#fff}
+.ises-app .item-container .card{border:1px solid var(--ises-line);border-radius:11px;box-shadow:var(--ises-shadow)}
+.ises-app .item-container .btn-purple{background:var(--ises-blue);border-color:var(--ises-blue);color:#fff}
+.ises-app .item-container .btn-purple:hover{background:var(--ises-blue-hover);border-color:var(--ises-blue-hover)}
+.ises-app .item-container .form-group input:focus,.ises-app .item-container .form-group select:focus,.ises-app .item-container .form-group textarea:focus{border-color:#6b9ccc;box-shadow:0 0 0 3px #2463a61c;outline:0}
+@media(max-width:640px){.ises-app .catalog-page .page-header-wrapper{gap:14px}.ises-app .item-container{padding-inline:14px}}
