@@ -28,7 +28,9 @@
 
     </style>
 
-    <div class="quotation-workspace max-w-7xl mx-auto">
+    <link rel="stylesheet" href="{{ asset('css/quotation-builder.css') }}?v={{ filemtime(public_path('css/quotation-builder.css')) }}">
+
+    <div class="quotation-workspace quotation-builder-page max-w-7xl mx-auto">
 @php
     // Back to the SAME project's overview page. If no project is loaded, go to the projects list.
     $backUrl = $prefillProject
