@@ -218,5 +218,7 @@
         </style>
         
         @stack('scripts')
+        {{-- Final cascade intentionally follows view-level CSS so the redesign is visible across legacy screens. --}}
+        <link rel="stylesheet" href="{{ asset('css/ises-final-overrides.css') }}?v={{ filemtime(public_path('css/ises-final-overrides.css')) }}">
     </body>
 </html>
