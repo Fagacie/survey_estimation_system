@@ -127,7 +127,7 @@
                                         <form action="{{ route('projects.destroy', $project->project_Id) }}" method="POST" class="inline-block form-delete m-0">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="button" class="projects-dashboard-action projects-dashboard-action-danger btn-delete-action" title="Delete project">
+                                            <button type="button" class="projects-dashboard-action projects-dashboard-action-danger btn-delete-action" title="Delete project" aria-label="Delete project: {{ $project->name }}">
                                                 <i class="fa-solid fa-trash-can"></i><span>Delete</span>
                                             </button>
                                         </form>
