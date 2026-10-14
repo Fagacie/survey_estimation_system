@@ -3,10 +3,6 @@
     box-sizing: border-box;
 }
 
-.admin-container * {
-    margin-top: 0;
-}
-
 .admin-container {
     width: 90%;
     max-width: 1200px;
