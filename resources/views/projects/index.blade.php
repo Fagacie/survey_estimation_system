@@ -35,6 +35,29 @@
         </dl>
     </section>
 
+    <nav class="projects-dashboard-shortcuts" aria-label="Quick access">
+        <a href="{{ route('projects.create') }}" class="projects-dashboard-shortcut">
+            <span class="projects-dashboard-shortcut-icon"><i class="fa-solid fa-folder-plus"></i></span>
+            <span><strong>Create project</strong><small>Start a new survey workspace</small></span>
+            <i class="fa-solid fa-arrow-up-right-from-square projects-dashboard-shortcut-arrow"></i>
+        </a>
+        <a href="{{ route('quotations.history') }}" class="projects-dashboard-shortcut">
+            <span class="projects-dashboard-shortcut-icon"><i class="fa-solid fa-file-invoice-dollar"></i></span>
+            <span><strong>Quotation history</strong><small>Review previous estimates</small></span>
+            <i class="fa-solid fa-arrow-up-right-from-square projects-dashboard-shortcut-arrow"></i>
+        </a>
+        <a href="{{ route('admin.equipment.index') }}" class="projects-dashboard-shortcut">
+            <span class="projects-dashboard-shortcut-icon"><i class="fa-solid fa-plane-up"></i></span>
+            <span><strong>Drone equipment</strong><small>Manage mapping equipment</small></span>
+            <i class="fa-solid fa-arrow-up-right-from-square projects-dashboard-shortcut-arrow"></i>
+        </a>
+        <a href="{{ route('admin.index') }}" class="projects-dashboard-shortcut">
+            <span class="projects-dashboard-shortcut-icon"><i class="fa-solid fa-database"></i></span>
+            <span><strong>Modelling catalogue</strong><small>Maintain services and rates</small></span>
+            <i class="fa-solid fa-arrow-up-right-from-square projects-dashboard-shortcut-arrow"></i>
+        </a>
+    </nav>
+
     @if($metrics['total'] > 0)
         @if($attention['missing_boundaries'] > 0 || $attention['missing_lines'] > 0 || $attention['missing_parameters'] > 0 || $attention['missing_cost'] > 0)
             <section class="projects-dashboard-queue" aria-labelledby="attention-title">
