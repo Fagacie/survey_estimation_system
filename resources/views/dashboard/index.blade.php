@@ -49,6 +49,121 @@
             </a>
         </section>
 
+        <section class="ises-dashboard-charts" aria-label="Project analytics">
+            <article class="ises-dashboard-section ises-dashboard-chart-card">
+                <div class="ises-dashboard-section-heading">
+                    <div>
+                        <p class="ises-dashboard-eyebrow">Portfolio</p>
+                        <h2>Project status</h2>
+                        <p>Select a segment to open projects with that status.</p>
+                    </div>
+                    <a class="ises-dashboard-chart-link" href="{{ route('projects.index') }}">All projects <i class="fa-solid fa-arrow-right"></i></a>
+                </div>
+                @if($statusBreakdown->isNotEmpty())
+                    <div class="ises-dashboard-chart-body">
+                        <div class="ises-dashboard-chart-canvas"><canvas id="projectStatusChart" role="img" aria-label="Doughnut chart showing project counts by status"></canvas></div>
+                        <ul class="ises-dashboard-chart-legend">
+                            @foreach($statusBreakdown as $status)
+                                <li><a href="{{ route('projects.index', ['status' => $status['key']]) }}"><span>{{ $status['label'] }}</span><strong>{{ $status['total'] }}</strong></a></li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @else
+                    <p class="ises-dashboard-chart-empty">Project status data will appear here once projects are created.</p>
+                @endif
+            </article>
+
+            <article class="ises-dashboard-section ises-dashboard-chart-card">
+                <div class="ises-dashboard-section-heading">
+                    <div>
+                        <p class="ises-dashboard-eyebrow">Project mix</p>
+                        <h2>By project type</h2>
+                        <p>Compare the number of projects in each category.</p>
+                    </div>
+                    <span class="ises-dashboard-chart-note">Live project records</span>
+                </div>
+                @if($projectTypeBreakdown->isNotEmpty())
+                    <div class="ises-dashboard-chart-body ises-dashboard-type-chart-body">
+                        <div class="ises-dashboard-type-chart-canvas"><canvas id="projectTypeChart" role="img" aria-label="Bar chart showing project counts by type"></canvas></div>
+                        <ul class="ises-dashboard-chart-legend ises-dashboard-type-legend">
+                            @foreach($projectTypeBreakdown as $type)
+                                <li><a href="{{ route('projects.index', ['project_type' => $type['key']]) }}"><span>{{ $type['label'] }}</span><strong>{{ $type['total'] }}</strong></a></li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @else
+                    <p class="ises-dashboard-chart-empty">Project type data will appear here once projects are created.</p>
+                @endif
+            </article>
+        </section>
+
+        @push('scripts')
+            <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+            <script>
+                (() => {
+                    const statusData = @json($statusBreakdown);
+                    const typeData = @json($projectTypeBreakdown);
+                    const statusCanvas = document.getElementById('projectStatusChart');
+                    const typeCanvas = document.getElementById('projectTypeChart');
+                    const palette = ['#2463a6', '#2d8a83', '#83a9cb', '#6d8298', '#c4d4e2', '#8b9c67'];
+
+                    if (window.Chart && statusCanvas && statusData.length) {
+                        new Chart(statusCanvas, {
+                            type: 'doughnut',
+                            data: {
+                                labels: statusData.map(item => item.label),
+                                datasets: [{ data: statusData.map(item => item.total), backgroundColor: statusData.map((_, index) => palette[index % palette.length]), borderColor: '#ffffff', borderWidth: 3, hoverOffset: 5 }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                cutout: '68%',
+                                plugins: {
+                                    legend: { display: false },
+                                    tooltip: { callbacks: { label: context => ' ' + context.label + ': ' + context.formattedValue + ' projects' } }
+                                },
+                                onClick: (event, elements) => {
+                                    if (!elements.length) return;
+                                    const item = statusData[elements[0].index];
+                                    window.location.href = new URL({!! json_encode(route('projects.index')) !!} + '?status=' + encodeURIComponent(item.key), window.location.origin).href;
+                                }
+                            }
+                        });
+                    }
+
+                    if (window.Chart && typeCanvas && typeData.length) {
+                        new Chart(typeCanvas, {
+                            type: 'bar',
+                            data: {
+                                labels: typeData.map(item => item.label),
+                                datasets: [{ label: 'Projects', data: typeData.map(item => item.total), backgroundColor: '#4d83b8', hoverBackgroundColor: '#2463a6', borderRadius: 3, maxBarThickness: 36 }]
+                            },
+                            options: {
+                                indexAxis: 'y',
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: { display: false },
+                                    tooltip: { callbacks: { label: context => ' ' + context.formattedValue + ' projects' } }
+                                },
+                                scales: {
+                                    x: { beginAtZero: true, ticks: { precision: 0 }, grid: { color: '#edf1f5' }, border: { display: false } },
+                                    y: { grid: { display: false }, border: { display: false } }
+                                },
+                                onClick: (event, elements) => {
+                                    if (!elements.length) return;
+                                    const item = typeData[elements[0].index];
+                                    const url = new URL({!! json_encode(route('projects.index')) !!}, window.location.origin);
+                                    url.searchParams.set('project_type', item.key || '');
+                                    window.location.href = url.href;
+                                }
+                            }
+                        });
+                    }
+                })();
+            </script>
+        @endpush
+
         <section class="ises-dashboard-section ises-dashboard-attention">
             <div class="ises-dashboard-section-heading">
                 <div>
