@@ -36,11 +36,6 @@
     </section>
 
     <nav class="projects-dashboard-shortcuts" aria-label="Quick access">
-        <a href="{{ route('projects.create') }}" class="projects-dashboard-shortcut">
-            <span class="projects-dashboard-shortcut-icon"><i class="fa-solid fa-folder-plus"></i></span>
-            <span><strong>Create project</strong><small>Start a new survey workspace</small></span>
-            <i class="fa-solid fa-arrow-up-right-from-square projects-dashboard-shortcut-arrow"></i>
-        </a>
         <a href="{{ route('quotations.history') }}" class="projects-dashboard-shortcut">
             <span class="projects-dashboard-shortcut-icon"><i class="fa-solid fa-file-invoice-dollar"></i></span>
             <span><strong>Quotation history</strong><small>Review previous estimates</small></span>
@@ -59,25 +54,27 @@
     </nav>
 
     @if($metrics['total'] > 0)
-        @if($attention['missing_boundaries'] > 0 || $attention['missing_lines'] > 0 || $attention['missing_parameters'] > 0 || $attention['missing_cost'] > 0)
+        @if(collect($attentionItems)->contains(fn ($item) => $item['projects']->isNotEmpty()))
             <section class="projects-dashboard-queue" aria-labelledby="attention-title">
                 <div class="projects-dashboard-section-heading">
                     <div><p class="projects-dashboard-eyebrow">Next actions</p><h2 id="attention-title">Needs attention</h2></div>
-                    <span>{{ collect($attention)->sum() }} open checks</span>
+                    <span>{{ collect($attentionItems)->sum(fn ($item) => $item['projects']->count()) }} open checks</span>
                 </div>
                 <div class="projects-dashboard-queue-grid">
-                    @if($attention['missing_boundaries'] > 0)
-                        <div><i class="fa-solid fa-draw-polygon"></i><span>Missing boundaries</span><strong>{{ $attention['missing_boundaries'] }}</strong></div>
-                    @endif
-                    @if($attention['missing_lines'] > 0)
-                        <div><i class="fa-solid fa-route"></i><span>Pending survey lines</span><strong>{{ $attention['missing_lines'] }}</strong></div>
-                    @endif
-                    @if($attention['missing_parameters'] > 0)
-                        <div><i class="fa-solid fa-sliders"></i><span>Missing parameters</span><strong>{{ $attention['missing_parameters'] }}</strong></div>
-                    @endif
-                    @if($attention['missing_cost'] > 0)
-                        <div><i class="fa-solid fa-calculator"></i><span>Awaiting cost estimation</span><strong>{{ $attention['missing_cost'] }}</strong></div>
-                    @endif
+                    @foreach($attentionItems as $attentionItem)
+                        <div class="projects-dashboard-attention-item">
+                            <span class="projects-dashboard-attention-label"><i class="{{ $attentionItem['icon'] }}"></i>{{ $attentionItem['label'] }}</span>
+                            <strong>{{ $attentionItem['projects']->count() }}</strong>
+                            <div class="projects-dashboard-attention-projects">
+                                @foreach($attentionItem['projects'] as $attentionProject)
+                                    <a href="{{ route('projects.show', $attentionProject->project_Id) }}" title="Open {{ $attentionProject->name }}">
+                                        <span>{{ $attentionProject->name }}</span>
+                                        <i class="fa-solid fa-arrow-up-right-from-square" aria-hidden="true"></i>
+                                    </a>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endforeach
                 </div>
             </section>
         @endif
@@ -158,7 +155,6 @@
                                             <i class="fa-solid fa-arrow-right font-light"></i>
                                         </a>
                                         <a href="{{ route('projects.edit', $project->project_Id) }}" class="projects-dashboard-action projects-dashboard-action-muted" title="Edit project"><i class="fa-solid fa-pen"></i><span>Edit</span>
-                                            <i class="fa-solid fa-pen font-light text-sm"></i>
                                         </a>
                                         <form action="{{ route('projects.destroy', $project->project_Id) }}" method="POST" class="inline-block form-delete m-0">
                                             @csrf
