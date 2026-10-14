@@ -182,3 +182,182 @@
 .ises-app main .ises-modelling-page table th, .ises-app main > .font-sans.text-slate-800.antialiased table th { color:#68798d; font-size:10px; letter-spacing:.07em; text-transform:uppercase; }
 .ises-app main .ises-modelling-page table tbody tr:hover, .ises-app main > .font-sans.text-slate-800.antialiased table tbody tr:hover { background:#f6f9fd; }
 .ises-app main .ises-modelling-page .act-btn, .ises-app main > .font-sans.text-slate-800.antialiased .act-btn { border-radius:7px; }
+
+
+/* Sidebar navigation refresh: light canvas, quiet states, typographic wordmark. */
+.ises-sidebar {
+    background: #f5f8fb !important;
+    color: #26394d !important;
+    border-right: 1px solid #dfe7ee !important;
+    box-shadow: 2px 0 12px rgba(25, 49, 73, .035) !important;
+}
+.ises-sidebar-brand {
+    min-height: 82px !important;
+    height: 82px !important;
+    padding: 0 18px !important;
+    justify-content: space-between !important;
+    border-bottom: 1px solid #e1e8ef !important;
+    background: #f5f8fb !important;
+}
+.ises-brand-name {
+    display: flex;
+    align-items: center;
+    min-width: 0;
+    text-decoration: none !important;
+    color: #193a56 !important;
+}
+.ises-brand-wordmark {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 5px;
+    color: #507087;
+    font-family: 'Space Grotesk', 'DM Sans', sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+    letter-spacing: -.8px;
+    line-height: 1.1;
+}
+.ises-brand-wordmark strong {
+    color: #163d5b;
+    font-weight: 750;
+}
+.ises-brand-compact {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #d7e3ec;
+    border-radius: 8px;
+    background: #fff;
+    color: #1d5b82;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: -.03em;
+}
+.ises-sidebar-brand > button {
+    width: 30px !important;
+    height: 30px !important;
+    flex: 0 0 30px;
+    border: 1px solid #d8e2eb !important;
+    border-radius: 6px !important;
+    background: #fff !important;
+    color: #5d7488 !important;
+}
+.ises-sidebar-brand > button:hover {
+    background: #eaf1f6 !important;
+    color: #1e557a !important;
+}
+.ises-sidebar .custom-scrollbar {
+    padding: 22px 12px !important;
+    gap: 5px !important;
+}
+.ises-sidebar .ises-nav-link {
+    min-height: 44px !important;
+    padding: 0 13px !important;
+    gap: 12px;
+    border: 1px solid transparent !important;
+    border-radius: 7px !important;
+    background: transparent !important;
+    color: #52677b !important;
+    font-size: 13px !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+    text-decoration: none !important;
+}
+.ises-sidebar .ises-nav-link i {
+    flex: 0 0 19px;
+    color: #8295a7 !important;
+    font-size: 14px !important;
+}
+.ises-sidebar .ises-nav-link:hover {
+    background: #eaf0f5 !important;
+    color: #1b3e5a !important;
+}
+.ises-sidebar .ises-nav-link:hover i {
+    color: #356b91 !important;
+}
+.ises-sidebar .ises-nav-link.active {
+    border-color: #d7e5ef !important;
+    background: #e5eff6 !important;
+    color: #17496d !important;
+    box-shadow: inset 3px 0 #4388b5 !important;
+}
+.ises-sidebar .ises-nav-link.active i {
+    color: #2b729f !important;
+}
+.ises-sidebar .ises-nav-link:focus-visible,
+.ises-sidebar .ises-sidebar-brand a:focus-visible,
+.ises-sidebar .ises-sidebar-brand button:focus-visible {
+    outline: 2px solid #6ca4c8 !important;
+    outline-offset: 2px;
+}
+.ises-sidebar [x-data] > div[x-show] .ises-nav-link {
+    min-height: 36px !important;
+    padding-left: 12px !important;
+    font-size: 12px !important;
+}
+.ises-sidebar-footer {
+    border-top: 1px solid #e1e8ef !important;
+    padding: 10px !important;
+    background: #f5f8fb !important;
+}
+.ises-sidebar-user {
+    display: flex !important;
+    min-width: 0;
+    gap: 10px;
+    padding: 10px !important;
+    border: 1px solid #e0e8ef;
+    border-radius: 8px;
+    background: #fff !important;
+}
+.ises-sidebar-user > a.ises-avatar {
+    width: 36px !important;
+    height: 36px !important;
+    flex: 0 0 36px;
+    border: 1px solid #d3e3ed !important;
+    border-radius: 7px !important;
+    background: #e7f0f6 !important;
+    color: #1c5b80 !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+}
+.ises-sidebar-user > div {
+    min-width: 0;
+    margin-left: 0 !important;
+}
+.ises-sidebar-user > div > div {
+    color: #263d52 !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 1.4;
+}
+.ises-sidebar-user form {
+    flex: 0 0 auto;
+    margin-left: auto !important;
+}
+.ises-sidebar-user form button {
+    width: 30px !important;
+    height: 30px !important;
+    border: 1px solid transparent !important;
+    border-radius: 6px !important;
+    color: #73889a !important;
+}
+.ises-sidebar-user form button:hover {
+    border-color: #f1d7d7 !important;
+    background: #fff1f1 !important;
+    color: #b54747 !important;
+}
+.ises-sidebar-user a:focus-visible,
+.ises-sidebar-user button:focus-visible {
+    outline: 2px solid #6ca4c8 !important;
+    outline-offset: 2px;
+}
+@media (max-width: 1023px) {
+    .ises-sidebar {
+        background: #f5f8fb !important;
+        box-shadow: 8px 0 28px rgba(25, 49, 73, .12) !important;
+    }
+}
