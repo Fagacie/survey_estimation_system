@@ -64,6 +64,19 @@ class ProjectController extends Controller
             $query->doesntHave('lineItems');
         }
 
+        $attention = $request->input('attention');
+        if (in_array($attention, ['boundaries', 'lines', 'cost'], true)) {
+            $query->where('status', '!=', 'completed');
+
+            if ($attention === 'boundaries') {
+                $query->doesntHave('boundaries');
+            } elseif ($attention === 'lines') {
+                $query->has('boundaries')->doesntHave('surveyLines');
+            } elseif ($attention === 'cost') {
+                $query->doesntHave('lineItems');
+            }
+        }
+
         $projects = $query->paginate(10)->withQueryString();
 
         $totalProjects = Project::count();
