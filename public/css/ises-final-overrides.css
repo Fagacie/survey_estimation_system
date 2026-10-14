@@ -159,3 +159,26 @@
 .ises-app main .projects-dashboard-shortcut-arrow { margin-left:auto; color:#91a2b5; font-size:11px; }
 @media(max-width:1100px) { .ises-app main .projects-dashboard-shortcuts { grid-template-columns:repeat(2,minmax(0,1fr)); } }
 @media(max-width:560px) { .ises-app main .projects-dashboard-shortcuts { grid-template-columns:1fr; } }
+
+
+/* Quotation builder workspace */
+.ises-app main .quotation-workspace { max-width:1540px; }
+.ises-app main .quotation-workspace #quotationBuilderHeader { padding-bottom:18px; border-bottom:1px solid var(--ises-border); }
+.ises-app main .quotation-workspace #quotationBuilderHeader h1 { color:var(--ises-ink); font-size:clamp(24px,2.4vw,32px); }
+.ises-app main .quotation-workspace #editFormContainer .bg-white.rounded-xl { border:1px solid var(--ises-border); border-radius:12px; box-shadow:var(--ises-elevation); }
+.ises-app main .quotation-workspace #editFormContainer h3 { color:var(--ises-ink); font-size:12px; letter-spacing:.06em; }
+.ises-app main .quotation-workspace input:not([type=checkbox]):not([type=radio]):not([type=hidden]),
+.ises-app main .quotation-workspace select,
+.ises-app main .quotation-workspace textarea { border-radius:8px; }
+.ises-app main .quotation-workspace .sticky-bottom-summary { border:1px solid var(--ises-border); border-radius:12px; box-shadow:var(--ises-elevation); }
+.ises-app main .quotation-workspace .bottom-bar { border:1px solid #223c5b; border-radius:10px; box-shadow:0 8px 20px rgba(20,43,73,.12); }
+/* Modelling catalogue, modules, packages and line-item pages */
+.ises-app main .ises-modelling-page,
+.ises-app main > .font-sans.text-slate-800.antialiased { max-width:1540px; margin-inline:auto; }
+.ises-app main :is(.ises-modelling-page,> .font-sans.text-slate-800.antialiased) header.flex { border-bottom-color:var(--ises-border); }
+.ises-app main :is(.ises-modelling-page,> .font-sans.text-slate-800.antialiased) h1 { font-size:clamp(25px,2.3vw,32px); font-weight:700; }
+.ises-app main :is(.ises-modelling-page,> .font-sans.text-slate-800.antialiased) .bg-white.rounded-xl.shadow-sm { border:1px solid var(--ises-border); border-radius:12px; box-shadow:var(--ises-elevation); overflow:hidden; }
+.ises-app main :is(.ises-modelling-page,> .font-sans.text-slate-800.antialiased) table thead { background:#f5f8fc; }
+.ises-app main :is(.ises-modelling-page,> .font-sans.text-slate-800.antialiased) table th { color:#68798d; font-size:10px; letter-spacing:.07em; text-transform:uppercase; }
+.ises-app main :is(.ises-modelling-page,> .font-sans.text-slate-800.antialiased) table tbody tr:hover { background:#f6f9fd; }
+.ises-app main :is(.ises-modelling-page,> .font-sans.text-slate-800.antialiased) .act-btn { border-radius:7px; }
