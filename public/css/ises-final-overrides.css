@@ -175,10 +175,10 @@
 /* Modelling catalogue, modules, packages and line-item pages */
 .ises-app main .ises-modelling-page,
 .ises-app main > .font-sans.text-slate-800.antialiased { max-width:1540px; margin-inline:auto; }
-.ises-app main :is(.ises-modelling-page,> .font-sans.text-slate-800.antialiased) header.flex { border-bottom-color:var(--ises-border); }
-.ises-app main :is(.ises-modelling-page,> .font-sans.text-slate-800.antialiased) h1 { font-size:clamp(25px,2.3vw,32px); font-weight:700; }
-.ises-app main :is(.ises-modelling-page,> .font-sans.text-slate-800.antialiased) .bg-white.rounded-xl.shadow-sm { border:1px solid var(--ises-border); border-radius:12px; box-shadow:var(--ises-elevation); overflow:hidden; }
-.ises-app main :is(.ises-modelling-page,> .font-sans.text-slate-800.antialiased) table thead { background:#f5f8fc; }
-.ises-app main :is(.ises-modelling-page,> .font-sans.text-slate-800.antialiased) table th { color:#68798d; font-size:10px; letter-spacing:.07em; text-transform:uppercase; }
-.ises-app main :is(.ises-modelling-page,> .font-sans.text-slate-800.antialiased) table tbody tr:hover { background:#f6f9fd; }
-.ises-app main :is(.ises-modelling-page,> .font-sans.text-slate-800.antialiased) .act-btn { border-radius:7px; }
+.ises-app main .ises-modelling-page header.flex, .ises-app main > .font-sans.text-slate-800.antialiased header.flex { border-bottom-color:var(--ises-border); }
+.ises-app main .ises-modelling-page h1, .ises-app main > .font-sans.text-slate-800.antialiased h1 { font-size:clamp(25px,2.3vw,32px); font-weight:700; }
+.ises-app main .ises-modelling-page .bg-white.rounded-xl.shadow-sm, .ises-app main > .font-sans.text-slate-800.antialiased .bg-white.rounded-xl.shadow-sm { border:1px solid var(--ises-border); border-radius:12px; box-shadow:var(--ises-elevation); overflow:hidden; }
+.ises-app main .ises-modelling-page table thead, .ises-app main > .font-sans.text-slate-800.antialiased table thead { background:#f5f8fc; }
+.ises-app main .ises-modelling-page table th, .ises-app main > .font-sans.text-slate-800.antialiased table th { color:#68798d; font-size:10px; letter-spacing:.07em; text-transform:uppercase; }
+.ises-app main .ises-modelling-page table tbody tr:hover, .ises-app main > .font-sans.text-slate-800.antialiased table tbody tr:hover { background:#f6f9fd; }
+.ises-app main .ises-modelling-page .act-btn, .ises-app main > .font-sans.text-slate-800.antialiased .act-btn { border-radius:7px; }
