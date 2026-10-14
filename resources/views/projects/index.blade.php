@@ -74,7 +74,14 @@
                             <option value="0" {{ request('has_quotation') === '0' ? 'selected' : '' }}>No quotation</option>
                         </select></label>
 
-                    @if(request('search') || request('status') || request('project_type') || request('location') || request('date_range') || request('survey_status') || request('has_quotation'))
+                    <label class="projects-dashboard-select"><span>Planning step</span><select name="attention" aria-label="Filter by outstanding planning step" onchange="this.form.submit()">
+                            <option value="">All planning steps</option>
+                            <option value="boundaries" {{ request('attention') === 'boundaries' ? 'selected' : '' }}>Missing boundaries</option>
+                            <option value="lines" {{ request('attention') === 'lines' ? 'selected' : '' }}>Pending survey lines</option>
+                            <option value="cost" {{ request('attention') === 'cost' ? 'selected' : '' }}>Awaiting cost estimate</option>
+                        </select></label>
+
+                    @if(request('search') || request('status') || request('project_type') || request('location') || request('date_range') || request('survey_status') || request('has_quotation') || request('attention'))
                         <a href="{{ route('projects.index') }}" class="projects-dashboard-clear"><i class="fa-solid fa-xmark"></i> Clear</a>
                     @endif
                     <button type="submit" class="hidden">Filter</button>
