@@ -67,17 +67,61 @@
         .text-center { text-align: center; }
         .font-bold { font-weight: bold; }
         
-        /* Header Block */
+        /* Report masthead */
         .doc-header-table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 12px;
-            border-bottom: 2px solid #0f2d4a;
-            padding-bottom: 8px;
+            background: #102b46;
+            border-top: 4px solid #1685b5;
         }
         .doc-header-table td {
             vertical-align: top;
-            padding: 0;
+            padding: 13px 14px 12px;
+            color: #ffffff;
+        }
+        .doc-brand {
+            color: #b9e6f7;
+            font-size: 8px;
+            font-weight: bold;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+        .doc-header-table h1 {
+            color: #ffffff;
+            font-size: 17px;
+            line-height: 1.25;
+            margin: 0 0 5px;
+            letter-spacing: 0.015em;
+        }
+        .doc-header-subtitle {
+            color: #d9e5ef;
+            font-size: 9px;
+            font-weight: bold;
+        }
+        .doc-header-meta {
+            color: #c6d5e2;
+            font-size: 8px;
+            line-height: 1.65;
+            margin-top: 8px;
+        }
+        .doc-header-meta strong {
+            color: #ffffff;
+        }
+        .doc-type-cell {
+            width: 32%;
+            text-align: right;
+            border-left: 1px solid #38536c;
+        }
+        .doc-header-table .badge {
+            display: inline-block;
+            padding: 4px 7px;
+            font-size: 7.5px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.045em;
+            border-radius: 2px;
         }
         .badge {
             display: inline-block;
@@ -243,24 +287,6 @@
             page-break-inside: avoid;
         }
 
-        /* Sign-off Block */
-        .signoff-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 24px;
-            page-break-inside: avoid;
-        }
-        .signoff-table td {
-            width: 50%;
-            padding: 8px 16px;
-            vertical-align: top;
-        }
-        .signoff-line {
-            border-bottom: 1px solid #94a3b8;
-            height: 40px;
-            margin-bottom: 4px;
-        }
-
         .footer {
             margin-top: 20px;
             padding-top: 6px;
@@ -277,24 +303,27 @@
     <table class="doc-header-table">
         <tr>
             <td style="width: 68%;">
+                <div class="doc-brand">Eco Hydrotech Solutions</div>
                 <h1>{{ $report_title }}</h1>
-                <div style="font-size: 10px; color: #475569; font-weight: bold; margin-bottom: 2px;">
-                    {{ $is_single ? 'Survey Area: ' . $report_subtitle : 'Project: ' . $project->name }}
+                <div class="doc-header-subtitle">
+                    {{ $is_single ? 'SURVEY AREA: ' . $report_subtitle : 'PROJECT: ' . $project->name }}
                 </div>
-                <div class="muted" style="font-size: 8.5px;">
-                    Generated on {{ $generated_at->format('d M Y, H:i') }} &bull; Reference Code: {{ $project->number ?? 'N/A' }}
+                <div class="doc-header-meta">
+                    <strong>Reference:</strong> {{ $project->number ?? 'N/A' }}<br>
+                    <strong>Generated:</strong> {{ $generated_at->format('d M Y, H:i') }}
                 </div>
             </td>
-            <td style="width: 32%; text-align: right;">
+            <td class="doc-type-cell">
                 @if($report_type === 'drone')
                     <span class="badge badge-drone">UAV Photogrammetry</span>
                 @elseif($report_type === 'sbes')
                     <span class="badge badge-sbes">Hydrographic SBES</span>
                 @else
-                    <span class="badge badge-mixed">Master Operations</span>
+                    <span class="badge badge-mixed">Survey Operations</span>
                 @endif
-                <div style="margin-top: 6px; font-size: 8px; color: #64748b;">
-                    Period: <strong style="color: #1e293b;">{{ $project->period ?? '10' }}</strong>
+                <div class="doc-header-meta">
+                    <strong>Project period</strong><br>
+                    {{ $project->period ?? '10' }}
                 </div>
             </td>
         </tr>
@@ -530,24 +559,9 @@
         <div class="alert-box">No survey areas have been registered for this project.</div>
     @endforelse
 
-    <!-- 5. SIGN-OFF BLOCK -->
-    <table class="signoff-table">
-        <tr>
-            <td>
-                <div class="signoff-line"></div>
-                <div style="font-weight: bold; font-size: 9px; color: #0f2d4a;">Prepared By / Field Surveyor</div>
-                <div style="font-size: 8px; color: #64748b;">Survey Planning & Operations</div>
-            </td>
-            <td>
-                <div class="signoff-line"></div>
-                <div style="font-weight: bold; font-size: 9px; color: #0f2d4a;">Approved By / Lead Hydrographer</div>
-                <div style="font-size: 8px; color: #64748b;">Operations & Quality Assurance</div>
-            </td>
-        </tr>
-    </table>
-
+    <!-- REPORT FOOTER -->
     <div class="footer">
-        Survey Estimation & Planning System &bull; Confidential Client Document &bull; Generated {{ $generated_at->format('Y-m-d H:i:s') }}
+        Eco Hydrotech Solutions &bull; Survey Planning & Technical Estimation &bull; Generated {{ $generated_at->format('Y-m-d H:i:s') }}
     </div>
 
 </body>
