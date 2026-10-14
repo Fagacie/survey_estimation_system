@@ -91,7 +91,7 @@
                     
                     <!-- Sidebar Header / Logo -->
                     <div class="ises-sidebar-brand flex items-center h-16 flex-shrink-0" :class="sidebarOpen ? 'px-4 justify-between' : 'justify-center'">
-                        <a href="{{ route('projects.index') }}" class="flex items-center gap-3 ises-brand overflow-hidden whitespace-nowrap" title="Survey Projects">
+                        <a href="{{ route('dashboard') }}" class="flex items-center gap-3 ises-brand overflow-hidden whitespace-nowrap" title="Dashboard">
                             <img x-show="sidebarOpen" src="{{ asset('images/logo.jpeg') }}" alt="Eco Hydrotech Solutions" class="ises-brand-logo">
                             <span x-show="!sidebarOpen" class="ises-brand-mark"><img src="{{ asset('images/logo.png') }}" alt="Eco Hydrotech"></span>
                         </a>
@@ -105,7 +105,11 @@
                     <!-- Sidebar Navigation Links -->
                     <div class="flex-1 overflow-y-auto py-6 flex flex-col gap-1.5 custom-scrollbar" :class="sidebarOpen ? 'px-3' : 'px-2 items-center'">
                         
-                        <a href="{{ route('projects.index') }}" title="Survey Projects" class="ises-nav-link flex items-center px-3 py-2.5 transition-all group {{ request()->routeIs('projects.*') ? 'active' : '' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
+                        <a href="{{ route('dashboard') }}" title="Dashboard" class="ises-nav-link flex items-center px-3 py-2.5 transition-all group {{ request()->routeIs('dashboard', 'home') ? 'active' : '' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
+                            <i class="fa-solid fa-chart-line w-5 text-center text-sm"></i>
+                            <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Dashboard</span>
+                        </a>
+                        <a href="{{ route('projects.index') }}" title="Survey Projects" class="ises-nav-link flex items-center px-3 py-2.5 transition-all group {{ request()->routeIs('projects.index', 'projects.create', 'projects.show', 'projects.edit') ? 'active' : '' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
                             <i class="fa-solid fa-map-location-dot w-5 text-center text-sm"></i>
                             <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Survey Projects</span>
                         </a>
@@ -185,7 +189,7 @@
                                     <i class="fa-solid fa-arrow-left text-xs"></i> Back to Project
                                 </a>
                             @else
-                                <a href="{{ route('projects.index') }}" class="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors font-medium text-sm">
+                                <a href="{{ route('dashboard') }}" class="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors font-medium text-sm">
                                     <i class="fa-solid fa-arrow-left text-xs"></i> Dashboard
                                 </a>
                             @endif
