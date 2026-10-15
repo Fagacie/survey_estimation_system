@@ -19,9 +19,35 @@
 .project-overview-page .grid.bg-white .text-\[10px\] { color: var(--overview-muted); letter-spacing: .12em; }
 .project-overview-page .grid.bg-white .text-sm { color: var(--overview-ink); }
 .project-overview-page h2 { color: var(--overview-ink); font-family: 'Space Grotesk', sans-serif; letter-spacing: .1em; }
-.project-overview-page .bg-white.border.rounded-lg.shadow-sm { border-color: var(--overview-line); border-radius: 0; box-shadow: none; }
-.project-overview-page .bg-white.border.rounded-lg.shadow-sm > ul > li { padding: 1.1rem 1.3rem; }
-.project-overview-page .bg-white.border.rounded-lg.shadow-sm > ul > li:hover { background: #f5fbfd; }
+.project-overview-page .project-active-modules { border: 1px solid var(--overview-line); background: #fff; }
+.project-overview-page .project-active-modules-scroll { overflow-x: auto; }
+.project-overview-page .project-active-modules-table { width: 100%; min-width: 1000px; border-collapse: collapse; table-layout: fixed; }
+.project-overview-page .project-active-modules-table th { padding: .8rem 1.15rem; border-bottom: 1px solid var(--overview-line); background: #f7f9fb; color: var(--overview-muted); font-size: .65rem; font-weight: 800; letter-spacing: .1em; text-align: left; text-transform: uppercase; }
+.project-overview-page .project-active-modules-table th:nth-child(1) { width: 32%; }
+.project-overview-page .project-active-modules-table th:nth-child(2) { width: 13%; }
+.project-overview-page .project-active-modules-table th:nth-child(3) { width: 15%; }
+.project-overview-page .project-active-modules-table th:nth-child(4) { width: 40%; }
+.project-overview-page .project-active-modules-table td { padding: 1rem 1.15rem; border-bottom: 1px solid #edf1f4; color: var(--overview-ink); font-size: .82rem; vertical-align: middle; }
+.project-overview-page .project-active-modules-table tbody tr:last-child td { border-bottom: 0; }
+.project-overview-page .project-active-modules-table tbody tr:hover { background: #f7fbfd; }
+.project-overview-page .project-module-name { display: flex; align-items: center; gap: .65rem; font-weight: 700; }
+.project-overview-page .project-module-name i { width: 1rem; color: var(--overview-blue); text-align: center; }
+.project-overview-page .project-module-detail { margin: .35rem 0 0 1.65rem; color: var(--overview-muted); font-size: .72rem; line-height: 1.5; }
+.project-overview-page .project-module-date { color: var(--overview-muted) !important; white-space: nowrap; }
+.project-overview-page .project-module-status { display: inline-flex; align-items: center; padding: .25rem .55rem; border: 1px solid transparent; border-radius: 999px; font-size: .62rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+.project-overview-page .project-module-status.is-complete { border-color: #a7f3d0; background: #ecfdf5; color: #047857; }
+.project-overview-page .project-module-status.is-pending { border-color: #e2e8f0; background: #f1f5f9; color: #475569; }
+.project-overview-page .project-module-actions { display: flex; align-items: center; justify-content: flex-end; gap: .7rem; }
+.project-overview-page .project-module-actions form { margin: 0; }
+.project-overview-page .project-module-link { display: inline-flex; align-items: center; gap: .35rem; font-size: .75rem; font-weight: 700; text-decoration: none; white-space: nowrap; }
+.project-overview-page .project-module-link.is-report { color: #0f766e; }
+.project-overview-page .project-module-link.is-map { color: var(--overview-blue); }
+.project-overview-page .project-module-link i { font-size: .65rem; }
+.project-overview-page .project-module-quote { display: inline-flex; justify-content: center; padding: .5rem .7rem; background: var(--overview-blue); color: #fff; font-size: .68rem; font-weight: 800; text-decoration: none; white-space: nowrap; }
+.project-overview-page .project-module-quote:hover { background: #08456b; }
+.project-overview-page .project-module-delete { padding: .4rem; border: 0; background: transparent; color: #dc2626; cursor: pointer; }
+.project-overview-page .project-module-empty { padding: 2rem !important; color: var(--overview-muted) !important; text-align: center; }
+.project-overview-page .project-module-empty i { display: block; margin-bottom: .65rem; color: #cbd5e1; font-size: 1.7rem; }
 .project-overview-page .bg-blue-600 { background: var(--overview-blue) !important; }
 .project-overview-page .hover\\:bg-blue-700:hover { background: #08456b !important; }
 .project-overview-page .text-blue-600 { color: var(--overview-blue) !important; }

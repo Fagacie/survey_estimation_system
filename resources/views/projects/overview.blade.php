@@ -57,94 +57,102 @@
                 @endif
             </div>
             
-            <div class="bg-white border border-slate-200 rounded-lg shadow-sm">
-                <ul class="divide-y divide-slate-100">
-                    
-                    @php 
-                        $hasAnyModule = false; 
-                        $hasSurvey = $project->surveyLocations->count() > 0;
-                    @endphp
+            <div class="project-active-modules">
+                <div class="project-active-modules-scroll">
+                    <table class="project-active-modules-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Active module</th>
+                                <th scope="col">Status</th>
+                                <th scope="col">Added</th>
+                                <th scope="col">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @php $hasAnyModule = false; @endphp
 
-                    @foreach($project->surveyLocations as $location)
-                        @php $hasAnyModule = true; @endphp
-                        <li class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
-                            <div>
-                                <div class="flex items-center gap-2.5 mb-1">
-                                    @if($location->survey_type === 'drone')
-                                        <i class="fa-solid fa-plane-up text-slate-500 w-4 text-center"></i>
-                                        <div class="font-bold text-slate-800 text-sm">Drone Mapping: {{ $location->name }}</div>
-                                    @else
-                                        <i class="fa-solid fa-water text-teal-600 w-4 text-center"></i>
-                                        <div class="font-bold text-slate-800 text-sm">SBES Survey: {{ $location->name }}</div>
-                                    @endif
-                                    
-                                    @if($location->status === 'Mapped')
-                                        <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Mapped</span>
-                                    @else
-                                        <span class="bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Pending</span>
-                                    @endif
-                                </div>
-                                <div class="text-[11px] text-slate-500 font-medium">Added {{ $location->created_at->format('M d, Y') }}</div>
-                            </div>
-                            <div class="flex flex-col sm:flex-row items-center gap-3">
-                                <a href="{{ route('projects.report.preview', ['project' => $project->project_Id, 'location_id' => $location->id]) }}" class="text-sm font-semibold text-teal-600 hover:text-teal-800 transition-colors flex items-center gap-1">
-                                    Report <i class="fa-solid fa-file-pdf text-[10px] ml-0.5"></i>
-                                </a>
-                                <a href="{{ route('projects.surveys.map', [$project->project_Id, $location->id]) }}" class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
-                                    Open Map <i class="fa-solid fa-arrow-right text-[10px] ml-0.5"></i>
-                                </a>
-                                <a href="{{ route('quotation.index', ['project_id' => $project->project_Id, 'module' => $location->survey_type, 'location_id' => $location->id]) }}" class="inline-flex justify-center items-center px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold transition-colors shadow-sm">
-                                    Proceed to Quotation
-                                </a>
-                                <form action="{{ route('projects.surveys.destroy', [$project->project_Id, $location->id]) }}" method="POST" class="m-0" onsubmit="return confirm('Delete this survey area?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-sm font-semibold text-red-500 hover:text-red-700 transition-colors ml-2"><i class="fa-solid fa-trash"></i></button>
-                                </form>
-                            </div>
-                        </li>
-                    @endforeach
+                            @foreach($project->surveyLocations as $location)
+                                @php $hasAnyModule = true; @endphp
+                                <tr>
+                                    <td>
+                                        <div class="project-module-name">
+                                            <i class="fa-solid {{ $location->survey_type === 'drone' ? 'fa-plane-up' : 'fa-water' }}" aria-hidden="true"></i>
+                                            <span>{{ $location->survey_type === 'drone' ? 'Drone Mapping' : 'SBES Survey' }}: {{ $location->name }}</span>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <span class="project-module-status {{ $location->status === 'Mapped' ? 'is-complete' : 'is-pending' }}">
+                                            {{ $location->status === 'Mapped' ? 'Mapped' : 'Pending' }}
+                                        </span>
+                                    </td>
+                                    <td class="project-module-date">{{ $location->created_at->format('M d, Y') }}</td>
+                                    <td>
+                                        <div class="project-module-actions">
+                                            <a href="{{ route('projects.report.preview', ['project' => $project->project_Id, 'location_id' => $location->id]) }}" class="project-module-link is-report">
+                                                Report <i class="fa-solid fa-file-pdf" aria-hidden="true"></i>
+                                            </a>
+                                            <a href="{{ route('projects.surveys.map', [$project->project_Id, $location->id]) }}" class="project-module-link is-map">
+                                                Open Map <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                                            </a>
+                                            <a href="{{ route('quotation.index', ['project_id' => $project->project_Id, 'module' => $location->survey_type, 'location_id' => $location->id]) }}" class="project-module-quote">
+                                                Proceed to Quotation
+                                            </a>
+                                            <form action="{{ route('projects.surveys.destroy', [$project->project_Id, $location->id]) }}" method="POST" onsubmit="return confirm('Delete this survey area?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="project-module-delete" aria-label="Delete {{ $location->name }}"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endforeach
 
-                    @php $summary = $project->modellingSummary; @endphp
-                    @if($summary)
-                        @php $hasAnyModule = true; @endphp
-                        <li class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
-                            <div>
-                                <div class="flex items-center gap-2.5 mb-1">
-                                    <i class="fa-solid fa-cubes text-slate-600 w-4 text-center"></i>
-                                    <div class="font-bold text-slate-800 text-sm">3D Modelling</div>
-                                    <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Saved</span>
-                                </div>
-                                <div class="text-[11px] text-slate-500 font-medium">
-                                    Package: {{ $summary->package_name ?? 'Custom selection' }},
-                                    {{ $project->modellingItems->pluck('catalog_module_id')->unique()->count() }} modules,
-                                    RM {{ number_format($summary->grand_total, 2) }}
-                                </div>
-                            </div>
-                            <div class="flex flex-col sm:flex-row items-center gap-3">
-                                <a href="{{ route('projects.modeling.builder', ['project_id' => $project->project_Id]) }}" class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
-                                    Edit Modules <i class="fa-solid fa-arrow-right text-[10px] ml-0.5"></i>
-                                </a>
-                                <a href="{{ route('quotation.index', ['project_id' => $project->project_Id, 'module' => 'modelling']) }}" class="inline-flex justify-center items-center px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold transition-colors shadow-sm">
-                                    Proceed to Quotation
-                                </a>
-                                <form action="{{ route('projects.modeling.destroy', $project->project_Id) }}" method="POST" class="m-0" onsubmit="return confirm('Remove modelling data for this project?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-sm font-semibold text-red-500 hover:text-red-700 transition-colors ml-2"><i class="fa-solid fa-trash"></i></button>
-                                </form>
-                            </div>
-                        </li>
-                    @endif
+                            @php $summary = $project->modellingSummary; @endphp
+                            @if($summary)
+                                @php $hasAnyModule = true; @endphp
+                                <tr>
+                                    <td>
+                                        <div class="project-module-name">
+                                            <i class="fa-solid fa-cubes" aria-hidden="true"></i>
+                                            <span>3D Modelling</span>
+                                        </div>
+                                        <div class="project-module-detail">
+                                            Package: {{ $summary->package_name ?? 'Custom selection' }},
+                                            {{ $project->modellingItems->pluck('catalog_module_id')->unique()->count() }} modules,
+                                            RM {{ number_format($summary->grand_total, 2) }}
+                                        </div>
+                                    </td>
+                                    <td><span class="project-module-status is-complete">Saved</span></td>
+                                    <td class="project-module-date">{{ $summary->created_at->format('M d, Y') }}</td>
+                                    <td>
+                                        <div class="project-module-actions">
+                                            <a href="{{ route('projects.modeling.builder', ['project_id' => $project->project_Id]) }}" class="project-module-link is-map">
+                                                Edit Modules <i class="fa-solid fa-arrow-right" aria-hidden="true"></i>
+                                            </a>
+                                            <a href="{{ route('quotation.index', ['project_id' => $project->project_Id, 'module' => 'modelling']) }}" class="project-module-quote">
+                                                Proceed to Quotation
+                                            </a>
+                                            <form action="{{ route('projects.modeling.destroy', $project->project_Id) }}" method="POST" onsubmit="return confirm('Remove modelling data for this project?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="project-module-delete" aria-label="Remove 3D modelling"><i class="fa-solid fa-trash" aria-hidden="true"></i></button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            @endif
 
-                    @if(!$hasAnyModule)
-                        <li class="p-8 text-center text-slate-500 font-medium text-sm">
-                            <i class="fa-regular fa-folder-open text-3xl text-slate-300 mb-3 block"></i>
-                            No workflows have been added to this project yet. Choose an option below to get started.
-                        </li>
-                    @endif
-
-                </ul>
+                            @if(!$hasAnyModule)
+                                <tr>
+                                    <td colspan="4" class="project-module-empty">
+                                        <i class="fa-regular fa-folder-open" aria-hidden="true"></i>
+                                        <span>No workflows have been added to this project yet. Choose an option below to get started.</span>
+                                    </td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
 

@@ -97,7 +97,7 @@
                     Don't have an account?
                 </div>
 
-                <a href="/signup" class="signup-btn">
+                <a href="{{ route('signup') }}" class="signup-btn">
                     SIGN UP
                     <i class="fa-solid fa-arrow-right"></i>
                 </a>
@@ -111,5 +111,4 @@
 
 </body>
 </html>
-
 
