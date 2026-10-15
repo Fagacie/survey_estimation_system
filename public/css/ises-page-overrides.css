@@ -1,0 +1,96 @@
+/* Page-level harmonisation; avoids changing calculations and print internals. */
+:root{--ises-page-width:1540px;--ises-space-1:4px;--ises-space-2:8px;--ises-space-3:12px;--ises-space-4:16px;--ises-space-5:20px;--ises-space-6:24px;--ises-space-8:32px}
+.ises-app main>.page-container,.ises-app main>.container,.ises-app main>.container-fluid,.ises-app main>.max-w-7xl,.ises-app main>.max-w-6xl{max-width:var(--ises-page-width)}
+.projects-dashboard{max-width:var(--ises-page-width);padding:28px clamp(18px,3vw,42px) 44px}.projects-dashboard-header{align-items:center;gap:24px;padding:4px 0 24px;border-color:var(--ises-line)}.projects-dashboard-eyebrow{margin-bottom:8px;color:var(--ises-blue);font-size:10px;letter-spacing:.12em}.projects-dashboard h1{font-size:clamp(27px,2.4vw,35px);line-height:1.14;letter-spacing:-.035em}.projects-dashboard-intro{max-width:680px;color:var(--ises-muted);line-height:1.65}.projects-dashboard-date{font-size:11px;letter-spacing:.04em}.projects-dashboard-primary{min-height:40px;padding:10px 15px;border-radius:8px;background:var(--ises-blue);border:1px solid var(--ises-blue);color:#fff;font-size:12px;font-weight:700;text-decoration:none}.projects-dashboard-primary:hover{background:var(--ises-blue-hover);border-color:var(--ises-blue-hover);color:#fff}.projects-dashboard-overview{border:1px solid var(--ises-line);border-radius:12px;background:#fff;box-shadow:var(--ises-shadow)}.projects-dashboard-overview-lead{padding:23px 25px}.projects-dashboard-overview-lead strong{font-family:var(--ises-display);font-size:clamp(32px,3vw,42px);letter-spacing:-.04em}.projects-dashboard-overview-label{color:var(--ises-blue);font-size:10px;font-weight:750;letter-spacing:.1em;text-transform:uppercase}.projects-dashboard-overview-metrics{gap:0}.projects-dashboard-overview-metrics>div{padding:20px 22px;border-left:1px solid var(--ises-line)}.projects-dashboard-overview-metrics dt{color:var(--ises-muted);font-size:11px;font-weight:650}.projects-dashboard-overview-metrics dd{margin-top:7px;font:650 25px/1.1 var(--ises-display);color:var(--ises-ink)}.projects-dashboard-feedback{border:1px solid #c6e9d7;border-radius:9px;background:#edf8f2;color:#146847}
+.create-project-page,.project-overview-page{max-width:var(--ises-page-width);margin-inline:auto}.create-project-page h1,.project-overview-page h1{letter-spacing:-.035em}.create-project-page .form-section,.project-overview-page .form-section{border:1px solid var(--ises-line);border-radius:11px;background:#fff}.create-project-page input:not([type=checkbox]):not([type=radio]),.create-project-page select,.create-project-page textarea,.project-overview-page input:not([type=checkbox]):not([type=radio]),.project-overview-page select,.project-overview-page textarea{border-radius:8px}
+.ises-app .container .card,.ises-app .container-fluid .card,.ises-app main .card{border-color:var(--ises-line)}.ises-app .breadcrumb{color:var(--ises-muted);font-size:12px}.ises-app .badge{font-weight:650;letter-spacing:.01em}.ises-app hr{border-color:var(--ises-line);opacity:1}.quotation-history-page,.history-container{max-width:var(--ises-page-width)}.quotation-history-page .page-header-title{color:var(--ises-ink);letter-spacing:-.03em}
+@media(max-width:900px){.projects-dashboard-header{align-items:flex-start;flex-direction:column}.projects-dashboard-header-tools{width:100%;justify-content:space-between;flex-wrap:wrap}.projects-dashboard-overview{grid-template-columns:1fr}.projects-dashboard-overview-metrics>div{border-left:0;border-top:1px solid var(--ises-line)}}
+@media(max-width:560px){.projects-dashboard{padding:20px 14px 30px}.projects-dashboard-overview-lead{padding:18px}.projects-dashboard-overview-metrics>div{padding:15px 18px}.projects-dashboard-primary{width:100%;justify-content:center}}
+@media print{.projects-dashboard,.create-project-page,.project-overview-page{max-width:none!important;padding:0!important}.projects-dashboard-overview,.projects-dashboard-feedback{box-shadow:none!important}}
+
+/* Quotation workspace: calmer tab hierarchy and a clear persistent summary. */
+.ises-app .custom-nav-tabs{border-color:var(--ises-line);gap:4px}
+.ises-app .custom-nav-tabs .nav-link{padding:13px 16px;color:var(--ises-muted);border-bottom:2px solid transparent;font-size:12px;font-weight:650}
+.ises-app .custom-nav-tabs .nav-link:hover{color:var(--ises-ink);border-color:#b8cce0}
+.ises-app .custom-nav-tabs .nav-link.active{color:var(--ises-blue);border-color:var(--ises-blue);background:transparent}
+.ises-app .sticky-bottom-summary{border:1px solid var(--ises-line);border-radius:11px;box-shadow:var(--ises-shadow);padding:20px}
+.ises-app .bottom-bar{border:1px solid #263d5b;border-radius:11px;background:var(--ises-navy);box-shadow:0 8px 24px #142b4918}
+.ises-app .project-grid{gap:18px}
+/* Quotation history: table/filter surfaces share the system tokens. */
+.quotation-history-page .filter-card-custom,.quotation-history-page .table-card{border:1px solid var(--ises-line);border-radius:11px;background:#fff;box-shadow:var(--ises-shadow)}
+.quotation-history-page .page-header-wrapper{padding-bottom:18px;border-bottom:1px solid var(--ises-line)}
+.quotation-history-page .page-header-title{font-family:var(--ises-display);font-size:clamp(26px,2.5vw,34px)}
+.quotation-history-page .filter-label{color:var(--ises-ink-soft);font-size:11px;font-weight:700}
+.quotation-history-page .filter-select{min-height:40px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:var(--ises-ink);font-size:12px}
+.quotation-history-page .action-circle-btn{border:1px solid var(--ises-line);background:#fff;color:var(--ises-muted);transition:background .15s,color .15s}
+.quotation-history-page .action-circle-btn:hover{background:#edf4fb;color:var(--ises-blue)}
+.quotation-history-page .modal-card{border:1px solid var(--ises-line);border-radius:13px;box-shadow:0 20px 55px #142b4926}
+/* Drone/equipment register */
+.equipment-page .section-header{border-bottom:1px solid var(--ises-line)}
+.equipment-page .equipment-eyebrow{color:var(--ises-blue);font-size:10px;font-weight:750;letter-spacing:.12em;text-transform:uppercase}
+.equipment-page .equipment-title{font-family:var(--ises-display);font-size:clamp(26px,2.4vw,34px);letter-spacing:-.035em}
+.equipment-page .equipment-subtitle{max-width:720px;color:var(--ises-muted);font-size:13px;line-height:1.65}
+.equipment-page .custom-card{overflow:hidden;border:1px solid var(--ises-line);border-radius:11px;background:#fff;box-shadow:var(--ises-shadow)}
+.equipment-page .custom-card-header{padding:16px 20px;border-bottom:1px solid var(--ises-line);background:#fff}
+.equipment-page .custom-card-title{font-family:var(--ises-display);font-size:15px}
+.equipment-page .status-badge{border-radius:6px;font-size:10px;font-weight:700}
+.equipment-page .minimal-input{width:100%;padding:9px 11px}
+/* Catalogue and modelling actions use compact, consistent controls. */
+.ises-app .act-wrap{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ises-app .act-btn{min-height:35px;padding:8px 12px;border:1px solid var(--ises-line);border-radius:8px;background:#fff;color:var(--ises-ink-soft);font-size:12px;font-weight:650;text-decoration:none}
+.ises-app .act-btn:hover{background:#edf4fb;border-color:#bfd2e5;color:var(--ises-blue)}
+/* Invoice controls are restyled on screen only. Document layout and print rules remain intact. */
+.invoice-page-wrap .invoice-controls{border:1px solid var(--ises-line);border-radius:11px;background:#fff;box-shadow:var(--ises-shadow)}
+.invoice-page-wrap .ctrl-btn{border-radius:8px;font-weight:650;transition:background .15s,border-color .15s}
+.invoice-page-wrap .ctrl-btn-primary{background:var(--ises-blue);border-color:var(--ises-blue)}
+.invoice-page-wrap .ctrl-btn-primary:hover{background:var(--ises-blue-hover);border-color:var(--ises-blue-hover)}
+@media(max-width:760px){.ises-app .sticky-bottom-summary{padding:14px}.ises-app .bottom-bar{gap:12px;flex-wrap:wrap;padding:14px}.quotation-history-page .page-header-title{font-size:25px}.equipment-page .custom-card-header{padding:13px 15px}}
+
+/* Higher-specificity page selectors intentionally win over legacy per-view stylesheets. */
+.ises-app .projects-dashboard{max-width:var(--ises-page-width);padding:28px clamp(18px,3vw,42px) 44px}
+.ises-app .projects-dashboard-header{align-items:center;gap:24px;padding:4px 0 24px;border-color:var(--ises-line)}
+.ises-app .projects-dashboard-eyebrow{margin-bottom:8px;color:var(--ises-blue);font-size:10px;letter-spacing:.12em}
+.ises-app .projects-dashboard h1{font-size:clamp(27px,2.4vw,35px);line-height:1.14;letter-spacing:-.035em}
+.ises-app .projects-dashboard-intro{max-width:680px;color:var(--ises-muted);line-height:1.65}
+.ises-app .projects-dashboard-overview{border:1px solid var(--ises-line);border-radius:12px;background:#fff;box-shadow:var(--ises-shadow)}
+.ises-app .projects-dashboard-overview-lead{padding:23px 25px}
+.ises-app .projects-dashboard-overview-label{color:var(--ises-blue)}
+.ises-app .projects-dashboard-overview-metrics>div{border-color:var(--ises-line)}
+.ises-app .projects-dashboard-feedback{border:1px solid #c6e9d7;border-radius:9px;background:#edf8f2;color:#146847}
+.ises-app .create-project-page,.ises-app .project-overview-page{max-width:var(--ises-page-width);margin-inline:auto}
+.ises-app .create-project-page h1,.ises-app .project-overview-page h1{letter-spacing:-.035em}
+.ises-app .quotation-history-page .filter-card-custom,.ises-app .quotation-history-page .table-card{border:1px solid var(--ises-line);border-radius:11px;background:#fff;box-shadow:var(--ises-shadow)}
+.ises-app .quotation-history-page .page-header-wrapper{padding-bottom:18px;border-bottom:1px solid var(--ises-line)}
+.ises-app .quotation-history-page .page-header-title{font-family:var(--ises-display);font-size:clamp(26px,2.5vw,34px);color:var(--ises-ink);letter-spacing:-.03em}
+.ises-app .quotation-history-page .filter-label{color:var(--ises-ink-soft);font-size:11px;font-weight:700}
+.ises-app .quotation-history-page .filter-select{min-height:40px;border:1px solid #cbd5e1;border-radius:8px;background:#fff;color:var(--ises-ink);font-size:12px}
+.ises-app .equipment-page .section-header{border-bottom:1px solid var(--ises-line)}
+.ises-app .equipment-page .equipment-eyebrow{color:var(--ises-blue);font-size:10px;font-weight:750;letter-spacing:.12em;text-transform:uppercase}
+.ises-app .equipment-page .equipment-title{font-family:var(--ises-display);font-size:clamp(26px,2.4vw,34px);letter-spacing:-.035em}
+.ises-app .equipment-page .custom-card{overflow:hidden;border:1px solid var(--ises-line);border-radius:11px;background:#fff;box-shadow:var(--ises-shadow)}
+.ises-app .equipment-page .custom-card-header{padding:16px 20px;border-bottom:1px solid var(--ises-line);background:#fff}
+@media(max-width:900px){.ises-app .projects-dashboard-header{align-items:flex-start;flex-direction:column}.ises-app .projects-dashboard-overview-metrics>div{border-left:0;border-top:1px solid var(--ises-line)}}
+@media(max-width:560px){.ises-app .projects-dashboard{padding:20px 14px 30px}.ises-app .projects-dashboard-overview-lead{padding:18px}.ises-app .projects-dashboard-overview-metrics>div{padding:15px 18px}}
+
+/* Reference-data catalog and item forms */
+.ises-app .catalog-page{max-width:var(--ises-page-width);color:var(--ises-ink)}
+.ises-app .catalog-page .catalog-kicker{color:var(--ises-blue);font-size:10px;font-weight:750;letter-spacing:.12em;text-transform:uppercase}
+.ises-app .catalog-page .page-header-wrapper{padding-bottom:20px;border-bottom:1px solid var(--ises-line)}
+.ises-app .catalog-page .page-header{font-family:var(--ises-display);font-size:clamp(25px,2.4vw,33px);letter-spacing:-.035em;color:var(--ises-ink)}
+.ises-app .catalog-page .create-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:39px;padding:9px 14px;border:1px solid var(--ises-blue);border-radius:8px;background:var(--ises-blue);color:#fff;font-size:12px;font-weight:700;text-decoration:none}
+.ises-app .catalog-page .create-button:hover{background:var(--ises-blue-hover);border-color:var(--ises-blue-hover);color:#fff}
+.ises-app .catalog-page .catalog-module,.ises-app .catalog-page>.bg-white.border{border-color:var(--ises-line);border-radius:11px;background:#fff;box-shadow:var(--ises-shadow)}
+.ises-app .catalog-page .catalog-module .table-card{overflow:hidden;border:1px solid var(--ises-line);border-radius:9px;background:#fff}
+.ises-app .catalog-page .catalog-module .table-card thead{background:#f7f9fc;color:var(--ises-muted)}
+.ises-app .catalog-page .catalog-module .table-card th{font-size:10px;font-weight:750;letter-spacing:.06em;text-transform:uppercase}
+.ises-app .catalog-page .catalog-module .table-card td{border-color:#edf1f5}
+.ises-app .catalog-page .catalog-module .action-button{border-radius:7px}
+.ises-app .catalog-page input:focus,.ises-app .catalog-page select:focus{border-color:#6b9ccc;box-shadow:0 0 0 3px #2463a61c;outline:0}
+.ises-app .item-container{max-width:980px;margin-inline:auto;color:var(--ises-ink)}
+.ises-app .item-container .page-header{font-family:var(--ises-display);font-size:clamp(25px,2.4vw,33px);letter-spacing:-.035em}
+.ises-app .item-container .banner{border-radius:11px;background:var(--ises-navy);color:#fff}
+.ises-app .item-container .card{border:1px solid var(--ises-line);border-radius:11px;box-shadow:var(--ises-shadow)}
+.ises-app .item-container .btn-purple{background:var(--ises-blue);border-color:var(--ises-blue);color:#fff}
+.ises-app .item-container .btn-purple:hover{background:var(--ises-blue-hover);border-color:var(--ises-blue-hover)}
+.ises-app .item-container .form-group input:focus,.ises-app .item-container .form-group select:focus,.ises-app .item-container .form-group textarea:focus{border-color:#6b9ccc;box-shadow:0 0 0 3px #2463a61c;outline:0}
+@media(max-width:640px){.ises-app .catalog-page .page-header-wrapper{gap:14px}.ises-app .item-container{padding-inline:14px}}

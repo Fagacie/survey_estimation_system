@@ -1,18 +1,321 @@
-/* INOS drone equipment register. */
+.equipment-page {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        .page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        .section-header {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #888;
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 0.75rem;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+
+        .custom-card {
+            background: #fff;
+            border: 1px solid #eaeaea;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .custom-card-header {
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid #eaeaea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+        }
+
+        .custom-card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #111;
+            margin: 0;
+            letter-spacing: -0.02em;
+        }
+
+        /* BUTTONS */
+        .btn-outline-dark-minimal {
+            background: transparent;
+            border: 1px solid #111;
+            color: #111;
+            padding: 0.4rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 500;
+            border-radius: 4px;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-outline-dark-minimal:hover {
+            background: #111;
+            color: #fff;
+        }
+        
+        .btn-dark-minimal {
+            background: #111;
+            border: 1px solid #111;
+            color: #fff;
+            padding: 0.6rem 1.5rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            border-radius: 4px;
+            transition: all 0.2s;
+            display: inline-block;
+            text-decoration: none;
+        }
+        .btn-dark-minimal:hover {
+            background: #333;
+            border-color: #333;
+            color: #fff;
+        }
+
+        /* TABLES */
+        .clean-table {
+            width: 100%;
+            margin-bottom: 0;
+        }
+        .clean-table th {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #888;
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+            background: #fff;
+            border-bottom: 1px solid #eaeaea;
+        }
+        .clean-table td {
+            padding: 1rem 1.5rem;
+            vertical-align: middle;
+            color: #444;
+            font-size: 0.9rem;
+            border-bottom: 1px solid #eaeaea;
+        }
+        .clean-table tbody tr:last-child td {
+            border-bottom: none;
+        }
+        .clean-table tbody tr:hover {
+            background-color: #fcfcfc;
+        }
+
+        /* BADGES */
+        .status-badge {
+            font-size: 0.7rem;
+            font-weight: 600;
+            padding: 0.35em 0.8em;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+        .status-active {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            border: 1px solid rgba(16, 185, 129, 0.2);
+        }
+        .status-inactive {
+            background: rgba(107, 114, 128, 0.1);
+            color: #6b7280;
+            border: 1px solid rgba(107, 114, 128, 0.2);
+        }
+
+        /* ACTION BUTTONS */
+        .action-btn {
+            background: none;
+            border: none;
+            color: #888;
+            transition: color 0.2s;
+            padding: 0.2rem 0.5rem;
+        }
+        .action-btn:hover {
+            color: #111;
+        }
+
+        /* MODALS */
+        .minimal-input {
+            border: 1px solid #eaeaea;
+            border-radius: 4px;
+            padding: 0.6rem 1rem;
+            font-size: 0.95rem;
+            background: #fafafa;
+            color: #111;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+        .minimal-input:focus {
+            outline: none;
+            border-color: #111;
+            background: #fff;
+        }
+        .input-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #888;
+            margin-bottom: 0.4rem;
+            display: block;
+            font-weight: 600;
+        }
+        
+        .modal-content {
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+        }
+        .modal-header {
+            border-bottom: 1px solid #eaeaea;
+            padding: 1.5rem;
+        }
+        .modal-body {
+            padding: 1.5rem;
+        }
+        .modal-footer {
+            border-top: 1px solid #eaeaea;
+            padding: 1.5rem;
+            background: #fafafa;
+        }
+
+        /* Final equipment workspace overrides. */
+        .equipment-page .equipment-eyebrow {
+            color: #087f78;
+            font-size: .68rem;
+            font-weight: 800;
+            letter-spacing: .13em;
+            text-transform: uppercase;
+        }
+
+        .equipment-page .equipment-title {
+            margin: 6px 0 0;
+            color: #122033;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: 0;
+        }
+
+        .equipment-page .equipment-subtitle {
+            margin: 8px 0 0;
+            color: #68788b;
+            font-size: .9rem;
+        }
+
+        .equipment-page .custom-card {
+            border-color: #dfe7ee;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px rgba(18, 32, 51, .04);
+        }
+
+        .equipment-page .equipment-registers {
+            display: grid;
+            gap: 24px;
+        }
+
+        .equipment-page .equipment-register {
+            min-width: 0;
+        }
+
+        .equipment-page .custom-card-header {
+            padding: 18px 20px;
+            background: #fff;
+            border-bottom-color: #eef2f5;
+        }
+
+        .equipment-page .custom-card-title {
+            color: #122033;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+        }
+
+        .equipment-page .custom-card-title i {
+            color: #087f78 !important;
+        }
+
+        .equipment-page .btn-outline-dark-minimal {
+            border-color: #b7d9d5;
+            border-radius: 6px;
+            color: #087f78;
+        }
+
+        .equipment-page .btn-outline-dark-minimal:hover {
+            border-color: #087f78;
+            background: #087f78;
+        }
+
+        .equipment-page .clean-table th {
+            padding: 12px 14px;
+            color: #68788b;
+            background: #f4f7f9;
+            border-bottom-color: #dfe7ee;
+            font-size: .64rem;
+            letter-spacing: .1em;
+        }
+
+        .equipment-page .clean-table td {
+            padding: 16px 14px;
+            color: #526579;
+            border-bottom-color: #eef2f5;
+            font-size: .82rem;
+        }
+
+        .equipment-page .clean-table tbody tr:hover {
+            background: #f0f8f7;
+        }
+
+        .equipment-page .status-badge {
+            border: 0;
+            border-radius: 999px;
+            font-size: .64rem;
+            letter-spacing: .08em;
+        }
+
+        .equipment-page .status-active {
+            color: #087f78;
+            background: #e9f7f5;
+        }
+
+        .equipment-page .status-inactive {
+            color: #64748b;
+            background: #f1f5f9;
+        }
+
+        .equipment-page .action-btn {
+            color: #68788b;
+        }
+
+        .equipment-page .action-btn:hover {
+            color: #087f78;
+        }
+
+        @media (max-width: 640px) {
+            .equipment-page .equipment-title { font-size: 1.65rem; }
+            .equipment-page .custom-card-header { align-items: flex-start; gap: 12px; }
+        }
+
+/* Eco Hydrotech Solutions drone equipment register. Base rules migrated from the Blade view. */
 .equipment-page {
     --equipment-ink: #122033;
     --equipment-muted: #68788b;
     --equipment-line: #dfe7ee;
     --equipment-soft-line: #eef2f5;
     --equipment-canvas: #f4f7f9;
-    --equipment-blue: #0b5c8e;
-    --equipment-blue-soft: #edf6fb;
+    --equipment-blue: #2463a6;
+    --equipment-blue-soft: #edf4fb;
 }
 
 .equipment-page .equipment-eyebrow { color: var(--equipment-blue); }
 .equipment-page .equipment-title { color: var(--equipment-ink); font-family: 'Space Grotesk', sans-serif; letter-spacing: 0; }
 .equipment-page .equipment-subtitle { color: var(--equipment-muted); }
-.equipment-page .custom-card { border-color: var(--equipment-line); border-radius: 0; box-shadow: none; }
+.equipment-page .custom-card { border-color: var(--equipment-line); border-radius: 10px; box-shadow: 0 4px 16px rgba(18, 32, 51, .045); }
 .equipment-page .custom-card-header { padding: 1rem 1.2rem; border-bottom-color: var(--equipment-line); background: #fff; }
 .equipment-page .custom-card-title { color: var(--equipment-ink); font-family: 'Space Grotesk', sans-serif; }
 .equipment-page .custom-card-title i { color: var(--equipment-blue) !important; }
@@ -29,7 +332,7 @@
 .equipment-page .minimal-input:focus { border-color: #78aec9; box-shadow: 0 0 0 3px rgba(11, 92, 142, .1); background: #fff; }
 .equipment-page .btn-dark-minimal { border-color: var(--equipment-blue); border-radius: 5px; background: var(--equipment-blue); }
 .equipment-page .btn-dark-minimal:hover { border-color: #08456b; background: #08456b; }
-.equipment-page .modal-content { border: 1px solid var(--equipment-line); border-radius: 0; box-shadow: 0 18px 40px rgba(18, 32, 51, .16); }
+.equipment-page .modal-content { border: 1px solid var(--equipment-line); border-radius: 10px; box-shadow: 0 18px 40px rgba(18, 32, 51, .16); }
 
 @media (max-width: 640px) {
     .equipment-page .equipment-title { font-size: 1.7rem; }

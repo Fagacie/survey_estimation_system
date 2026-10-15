@@ -3,13 +3,9 @@
     <link rel="stylesheet" href="{{ asset('css/project-overview.css') }}?v={{ filemtime(public_path('css/project-overview.css')) }}">
 
     <div class="project-overview-page">
-    <div class="w-full max-w-5xl mx-auto">
+    <div class="project-overview-content">
         
-        <div class="mb-4">
-            <a href="{{ route('projects.index') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 rounded text-xs font-bold transition-colors shadow-sm">
-                &larr; Back
-            </a>
-        </div>
+        <div class="project-overview-breadcrumb"><a href="{{ route('projects.index') }}"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to projects</a></div>
 
         @if(session('success'))
             <div class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-4 mb-8 flex items-start gap-3 text-sm rounded-md">
@@ -25,133 +21,43 @@
         @endif
 
         <!-- 1. PROJECT HEADER -->
-        <div class="mb-8">
-            <p class="project-overview-eyebrow">Project workspace / survey operations</p>
-            <h1 class="text-3xl font-bold text-slate-900 tracking-tight mb-1">{{ $project->name }}</h1>
-            <div class="text-sm font-medium text-slate-500">Project Code: {{ $project->number ?? 'N/A' }}</div>
-            
-            <div class="grid grid-cols-1 md:grid-cols-3 bg-white border border-slate-200 rounded-lg mt-6 shadow-sm overflow-hidden">
-                <div class="p-5 border-b md:border-b-0 md:border-r border-slate-200">
-                    <div class="text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-1">Client</div>
-                    <div class="text-sm font-semibold text-slate-800">{{ $project->client?->company_name ?? 'N/A' }}</div>
+        <header class="project-overview-hero">
+            <div class="project-overview-hero-top">
+                <div class="project-overview-title-group">
+                    <p class="project-overview-eyebrow">Project workspace <span aria-hidden="true">/</span> survey operations</p>
+                    <h1>{{ $project->name }}</h1>
+                    <div class="project-overview-code"><i class="fa-solid fa-hashtag" aria-hidden="true"></i> {{ $project->number ?? 'Project code not assigned' }}</div>
+                    <div class="project-overview-badges">
+                        <span class="project-overview-status project-overview-status-{{ strtolower($project->status ?? 'draft') }}">{{ ucfirst($project->status ?? 'draft') }}</span>
+                        <span class="project-overview-type">{{ \App\Models\Project::TYPES[$project->project_type] ?? $project->project_type ?? 'Type not set' }}</span>
+                        @if($project->location)
+                            <span class="project-overview-location"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> {{ $project->location }}</span>
+                        @endif
+                    </div>
                 </div>
-                <div class="p-5 border-b md:border-b-0 md:border-r border-slate-200">
-                    <div class="text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-1">Period</div>
-                    <div class="text-sm font-semibold text-slate-800">{{ $project->period ?? 'N/A' }}</div>
-                </div>
-                <div class="p-5">
-                    <div class="text-[10px] font-bold tracking-wider text-slate-400 uppercase mb-1">Created</div>
-                    <div class="text-sm font-semibold text-slate-800">{{ $project->created_at->format('d M Y') }}</div>
+                <div class="project-overview-hero-actions">
+                    <a href="{{ route('projects.index') }}" class="project-overview-secondary-action"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Project register</a>
+                    <a href="{{ route('projects.edit', $project->project_Id) }}" class="project-overview-primary-action"><i class="fa-solid fa-pen-to-square" aria-hidden="true"></i> Edit project</a>
                 </div>
             </div>
-        </div>
-
-        <!-- 2. ACTIVE WORKFLOWS -->
-        <div class="mb-10">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Active Modules</h2>
-                @if($project->surveyLocations->count() > 1)
-                    <a href="{{ route('projects.report.preview', $project->project_Id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 rounded text-xs font-bold transition-colors shadow-sm">
-                        <i class="fa-solid fa-file-lines text-slate-500"></i> Full Project Report (All Areas)
-                    </a>
-                @endif
+            <div class="project-overview-meta-grid">
+                <div class="project-overview-meta-item"><span>Client</span><strong>{{ $project->client?->company_name ?? 'No client assigned' }}</strong></div>
+                <div class="project-overview-meta-item"><span>Project period</span><strong>{{ $project->period ?: 'Not specified' }}</strong></div>
+                <div class="project-overview-meta-item"><span>Created</span><strong>{{ $project->created_at?->format('d M Y') ?? 'N/A' }}</strong></div>
             </div>
-            
-            <div class="bg-white border border-slate-200 rounded-lg shadow-sm">
-                <ul class="divide-y divide-slate-100">
-                    
-                    @php 
-                        $hasAnyModule = false; 
-                        $hasSurvey = $project->surveyLocations->count() > 0;
-                    @endphp
-
-                    @foreach($project->surveyLocations as $location)
-                        @php $hasAnyModule = true; @endphp
-                        <li class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
-                            <div>
-                                <div class="flex items-center gap-2.5 mb-1">
-                                    @if($location->survey_type === 'drone')
-                                        <i class="fa-solid fa-plane-up text-slate-500 w-4 text-center"></i>
-                                        <div class="font-bold text-slate-800 text-sm">Drone Mapping: {{ $location->name }}</div>
-                                    @else
-                                        <i class="fa-solid fa-water text-teal-600 w-4 text-center"></i>
-                                        <div class="font-bold text-slate-800 text-sm">SBES Survey: {{ $location->name }}</div>
-                                    @endif
-                                    
-                                    @if($location->status === 'Mapped')
-                                        <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Mapped</span>
-                                    @else
-                                        <span class="bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Pending</span>
-                                    @endif
-                                </div>
-                                <div class="text-[11px] text-slate-500 font-medium">Added {{ $location->created_at->format('M d, Y') }}</div>
-                            </div>
-                            <div class="flex flex-col sm:flex-row items-center gap-3">
-                                <a href="{{ route('projects.report.preview', ['project' => $project->project_Id, 'location_id' => $location->id]) }}" class="text-sm font-semibold text-teal-600 hover:text-teal-800 transition-colors flex items-center gap-1">
-                                    Report <i class="fa-solid fa-file-pdf text-[10px] ml-0.5"></i>
-                                </a>
-                                <a href="{{ route('projects.surveys.map', [$project->project_Id, $location->id]) }}" class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
-                                    Open Map <i class="fa-solid fa-arrow-right text-[10px] ml-0.5"></i>
-                                </a>
-                                <a href="{{ route('quotation.index', ['project_id' => $project->project_Id, 'module' => $location->survey_type, 'location_id' => $location->id]) }}" class="inline-flex justify-center items-center px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold transition-colors shadow-sm">
-                                    Proceed to Quotation
-                                </a>
-                                <form action="{{ route('projects.surveys.destroy', [$project->project_Id, $location->id]) }}" method="POST" class="m-0" onsubmit="return confirm('Delete this survey area?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-sm font-semibold text-red-500 hover:text-red-700 transition-colors ml-2"><i class="fa-solid fa-trash"></i></button>
-                                </form>
-                            </div>
-                        </li>
-                    @endforeach
-
-                    @php $summary = $project->modellingSummary; @endphp
-                    @if($summary)
-                        @php $hasAnyModule = true; @endphp
-                        <li class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
-                            <div>
-                                <div class="flex items-center gap-2.5 mb-1">
-                                    <i class="fa-solid fa-cubes text-slate-600 w-4 text-center"></i>
-                                    <div class="font-bold text-slate-800 text-sm">3D Modelling</div>
-                                    <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Saved</span>
-                                </div>
-                                <div class="text-[11px] text-slate-500 font-medium">
-                                    Package: {{ $summary->package_name ?? 'Custom selection' }},
-                                    {{ $project->modellingItems->pluck('catalog_module_id')->unique()->count() }} modules,
-                                    RM {{ number_format($summary->grand_total, 2) }}
-                                </div>
-                            </div>
-                            <div class="flex flex-col sm:flex-row items-center gap-3">
-                                <a href="{{ route('projects.modeling.builder', ['project_id' => $project->project_Id]) }}" class="text-sm font-semibold text-blue-600 hover:text-blue-800 transition-colors flex items-center gap-1">
-                                    Edit Modules <i class="fa-solid fa-arrow-right text-[10px] ml-0.5"></i>
-                                </a>
-                                <a href="{{ route('quotation.index', ['project_id' => $project->project_Id, 'module' => 'modelling']) }}" class="inline-flex justify-center items-center px-4 py-1.5 bg-blue-600 hover:bg-blue-700 text-white rounded text-xs font-bold transition-colors shadow-sm">
-                                    Proceed to Quotation
-                                </a>
-                                <form action="{{ route('projects.modeling.destroy', $project->project_Id) }}" method="POST" class="m-0" onsubmit="return confirm('Remove modelling data for this project?');">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="submit" class="text-sm font-semibold text-red-500 hover:text-red-700 transition-colors ml-2"><i class="fa-solid fa-trash"></i></button>
-                                </form>
-                            </div>
-                        </li>
-                    @endif
-
-                    @if(!$hasAnyModule)
-                        <li class="p-8 text-center text-slate-500 font-medium text-sm">
-                            <i class="fa-regular fa-folder-open text-3xl text-slate-300 mb-3 block"></i>
-                            No workflows have been added to this project yet. Choose an option below to get started.
-                        </li>
-                    @endif
-
-                </ul>
+            <div class="project-overview-summary" aria-label="Project workflow summary">
+                <div class="project-overview-summary-item"><span class="project-overview-summary-icon"><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i></span><span><small>Survey areas</small><strong>{{ $project->surveyLocations->count() }}</strong></span></div>
+                <div class="project-overview-summary-item"><span class="project-overview-summary-icon"><i class="fa-solid fa-circle-check" aria-hidden="true"></i></span><span><small>Mapped areas</small><strong>{{ $project->surveyLocations->where('status', 'Mapped')->count() }}</strong></span></div>
+                <div class="project-overview-summary-item"><span class="project-overview-summary-icon"><i class="fa-solid fa-cubes" aria-hidden="true"></i></span><span><small>Modelling</small><strong>{{ $project->modellingSummary ? 'Configured' : 'Not added' }}</strong></span></div>
             </div>
-        </div>
+        </header>
 
-        <!-- 3. ADD NEW MODULES -->
-        <div class="mb-8">
-            <div class="flex items-center justify-between mb-4">
-                <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Add Workflow Module</h2>
+        @php $summary = $project->modellingSummary; @endphp
+
+        <!-- ADD WORKFLOW: kept ahead of the workflow register for a clear next action -->
+        <section class="project-overview-section project-overview-add mb-8">
+            <div class="project-overview-section-heading flex items-center justify-between mb-4">
+                <div><p class="project-overview-section-kicker">Expand this project</p><h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Add a Workflow</h2><p class="project-overview-section-description">Add a survey area or configure a modelling package for this project.</p></div>
                 <a href="{{ url('/admin/equipment') }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 rounded text-[11px] font-bold uppercase tracking-wider transition-colors shadow-sm">
                     <i class="fa-solid fa-database"></i> Equipment Database
                 </a>
@@ -197,7 +103,112 @@
                 @endif
                 
             </div>
-        </div>
+        </section>
+
+
+
+        <!-- ACTIVE WORKFLOWS -->
+        <section class="project-overview-section project-overview-workflows mb-10">
+            <div class="project-overview-section-heading flex items-center justify-between mb-4">
+                <div><p class="project-overview-section-kicker">Survey register</p><h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">Active Workflows</h2><p class="project-overview-section-description">Manage survey areas and modelling packages, with each action kept beside its workflow.</p></div>
+                @if($project->surveyLocations->count() > 1)
+                    <a href="{{ route('projects.report.preview', $project->project_Id) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 rounded text-xs font-bold transition-colors shadow-sm">
+                        <i class="fa-solid fa-file-lines text-slate-500"></i> Full Project Report (All Areas)
+                    </a>
+                @endif
+            </div>
+            
+            <div class="project-overview-workflow-table">
+                <div class="project-overview-workflow-table-head" aria-hidden="true"><span>Workflow</span><span>Actions</span></div>
+                <ul class="divide-y divide-slate-100">
+                    
+                    @php 
+                        $hasAnyModule = false; 
+                        $hasSurvey = $project->surveyLocations->count() > 0;
+                    @endphp
+
+                    @foreach($project->surveyLocations as $location)
+                        @php $hasAnyModule = true; @endphp
+                        <li class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
+                            <div>
+                                <div class="flex items-center gap-2.5 mb-1">
+                                    @if($location->survey_type === 'drone')
+                                        <i class="fa-solid fa-plane-up text-slate-500 w-4 text-center"></i>
+                                        <div class="font-bold text-slate-800 text-sm">Drone Mapping: {{ $location->name }}</div>
+                                    @else
+                                        <i class="fa-solid fa-water text-teal-600 w-4 text-center"></i>
+                                        <div class="font-bold text-slate-800 text-sm">SBES Survey: {{ $location->name }}</div>
+                                    @endif
+                                    
+                                    @if($location->status === 'Mapped')
+                                        <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Mapped</span>
+                                    @else
+                                        <span class="bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Pending</span>
+                                    @endif
+                                </div>
+                                <div class="text-[11px] text-slate-500 font-medium">Added {{ $location->created_at->format('M d, Y') }}</div>
+                            </div>
+                            <div class="project-overview-row-actions">
+                                <a href="{{ route('projects.report.preview', ['project' => $project->project_Id, 'location_id' => $location->id]) }}" class="project-overview-action project-overview-action-secondary">
+                                    <i class="fa-regular fa-file-pdf" aria-hidden="true"></i><span>Report</span>
+                                </a>
+                                <a href="{{ route('projects.surveys.map', [$project->project_Id, $location->id]) }}" class="project-overview-action project-overview-action-secondary">
+                                    <i class="fa-solid fa-map" aria-hidden="true"></i><span>Open map</span>
+                                </a>
+                                <a href="{{ route('quotation.index', ['project_id' => $project->project_Id, 'module' => $location->survey_type, 'location_id' => $location->id]) }}" class="project-overview-action project-overview-action-primary">
+                                    <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i><span>Quotation</span>
+                                </a>
+                                <form action="{{ route('projects.surveys.destroy', [$project->project_Id, $location->id]) }}" method="POST" class="m-0" onsubmit="return confirm('Delete this survey area?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="project-overview-action-delete" aria-label="Delete survey area {{ $location->name }}" title="Delete survey area"><i class="fa-regular fa-trash-can" aria-hidden="true"></i></button>
+                                </form>
+                            </div>
+                        </li>
+                    @endforeach
+
+                    @php $summary = $project->modellingSummary; @endphp
+                    @if($summary)
+                        @php $hasAnyModule = true; @endphp
+                        <li class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
+                            <div>
+                                <div class="flex items-center gap-2.5 mb-1">
+                                    <i class="fa-solid fa-cubes text-slate-600 w-4 text-center"></i>
+                                    <div class="font-bold text-slate-800 text-sm">3D Modelling</div>
+                                    <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">Saved</span>
+                                </div>
+                                <div class="text-[11px] text-slate-500 font-medium">
+                                    Package: {{ $summary->package_name ?? 'Custom selection' }},
+                                    {{ $project->modellingItems->pluck('catalog_module_id')->unique()->count() }} modules,
+                                    RM {{ number_format($summary->grand_total, 2) }}
+                                </div>
+                            </div>
+                            <div class="project-overview-row-actions">
+                                <a href="{{ route('projects.modeling.builder', ['project_id' => $project->project_Id]) }}" class="project-overview-action project-overview-action-secondary">
+                                    <i class="fa-solid fa-sliders" aria-hidden="true"></i><span>Edit modules</span>
+                                </a>
+                                <a href="{{ route('quotation.index', ['project_id' => $project->project_Id, 'module' => 'modelling']) }}" class="project-overview-action project-overview-action-primary">
+                                    <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i><span>Quotation</span>
+                                </a>
+                                <form action="{{ route('projects.modeling.destroy', $project->project_Id) }}" method="POST" class="m-0" onsubmit="return confirm('Remove modelling data for this project?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" class="project-overview-action-delete" aria-label="Delete modelling package" title="Delete modelling package"><i class="fa-regular fa-trash-can" aria-hidden="true"></i></button>
+                                </form>
+                            </div>
+                        </li>
+                    @endif
+
+                    @if(!$hasAnyModule)
+                        <li class="p-8 text-center text-slate-500 font-medium text-sm">
+                            <i class="fa-regular fa-folder-open text-3xl text-slate-300 mb-3 block"></i>
+                            No workflows have been added to this project yet. Choose an option below to get started.
+                        </li>
+                    @endif
+
+                </ul>
+            </div>
+        </section>
 
     </div>
 

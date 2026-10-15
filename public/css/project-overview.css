@@ -37,3 +37,170 @@
 @media (max-width: 640px) {
     .project-overview-page h1 { font-size: 1.8rem; }
 }
+
+
+/* Project details workspace refinement: strong hierarchy, useful actions, responsive workflow cards. */
+.project-overview-page { max-width: 1480px; color: #17283f; }
+.project-overview-page .project-overview-breadcrumb { margin: 0 0 1rem; }
+.project-overview-page .project-overview-breadcrumb a { display:inline-flex;align-items:center;gap:.5rem;padding:.45rem 0;color:#52647a;font-size:.78rem;font-weight:700;text-decoration:none; }
+.project-overview-page .project-overview-breadcrumb a:hover { color:#2463a6; }
+.project-overview-hero { margin-bottom:2rem;padding:clamp(1.15rem,2.5vw,2rem);border:1px solid #dfe7ee;border-radius:12px;background:#fff;box-shadow:0 4px 18px rgba(20,43,73,.045); }
+.project-overview-hero-top { display:flex;align-items:flex-start;justify-content:space-between;gap:1.5rem; }
+.project-overview-title-group { min-width:0; }
+.project-overview-page .project-overview-eyebrow { margin-bottom:.55rem;font-size:.68rem;letter-spacing:.13em; }
+.project-overview-page .project-overview-title-group h1 { margin:0;overflow-wrap:anywhere;font-size:clamp(1.65rem,2.5vw,2.35rem);font-weight:700;line-height:1.15;letter-spacing:-.035em; }
+.project-overview-code { margin-top:.65rem;color:#65768a;font-size:.82rem;font-weight:600; }
+.project-overview-code i { margin-right:.2rem;color:#8797a9; }
+.project-overview-badges { display:flex;flex-wrap:wrap;align-items:center;gap:.45rem;margin-top:.9rem; }
+.project-overview-status,.project-overview-type,.project-overview-location { display:inline-flex;align-items:center;gap:.35rem;padding:.32rem .6rem;border:1px solid #dfe7ee;border-radius:5px;color:#53657a;background:#f8fafc;font-size:.7rem;font-weight:700;line-height:1.2; }
+.project-overview-status-draft { color:#79551b;border-color:#f1dfb6;background:#fffbeb; }
+.project-overview-status-planned { color:#205b91;border-color:#cfe1f2;background:#f0f7fd; }
+.project-overview-status-completed { color:#17684e;border-color:#c6e7d8;background:#effaf4; }
+.project-overview-hero-actions { display:flex;flex:0 0 auto;flex-wrap:wrap;justify-content:flex-end;gap:.55rem; }
+.project-overview-secondary-action,.project-overview-primary-action { display:inline-flex;align-items:center;justify-content:center;gap:.5rem;min-height:38px;padding:.55rem .8rem;border:1px solid #dfe7ee;border-radius:6px;font-size:.77rem;font-weight:700;text-decoration:none;transition:background .16s,border-color .16s,color .16s; }
+.project-overview-secondary-action { color:#455970;background:#fff; }
+.project-overview-secondary-action:hover { color:#1d518a;border-color:#b8cfe1;background:#f7fbff; }
+.project-overview-primary-action { color:#fff;border-color:#2463a6;background:#2463a6; }
+.project-overview-primary-action:hover { color:#fff;border-color:#1d518a;background:#1d518a; }
+.project-overview-meta-grid { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:1.4rem;border:1px solid #e3e9ef;border-radius:8px;background:#fbfcfe; }
+.project-overview-meta-item { display:flex;flex-direction:column;gap:.3rem;min-width:0;padding:.85rem 1rem; }
+.project-overview-meta-item + .project-overview-meta-item { border-left:1px solid #e3e9ef; }
+.project-overview-meta-item span { color:#758499;font-size:.64rem;font-weight:800;letter-spacing:.1em;text-transform:uppercase; }
+.project-overview-meta-item strong { color:#25384e;font-size:.83rem;font-weight:700;overflow-wrap:anywhere; }
+.project-overview-summary { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.75rem;margin-top:.85rem; }
+.project-overview-summary-item { display:flex;align-items:center;gap:.7rem;min-width:0;padding:.8rem .9rem;border:1px solid #e3e9ef;border-radius:8px;background:#fff; }
+.project-overview-summary-icon { display:grid;flex:0 0 36px;width:36px;height:36px;place-items:center;border-radius:7px;color:#2463a6;background:#eef5fc; }
+.project-overview-summary-item > span:last-child { display:flex;flex-direction:column;gap:.1rem;min-width:0; }
+.project-overview-summary-item small { color:#748397;font-size:.68rem;font-weight:600; }
+.project-overview-summary-item strong { color:#1a2d43;font-size:.92rem;font-weight:800;overflow-wrap:anywhere; }
+.project-overview-page .project-overview-section { margin-bottom:2rem; }
+.project-overview-page .project-overview-section-heading { align-items:flex-start;gap:1rem; }
+.project-overview-section-heading > div { min-width:0; }
+.project-overview-section-kicker { margin:0 0 .25rem;color:#2463a6;font-size:.65rem;font-weight:800;letter-spacing:.12em;text-transform:uppercase; }
+.project-overview-page .project-overview-section-heading h2 { margin:0;font-size:1.12rem;font-weight:700;letter-spacing:-.02em;text-transform:none; }
+.project-overview-section-description { margin:.3rem 0 0;color:#6b7b8e;font-size:.8rem;line-height:1.5; }
+.project-overview-page .project-overview-workflows > .bg-white.border.rounded-lg.shadow-sm { overflow:hidden;border-radius:10px; }
+.project-overview-page .project-overview-workflows > .bg-white.border.rounded-lg.shadow-sm > ul > li { gap:1.25rem;padding:1.15rem 1.2rem; }
+.project-overview-page .project-overview-workflows > .bg-white.border.rounded-lg.shadow-sm > ul > li > div:first-child { flex:1 1 260px;min-width:0; }
+.project-overview-page .project-overview-workflows > .bg-white.border.rounded-lg.shadow-sm > ul > li > div:last-child { flex-wrap:wrap;justify-content:flex-end;align-items:center;gap:.5rem .8rem; }
+.project-overview-page .project-overview-workflows > .bg-white.border.rounded-lg.shadow-sm > ul > li > div:last-child a { white-space:nowrap; }
+.project-overview-page .project-overview-workflows > .bg-white.border.rounded-lg.shadow-sm > ul > li > div:last-child form { margin-left:.1rem; }
+.project-overview-page .project-overview-workflows > .bg-white.border.rounded-lg.shadow-sm > ul > li > div:last-child form button { display:inline-grid;width:34px;height:34px;place-items:center;margin:0;border:1px solid #f1d5d3;border-radius:6px;background:#fff; }
+.project-overview-page .project-overview-workflows > .bg-white.border.rounded-lg.shadow-sm > ul > li > div:last-child form button:hover { background:#fff5f4; }
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\:grid-cols-3 > button,.project-overview-page .project-overview-add .grid.grid-cols-1.md\:grid-cols-3 > a,.project-overview-page .project-overview-add .grid.grid-cols-1.md\:grid-cols-3 > div { min-height:176px;border-radius:9px;box-shadow:none;transition:border-color .16s,background .16s,transform .16s; }
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\:grid-cols-3 > button:hover,.project-overview-page .project-overview-add .grid.grid-cols-1.md\:grid-cols-3 > a:hover { transform:translateY(-2px); }
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\:grid-cols-3 > button:focus-visible,.project-overview-page .project-overview-add .grid.grid-cols-1.md\:grid-cols-3 > a:focus-visible,.project-overview-page .project-overview-hero a:focus-visible { outline:3px solid rgba(36,99,166,.28);outline-offset:3px; }
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\:grid-cols-3 > button > div:first-child,.project-overview-page .project-overview-add .grid.grid-cols-1.md\:grid-cols-3 > a > div:first-child { border-radius:8px; }
+.project-overview-page .modal-content { border-radius:10px !important; }
+@media (max-width:900px) { .project-overview-hero-top { flex-direction:column; }.project-overview-hero-actions { justify-content:flex-start; }.project-overview-page .project-overview-workflows > .bg-white.border.rounded-lg.shadow-sm > ul > li > div:last-child { justify-content:flex-start; } }
+@media (max-width:640px) { .project-overview-hero { padding:1rem; }.project-overview-meta-grid { grid-template-columns:1fr; }.project-overview-meta-item + .project-overview-meta-item { border-top:1px solid #e3e9ef;border-left:0; }.project-overview-summary { grid-template-columns:1fr; }.project-overview-hero-actions { width:100%; }.project-overview-hero-actions a { flex:1 1 auto; }.project-overview-page .project-overview-section-heading { flex-direction:column; } }
+@media (prefers-reduced-motion:reduce) { .project-overview-page * { transition:none !important; } }
+
+
+/* Workspace information architecture pass: actions first, compact operational register. */
+.project-overview-page { max-width: 1540px; }
+.project-overview-content { width: 100%; max-width: none; margin: 0 auto; }
+.project-overview-page .project-overview-hero { margin-bottom: 1.35rem; padding: clamp(1.15rem, 2vw, 1.7rem); border-radius: 8px; box-shadow: none; }
+.project-overview-page .project-overview-meta-grid { margin-top: 1.1rem; }
+.project-overview-page .project-overview-summary { margin-top: .7rem; }
+.project-overview-page .project-overview-section { margin-bottom: 1.5rem; }
+.project-overview-page .project-overview-add { padding: 1.1rem 1.2rem 1.2rem; border: 1px solid #dfe7ee; border-radius: 8px; background: #fff; }
+.project-overview-page .project-overview-add .project-overview-section-heading { align-items: center; margin-bottom: .9rem; }
+.project-overview-page .project-overview-add .project-overview-section-kicker { color: #526c84; }
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\\:grid-cols-3 { gap: .75rem; }
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\\:grid-cols-3 > button,
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\\:grid-cols-3 > a,
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\\:grid-cols-3 > div {
+    min-height: 104px; display: grid; grid-template-columns: 42px minmax(0,1fr); grid-template-rows: auto auto;
+    align-content: center; justify-items: start; column-gap: .85rem; row-gap: .15rem; padding: 1rem 1.05rem;
+    border: 1px solid #e0e7ef; border-radius: 6px; text-align: left; background: #fff;
+}
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\\:grid-cols-3 > button:hover,
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\\:grid-cols-3 > a:hover { border-color: #8eb4d0; background: #f8fbfe; transform: none; }
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\\:grid-cols-3 > button > div:first-child,
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\\:grid-cols-3 > a > div:first-child,
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\\:grid-cols-3 > div > div:first-child {
+    grid-row: 1 / span 2; width: 42px; height: 42px; margin: 0; border-radius: 6px; align-self: center;
+}
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\\:grid-cols-3 > button > div:nth-child(2),
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\\:grid-cols-3 > a > div:nth-child(2),
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\\:grid-cols-3 > div > div:nth-child(2) { margin: 0; align-self: end; }
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\\:grid-cols-3 > button > div:nth-child(3),
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\\:grid-cols-3 > a > div:nth-child(3),
+.project-overview-page .project-overview-add .grid.grid-cols-1.md\\:grid-cols-3 > div > div:nth-child(3) { text-align: left; align-self: start; }
+.project-overview-page .project-overview-workflows .project-overview-section-heading { margin-bottom: .8rem; }
+.project-overview-workflow-table { overflow: hidden; border: 1px solid #dfe7ee; border-radius: 8px; background: #fff; }
+.project-overview-workflow-table-head { display: grid; grid-template-columns: minmax(230px,1.2fr) minmax(160px,.65fr) minmax(390px,1.5fr); gap: 1rem; padding: .7rem 1.1rem; border-bottom: 1px solid #dfe7ee; background: #f6f8fb; color: #65778b; font-size: .65rem; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+.project-overview-page .project-overview-workflows .project-overview-workflow-table > ul { margin: 0; padding: 0; list-style: none; }
+.project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li { display: grid; grid-template-columns: minmax(230px,1.2fr) minmax(160px,.65fr) minmax(390px,1.5fr); align-items: center; gap: 1rem; padding: .9rem 1.1rem; border-bottom: 1px solid #edf1f5; }
+.project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li:last-child { border-bottom: 0; }
+.project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li > div:first-child { min-width: 0; }
+.project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li > div:last-child { display: flex; flex-wrap: wrap; justify-content: flex-end; align-items: center; gap: .45rem .8rem; min-width: 0; }
+.project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li > div:last-child a { white-space: nowrap; }
+.project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li > div:last-child a:last-of-type { padding: .55rem .8rem; border: 1px solid #0b5c8e; border-radius: 5px; background: #0b5c8e; color: #fff !important; font-size: .72rem; font-weight: 700; text-decoration: none; }
+.project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li > div:last-child a:last-of-type:hover { background: #08456b; }
+.project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li > div:last-child form button { width: 32px; height: 32px; border: 1px solid #e5c9c7; color: #a43b37; }
+.project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li > div:first-child .font-bold { overflow-wrap: anywhere; }
+.project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li > div:first-child .text-\\[11px\\] { margin-top: .35rem; }
+.project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li > div:nth-child(2) { color: #65778b; font-size: .75rem; }
+.project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li:has(> i) { display: block; padding: 1.5rem; text-align: center; }
+.project-overview-page .project-overview-section-heading > a { flex: 0 0 auto; }
+.project-overview-page .project-overview-add a:focus-visible,
+.project-overview-page .project-overview-add button:focus-visible,
+.project-overview-page .project-overview-workflows a:focus-visible,
+.project-overview-page .project-overview-workflows button:focus-visible { outline: 3px solid rgba(36,99,166,.25); outline-offset: 2px; }
+@media (max-width: 1100px) {
+ .project-overview-workflow-table-head { display: none; }
+ .project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li { grid-template-columns: minmax(0,1fr); gap: .75rem; }
+ .project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li > div:last-child { justify-content: flex-start; }
+}
+@media (max-width: 700px) {
+ .project-overview-page .project-overview-add { padding: .9rem; }
+ .project-overview-page .project-overview-add .project-overview-section-heading { align-items: flex-start; }
+ .project-overview-page .project-overview-add .grid.grid-cols-1.md\\:grid-cols-3 > button,
+ .project-overview-page .project-overview-add .grid.grid-cols-1.md\\:grid-cols-3 > a,
+ .project-overview-page .project-overview-add .grid.grid-cols-1.md\\:grid-cols-3 > div { min-height: 88px; }
+ .project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li { padding: .9rem; }
+ .project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li > div:last-child { gap: .5rem; }
+}
+
+/* The register rows have two content groups: workflow identity and action controls. */
+.project-overview-workflow-table-head { grid-template-columns: minmax(0,1fr) minmax(390px,1.5fr); }
+.project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li { grid-template-columns: minmax(0,1fr) minmax(390px,1.5fr); }
+@media (max-width:1100px) {
+ .project-overview-workflow-table-head { display:none; }
+ .project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li { grid-template-columns:minmax(0,1fr); }
+}
+
+
+/* Final pass: remove accidental underlines and make workflow actions deliberate controls. */
+.project-overview-page a,
+.project-overview-page a:hover,
+.project-overview-page a:focus,
+.project-overview-page a:visited { text-decoration: none !important; }
+.project-overview-page .project-overview-section-heading a { text-decoration: none !important; }
+.project-overview-page .project-overview-row-actions { display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:.5rem;min-width:0; }
+.project-overview-page .project-overview-row-actions .project-overview-action { display:inline-flex;align-items:center;justify-content:center;gap:.45rem;min-height:35px;padding:.5rem .7rem;border:1px solid #d7e1eb;border-radius:5px;background:#fff;color:#3e5872 !important;font-size:.74rem;font-weight:700;line-height:1.1;white-space:nowrap;text-decoration:none !important;transition:background .15s,border-color .15s,color .15s; }
+.project-overview-page .project-overview-row-actions .project-overview-action i { font-size:.78rem;color:#66829b; }
+.project-overview-page .project-overview-row-actions .project-overview-action:hover { border-color:#a9c4da;background:#f5f9fc;color:#124f7a !important; }
+.project-overview-page .project-overview-row-actions .project-overview-action:hover i { color:#124f7a; }
+.project-overview-page .project-overview-row-actions .project-overview-action-primary { border-color:#175f91;background:#175f91;color:#fff !important; }
+.project-overview-page .project-overview-row-actions .project-overview-action-primary i { color:#fff; }
+.project-overview-page .project-overview-row-actions .project-overview-action-primary:hover { border-color:#10486f;background:#10486f;color:#fff !important; }
+.project-overview-page .project-overview-row-actions .project-overview-action-delete { display:inline-grid;place-items:center;width:35px;height:35px;padding:0;border:1px solid #e7d3d1;border-radius:5px;background:#fff;color:#a43b37;cursor:pointer; }
+.project-overview-page .project-overview-row-actions .project-overview-action-delete:hover { border-color:#d8aaa6;background:#fff5f4;color:#8f2925; }
+.project-overview-page .project-overview-row-actions .project-overview-action-delete:focus-visible { outline:3px solid rgba(164,59,55,.2);outline-offset:2px; }
+.project-overview-page .project-overview-workflow-table-head { grid-template-columns:minmax(0,1fr) auto; }
+.project-overview-page .project-overview-workflow-table-head span:last-child { text-align:right;padding-right:2.9rem; }
+.project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li { grid-template-columns:minmax(250px,.8fr) minmax(0,1.2fr); }
+@media(max-width:1100px) {
+ .project-overview-page .project-overview-workflows .project-overview-workflow-table > ul > li { grid-template-columns:minmax(0,1fr); }
+ .project-overview-page .project-overview-row-actions { justify-content:flex-start; }
+ .project-overview-page .project-overview-workflow-table-head { display:none; }
+}
+@media(max-width:520px) {
+ .project-overview-page .project-overview-row-actions { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%; }
+ .project-overview-page .project-overview-row-actions .project-overview-action { width:100%; }
+ .project-overview-page .project-overview-row-actions .project-overview-action-primary { grid-column:1 / span 2; }
+ .project-overview-page .project-overview-row-actions .project-overview-action-delete { grid-column:1 / span 2;width:100%; }
+}

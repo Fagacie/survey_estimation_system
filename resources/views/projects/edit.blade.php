@@ -1,6 +1,9 @@
-<x-app-layout>
+<x-app-layout containerClass="w-full px-4 py-6 sm:px-8 sm:py-8">
     
     <x-slot name="header">Edit Project</x-slot>
+    <link rel="stylesheet" href="{{ asset('css/project-edit.css') }}?v={{ filemtime(public_path('css/project-edit.css')) }}">
+
+    <div class="project-edit-page">
 
     <div class="row justify-content-center">
         <div class="col-md-8">
@@ -107,5 +110,6 @@
                 </div>
             </div>
         </div>
+    </div>
     </div>
 </x-app-layout>

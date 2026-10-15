@@ -1,52 +1,8 @@
-<x-app-layout containerClass="w-full px-6 md:px-12 py-6">
+<x-app-layout containerClass="w-full px-4 sm:px-6 xl:px-10 py-6">
+    <link rel="stylesheet" href="{{ asset('css/modelling-management.css') }}?v={{ filemtime(public_path('css/modelling-management.css')) }}">
 
-    <style>
-        [x-cloak] { display: none !important; }
 
-        /* Wrapper: puts edit + delete side by side */
-        .act-wrap {
-            display: inline-flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 8px;
-        }
-
-        /* Base icon button */
-        .act-btn {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 34px;
-            height: 34px;
-            padding: 0;
-            line-height: 1;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            color: #64748b;
-            font-size: 14px;
-            cursor: pointer;
-            transition: background-color .15s ease, border-color .15s ease, color .15s ease;
-        }
-
-        /* Edit: soft teal on hover */
-        .act-edit:hover {
-            background: #f0fdfa;
-            border-color: #5eead4;
-            color: #0f766e;
-        }
-
-        /* Delete: soft red on hover */
-        .act-del:hover {
-            background: #fef2f2;
-            border-color: #fca5a5;
-            color: #dc2626;
-        }
-    </style>
-
-    <div class="font-sans text-slate-800 antialiased" x-data="{ showModal: false, editing: null }" x-cloak>
+    <div class="ises-modelling-page font-sans text-slate-800 antialiased" x-data="{ showModal: false, editing: null }" x-cloak>
 
         <!-- Header -->
         <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-6 border-b border-slate-200/60">

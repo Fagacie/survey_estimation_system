@@ -3,279 +3,6 @@
     
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <style>
-        .quotation-history-page {
-            max-width: 1440px;
-            margin: 0 auto;
-        }
-
-        /* Base Overrides */
-        body {
-            color: #334155;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
-
-        .history-container {
-            width: 100%;
-            max-width: 1440px;
-            margin: 0 auto !important;
-        }
-
-        /* Page Heading */
-        .page-header-wrapper {
-            margin-bottom: 28px;
-        }
-
-        .page-header-title {
-            font-family: 'Space Grotesk', sans-serif;
-            font-size: 2rem;
-            font-weight: 700;
-            color: #0f172a;
-            letter-spacing: 0;
-            margin-bottom: 4px;
-        }
-
-        .page-header-subtitle {
-            font-size: 0.875rem;
-            color: #64748b;
-            margin: 0;
-        }
-
-        /* Filter Box Cards */
-        .filter-card-custom {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 20px;
-            box-shadow: 0 8px 24px rgba(18, 32, 51, 0.05);
-            margin-bottom: 24px;
-        }
-
-        .filter-label {
-            font-size: 0.725rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #475569;
-            margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .filter-input, .filter-select {
-            width: 100%;
-            height: 42px;
-            border: 1px solid transparent;
-            border-radius: 8px;
-            padding: 8px 14px;
-            font-size: 0.875rem;
-            color: #1e293b;
-            background-color: #f8fafc;
-            transition: all 0.2s ease;
-        }
-
-        .filter-input:focus, .filter-select:focus {
-            outline: none;
-            border-color: #0d9488;
-            box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.1);
-            background-color: #ffffff;
-        }
-
-        /* Table Design */
-        .table-card {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            overflow: hidden;
-            box-shadow: 0 8px 24px rgba(18, 32, 51, 0.05);
-        }
-
-        .custom-project-table {
-            width: 100%;
-            margin-bottom: 0;
-            border-collapse: separate;
-            border-spacing: 0;
-        }
-
-        .custom-project-table thead th {
-            background-color: #f8fafc;
-            color: #475569;
-            font-size: 0.725rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 14px 20px;
-            border-bottom: 1px solid #e2e8f0;
-            vertical-align: middle;
-        }
-
-        .custom-project-table tbody td {
-            padding: 20px 20px;
-            font-size: 0.875rem;
-            color: #334155;
-            border-bottom: 1px solid #f1f5f9;
-            vertical-align: middle;
-            background-color: #ffffff;
-        }
-
-        .custom-project-table tbody tr:last-child td {
-            border-bottom: none;
-        }
-
-        .custom-project-table tbody tr:hover td {
-            background-color: #f0f8f7;
-        }
-
-        .custom-project-table tbody tr {
-            transition: background-color .18s ease;
-        }
-
-        .quotation-history-page .action-circle-btn {
-            border-color: #dfe7ee;
-            color: #68788b;
-        }
-
-        .quotation-history-page .action-circle-btn:hover {
-            border-color: #8ed8d1;
-            color: #087f78;
-            background: #e9f7f5;
-        }
-
-        .quotation-history-page .action-circle-btn.delete-btn:hover {
-            border-color: #fca5a5;
-            color: #dc2626;
-            background: #fef2f2;
-        }
-
-        .quotation-history-page .modal-card {
-            border: 1px solid #dfe7ee;
-        }
-
-        @media (max-width: 768px) {
-            .page-header-title { font-size: 1.65rem; }
-            .filter-card-custom { padding: 16px; }
-            .table-card { overflow-x: auto; }
-            .custom-project-table { min-width: 860px; }
-        }
-
-        .project-code-text {
-            color: #64748b;
-            font-size: 0.825rem;
-            font-weight: 500;
-        }
-
-        .project-title-text {
-            font-weight: 700;
-            color: #0f172a;
-            font-size: 0.925rem;
-            display: block;
-        }
-
-        .project-sub-info {
-            font-size: 0.775rem;
-            color: #94a3b8;
-            margin-top: 2px;
-        }
-
-        /* Circular Action Buttons */
-        .action-buttons-group {
-            display: flex;
-            align-items: center;
-            justify-content: flex-end;
-            gap: 8px;
-        }
-
-        .action-circle-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 1px solid #cbd5e1;
-            background-color: #ffffff;
-            color: #64748b;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            transition: all 0.2s ease;
-            font-size: 0.875rem;
-        }
-
-        .action-circle-btn:hover {
-            background-color: #f1f5f9;
-            color: #0f172a;
-            border-color: #94a3b8;
-        }
-
-        .action-circle-btn.delete-btn:hover {
-            background-color: #fef2f2;
-            color: #ef4444;
-            border-color: #fca5a5;
-        }
-
-        /* Custom Modal Styling */
-        .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(4px);
-            z-index: 1050;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .modal-card {
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 24px;
-            max-width: 440px;
-            width: 90%;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-        }
-
-        .modal-card h3 {
-            font-size: 1.125rem;
-            font-weight: 700;
-            color: #0f172a;
-            margin-bottom: 8px;
-        }
-
-        .modal-card p {
-            font-size: 0.875rem;
-            color: #64748b;
-            margin-bottom: 20px;
-        }
-
-        .modal-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-
-        .btn-cancel {
-            background: #ffffff;
-            border: 1px solid #cbd5e1;
-            color: #334155;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-
-        .btn-confirm {
-            background: #ef4444;
-            border: none;
-            color: #ffffff;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: 600;
-            font-size: 0.875rem;
-        }
-    </style>
     <link rel="stylesheet" href="{{ asset('css/quotation-history.css') }}?v={{ filemtime(public_path('css/quotation-history.css')) }}">
 
     <!-- Main Content Layout Wrapper -->
@@ -355,6 +82,15 @@
                     </select>
                 </div>
             </div>
+            <div class="history-filter-footer">
+                <span id="historyResultsCount" class="history-results-count" aria-live="polite">
+                    {{ $quotations->count() }} records
+                </span>
+                <button type="button" id="clearHistoryFilters" class="history-clear-filters">
+                    <i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i>
+                    Clear filters
+                </button>
+            </div>
         </div>
 
         <!-- History Data Table Container -->
@@ -426,16 +162,16 @@
                         <!-- Actions -->
                         <td>
                             <div class="action-buttons-group">
-                                <a href="{{ route('quotations.show', $item->quotation_Id) }}" class="action-circle-btn" title="View Details">
+                                <a href="{{ route('quotations.show', $item->quotation_Id) }}" class="action-circle-btn" title="View Details" aria-label="View quotation details">
                                     <i class="bi bi-arrow-right"></i>
                                 </a>
                                 
-                                <a href="{{ route('quotations.invoice', $item->quotation_Id) }}" class="action-circle-btn" title="Generate Invoice">
+                                <a href="{{ route('quotations.invoice', $item->quotation_Id) }}" class="action-circle-btn" title="Generate Invoice" aria-label="Generate invoice">
                                     <i class="bi bi-file-earmark-text"></i>
                                 </a>
 
                                 <button type="button" class="action-circle-btn delete-btn" 
-                                        title="Delete" 
+                                        title="Delete" aria-label="Delete quotation" 
                                         data-id="{{ $item->quotation_Id }}" 
                                         data-delete-url="{{ route('quotations.destroy', $item->quotation_Id) }}">
                                     <i class="bi bi-trash3"></i>
@@ -506,38 +242,54 @@
             const typeFilter = document.getElementById('typeFilter');
             const locationFilter = document.getElementById('locationFilter');   // NEW
             const monthFilter = document.getElementById('monthFilter');
-            const rows = document.querySelectorAll('.quotation-row');
+            const clearFiltersButton = document.getElementById('clearHistoryFilters');
+            const resultsCount = document.getElementById('historyResultsCount');
+            const rows = Array.from(document.querySelectorAll('.quotation-row'));
 
             function filterTable() {
                 const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
                 const selectedType = typeFilter ? typeFilter.value.toLowerCase().trim() : '';
-                const selectedLocation = locationFilter ? locationFilter.value.toLowerCase().trim() : '';   // NEW
+                const selectedLocation = locationFilter ? locationFilter.value.toLowerCase().trim() : '';
                 const selectedMonth = monthFilter ? monthFilter.value.trim() : '';
+                let visibleCount = 0;
 
                 rows.forEach(row => {
                     const rowText = row.innerText.toLowerCase();
                     const rowType = row.getAttribute('data-type') || '';
-                    const rowLocation = row.getAttribute('data-location') || '';   // NEW
+                    const rowLocation = row.getAttribute('data-location') || '';
                     const rowMonth = row.getAttribute('data-month') || '';
 
                     const matchesSearch = query === '' || rowText.includes(query);
                     const matchesType = selectedType === '' || rowType === selectedType;
-                    const matchesLocation = selectedLocation === '' || rowLocation === selectedLocation;   // NEW
+                    const matchesLocation = selectedLocation === '' || rowLocation === selectedLocation;
                     const matchesMonth = selectedMonth === '' || rowMonth === selectedMonth;
+                    const isVisible = matchesSearch && matchesType && matchesLocation && matchesMonth;
 
-                    if (matchesSearch && matchesType && matchesLocation && matchesMonth) {
-                        row.style.display = '';
-                    } else {
-                        row.style.display = 'none';
-                    }
+                    row.style.display = isVisible ? '' : 'none';
+                    if (isVisible) visibleCount++;
                 });
+
+                if (resultsCount) {
+                    resultsCount.textContent = visibleCount + (visibleCount === 1 ? ' record' : ' records');
+                }
             }
 
+            function clearHistoryFilters() {
+                if (searchInput) searchInput.value = '';
+                if (typeFilter) typeFilter.value = '';
+                if (locationFilter) locationFilter.value = '';
+                if (monthFilter) monthFilter.value = '';
+                filterTable();
+            }
             // Event Listeners for Filters
             if (searchInput) searchInput.addEventListener('keyup', filterTable);
             if (typeFilter) typeFilter.addEventListener('change', filterTable);
             if (locationFilter) locationFilter.addEventListener('change', filterTable);   // NEW
             if (monthFilter) monthFilter.addEventListener('change', filterTable);
+            if (clearFiltersButton) clearFiltersButton.addEventListener('click', clearHistoryFilters);
+
+            // Initialize count and keep it synchronized with the active filters.
+            filterTable();
 
             // Modal logic for Delete button
             const deleteOverlay = document.getElementById('deleteModalOverlay');

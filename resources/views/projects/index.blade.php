@@ -1,5 +1,7 @@
 <x-app-layout containerClass="w-full px-4 py-6 sm:px-8 sm:py-8">
+@push('styles')
 <link rel="stylesheet" href="{{ asset('css/projects-dashboard.css') }}?v={{ filemtime(public_path('css/projects-dashboard.css')) }}">
+@endpush
 <div class="projects-dashboard">
     
     <!-- 1. PAGE HEADER -->
@@ -22,43 +24,11 @@
         </div>
     @endif
 
-    <section class="projects-dashboard-overview" aria-label="Project overview">
-        <div class="projects-dashboard-overview-lead">
-            <span class="projects-dashboard-overview-label">Portfolio overview</span>
-            <strong>{{ $metrics['total'] }}</strong>
-            <span>total projects in your workspace</span>
-        </div>
-        <dl class="projects-dashboard-overview-metrics">
-            <div><dt>Drafts</dt><dd>{{ $metrics['draft'] }}</dd></div>
-            <div><dt>Mapped areas</dt><dd>{{ $metrics['mapped'] }}</dd></div>
-            <div><dt>Quotations</dt><dd>{{ $metrics['quotations'] }}</dd></div>
-        </dl>
-    </section>
 
-    @if($metrics['total'] > 0)
-        @if($attention['missing_boundaries'] > 0 || $attention['missing_lines'] > 0 || $attention['missing_parameters'] > 0 || $attention['missing_cost'] > 0)
-            <section class="projects-dashboard-queue" aria-labelledby="attention-title">
-                <div class="projects-dashboard-section-heading">
-                    <div><p class="projects-dashboard-eyebrow">Next actions</p><h2 id="attention-title">Needs attention</h2></div>
-                    <span>{{ collect($attention)->sum() }} open checks</span>
-                </div>
-                <div class="projects-dashboard-queue-grid">
-                    @if($attention['missing_boundaries'] > 0)
-                        <div><i class="fa-solid fa-draw-polygon"></i><span>Missing boundaries</span><strong>{{ $attention['missing_boundaries'] }}</strong></div>
-                    @endif
-                    @if($attention['missing_lines'] > 0)
-                        <div><i class="fa-solid fa-route"></i><span>Pending survey lines</span><strong>{{ $attention['missing_lines'] }}</strong></div>
-                    @endif
-                    @if($attention['missing_parameters'] > 0)
-                        <div><i class="fa-solid fa-sliders"></i><span>Missing parameters</span><strong>{{ $attention['missing_parameters'] }}</strong></div>
-                    @endif
-                    @if($attention['missing_cost'] > 0)
-                        <div><i class="fa-solid fa-calculator"></i><span>Awaiting cost estimation</span><strong>{{ $attention['missing_cost'] }}</strong></div>
-                    @endif
-                </div>
-            </section>
-        @endif
 
+
+
+    @if($totalProjects > 0)
         <section class="projects-dashboard-register" aria-labelledby="register-title">
             <div class="projects-dashboard-register-header">
                 <div><p class="projects-dashboard-eyebrow">Work queue</p><h2 id="register-title">Project register</h2><p>Search and filter projects before opening a workspace.</p></div>
@@ -70,7 +40,7 @@
                     <label class="projects-dashboard-select"><span>Status</span><select name="status" aria-label="Filter by status" onchange="this.form.submit()">
                             <option value="">All Statuses</option>
                             <option value="draft" {{ request('status') === 'draft' ? 'selected' : '' }}>Draft</option>
-                            <option value="planned" {{ request('status') === 'planned' ? 'selected' : '' }}>In Progress</option>
+                            <option value="planned" {{ request('status') === 'planned' ? 'selected' : '' }}>Planned</option>
                             <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Completed</option>
                         </select></label>
 
@@ -95,7 +65,25 @@
                             <option value="this_year" {{ request('date_range') === 'this_year' ? 'selected' : '' }}>This Year</option>
                         </select></label>
 
-                    @if(request('search') || request('status') || request('project_type') || request('location') || request('date_range'))
+                    <label class="projects-dashboard-select"><span>Survey areas</span><select name="survey_status" aria-label="Filter by survey area" onchange="this.form.submit()">
+                            <option value="">Any survey state</option>
+                            <option value="Mapped" {{ request('survey_status') === 'Mapped' ? 'selected' : '' }}>Mapped areas</option>
+                        </select></label>
+
+                    <label class="projects-dashboard-select"><span>Quotation</span><select name="has_quotation" aria-label="Filter by quotation status" onchange="this.form.submit()">
+                            <option value="">Any quotation state</option>
+                            <option value="1" {{ request('has_quotation') === '1' ? 'selected' : '' }}>Has quotation</option>
+                            <option value="0" {{ request('has_quotation') === '0' ? 'selected' : '' }}>No quotation</option>
+                        </select></label>
+
+                    <label class="projects-dashboard-select"><span>Planning step</span><select name="attention" aria-label="Filter by outstanding planning step" onchange="this.form.submit()">
+                            <option value="">All planning steps</option>
+                            <option value="boundaries" {{ request('attention') === 'boundaries' ? 'selected' : '' }}>Missing boundaries</option>
+                            <option value="lines" {{ request('attention') === 'lines' ? 'selected' : '' }}>Pending survey lines</option>
+                            <option value="cost" {{ request('attention') === 'cost' ? 'selected' : '' }}>Awaiting cost estimate</option>
+                        </select></label>
+
+                    @if(request('search') || request('status') || request('project_type') || request('location') || request('date_range') || request('survey_status') || request('has_quotation') || request('attention'))
                         <a href="{{ route('projects.index') }}" class="projects-dashboard-clear"><i class="fa-solid fa-xmark"></i> Clear</a>
                     @endif
                     <button type="submit" class="hidden">Filter</button>
@@ -135,12 +123,11 @@
                                             <i class="fa-solid fa-arrow-right font-light"></i>
                                         </a>
                                         <a href="{{ route('projects.edit', $project->project_Id) }}" class="projects-dashboard-action projects-dashboard-action-muted" title="Edit project"><i class="fa-solid fa-pen"></i><span>Edit</span>
-                                            <i class="fa-solid fa-pen font-light text-sm"></i>
                                         </a>
                                         <form action="{{ route('projects.destroy', $project->project_Id) }}" method="POST" class="inline-block form-delete m-0">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="button" class="projects-dashboard-action projects-dashboard-action-danger btn-delete-action" title="Delete project">
+                                            <button type="button" class="projects-dashboard-action projects-dashboard-action-danger btn-delete-action" title="Delete project" aria-label="Delete project: {{ $project->name }}">
                                                 <i class="fa-solid fa-trash-can"></i><span>Delete</span>
                                             </button>
                                         </form>

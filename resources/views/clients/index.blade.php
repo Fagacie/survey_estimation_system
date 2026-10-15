@@ -15,7 +15,7 @@
     </div>
 
     @if(session('success'))
-        <div class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-4 mb-8 flex items-start gap-3 text-sm">
+        <div class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-4 mb-8 flex items-start gap-3 text-sm" role="status">
             <i class="fa-solid fa-circle-check mt-0.5 text-emerald-600"></i>
             <span class="font-medium">{{ session('success') }}</span>
         </div>
@@ -32,12 +32,13 @@
         <!-- Table Data (Dense) -->
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse text-sm">
+                <caption class="sr-only">Client directory with contact details, project counts, and available actions</caption>
                 <thead>
                     <tr class="bg-slate-50/50 border-b border-slate-200 text-slate-500">
-                        <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Name / Company</th>
-                        <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Contact Info</th>
-                        <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Projects</th>
-                        <th class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px] text-right">Actions</th>
+                        <th scope="col" class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Name / Company</th>
+                        <th scope="col" class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Contact Info</th>
+                        <th scope="col" class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px]">Projects</th>
+                        <th scope="col" class="px-5 py-2.5 font-bold uppercase tracking-wider text-[10px] text-right">Actions</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -61,8 +62,8 @@
                             <td class="px-5 py-3 align-middle text-right whitespace-nowrap">
                                 <div class="flex items-center justify-end gap-1">
                                     <!-- We do not have a dedicated edit view, assuming it uses a modal or isn't built yet based on original code, so keeping it disabled or unlinked as original just had # -->
-                                    <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-all" title="Edit Client">
-                                        <i class="fa-solid fa-pen font-light text-sm"></i>
+                                    <button type="button" class="w-8 h-8 rounded-full flex items-center justify-center text-slate-300 bg-slate-50 cursor-not-allowed" title="Client editing is not available yet" aria-label="Client editing is not available yet" disabled>
+                                        <i class="fa-solid fa-pen font-light text-sm" aria-hidden="true"></i>
                                     </button>
                                     <form action="{{ route('clients.destroy', $client->id) }}" method="POST" class="inline-block m-0 form-delete">
                                         @csrf
