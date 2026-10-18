@@ -18,7 +18,7 @@
                 <div class="catalog-kicker">Reference data</div>
                 <h2 class="page-header">
                 <i class="bi bi-clipboard-data"></i>
-                    Modelling Catalog
+                    Item Catalog
                 </h2>
                 <p class="catalog-subtitle">Manage reusable survey services, categories, and internal rates.</p>
             </div>
