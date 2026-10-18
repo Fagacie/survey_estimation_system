@@ -204,6 +204,25 @@
             page-break-inside: avoid;
         }
 
+        /* ── Sign-off Block ──────────────────────── */
+        .signoff-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 18px;
+            page-break-inside: avoid;
+            break-inside: avoid;
+        }
+        .signoff-table td {
+            width: 50%;
+            padding: 6px 14px;
+            vertical-align: top;
+        }
+        .signoff-line {
+            border-bottom: 1px solid #94a3b8;
+            height: 36px;
+            margin-bottom: 4px;
+        }
+
         /* ── Footer ───────────────────────────────── */
         .footer {
             margin-top: 12px;
@@ -477,6 +496,22 @@
     @empty
         <div class="alert">No survey areas have been registered for this project.</div>
     @endforelse
+
+    {{-- ─── 5. SIGN-OFF BLOCK ─────────────────────── --}}
+    <table class="signoff-table">
+        <tr>
+            <td>
+                <div class="signoff-line"></div>
+                <div style="font-weight: bold; font-size: 8.5px; color: #102b46;">Prepared By / Field Surveyor</div>
+                <div style="font-size: 7.5px; color: #64748b;">Survey Planning &amp; Operations</div>
+            </td>
+            <td>
+                <div class="signoff-line"></div>
+                <div style="font-weight: bold; font-size: 8.5px; color: #102b46;">Approved By / Lead Hydrographer</div>
+                <div style="font-size: 7.5px; color: #64748b;">Operations &amp; Quality Assurance</div>
+            </td>
+        </tr>
+    </table>
 
     {{-- ─── FOOTER ─────────────────────────────────── --}}
     <div class="footer">

@@ -2,6 +2,7 @@
     $links = [
         ['label' => 'Builder',  'route' => 'projects.modeling.builder'],
         ['label' => 'Items',    'route' => 'projects.modeling.items.index'],
+        ['label' => 'Modules',  'route' => 'projects.modeling.modules.index'],
         ['label' => 'Packages', 'route' => 'projects.modeling.packages.index'],
     ];
 @endphp

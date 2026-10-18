@@ -118,18 +118,18 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{project}', [ModellingController::class, 'destroyQuote'])->name('destroy');
     });
 
-    Route::get('/projects', [App\Http\Controllers\ProjectController::class, 'indexReact'])->name('projects.index');
-    Route::get('/projects/create', [App\Http\Controllers\ProjectController::class, 'createReact'])->name('projects.create');
-    Route::get('/projects/{project}/edit', [App\Http\Controllers\ProjectController::class, 'editReact'])->name('projects.edit');
-    Route::get('/projects/{project}', [App\Http\Controllers\ProjectController::class, 'showReact'])->name('projects.show');
-    Route::get('/projects-legacy', [App\Http\Controllers\ProjectController::class, 'index'])->name('projects.legacy.index');
-    Route::get('/projects-legacy/create', [App\Http\Controllers\ProjectController::class, 'create'])->name('projects.legacy.create');
-    Route::get('/projects-legacy/{project}/edit', [App\Http\Controllers\ProjectController::class, 'edit'])->name('projects.legacy.edit');
-    Route::get('/projects-legacy/{project}', [App\Http\Controllers\ProjectController::class, 'show'])->name('projects.legacy.show');
+    Route::get('/projects', [App\Http\Controllers\ProjectController::class, 'index'])->name('projects.index');
+    Route::get('/projects/create', [App\Http\Controllers\ProjectController::class, 'create'])->name('projects.create');
+    Route::get('/projects/{project}/edit', [App\Http\Controllers\ProjectController::class, 'edit'])->name('projects.edit');
+    Route::get('/projects/{project}', [App\Http\Controllers\ProjectController::class, 'show'])->name('projects.show');
+    Route::get('/projects-react', [App\Http\Controllers\ProjectController::class, 'indexReact'])->name('projects.react.index');
+    Route::get('/projects-react/create', [App\Http\Controllers\ProjectController::class, 'createReact'])->name('projects.react.create');
+    Route::get('/projects-react/{project}/edit', [App\Http\Controllers\ProjectController::class, 'editReact'])->name('projects.react.edit');
+    Route::get('/projects-react/{project}', [App\Http\Controllers\ProjectController::class, 'showReact'])->name('projects.react.show');
     Route::resource('projects', App\Http\Controllers\ProjectController::class)->except(['index', 'create', 'edit', 'show']);
 
-    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'editReact'])->name('profile.edit');
-    Route::get('/profile-legacy', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.legacy.edit');
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile-react', [App\Http\Controllers\ProfileController::class, 'editReact'])->name('profile.react.edit');
     Route::patch('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
 
@@ -149,16 +149,15 @@ Route::middleware('auth')->group(function () {
         return redirect()->route('dashboard');
     })->name('home');
 
-    Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
+    Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'legacy'])
         ->name('dashboard');
-    Route::get('/dashboard-legacy', [\App\Http\Controllers\DashboardController::class, 'legacy'])
-        ->name('dashboard.legacy');
+    Route::get('/dashboard-react', [\App\Http\Controllers\DashboardController::class, 'index'])
+        ->name('dashboard.react');
 
     // 2. Quotation Routes
     Route::get('/quotation', [QuotationController::class, 'index'])->name('quotation.index');
     Route::post('/quotation', [QuotationController::class, 'store'])->name('quotation.store');
-    // The primary history route must return an Inertia response for the React workspace navigation.
-    Route::get('/quotations/history', [HistoryController::class, 'index'])->name('quotations.history');
+    Route::get('/quotations/history', [HistoryController::class, 'legacyIndex'])->name('quotations.history');
     Route::get('/quotations/history-react', [HistoryController::class, 'index'])->name('quotations.history.react');
     Route::get('/quotations-history-legacy', [HistoryController::class, 'legacyIndex'])->name('quotations.history.legacy');
     Route::get('/quotations/{id}', [QuotationController::class, 'show'])->name('quotations.show');

@@ -872,6 +872,7 @@
                         drawnItems.addLayer(l);
                     });
                 });
+                rebuildLayerGroups();
             @endif
 
             let ts = new Date().getTime();
@@ -1366,7 +1367,7 @@
                     let targetBoundary = (isDrone && window.droneEffectiveBoundary) ? window.droneEffectiveBoundary : boundaryFeature;
                     let bbox = turf.bbox(targetBoundary);
                     let center = turf.center(targetBoundary);
-                    let worker = new Worker('/js/gis-worker.js?v=' + (new Date().getTime() + 1000));
+                    let worker = new Worker(@json(asset('js/gis-worker.js')) + '?v=' + (new Date().getTime() + 1000));
 
                     worker.onmessage = function(e) {
                         if (e.data.success) resolve(e.data.features);
@@ -1374,7 +1375,8 @@
                         worker.terminate();
                     };
                     worker.onerror = function(e) {
-                        reject('Worker failed');
+                        let location = e.filename ? ' (' + e.filename + (e.lineno ? ':' + e.lineno : '') + ')' : '';
+                        reject((e.message || 'Worker script failed to load') + location);
                         worker.terminate();
                     };
 
