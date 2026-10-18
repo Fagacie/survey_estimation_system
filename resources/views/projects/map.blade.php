@@ -76,7 +76,7 @@
                     @if($surveyLocation->survey_type !== 'drone')
                     <div class="accordion-item">
                         <h2 class="accordion-header">
-                            <button class="accordion-button collapsed accent-cyan" type="button" data-bs-toggle="collapse" data-bs-target="#panelGenerator">
+                            <button class="accordion-button accent-cyan" type="button" data-bs-toggle="collapse" data-bs-target="#panelGenerator">
                                 <span class="panel-icon bg-cyan"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
                                 Line Generator
                             </button>
@@ -201,7 +201,7 @@
                     @if($surveyLocation->survey_type !== 'drone')
                     <div class="accordion-item">
                         <h2 class="accordion-header">
-                            <button class="accordion-button collapsed accent-amber" type="button" data-bs-toggle="collapse" data-bs-target="#panelTime">
+                            <button class="accordion-button accent-amber" type="button" data-bs-toggle="collapse" data-bs-target="#panelTime">
                                 <span class="panel-icon bg-amber"><i class="fa-solid fa-clock"></i></span>
                                 Survey Parameters & Time
                             </button>
@@ -249,7 +249,7 @@
                     @if($surveyLocation->survey_type === 'drone')
                     <div class="accordion-item" id="droneMappingAccordionItem" style="display: none;">
                         <h2 class="accordion-header">
-                            <button class="accordion-button collapsed accent-green" type="button" data-bs-toggle="collapse" data-bs-target="#panelDrone">
+                            <button class="accordion-button accent-green" type="button" data-bs-toggle="collapse" data-bs-target="#panelDrone">
                                 <span class="panel-icon bg-green"><i class="fa-solid fa-plane"></i></span>
                                 Drone Mapping
                             </button>

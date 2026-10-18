@@ -54,52 +54,36 @@ class ProjectController extends Controller
             }
         }
 
-        $projects = $query->paginate(10);
+        if ($request->input('survey_status') === 'Mapped') {
+            $query->whereHas('surveyLocations', fn ($q) => $q->where('status', 'Mapped'));
+        }
 
-        // 2. Core KPIs
-        $totalSbes = Project::count();
-        $metrics = [
-            'total' => $totalSbes,
-            'draft' => Project::where('status', 'draft')->count(),
-            'planned' => Project::where('status', 'planned')->count(),
-            'completed' => Project::where('status', 'completed')->count(),
-            'mapped' => Project::whereHas('surveyLocations', fn ($q) => $q->where('status', 'Mapped'))->count(),
-            'quotations' => Project::has('lineItems')->count(),
-        ];
+        if ($request->input('has_quotation') === '1') {
+            $query->has('lineItems');
+        } elseif ($request->input('has_quotation') === '0') {
+            $query->doesntHave('lineItems');
+        }
 
-        // (SurveyStatistic table was removed, distance is calculated live in the map UI)
-        $totalDistance = 0;
+        $attention = $request->input('attention');
+        if (in_array($attention, ['boundaries', 'lines', 'cost'], true)) {
+            $query->where('status', '!=', 'completed');
 
-        $projectsWithLines = Project::has('surveyLines')->count();
-        $projectsAwaitingPlanning = Project::doesntHave('boundaries')->count();
-        $projectsWithCost = Project::has('lineItems')->count();
+            if ($attention === 'boundaries') {
+                $query->doesntHave('boundaries');
+            } elseif ($attention === 'lines') {
+                $query->has('boundaries')->doesntHave('surveyLines');
+            } elseif ($attention === 'cost') {
+                $query->doesntHave('lineItems');
+            }
+        }
 
-        $overview = [
-            'total_distance' => round($totalDistance, 2),
-            'with_lines' => $projectsWithLines,
-            'awaiting_planning' => $projectsAwaitingPlanning,
-            'completed_estimation' => $projectsWithCost,
-        ];
+        $projects = $query->paginate(10)->withQueryString();
 
-        // 4. Requires Attention Metrics
-        // Projects that are active/draft but missing key steps
-        $missingBoundariesCount = Project::where('status', '!=', 'completed')->doesntHave('boundaries')->count();
-        $missingLinesCount = Project::where('status', '!=', 'completed')->has('boundaries')->doesntHave('surveyLines')->count();
-        $missingParamsCount = 0; // Removed this metric for now
-        $missingCostCount = Project::where('status', '!=', 'completed')->doesntHave('lineItems')->count();
-
-        $attention = [
-            'missing_boundaries' => $missingBoundariesCount,
-            'missing_lines' => $missingLinesCount,
-            'missing_parameters' => $missingParamsCount,
-            'missing_cost' => $missingCostCount,
-        ];
+        $totalProjects = Project::count();
 
         return view('projects.index', [
             'projects' => $projects,
-            'metrics' => $metrics,
-            'overview' => $overview,
-            'attention' => $attention,
+            'totalProjects' => $totalProjects,
             'projectTypes' => \App\Models\Project::TYPES,
             'locations' => \App\Models\Project::LOCATIONS,
         ]);
@@ -179,8 +163,12 @@ class ProjectController extends Controller
      */
     public function show(string $id)
     {
-        $project = Project::findOrFail($id);
-        $project->load('surveyLocations');
+        $project = Project::with([
+            'client',
+            'surveyLocations',
+            'modellingSummary',
+            'modellingItems',
+        ])->findOrFail($id);
         return view('projects.overview', compact('project'));
     }
 

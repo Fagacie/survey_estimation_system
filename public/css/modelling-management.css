@@ -1,0 +1,213 @@
+/* Shared presentation for modelling catalogue pages. Behaviour remains in the Blade/Alpine views. */
+.ises-modelling-page {
+    --model-ink: #17283f;
+    --model-muted: #68798d;
+    --model-line: #dce5ee;
+    --model-soft: #f5f8fb;
+    --model-blue: #2463a6;
+    --model-blue-dark: #1d518a;
+    color: var(--model-ink);
+    min-width: 0;
+}
+.ises-modelling-page > header {
+    border-bottom-color: var(--model-line) !important;
+    gap: 1rem;
+}
+.ises-modelling-page > header h1 {
+    color: var(--model-ink);
+    font-size: clamp(1.55rem, 2.2vw, 2rem);
+    line-height: 1.2;
+    letter-spacing: -.035em;
+}
+.ises-modelling-page > header p {
+    color: var(--model-muted);
+    max-width: 46rem;
+}
+.ises-modelling-page .mnav {
+    display: inline-flex;
+    max-width: 100%;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 3px;
+    padding: 4px;
+    border: 1px solid var(--model-line);
+    border-radius: 9px;
+    background: #fff;
+}
+.mnav .mnav-link {
+    display: inline-flex;
+    min-height: 36px;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 13px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    color: #526579;
+    font-size: .8125rem;
+    font-weight: 600;
+    line-height: 1.25;
+    text-decoration: none;
+    transition: color .15s ease, background-color .15s ease, border-color .15s ease;
+}
+.mnav .mnav-link:not(.mnav-active):hover {
+    color: var(--model-blue-dark);
+    background: #f2f7fc;
+}
+.mnav .mnav-link:focus-visible {
+    outline: 3px solid rgba(36, 99, 166, .25);
+    outline-offset: 2px;
+}
+.mnav .mnav-active {
+    color: #fff !important;
+    background: var(--model-blue);
+    border-color: var(--model-blue);
+}
+.ises-modelling-page button:not(.act-btn):not([disabled]) {
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
+}
+.ises-modelling-page button:focus-visible,
+.ises-modelling-page a:focus-visible {
+    outline: 3px solid rgba(36, 99, 166, .22);
+    outline-offset: 2px;
+}
+.ises-modelling-page .act-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+}
+.ises-modelling-page .act-btn {
+    appearance: none;
+    width: 34px;
+    height: 34px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--model-line);
+    border-radius: 7px;
+    background: #fff;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1;
+    cursor: pointer;
+    transition: background-color .15s ease, border-color .15s ease, color .15s ease;
+}
+.ises-modelling-page .act-edit:hover {
+    color: #1d518a;
+    border-color: #a8c6e4;
+    background: #f1f7fc;
+}
+.ises-modelling-page .act-del:hover {
+    color: #b91c1c;
+    border-color: #fca5a5;
+    background: #fef2f2;
+}
+.ises-modelling-page .overflow-x-auto {
+    border: 1px solid var(--model-line);
+    border-radius: 10px;
+    background: #fff;
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+}
+.ises-modelling-page table {
+    border-collapse: separate;
+    border-spacing: 0;
+}
+.ises-modelling-page table thead th {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--model-line);
+    background: #f6f9fc;
+    color: #627489;
+    font-size: .66rem;
+    font-weight: 750;
+    letter-spacing: .07em;
+    line-height: 1.35;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+.ises-modelling-page table tbody td {
+    padding: 13px 16px;
+    border-bottom: 1px solid #edf1f5;
+    color: #40536a;
+    font-size: .83rem;
+    vertical-align: middle;
+}
+.ises-modelling-page table tbody tr:last-child td {
+    border-bottom: 0;
+}
+.ises-modelling-page table tbody tr:hover td {
+    background: #f8fbfe;
+}
+.ises-modelling-page input:not([type=checkbox]):not([type=radio]),
+.ises-modelling-page select,
+.ises-modelling-page textarea {
+    max-width: 100%;
+    border-color: #cbd7e3;
+    border-radius: 7px;
+    color: var(--model-ink);
+    background-color: #fff;
+    box-shadow: none;
+}
+.ises-modelling-page input:not([type=checkbox]):not([type=radio]):focus,
+.ises-modelling-page select:focus,
+.ises-modelling-page textarea:focus {
+    border-color: #77a3cd;
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(36, 99, 166, .12);
+}
+.ises-modelling-page input[type=checkbox] {
+    accent-color: var(--model-blue);
+}
+.ises-modelling-page [x-show="showModal"] {
+    overscroll-behavior: contain;
+}
+.ises-modelling-page [x-show="showModal"] > div {
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+.ises-modelling-page .bg-emerald-50[role="status"],
+.ises-modelling-page > div > .bg-emerald-50 {
+    border-radius: 8px;
+}
+@media (max-width: 900px) {
+    .ises-modelling-page > header {
+        align-items: flex-start;
+    }
+    .ises-modelling-page > header > div:last-child {
+        width: 100%;
+    }
+    .ises-modelling-page .mnav {
+        display: flex;
+        width: 100%;
+    }
+    .mnav .mnav-link {
+        flex: 1 1 auto;
+        padding-inline: 10px;
+    }
+    .ises-modelling-page .flex.items-center.justify-between.gap-3.mb-4 {
+        align-items: stretch;
+        flex-wrap: wrap;
+    }
+}
+@media (max-width: 600px) {
+    .ises-modelling-page table thead th,
+    .ises-modelling-page table tbody td {
+        padding: 10px 12px;
+    }
+    .ises-modelling-page .mnav {
+        overflow-x: auto;
+        flex-wrap: nowrap;
+    }
+    .mnav .mnav-link {
+        flex: 0 0 auto;
+    }
+}
+@media (prefers-reduced-motion: reduce) {
+    .ises-modelling-page *,
+    .mnav .mnav-link {
+        transition-duration: .01ms !important;
+        animation-duration: .01ms !important;
+    }
+}

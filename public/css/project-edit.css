@@ -1,0 +1,107 @@
+/* Project edit form refinement. Scoped to this page; form names, actions and validation stay unchanged. */
+.project-edit-page {
+    --edit-ink: #17283f;
+    --edit-muted: #68798d;
+    --edit-line: #dce5ee;
+    --edit-blue: #2463a6;
+    max-width: 1180px;
+    margin: 0 auto;
+    color: var(--edit-ink);
+}
+.project-edit-page > .row {
+    margin: 0;
+}
+.project-edit-page > .row > .col-md-8 {
+    width: 100%;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 0;
+}
+.project-edit-page > .row > .col-md-8 > .mt-4:first-child {
+    margin-top: 0 !important;
+    margin-bottom: 1.25rem;
+}
+.project-edit-page .btn-outline-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    border-color: var(--edit-line);
+    border-radius: 7px;
+    color: #40556b;
+    background: #fff;
+    box-shadow: none;
+}
+.project-edit-page .btn-outline-secondary:hover {
+    border-color: #b8cfe1;
+    color: var(--edit-blue);
+    background: #f5f9fc;
+}
+.project-edit-page .card {
+    overflow: hidden;
+    border: 1px solid var(--edit-line) !important;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 5px 20px rgba(23, 40, 63, .045) !important;
+}
+.project-edit-page .card-body {
+    padding: clamp(1.25rem, 3vw, 2.25rem) !important;
+}
+.project-edit-page form .row {
+    --bs-gutter-x: 1.25rem;
+    --bs-gutter-y: .25rem;
+}
+.project-edit-page .form-label {
+    margin-bottom: .45rem;
+    color: #526579;
+    font-size: .78rem;
+    font-weight: 700 !important;
+}
+.project-edit-page .form-control,
+.project-edit-page .form-select {
+    min-height: 42px;
+    border: 1px solid #cfdbe5;
+    border-radius: 6px;
+    color: var(--edit-ink);
+    background-color: #fff;
+    box-shadow: none;
+    font-size: .875rem;
+}
+.project-edit-page textarea.form-control {
+    min-height: auto;
+}
+.project-edit-page .form-control:focus,
+.project-edit-page .form-select:focus {
+    border-color: #78aec9;
+    box-shadow: 0 0 0 3px rgba(36, 99, 166, .12);
+}
+.project-edit-page .form-control[readonly] {
+    color: #65778a;
+    background: #f5f8fa;
+}
+.project-edit-page .form-text,
+.project-edit-page .invalid-feedback {
+    font-size: .75rem;
+}
+.project-edit-page .btn-primary {
+    border-color: var(--edit-blue);
+    border-radius: 7px;
+    background: var(--edit-blue);
+    box-shadow: none;
+    font-size: .9rem;
+    font-weight: 700;
+}
+.project-edit-page .btn-primary:hover {
+    border-color: #1d518a;
+    background: #1d518a;
+}
+.project-edit-page .btn-lg {
+    min-height: 44px;
+    padding: .65rem 1rem;
+    font-size: .9rem;
+}
+@media (max-width: 575.98px) {
+    .project-edit-page .card-body { padding: 1.1rem !important; }
+    .project-edit-page form > .row { row-gap: .25rem; }
+    .project-edit-page form > .d-flex { flex-direction: column; }
+    .project-edit-page form > .d-flex > * { width: 100%; }
+}

@@ -1,114 +1,192 @@
+```html
 <!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Sign in — ISES</title>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <link rel="stylesheet" href="{{ asset('css/signin.css') }}">
+    <title>Sign in — ISES</title>
 
-        <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap"
+          rel="stylesheet">
 
-        <!--font-->
-        <link rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+
+    <!-- ISES Authentication CSS -->
+    <link rel="stylesheet"
+          href="{{ asset('css/ises-auth.css') }}?v={{ filemtime(public_path('css/ises-auth.css')) }}">
 </head>
+
 <body>
-    <div class="background">
-        <div class="signin-card">
+    <div class="auth-shell">
 
-        <!--header-->
-        <div class="card-header">
-            <div class="header-title">
-            <i class= "fa-solid fa-user"></i>
-            <span>SIGN IN</span>
-        </div>
+        <!-- Left-side branding -->
+        <aside class="auth-aside">
+            <a class="auth-brand" href="{{ url('/') }}">
+                <span class="auth-brand-mark">
+                    <i class="fa-solid fa-water"></i>
+                </span>
 
-            <p class="subtitle">
-            Enter your credentials to access the dashboard.
-        </p>
+                <span>
+                    <strong>ISES</strong>
+                    <small>Survey Estimation System</small>
+                </span>
+            </a>
+
+            <div class="auth-aside-copy">
+                <span class="auth-overline">INOS · ECO HYDROTECH</span>
+
+                <h1>
+                    Plan with clarity.<br>
+                    Survey with confidence.
+                </h1>
+
+                <p>
+                    One workspace for survey planning, time estimation,
+                    and project cost workflows.
+                </p>
+
+                <div class="auth-feature-list">
+                    <div>
+                        <i class="fa-solid fa-map-location-dot"></i>
+                        <span>Survey planning workspace</span>
+                    </div>
+
+                    <div>
+                        <i class="fa-solid fa-calculator"></i>
+                        <span>Time and cost estimation</span>
+                    </div>
+
+                    <div>
+                        <i class="fa-solid fa-file-invoice"></i>
+                        <span>Project quotations and records</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="auth-aside-foot">
+                INSTITUTE OF OCEANOGRAPHY AND ENVIRONMENT
+            </div>
+        </aside>
+
+        <!-- Right-side sign-in form -->
+        <main class="auth-main">
+            <section class="auth-card" aria-labelledby="auth-title">
+
+                <div class="auth-mobile-brand">
+                    <span class="auth-brand-mark">
+                        <i class="fa-solid fa-water"></i>
+                    </span>
+                    <strong>ISES</strong>
+                </div>
+
+                <div class="auth-card-heading">
+                    <span class="auth-step">ACCOUNT ACCESS</span>
+                    <h2 id="auth-title">Welcome back</h2>
+                    <p>Sign in with your registered account to continue.</p>
+                </div>
+
+                <form method="POST" action="{{ route('signin') }}">
+                    @csrf
+
+                    <!-- Success message -->
+                    @if (session('success'))
+                        <div class="auth-alert auth-alert-success">
+                            <i class="fa-solid fa-circle-check"></i>
+                            <span>{{ session('success') }}</span>
+                        </div>
+                    @endif
+
+                    <!-- Validation errors -->
+                    @if ($errors->any())
+                        <div class="auth-alert auth-alert-error" role="alert">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+
+                            <ul>
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    @endif
+
+                    <!-- Email -->
+                    <label for="email">Email address</label>
+
+                    <div class="auth-input-wrap">
+                        <i class="fa-regular fa-envelope"></i>
+
+                        <input
+                            id="email"
+                            type="email"
+                            name="email"
+                            value="{{ old('email', session('registered_email')) }}"
+                            placeholder="name@organisation.com"
+                            autocomplete="email"
+                            required>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="auth-label-row">
+                        <label for="password">Password</label>
+
+                        @if (\Illuminate\Support\Facades\Route::has('password.request'))
+                            <a href="{{ route('password.request') }}">
+                                Forgot password?
+                            </a>
+                        @endif
+                    </div>
+
+                    <div class="auth-input-wrap">
+                        <i class="fa-solid fa-lock"></i>
+
+                        <input
+                            id="password"
+                            type="password"
+                            name="password"
+                            placeholder="Enter your password"
+                            autocomplete="current-password"
+                            required>
+
+                        <button
+                            class="auth-password-toggle"
+                            type="button"
+                            id="togglePassword"
+                            aria-label="Show password">
+                            <i class="fa-regular fa-eye"></i>
+                        </button>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="auth-submit">
+                        Sign in
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+
+                    <!-- Sign-up link -->
+                    <div class="auth-switch">
+                        <span>New to ISES?</span>
+                        <a href="{{ route('signup') }}">Create an account</a>
+                    </div>
+                </form>
+
+                <p class="auth-legal">
+                    Access is limited to authorised users.
+                    Keep your account credentials secure.
+                </p>
+
+            </section>
+        </main>
+
     </div>
 
-    <!--body-->
-    <div class="card-body">
-
-    <form method="POST" action="{{ route('signin') }}">
-        @csrf
-
-        @if (session('success'))
-        <div class="success-box">
-            <i class="fa-solid fa-circle-check"></i>
-            <span>{{ session('success') }}</span>
-        </div>
-        @endif
-
-        @if ($errors->any())
-        <div class="error-box">
-            <ul>
-                @foreach($errors->all() as $error)
-                <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-        @endif
-
-            <!--email-->
-            <label>Email</label>
-            
-            <div class="input-box">
-                <i class="fa-regular fa-envelope"></i>
-
-                <input
-                    type="email"
-                    name="email"
-                    value="{{ old('email', session('registered_email')) }}"
-                    placeholder="admin@gmail.com"
-                    required>
-                </div>
-
-                <!--password-->
-                <label>Password</label>
-
-                <div class="input-box">
-                    <i class="fa-solid fa-lock"></i>
-
-                    <input
-                    type="password"
-                    id="password"
-                    name="password"
-                    placeholder="Enter your password"
-                    required>
-
-                    <i class="fa-regular fa-eye" id="togglePassword"></i>
-
-                </div>
-
-                <div class="forgot-password">
-                    <a href="#">Forgot password?</a>
-                </div>
-
-                <button type="submit" class="signin-btn">
-                    SIGN IN
-                </button>
-
-                <hr>
-
-                <div class="new-user">
-                    Don't have an account?
-                </div>
-
-                <a href="{{ route('signup') }}" class="signup-btn">
-                    SIGN UP
-                    <i class="fa-solid fa-arrow-right"></i>
-                </a>
-
-            </form>
-        </div>
-    </div>
-</div>
-
-<script src="{{ asset('js/signin.js') }}"></script>
-
+    <!-- Password visibility toggle -->
+    <script src="{{ asset('js/signin.js') }}"></script>
 </body>
 </html>
-

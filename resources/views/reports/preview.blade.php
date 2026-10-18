@@ -3,135 +3,224 @@
 
     @push('styles')
     <style>
-        .preview-toolbar {
+        .report-preview-page {
+            --report-ink: #142f49;
+            --report-muted: #62758a;
+            --report-line: #dce4ec;
+            background: #f3f6f9;
+            min-height: calc(100vh - 4rem);
+            color: var(--report-ink);
+        }
+        .report-preview-toolbar {
+            position: relative;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0.85rem 2rem;
-            background: #fff;
-            border-bottom: 1px solid #e2e8f0;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            gap: 1.5rem;
+            padding: 1.15rem clamp(1rem, 3vw, 2.5rem);
+            background: #ffffff;
+            border-bottom: 1px solid var(--report-line);
         }
-        .preview-title-badge {
+        .report-preview-toolbar::before {
+            content: "";
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 4px;
+            background: #1685b5;
+        }
+        .report-preview-heading {
             display: flex;
-            align-items: center;
-            gap: 0.75rem;
+            align-items: flex-start;
+            gap: 1rem;
+            min-width: 0;
         }
-        .preview-tag {
-            font-size: 0.7rem;
-            font-weight: 700;
+        .report-preview-heading-copy { min-width: 0; }
+        .report-preview-eyebrow {
+            margin: 0 0 0.3rem;
+            color: #1685b5;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.14em;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            padding: 0.25rem 0.6rem;
-            border-radius: 9999px;
         }
-        .preview-tag-sbes {
-            background: #e0f2fe;
-            color: #0369a1;
-            border: 1px solid #bae6fd;
+        .report-preview-title {
+            margin: 0;
+            color: #142f49;
+            font-size: clamp(1rem, 1.4vw, 1.25rem);
+            font-weight: 750;
+            line-height: 1.35;
+            overflow-wrap: anywhere;
         }
-        .preview-tag-drone {
-            background: #dcfce7;
-            color: #15803d;
-            border: 1px solid #bbf7d0;
+        .report-preview-subtitle {
+            margin-top: 0.35rem;
+            color: var(--report-muted);
+            font-size: 0.82rem;
+            line-height: 1.5;
         }
-        .preview-tag-mixed {
-            background: #f1f5f9;
-            color: #475569;
-            border: 1px solid #e2e8f0;
-        }
-        .preview-iframe {
-            width: 100%;
-            min-height: 297mm;
-            border: none;
-            display: block;
-        }
-        .btn-outline-dark-minimal {
-            background: transparent;
-            border: 1px solid #0f172a;
-            color: #0f172a;
-            padding: 0.5rem 1rem;
-            font-size: 0.825rem;
-            font-weight: 600;
-            border-radius: 6px;
-            transition: all 0.15s ease;
-            text-decoration: none;
+        .report-preview-type {
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
+            margin-top: 0.65rem;
+            padding: 0.3rem 0.55rem;
+            background: #edf6fa;
+            border: 1px solid #d1e8f2;
+            color: #176487;
+            border-radius: 3px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.055em;
+            text-transform: uppercase;
         }
-        .btn-outline-dark-minimal:hover {
-            background: #0f172a;
-            color: #fff;
+        .report-preview-type-drone {
+            background: #eef6f0;
+            border-color: #d6e8da;
+            color: #2e6844;
         }
-        .btn-dark-minimal {
-            background: #0f172a;
-            border: 1px solid #0f172a;
-            color: #fff;
-            padding: 0.5rem 1.15rem;
-            font-size: 0.825rem;
-            font-weight: 600;
-            border-radius: 6px;
-            transition: all 0.15s ease;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            box-shadow: 0 2px 4px rgba(15,23,42,0.15);
+        .report-preview-type-mixed {
+            background: #f1f4f7;
+            border-color: #dfe5eb;
+            color: #4b5c6c;
         }
-        .btn-dark-minimal:hover {
-            background: #1e293b;
-            border-color: #1e293b;
-            color: #fff;
-        }
-        .preview-container {
-            padding: 2.5rem 1rem;
-            background: #f1f5f9;
+        .report-preview-actions {
             display: flex;
-            justify-content: center;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.6rem;
+            flex-shrink: 0;
         }
-        .preview-paper {
-            background: white;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-            border: 1px solid #cbd5e1;
-            width: 210mm;
-            min-height: 297mm;
+        .report-preview-button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            min-height: 40px;
+            padding: 0.65rem 0.9rem;
+            border: 1px solid #cbd6e0;
             border-radius: 4px;
+            background: #fff;
+            color: #243f58 !important;
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+            transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
+        }
+        .report-preview-button:hover {
+            background: #f5f8fa;
+            border-color: #91a6b8;
+            color: #102b46 !important;
+        }
+        .report-preview-button-primary {
+            background: #102b46 !important;
+            border-color: #102b46 !important;
+            color: #fff !important;
+        }
+        .report-preview-button-primary:hover {
+            background: #1b4262 !important;
+            border-color: #1b4262 !important;
+            color: #fff !important;
+        }
+        .report-preview-stage {
+            padding: clamp(1rem, 3vw, 2.25rem) 1rem 3rem;
+        }
+        .report-preview-stage-head {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            max-width: 210mm;
+            margin: 0 auto 0.8rem;
+            color: #62758a;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .report-preview-paper {
+            width: 210mm;
+            max-width: 100%;
+            min-height: 297mm;
+            margin: 0 auto;
             overflow: hidden;
+            background: #ffffff;
+            border: 1px solid #d5dee7;
+            box-shadow: 0 4px 16px rgba(20, 47, 73, 0.08);
+        }
+        .report-preview-frame {
+            display: block;
+            width: 100%;
+            height: 594mm;
+            border: 0;
+            background: #ffffff;
+        }
+        @media (max-width: 760px) {
+            .report-preview-toolbar {
+                align-items: stretch;
+                flex-direction: column;
+                gap: 1rem;
+                padding: 1rem;
+            }
+            .report-preview-heading { gap: 0.7rem; }
+            .report-preview-actions {
+                display: grid;
+                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            }
+            .report-preview-button { padding-inline: 0.55rem; }
+            .report-preview-stage { padding: 1rem 0.5rem 2rem; }
+            .report-preview-paper { width: 100%; }
+            .report-preview-frame { height: 594mm; }
+            .report-preview-stage-head { padding-inline: 0.35rem; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .report-preview-button { transition: none; }
         }
     </style>
     @endpush
 
-    <div class="preview-toolbar">
-        <div class="preview-title-badge">
-            <a href="{{ route('projects.show', $project->project_Id) }}" class="btn-outline-dark-minimal">
-                <i class="fa-solid fa-arrow-left"></i> Back to Project
-            </a>
-            <div>
-                <div class="flex items-center gap-2">
-                    <span class="font-bold text-slate-800 text-sm">{{ $report_title }}</span>
+    <main class="report-preview-page">
+        <header class="report-preview-toolbar">
+            <div class="report-preview-heading">
+                <div class="report-preview-heading-copy">
+                    <p class="report-preview-eyebrow">Eco Hydrotech Solutions / Report Centre</p>
+                    <h1 class="report-preview-title">{{ $report_title }}</h1>
+                    <div class="report-preview-subtitle">
+                        {{ $is_single ? 'Survey area: ' . $report_subtitle : 'Project: ' . $project->name }}
+                        <span aria-hidden="true"> &bull; </span>
+                        Reference {{ $project->number ?? 'N/A' }}
+                    </div>
                     @if($report_type === 'drone')
-                        <span class="preview-tag preview-tag-drone">UAV Drone Mapping</span>
+                        <span class="report-preview-type report-preview-type-drone">UAV Drone Mapping</span>
                     @elseif($report_type === 'sbes')
-                        <span class="preview-tag preview-tag-sbes">Hydrographic Survey</span>
+                        <span class="report-preview-type">Hydrographic SBES</span>
                     @else
-                        <span class="preview-tag preview-tag-mixed">Master Operations</span>
+                        <span class="report-preview-type report-preview-type-mixed">Survey Operations</span>
                     @endif
                 </div>
-                <div class="text-[11px] text-slate-500 font-medium">Scope: {{ $report_subtitle }} &bull; Total Duration: {{ number_format($summary['sbes']['total_days'] ?? 0, 2) }} days</div>
             </div>
-        </div>
 
-        <div class="flex items-center gap-3">
-            <a href="{{ route('projects.report.pdf', array_filter(['project' => $project->project_Id, 'location_id' => $locationId])) }}" class="btn-dark-minimal">
-                <i class="fa-solid fa-file-arrow-down"></i> Download PDF
-            </a>
-        </div>
-    </div>
+            <nav class="report-preview-actions" aria-label="Report actions">
+                <a href="{{ route('projects.show', $project->project_Id) }}" class="report-preview-button">
+                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                    <span>Back to project</span>
+                </a>
+                <a href="{{ route('projects.report.pdf', array_filter(['project' => $project->project_Id, 'location_id' => $locationId])) }}" class="report-preview-button report-preview-button-primary">
+                    <i class="fa-solid fa-file-arrow-down" aria-hidden="true"></i>
+                    <span>Download PDF</span>
+                </a>
+            </nav>
+        </header>
 
-    <div class="preview-container">
-        <div class="preview-paper">
-            <iframe src="{{ route('projects.report.preview', array_filter(['project' => $project->project_Id, 'location_id' => $locationId, 'raw' => 1, 't' => time()])) }}" class="preview-iframe"></iframe>
-        </div>
-    </div>
+        <section class="report-preview-stage" aria-label="Survey report document preview">
+            <div class="report-preview-stage-head">
+                <span>Document preview</span>
+                <span>A4 &bull; Portrait</span>
+            </div>
+            <div class="report-preview-paper">
+                <iframe
+                    title="Survey report document"
+                    src="{{ route('projects.report.preview', array_filter(['project' => $project->project_Id, 'location_id' => $locationId, 'raw' => 1, 't' => time()])) }}"
+                    class="report-preview-frame"></iframe>
+            </div>
+        </section>
+    </main>
 </x-app-layout>

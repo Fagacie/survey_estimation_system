@@ -24,10 +24,8 @@
             </div>
 
             <!-- CREATE NEW ITEM BUTTON -->
-            <a href="{{ route('newItem') }}">
-                <button type="button" class="create-button" id="createButton">
-                    <i class="fa-solid fa-plus"></i> CREATE NEW
-                </button>
+            <a href="{{ route('newItem') }}" class="create-button" id="createButton">
+                <i class="fa-solid fa-plus" aria-hidden="true"></i> Create new item
             </a>
         </div>
         

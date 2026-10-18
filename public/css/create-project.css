@@ -36,3 +36,132 @@
     .create-project-page .max-w-4xl > form > div:first-child { padding: 1.25rem; }
     .create-project-page .bg-slate-50.p-6 { padding: 1rem 1.25rem; }
 }
+
+
+/* Create-project form refinement: clear hierarchy, consistent controls, and responsive layout. */
+.create-project-page {
+    --create-ink: #17283f;
+    --create-muted: #68798d;
+    --create-line: #dce5ee;
+    --create-blue: #2463a6;
+    --create-blue-soft: #edf4fb;
+    max-width: 1120px;
+    width: 100%;
+}
+.create-project-page > .mb-8 {
+    margin-bottom: 1.4rem !important;
+    padding-bottom: 1.25rem;
+}
+.create-project-page .max-w-4xl {
+    max-width: 100%;
+    overflow: hidden;
+    border: 1px solid var(--create-line);
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 3px 14px rgba(20,43,73,.05);
+}
+.create-project-page .max-w-4xl > form > div:first-child {
+    padding: clamp(1.25rem, 3vw, 2.1rem);
+}
+.create-project-page .max-w-4xl > form > div:first-child > div {
+    min-width: 0;
+}
+.create-project-page h2 {
+    margin-bottom: 1.15rem;
+    padding-bottom: .8rem;
+    border-bottom: 1px solid var(--create-line);
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: -.015em;
+}
+.create-project-page h2 span {
+    flex: 0 0 28px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 8px;
+    color: var(--create-blue);
+    background: var(--create-blue-soft);
+    font-weight: 800;
+}
+.create-project-page label {
+    display: block;
+    margin-bottom: .4rem;
+    color: #344860;
+    font-size: .78rem;
+    font-weight: 650;
+    letter-spacing: 0;
+}
+.create-project-page label .text-red-500 { color: #c2413b; }
+.create-project-page input:not([type=checkbox]):not([type=radio]),
+.create-project-page select,
+.create-project-page textarea {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 43px;
+    padding: .65rem .8rem;
+    border: 1px solid #cbd7e3;
+    border-radius: 8px;
+    color: var(--create-ink);
+    background: #fff;
+    font-size: .84rem;
+    line-height: 1.45;
+    box-shadow: none;
+    transition: border-color .15s ease, box-shadow .15s ease;
+}
+.create-project-page textarea {
+    min-height: 86px;
+    resize: vertical;
+}
+.create-project-page input:focus,
+.create-project-page select:focus,
+.create-project-page textarea:focus {
+    border-color: #77a3cd;
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba(36,99,166,.12);
+}
+.create-project-page input::placeholder,
+.create-project-page textarea::placeholder { color: #94a3b4; }
+.create-project-page .space-y-4 > div { min-width: 0; }
+.create-project-page .grid.grid-cols-2 { gap: .85rem; }
+.create-project-page .text-red-500.text-xs { margin-top: .4rem; font-size: .75rem; }
+.create-project-page .bg-slate-50.p-6 {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem clamp(1.25rem, 3vw, 2.1rem);
+    border-top: 1px solid var(--create-line);
+    background: #f8fafc;
+}
+.create-project-page button[type="submit"] {
+    min-height: 43px;
+    padding: .7rem 1.15rem;
+    border: 1px solid var(--create-blue);
+    border-radius: 8px;
+    color: #fff;
+    background: var(--create-blue);
+    box-shadow: none;
+    font-size: .82rem;
+    font-weight: 700;
+}
+.create-project-page button[type="submit"]:hover {
+    border-color: #1d518a;
+    background: #1d518a;
+}
+.create-project-page a[href*="projects.index"] {
+    min-height: 40px;
+    align-items: center;
+    border-radius: 8px;
+    border-color: var(--create-line);
+    box-shadow: none;
+}
+.create-project-page a[href*="projects.index"]:focus-visible,
+.create-project-page button[type="submit"]:focus-visible {
+    outline: 3px solid rgba(36,99,166,.25);
+    outline-offset: 2px;
+}
+@media (max-width: 767px) {
+    .create-project-page .grid.grid-cols-2 { grid-template-columns: 1fr; }
+    .create-project-page .max-w-4xl > form > div:first-child { padding: 1.1rem; }
+    .create-project-page .bg-slate-50.p-6 { padding: 1rem 1.1rem; }
+    .create-project-page .bg-slate-50.p-6 button { width: 100%; }
+}

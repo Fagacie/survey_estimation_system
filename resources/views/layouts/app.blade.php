@@ -5,7 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'ISES') }} — Eco Hydrotech</title>
+        <title>Eco Hydrotech Solutions</title>
 
         <!-- Google Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -34,8 +34,11 @@
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
         <!-- Custom CSS -->
-        <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ time() + 1 }}">
+        <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}">
+        <link rel="stylesheet" href="{{ asset('css/ises-redesign.css') }}?v={{ filemtime(public_path('css/ises-redesign.css')) }}">
+        <link rel="stylesheet" href="{{ asset('css/ises-page-overrides.css') }}?v={{ filemtime(public_path('css/ises-page-overrides.css')) }}">
         @stack('styles')
+        <link rel="stylesheet" href="{{ asset('css/ises-final-overrides.css') }}?v={{ filemtime(public_path('css/ises-final-overrides.css')) }}">
 
         <style>
             @media print {
@@ -89,9 +92,12 @@
                     
                     <!-- Sidebar Header / Logo -->
                     <div class="ises-sidebar-brand flex items-center h-16 flex-shrink-0" :class="sidebarOpen ? 'px-4 justify-between' : 'justify-center'">
-                        <a href="{{ route('projects.index') }}" class="flex items-center gap-3 ises-brand overflow-hidden whitespace-nowrap" title="Survey Projects">
-                            <img x-show="sidebarOpen" src="{{ asset('images/logo.jpeg') }}" alt="Eco Hydrotech Solutions" class="ises-brand-logo">
-                            <span x-show="!sidebarOpen" class="ises-brand-mark"><img src="{{ asset('images/logo.png') }}" alt="Eco Hydrotech"></span>
+                        <a href="{{ route('dashboard') }}" class="ises-brand-name overflow-hidden whitespace-nowrap" title="Eco Hydrotech Solutions dashboard">
+                            <span x-show="sidebarOpen" class="ises-brand-full">
+                                <span class="ises-brand-symbol" aria-hidden="true"><i class="fa-solid fa-water"></i></span>
+                                <span class="ises-brand-type"><span><span>Eco</span> <strong>Hydrotech</strong></span><small>Solutions</small></span>
+                            </span>
+                            <span x-show="!sidebarOpen" class="ises-brand-compact" aria-label="Eco Hydrotech Solutions">EH</span>
                         </a>
                         
                         <!-- Toggle Button Integrated into Sidebar Header -->
@@ -103,18 +109,22 @@
                     <!-- Sidebar Navigation Links -->
                     <div class="flex-1 overflow-y-auto py-6 flex flex-col gap-1.5 custom-scrollbar" :class="sidebarOpen ? 'px-3' : 'px-2 items-center'">
                         
-                        <a href="{{ route('projects.index') }}" title="Survey Projects" class="ises-nav-link flex items-center px-3 py-2.5 transition-all group {{ request()->routeIs('projects.*') ? 'active' : '' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
+                        <a href="{{ route('dashboard') }}" title="Dashboard" class="ises-nav-link flex items-center px-3 py-2.5 transition-all group {{ request()->routeIs('dashboard', 'home') ? 'active' : '' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
+                            <i class="fa-solid fa-chart-line w-5 text-center text-sm"></i>
+                            <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Dashboard</span>
+                        </a>
+                        <a href="{{ route('projects.index') }}" title="Survey Projects" class="ises-nav-link flex items-center px-3 py-2.5 transition-all group {{ request()->routeIs('projects.index', 'projects.create', 'projects.show', 'projects.edit') ? 'active' : '' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
                             <i class="fa-solid fa-map-location-dot w-5 text-center text-sm"></i>
                             <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Survey Projects</span>
                         </a>
-                        <a href="{{ route('quotations.history') }}" title="Quotation History" class="ises-nav-link flex items-center px-3 py-2.5 transition-all group {{ request()->routeIs('quotations.*') ? 'active' : '' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
+                        <a href="{{ route('quotations.history') }}" title="Quotation History" class="ises-nav-link flex items-center px-3 py-2.5 transition-all group {{ request()->routeIs('quotations.*', 'quotation.*') ? 'active' : '' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
                             <i class="fa-solid fa-file-invoice-dollar w-5 text-center text-sm"></i>
                             <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Quotation History</span>
                         </a>
 
 
                         <!-- Database Management Navigation Dropdown -->
-                        <div x-data="{ itemsOpen: {{ request()->routeIs('admin.index', 'newItem', 'admin.equipment.*') ? 'true' : 'false' }} }" class="w-full">
+                        <div x-data="{ itemsOpen: {{ request()->routeIs('admin.index', 'newItem', 'admin.equipment.*', 'projects.modeling.*') ? 'true' : 'false' }} }" class="w-full">
                             <button @click="itemsOpen = !itemsOpen" title="Database Management" class="ises-nav-link flex items-center justify-between px-3 py-2.5 transition-all group w-full focus:outline-none border-none outline-none bg-transparent {{ request()->routeIs('admin.index', 'newItem', 'admin.equipment.*') ? 'active' : '' }}" :class="sidebarOpen ? '' : 'justify-center'">
                                 <div class="flex items-center gap-3">
                                     <i class="fa-solid fa-database w-5 text-center text-sm"></i>
@@ -125,7 +135,7 @@
                             
                             <!-- Sub-navigation -->
                             <div x-show="itemsOpen && sidebarOpen" x-transition class="pl-11 pr-3 py-1 space-y-1">
-                                <a href="{{ route('admin.index') }}" class="ises-nav-link block px-3 py-2 text-[11px] font-medium transition-colors {{ request()->routeIs('admin.index', 'newItem') ? 'active' : '' }}">
+                                <a href="{{ route('admin.index') }}" class="ises-nav-link block px-3 py-2 text-[11px] font-medium transition-colors {{ request()->routeIs('admin.index', 'newItem', 'projects.modeling.modules.*', 'projects.modeling.items.*', 'projects.modeling.packages.*') ? 'active' : '' }}">
                                     Item Catalog
                                 </a>
                                 <a href="{{ route('admin.equipment.index') }}" class="ises-nav-link block px-3 py-2 text-[11px] font-medium transition-colors {{ request()->routeIs('admin.equipment.*') ? 'active' : '' }}">
@@ -137,12 +147,12 @@
                     </div>
 
                     <!-- Sidebar Footer -->
-                    <div class="ises-sidebar-footer border-t border-slate-800 flex-shrink-0 flex flex-col">
+                    <div class="ises-sidebar-footer flex-shrink-0 flex flex-col">
                         
                         <!-- User Info -->
                         @auth
-                            <div class="ises-sidebar-user p-3 flex items-center justify-center transition-all bg-white" :class="sidebarOpen ? '' : 'flex-col gap-2'">
-                                    <a href="{{ route('profile.edit') }}" title="Profile" class="ises-avatar flex items-center justify-center font-semibold text-xs flex-shrink-0 transition-colors rounded-full text-white">
+                            <div class="ises-sidebar-user p-3 flex items-center transition-all" :class="sidebarOpen ? '' : 'flex-col gap-2'">
+                                    <a href="{{ route('profile.edit') }}" title="Profile" class="ises-avatar flex items-center justify-center font-semibold text-xs flex-shrink-0 transition-colors">
                                     {{ substr(auth()->user()->name, 0, 1) }}
                                 </a>
                                 <div x-show="sidebarOpen" class="flex-1 min-w-0 ml-3">
@@ -164,39 +174,42 @@
             <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative bg-white print:overflow-visible">
                 
                 <!-- TOP UTILITY HEADER -->
-                <!-- Removed branding, removed hamburger (handled in sidebar), clean white BG, 1px bottom border -->
-                <header class="ises-topbar h-16 flex items-center justify-between px-8 z-10 flex-shrink-0 print:hidden">
-                    <div class="flex items-center gap-3">
+                <header class="ises-topbar map-workspace-topbar h-16 flex items-center justify-between px-8 z-10 flex-shrink-0 print:hidden">
+                    <div class="map-topbar-leading flex items-center gap-4 min-w-0">
                         @unless($hideSidebar ?? false)
-                            <!-- Hamburger only visible on mobile -->
-                            <button @click="sidebarOpen = true" class="text-slate-500 hover:text-slate-800 focus:outline-none p-1.5 rounded hover:bg-slate-100 transition-colors lg:hidden mr-2">
+                            <button @click="sidebarOpen = true" aria-label="Open navigation" class="text-slate-500 hover:text-slate-800 focus:outline-none p-1.5 rounded hover:bg-slate-100 transition-colors lg:hidden mr-2">
                                 <i class="fa-solid fa-bars"></i>
                             </button>
                         @else
-                            <!-- If sidebar is completely hidden (e.g. Map View) -->
                             @if(request()->route('project'))
                                 @php
                                     $project = request()->route('project');
                                     $projectId = is_object($project) ? $project->project_Id : $project;
                                 @endphp
-                                <a href="{{ route('projects.show', $projectId) }}" class="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors font-medium text-sm">
-                                    <i class="fa-solid fa-arrow-left text-xs"></i> Back to Project
+                                <a href="{{ route('projects.show', $projectId) }}" class="map-back-project">
+                                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                                    <span>Back to Project</span>
                                 </a>
                             @else
-                                <a href="{{ route('projects.index') }}" class="flex items-center gap-2 text-slate-600 hover:text-slate-900 transition-colors font-medium text-sm">
-                                    <i class="fa-solid fa-arrow-left text-xs"></i> Dashboard
+                                <a href="{{ route('dashboard') }}" class="map-back-project">
+                                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+                                    <span>Dashboard</span>
                                 </a>
                             @endif
-                            <div class="h-4 w-px bg-slate-300 mx-3"></div>
-                            <span class="text-sm font-medium text-slate-800 tracking-wide">Map Engine</span>
-                        @endunless
-                        
-                        <!-- Page Title / Breadcrumb (Dynamic) -->
-                        @if(isset($header))
-                            <div class="text-sm font-medium text-slate-600">
-                                {{ $header }}
+                            <span class="map-topbar-divider" aria-hidden="true"></span>
+                            <div class="map-topbar-context">
+                                <span class="map-topbar-eyebrow">SURVEY WORKSPACE</span>
+                                <span class="map-topbar-section">Survey Planning</span>
                             </div>
+                        @endunless
+
+                        @if(isset($header))
+                            <div class="map-topbar-page-title">{{ $header }}</div>
                         @endif
+                    </div>
+                    <div class="map-topbar-trailing">
+                        <span class="map-topbar-live-dot" aria-hidden="true"></span>
+                        <span>Map workspace</span>
                     </div>
                 </header>
 
