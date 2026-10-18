@@ -9,7 +9,7 @@
             border-bottom: 2px solid transparent; transition: all 0.2s ease; white-space: nowrap; 
         }
         .custom-nav-tabs .nav-link:hover { color: #0f172a; border-color: #cbd5e1; }
-        .custom-nav-tabs .nav-link.active { color: #0d9488; border-color: #0d9488; }
+        .custom-nav-tabs .nav-link.active { color: #1679b8; border-color: #1679b8; }
         
         .sticky-bottom-summary {
             background: white; border-top: 1px solid #e2e8f0; padding: 1.5rem 2rem; border-radius: 0.75rem; 
@@ -38,11 +38,15 @@
         : route('projects.index');
 @endphp
 
-<div id="quotationBuilderHeader" class="flex items-center gap-3 mb-8 print:hidden">
-    <div class="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center text-teal-600 shadow-sm border border-teal-100">
+<div id="quotationBuilderHeader" class="quotation-builder-heading print:hidden">
+    <div class="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center text-sky-700 shadow-sm border border-sky-100">
         <i class="fa-solid fa-file-invoice-dollar text-xl"></i>
     </div>
-    <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Quotation Builder</h1>
+    <div class="quotation-builder-heading-copy">
+        <p class="quotation-builder-heading-eyebrow">COMMERCIAL WORKSPACE</p>
+        <h1 class="text-2xl font-bold text-slate-800 tracking-tight">Quotation Builder</h1>
+        <p class="quotation-builder-heading-description">Prepare survey costs, review the estimate, and generate a client-ready quotation.</p>
+    </div>
 
     <a href="{{ $backUrl }}"
        class="ml-auto px-4 py-2 rounded-lg text-sm font-bold border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 transition-colors"
@@ -66,7 +70,7 @@
                     
                     <div>
                         <label for="project" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Project Name</label>
-                        <input type="text" id="project" name="project" value="{{ $prefillProject?->name ?? '' }}" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm transition-colors">
+                        <input type="text" id="project" name="project" value="{{ $prefillProject?->name ?? '' }}" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors">
                     </div>
 
                     @php
@@ -79,7 +83,7 @@
                     <div>
                         <label for="selectType" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Project Type</label>
                         <select id="selectType" {{ $typeLocked ? 'disabled' : '' }}
-                                class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm transition-colors {{ $typeLocked ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : 'bg-white' }}">
+                                class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors {{ $typeLocked ? 'bg-slate-100 text-slate-500 cursor-not-allowed' : 'bg-white' }}">
                             <option value="">{{ $typeLocked ? 'Not set (older project)' : 'Choose Project Type' }}</option>
                             @foreach($typeCodes as $i => $code)
                                 <option value="{{ $i + 1 }}" {{ $selectedTypeValue === $i + 1 ? 'selected' : '' }}>
@@ -95,34 +99,34 @@
                     <div class="col-span-full md:col-span-2 lg:col-span-1 grid grid-cols-2 gap-4">
                         <div>
                             <label for="project_start_date" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Start Date</label>
-                            <input type="date" id="project_start_date" name="project_start_date" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm transition-colors">
+                            <input type="date" id="project_start_date" name="project_start_date" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors">
                         </div>
                         <div>
                             <label for="project_end_date" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">End Date</label>
-                            <input type="date" id="project_end_date" name="project_end_date" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm transition-colors">
+                            <input type="date" id="project_end_date" name="project_end_date" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors">
                         </div>
                     </div>
 
                     <div>
                         <label for="period" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Period</label>
-                        <input type="text" id="period" name="period" value="{{ $prefillProject?->period ?? '' }}" placeholder="Auto-calculated (if dates present)" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm bg-slate-50 focus:border-teal-500 focus:ring-teal-500 shadow-sm transition-colors">
+                        <input type="text" id="period" name="period" value="{{ $prefillProject?->period ?? '' }}" placeholder="Auto-calculated (if dates present)" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm bg-slate-50 focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors">
                     </div>
 
                     <div>
                         <label for="client" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Client</label>
-                        <input type="text" id="client" name="client" value="{{ $prefillProject?->client?->company_name ?? '' }}" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm transition-colors">
+                        <input type="text" id="client" name="client" value="{{ $prefillProject?->client?->company_name ?? '' }}" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors">
                     </div>
 
                     <div class="col-span-full md:col-span-2">
                         <label for="client_address" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Client Address</label>
-                        <textarea id="client_address" name="client_address" rows="2" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm transition-colors">{{ $prefillProject?->client?->client_address ?? '' }}</textarea>
+                        <textarea id="client_address" name="client_address" rows="2" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors">{{ $prefillProject?->client?->client_address ?? '' }}</textarea>
                     </div>
 
                     <div>
                         <label class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">Project No.</label>
                         <div class="flex gap-2">
                             <input type="text" id="number_prefix" class="flex-1 rounded-lg border-slate-300 py-2.5 px-3 text-sm bg-slate-100 text-slate-500 shadow-sm" readonly placeholder="EHS/--/--/">
-                            <input type="text" id="number_running" class="w-24 rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm transition-colors" placeholder="001" maxlength="4">
+                            <input type="text" id="number_running" class="w-24 rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors" placeholder="001" maxlength="4">
                         </div>
                         <input type="hidden" id="number" name="number" value="{{ $prefillProject?->number ?? '' }}">
                     </div>
@@ -131,12 +135,12 @@
 
                     <div>
                         <label for="pic" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">PIC</label>
-                        <input type="text" id="pic" name="pic" value="{{ $prefillProject?->pic_name ?? '' }}" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm transition-colors">
+                        <input type="text" id="pic" name="pic" value="{{ $prefillProject?->pic_name ?? '' }}" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors">
                     </div>
 
                     <div>
                         <label for="pic_no" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-1.5">No. of PIC</label>
-                        <input type="text" id="pic_no" name="pic_no" value="{{ $prefillProject?->pic_no ?? '' }}" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm transition-colors">
+                        <input type="text" id="pic_no" name="pic_no" value="{{ $prefillProject?->pic_no ?? '' }}" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors">
                     </div>
                 </div>
             </div>
@@ -296,7 +300,7 @@
                             </div>
                             <div class="text-end">
                                 <div class="text-xs fw-bold text-slate-500 text-uppercase">Modelling Total</div>
-                                <div class="fs-4 fw-bold text-teal-600">MYR {{ number_format($modellingSummary->grand_total, 2) }}</div>
+                                <div class="fs-4 fw-bold text-sky-700">MYR {{ number_format($modellingSummary->grand_total, 2) }}</div>
                             </div>
                         </div>
 
@@ -351,7 +355,7 @@
                             </div>
                             <div class="d-flex justify-content-between pt-2 border-top mt-2">
                                 <span class="fw-bold text-slate-800">Grand Total</span>
-                                <span class="fw-bold text-teal-600">MYR {{ number_format($modellingSummary->grand_total, 2) }}</span>
+                                <span class="fw-bold text-sky-700">MYR {{ number_format($modellingSummary->grand_total, 2) }}</span>
                             </div>
                         </div>
 
@@ -373,7 +377,7 @@
 
                     <div id="paymentTermsList" class="space-y-3 mb-4"></div>
 
-                    <button type="button" id="addPaymentTermBtn" class="self-start text-sm font-semibold text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
+                    <button type="button" id="addPaymentTermBtn" class="self-start text-sm font-semibold text-sky-700 hover:text-sky-800 bg-sky-50 hover:bg-sky-100 px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
                         <i class="fa-solid fa-plus"></i> Add Payment Term
                     </button>
 
@@ -382,13 +386,13 @@
                     <!-- ADDITIONAL NOTES -->
                     <div class="mt-6 pt-4 border-t border-slate-100">
                         <label for="additional_notes" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Additional Notes</label>
-                        <textarea id="additional_notes" name="additional_notes" rows="4" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm transition-colors placeholder:text-slate-400" placeholder="Enter any special conditions or notes here..."></textarea>
+                        <textarea id="additional_notes" name="additional_notes" rows="4" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors placeholder:text-slate-400" placeholder="Enter any special conditions or notes here..."></textarea>
                     </div>
 
                     <!-- SIGNED BY -->
                     <div class="mt-6 pt-4 border-t border-slate-100">
                         <label for="signatory_id" class="block text-xs font-semibold text-slate-500 uppercase tracking-wider mb-2">Signed by</label>
-                        <select id="signatory_id" name="signatory_id" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm transition-colors">
+                        <select id="signatory_id" name="signatory_id" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors">
                             @foreach($signatories as $s)
                                 <option value="{{ $s->id }}" {{ optional($defaultSigner)->id == $s->id ? 'selected' : '' }}>{{ $s->name }}</option>
                             @endforeach
@@ -411,7 +415,7 @@
                             </div>
                             <p id="newSignatoryError" class="d-none text-xs text-red-600"></p>
                             <div class="flex gap-2">
-                                <button type="button" id="saveNewSignatoryBtn" class="px-4 py-2 rounded-lg text-sm font-bold bg-teal-600 text-white hover:bg-teal-500">Add person</button>
+                                <button type="button" id="saveNewSignatoryBtn" class="px-4 py-2 rounded-lg text-sm font-bold bg-sky-700 text-white hover:bg-sky-800">Add person</button>
                                 <button type="button" id="cancelNewSignatoryBtn" class="px-4 py-2 rounded-lg text-sm font-semibold border border-slate-300 text-slate-700 hover:bg-white">Cancel</button>
                             </div>
                         </div>
@@ -428,8 +432,8 @@
                     <div id="serviceBreakdownContainer" class="flex-1"></div>
 
                     <div class="flex justify-between items-center pt-4 border-t border-slate-200 mt-4">
-                        <span class="text-sm font-bold text-slate-800 uppercase">Module Total (<span class="active-module-title text-teal-600">{{ strtoupper($modules->first()->module_name ?? 'MODULE') }}</span>)</span>
-                        <span class="text-xl font-bold text-teal-600 current-module-total">MYR 0.00</span>
+                        <span class="text-sm font-bold text-slate-800 uppercase">Module Total (<span class="active-module-title text-sky-700">{{ strtoupper($modules->first()->module_name ?? 'MODULE') }}</span>)</span>
+                        <span class="text-xl font-bold text-sky-700 current-module-total">MYR 0.00</span>
                     </div>
                 </div>
             </div>
@@ -437,7 +441,7 @@
             <!-- STICKY BOTTOM SUMMARY BAR -->
             <div class="sticky-bottom-summary quotation-grand-total flex flex-wrap justify-between items-center gap-4">
                 <div class="flex-1 overflow-x-auto pr-4">
-                    <span class="text-sm font-bold text-teal-600 uppercase tracking-wider all-modules-list">ALL MODULES</span>
+                    <span class="text-sm font-bold text-sky-700 uppercase tracking-wider all-modules-list">ALL MODULES</span>
                 </div>
                 <div class="text-right whitespace-nowrap">
                     <span class="text-xs font-bold text-slate-500 uppercase tracking-wider mr-4">Grand Total</span>
@@ -456,7 +460,7 @@
                     <button type="button" class="preview-button px-5 py-2.5 rounded-lg text-sm font-bold border border-slate-600 hover:bg-slate-800 transition-colors" id="previewBtn">
                         <i class="fa-regular fa-eye mr-2"></i> PREVIEW
                     </button>
-                    <button type="button" id="saveQuotationBtn" class="px-5 py-2.5 rounded-lg text-sm font-bold bg-teal-500 hover:bg-teal-400 text-white shadow-sm transition-colors border border-transparent">
+                    <button type="button" id="saveQuotationBtn" class="px-5 py-2.5 rounded-lg text-sm font-bold bg-sky-700 hover:bg-sky-800 text-white shadow-sm transition-colors border border-transparent">
                         <i class="fa-regular fa-floppy-disk mr-2"></i> SAVE / DOWNLOAD
                     </button>
                 </div>
@@ -475,7 +479,7 @@
                     <i class="fa-solid fa-arrow-left mr-2"></i> BACK TO EDIT
                 </button>
                 
-                <button type="button" id="previewDownloadPdfBtn" class="px-5 py-2.5 rounded-lg text-sm font-bold bg-teal-600 text-white hover:bg-teal-500 shadow-sm transition-colors">
+                <button type="button" id="previewDownloadPdfBtn" class="px-5 py-2.5 rounded-lg text-sm font-bold bg-sky-700 text-white hover:bg-sky-800 shadow-sm transition-colors">
                     <i class="fa-solid fa-file-pdf mr-2"></i> DOWNLOAD PDF
                 </button>
             </div>
@@ -495,7 +499,7 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content rounded-xl border-0 shadow-lg overflow-hidden">
                 <div class="modal-header border-0 pb-0 pt-5 px-6">
-                    <h5 class="text-lg font-bold text-teal-600 flex items-center gap-3">
+                    <h5 class="text-lg font-bold text-sky-700 flex items-center gap-3">
                         <i class="fa-solid fa-circle-check text-2xl"></i> Quotation Saved
                     </h5>
                 </div>
@@ -508,7 +512,7 @@
                     <button type="button" id="cancelQuotationSaveBtn" class="flex-1 py-2.5 rounded-lg text-sm font-semibold border border-slate-300 text-slate-700 hover:bg-slate-50 transition-colors">
                         No, stay here
                     </button>
-                    <button type="button" id="confirmQuotationSaveBtn" class="flex-1 py-2.5 rounded-lg text-sm font-bold bg-teal-600 text-white hover:bg-teal-500 shadow-sm transition-colors">
+                    <button type="button" id="confirmQuotationSaveBtn" class="flex-1 py-2.5 rounded-lg text-sm font-bold bg-sky-700 text-white hover:bg-sky-800 shadow-sm transition-colors">
                         Yes, Download PDF
                     </button>
                 </div>

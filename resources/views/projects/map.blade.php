@@ -479,21 +479,39 @@
             });
             map.addControl(drawControl);
 
+            // Auto-commit deletions when switching tools or clicking off delete toolbar
+            if (L.EditToolbar && L.EditToolbar.Delete) {
+                var origDeleteDisable = L.EditToolbar.Delete.prototype.disable;
+                L.EditToolbar.Delete.prototype.disable = function() {
+                    if (this._enabled && this._deletedLayers && this._deletedLayers.getLayers().length > 0) {
+                        this.save();
+                    }
+                    origDeleteDisable.call(this);
+                };
+            }
+
             // 7. Load Existing Data
             loadExistingData();
 
             // 8. Draw Events
             map.on(L.Draw.Event.CREATED, function (e) {
                 var type = e.layerType, layer = e.layer;
-                drawnItems.addLayer(layer);
 
-                // Categorize drawn layer
+                // When a new boundary polygon is drawn, remove any older boundary polygons
                 if (type === 'polygon') {
-                    boundaryLayerGroup.addLayer(L.geoJSON(layer.toGeoJSON(), {
-                        style: { color: '#3b82f6', weight: 3, fillOpacity: 0.15 }
-                    }));
+                    var toRemove = [];
+                    drawnItems.eachLayer(function(l) {
+                        if (l instanceof L.Polygon) {
+                            toRemove.push(l);
+                        }
+                    });
+                    toRemove.forEach(function(l) {
+                        drawnItems.removeLayer(l);
+                    });
                 }
 
+                drawnItems.addLayer(layer);
+                rebuildLayerGroups();
                 recalculateAllStats();
             });
 
@@ -782,17 +800,62 @@
 
             // 14. Layer toggle listeners
             document.getElementById('layer-boundaries').addEventListener('change', function() {
-                this.checked ? boundaryLayerGroup.addTo(map) : map.removeLayer(boundaryLayerGroup);
+                var checked = this.checked;
+                checked ? boundaryLayerGroup.addTo(map) : map.removeLayer(boundaryLayerGroup);
+                drawnItems.eachLayer(function(l) {
+                    if (l instanceof L.Polygon) {
+                        checked ? (!map.hasLayer(l) && map.addLayer(l)) : (map.hasLayer(l) && map.removeLayer(l));
+                    }
+                });
             });
             document.getElementById('layer-main-lines').addEventListener('change', function() {
-                this.checked ? mainLineLayerGroup.addTo(map) : map.removeLayer(mainLineLayerGroup);
+                var checked = this.checked;
+                checked ? mainLineLayerGroup.addTo(map) : map.removeLayer(mainLineLayerGroup);
+                drawnItems.eachLayer(function(l) {
+                    if (l instanceof L.Polyline && !(l instanceof L.Polygon) && (l.lineType === 'main' || !l.lineType)) {
+                        checked ? (!map.hasLayer(l) && map.addLayer(l)) : (map.hasLayer(l) && map.removeLayer(l));
+                    }
+                });
             });
             document.getElementById('layer-cross-lines').addEventListener('change', function() {
-                this.checked ? crossLineLayerGroup.addTo(map) : map.removeLayer(crossLineLayerGroup);
+                var checked = this.checked;
+                checked ? crossLineLayerGroup.addTo(map) : map.removeLayer(crossLineLayerGroup);
+                drawnItems.eachLayer(function(l) {
+                    if (l instanceof L.Polyline && !(l instanceof L.Polygon) && l.lineType === 'cross') {
+                        checked ? (!map.hasLayer(l) && map.addLayer(l)) : (map.hasLayer(l) && map.removeLayer(l));
+                    }
+                });
             });
             document.getElementById('layer-labels').addEventListener('change', function() {
                 this.checked ? labelLayerGroup.addTo(map) : map.removeLayer(labelLayerGroup);
             });
+
+            // Global Drone Lines Clearer
+            window.clearDroneLines = function() {
+                let toRemove = [];
+                drawnItems.eachLayer(function(layer) {
+                    if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
+                        toRemove.push(layer);
+                    }
+                });
+                toRemove.forEach(l => drawnItems.removeLayer(l));
+                mainLineLayerGroup.clearLayers();
+                crossLineLayerGroup.clearLayers();
+                labelLayerGroup.clearLayers();
+                if (window.routeMarkers) {
+                    window.routeMarkers.forEach(m => map.removeLayer(m));
+                    window.routeMarkers = [];
+                }
+                isGeometryStale = false;
+                let warningEl = document.getElementById('stale-warning');
+                if (warningEl) warningEl.classList.add('d-none');
+                let droneWarning = document.getElementById('drone-stale-warning');
+                if (droneWarning) droneWarning.classList.add('d-none');
+                if (typeof DroneUI !== 'undefined') {
+                    DroneUI.updateFinalMetrics(0, []);
+                }
+                recalculateAllStats();
+            };
         });
 
         // ============================================================
@@ -807,9 +870,6 @@
                     });
                     layer.eachLayer(function (l) {
                         drawnItems.addLayer(l);
-                        boundaryLayerGroup.addLayer(L.geoJSON(l.toGeoJSON(), {
-                            style: { color: '#3b82f6', weight: 3, fillOpacity: 0.15 }
-                        }));
                     });
                 });
             @endif

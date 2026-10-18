@@ -1,79 +1,80 @@
-// public/js/drone_mapping/photogrammetry.js
+// Pure photogrammetry calculations shared by the Drone Mapping planning UI.
 
-/**
- * Calculates the Ground Sample Distance (GSD) in cm/pixel.
- * @param {number} altitude - Flight altitude in meters
- * @param {Object} cameraSpec - Camera specification object
- * @returns {number} GSD in cm/pixel
- */
+function isPositiveFinite(value) {
+    const number = Number(value);
+    return Number.isFinite(number) && number > 0;
+}
+
+/** Ground Sample Distance in cm/pixel. */
 function calculateGSD(altitude, cameraSpec) {
-    if (!altitude || !cameraSpec || !cameraSpec.focal_length_mm || !cameraSpec.image_width_px) return 0;
-    
-    // GSD (m/px) = (Altitude_m * SensorWidth_mm) / (FocalLength_mm * ImageWidth_px)
-    let gsdMeters = (altitude * cameraSpec.sensor_width_mm) / (cameraSpec.focal_length_mm * cameraSpec.image_width_px);
-    
-    // Convert to cm/px
-    return gsdMeters * 100;
+    if (!isPositiveFinite(altitude) || !cameraSpec ||
+        !isPositiveFinite(cameraSpec.sensor_width_mm) ||
+        !isPositiveFinite(cameraSpec.focal_length_mm) ||
+        !isPositiveFinite(cameraSpec.image_width_px)) {
+        return 0;
+    }
+
+    const gsdMeters = (Number(altitude) * Number(cameraSpec.sensor_width_mm)) /
+        (Number(cameraSpec.focal_length_mm) * Number(cameraSpec.image_width_px));
+
+    return Number.isFinite(gsdMeters) ? gsdMeters * 100 : 0;
 }
 
-/**
- * Calculates the Ground Footprint (width and height on the ground in meters)
- * @param {number} altitude - Flight altitude in meters
- * @param {Object} cameraSpec - Camera specification object
- * @returns {Object} { ground_width_m, ground_height_m }
- */
+/** Ground footprint dimensions in metres. */
 function calculateGroundFootprint(altitude, cameraSpec) {
-    if (!altitude || !cameraSpec) return { ground_width_m: 0, ground_height_m: 0 };
+    if (!isPositiveFinite(altitude) || !cameraSpec ||
+        !isPositiveFinite(cameraSpec.sensor_width_mm) ||
+        !isPositiveFinite(cameraSpec.sensor_height_mm) ||
+        !isPositiveFinite(cameraSpec.focal_length_mm)) {
+        return { ground_width_m: 0, ground_height_m: 0 };
+    }
 
-    let groundWidth = (altitude * cameraSpec.sensor_width_mm) / cameraSpec.focal_length_mm;
-    let groundHeight = (altitude * cameraSpec.sensor_height_mm) / cameraSpec.focal_length_mm;
+    const focalLength = Number(cameraSpec.focal_length_mm);
+    const groundWidth = (Number(altitude) * Number(cameraSpec.sensor_width_mm)) / focalLength;
+    const groundHeight = (Number(altitude) * Number(cameraSpec.sensor_height_mm)) / focalLength;
 
-    return {
-        ground_width_m: groundWidth,
-        ground_height_m: groundHeight
-    };
+    if (!Number.isFinite(groundWidth) || !Number.isFinite(groundHeight)) {
+        return { ground_width_m: 0, ground_height_m: 0 };
+    }
+
+    return { ground_width_m: groundWidth, ground_height_m: groundHeight };
 }
 
-/**
- * Calculates the distance between flight lines (Side Lap spacing)
- * @param {number} groundWidth - Width of the photo footprint on the ground (meters)
- * @param {number} sideOverlapPercent - Percentage of side overlap (e.g., 70 for 70%)
- * @returns {number} Line spacing in meters
- */
+/** Distance between flight lines based on side overlap percentage. */
 function calculateLineSpacing(groundWidth, sideOverlapPercent) {
-    let overlapRatio = sideOverlapPercent / 100.0;
-    return groundWidth * (1 - overlapRatio);
+    if (!Number.isFinite(Number(groundWidth)) || Number(groundWidth) <= 0 ||
+        !Number.isFinite(Number(sideOverlapPercent)) || Number(sideOverlapPercent) < 0 || Number(sideOverlapPercent) >= 100) {
+        return 0;
+    }
+
+    return Number(groundWidth) * (1 - Number(sideOverlapPercent) / 100);
 }
 
-/**
- * Calculates the distance between photos along a single line (Front Lap spacing)
- * @param {number} groundHeight - Height of the photo footprint on the ground (meters)
- * @param {number} frontOverlapPercent - Percentage of front overlap (e.g., 80 for 80%)
- * @returns {number} Shot spacing in meters
- */
+/** Distance between photo captures based on front overlap percentage. */
 function calculateShotSpacing(groundHeight, frontOverlapPercent) {
-    let overlapRatio = frontOverlapPercent / 100.0;
-    return groundHeight * (1 - overlapRatio);
+    if (!Number.isFinite(Number(groundHeight)) || Number(groundHeight) <= 0 ||
+        !Number.isFinite(Number(frontOverlapPercent)) || Number(frontOverlapPercent) < 0 || Number(frontOverlapPercent) >= 100) {
+        return 0;
+    }
+
+    return Number(groundHeight) * (1 - Number(frontOverlapPercent) / 100);
 }
 
-/**
- * Calculates the required Altitude in meters from a Target GSD in cm/pixel.
- * @param {number} targetGSD_cm - Target Ground Sample Distance in cm/pixel
- * @param {Object} cameraSpec - Camera specification object
- * @returns {number} Altitude in meters
- */
+/** Required altitude in metres for a target GSD in cm/pixel. */
 function calculateAltitudeFromGSD(targetGSD_cm, cameraSpec) {
-    if (!targetGSD_cm || !cameraSpec || !cameraSpec.sensor_width_mm || !cameraSpec.image_width_px) return 0;
-    
-    // Altitude_m = (ImageWidth_px * TargetGSD_cm * FocalLength_mm) / (SensorWidth_mm * 100)
-    let altitudeMeters = (cameraSpec.image_width_px * targetGSD_cm * cameraSpec.focal_length_mm) / (cameraSpec.sensor_width_mm * 100);
-    
-    return altitudeMeters;
+    if (!isPositiveFinite(targetGSD_cm) || !cameraSpec ||
+        !isPositiveFinite(cameraSpec.sensor_width_mm) ||
+        !isPositiveFinite(cameraSpec.focal_length_mm) ||
+        !isPositiveFinite(cameraSpec.image_width_px)) {
+        return 0;
+    }
+
+    const altitudeMeters = (Number(cameraSpec.image_width_px) * Number(targetGSD_cm) * Number(cameraSpec.focal_length_mm)) /
+        (Number(cameraSpec.sensor_width_mm) * 100);
+
+    return Number.isFinite(altitudeMeters) ? altitudeMeters : 0;
 }
 
-/**
- * Expose for frontend or module usage
- */
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
         calculateGSD,

@@ -21,105 +21,83 @@
         <form action="{{ route('projects.store') }}" method="POST" id="createProjectForm">
             @csrf
             
-            <div class="p-6 md:p-8 space-y-8">
+            <div class="p-6 md:p-8">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Left Side: Project details -->
+                    <div class="space-y-4">
+                        <div>
+                            <label for="project_name" class="block text-sm font-semibold text-slate-700 mb-1.5">Project Name <span class="text-red-500">*</span></label>
+                            <input type="text" id="project_name" name="name" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm @error('name') border-red-500 @enderror" value="{{ old('name') }}" placeholder="e.g. Nearshore Hydrographic Survey" required>
+                            @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        </div>
 
-                <!-- SECTION 1: PROJECT CONFIGURATION -->
-                <div>
-                    <h2 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-                        <span class="bg-teal-100 text-teal-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">1</span> 
-                        Project Configuration
-                    </h2>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Left Side -->
-                        <div class="space-y-4">
-                            <div>
-                                <label for="project_type" class="block text-sm font-semibold text-slate-700 mb-1.5">Project Type <span class="text-red-500">*</span></label>
-                                <select id="project_type" name="project_type" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm @error('project_type') border-red-500 @enderror" required>
-                                    <option value="" disabled {{ old('project_type') ? '' : 'selected' }}>Choose project type</option>
-                                    @foreach(\App\Models\Project::TYPES as $code => $label)
-                                        <option value="{{ $code }}" {{ old('project_type') == $code ? 'selected' : '' }}>{{ $code }} - {{ $label }}</option>
-                                    @endforeach
-                                </select>
-                                @error('project_type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                            </div>
+                        <div>
+                            <label for="project_type" class="block text-sm font-semibold text-slate-700 mb-1.5">Project Type <span class="text-red-500">*</span></label>
+                            <select id="project_type" name="project_type" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm @error('project_type') border-red-500 @enderror" required>
+                                <option value="" disabled {{ old('project_type') ? '' : 'selected' }}>Choose project type</option>
+                                @foreach(\App\Models\Project::TYPES as $code => $label)
+                                    <option value="{{ $code }}" {{ old('project_type') == $code ? 'selected' : '' }}>{{ $code }} - {{ $label }}</option>
+                                @endforeach
+                            </select>
+                            @error('project_type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        </div>
+                        
+                        <div>
+                            <label for="location" class="block text-sm font-semibold text-slate-700 mb-1.5">Location <span class="text-red-500">*</span></label>
+                            <select id="location" name="location" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm @error('location') border-red-500 @enderror" required>
+                                <option value="" disabled {{ old('location') ? '' : 'selected' }}>Choose location</option>
+                                @foreach(\App\Models\Project::LOCATIONS as $loc)
+                                    <option value="{{ $loc }}" {{ old('location') == $loc ? 'selected' : '' }}>{{ $loc }}</option>
+                                @endforeach
+                            </select>
+                            @error('location') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        </div>
 
-                            <div>
-                                <label for="project_name" class="block text-sm font-semibold text-slate-700 mb-1.5">Project Name <span class="text-red-500">*</span></label>
-                                <input type="text" id="project_name" name="name" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm @error('name') border-red-500 @enderror" value="{{ old('name') }}" placeholder="e.g. Nearshore Hydrographic Survey" required>
-                                @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                            </div>
-                            
-                            <div>
-                                <label for="location" class="block text-sm font-semibold text-slate-700 mb-1.5">Location <span class="text-red-500">*</span></label>
-                                <select id="location" name="location" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm @error('location') border-red-500 @enderror" required>
-                                    <option value="" disabled {{ old('location') ? '' : 'selected' }}>Choose location</option>
-                                    @foreach(\App\Models\Project::LOCATIONS as $loc)
-                                        <option value="{{ $loc }}" {{ old('location') == $loc ? 'selected' : '' }}>{{ $loc }}</option>
-                                    @endforeach
-                                </select>
-                                @error('location') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                            </div>
+                        <div>
+                            <label for="status" class="block text-sm font-semibold text-slate-700 mb-1.5">Project Status</label>
+                            <select id="status" name="status" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm @error('status') border-red-500 @enderror" required>
+                                <option value="draft" {{ old('status', 'draft') == 'draft' ? 'selected' : '' }}>Draft</option>
+                                <option value="planned" {{ old('status') == 'planned' ? 'selected' : '' }}>Planned (In Progress)</option>
+                                <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                            </select>
+                            @error('status') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+                        </div>
 
-                            <div>
-                                <label for="status" class="block text-sm font-semibold text-slate-700 mb-1.5">Project Status</label>
-                                <select id="status" name="status" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm @error('status') border-red-500 @enderror" required>
-                                    <option value="draft" {{ old('status', 'draft') == 'draft' ? 'selected' : '' }}>Draft</option>
-                                    <option value="planned" {{ old('status') == 'planned' ? 'selected' : '' }}>Planned (In Progress)</option>
-                                    <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                                </select>
-                                @error('status') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                            </div>
+                        <div>
+                            <label for="period" class="block text-sm font-semibold text-slate-700 mb-1.5">Estimated Duration</label>
+                            <input type="text" id="period" name="period" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" value="{{ old('period') }}" placeholder="e.g. 5 Days">
+                        </div>
+                    </div>
 
+                    <!-- Right Side: Details of the client -->
+                    <div class="space-y-4">
+                        <div>
+                            <label for="client_name" class="block text-sm font-semibold text-slate-700 mb-1.5">Client Company</label>
+                            <input type="text" id="client_name" name="client_name" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" value="{{ old('client_name') }}" placeholder="Client Organization Name">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
                             <div>
-                                <label for="period" class="block text-sm font-semibold text-slate-700 mb-1.5">Estimated Duration</label>
-                                <input type="text" id="period" name="period" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm" value="{{ old('period') }}" placeholder="e.g. 5 Days">
+                                <label for="pic_name" class="block text-sm font-semibold text-slate-700 mb-1.5">PIC Name</label>
+                                <input type="text" id="pic_name" name="pic_name" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" value="{{ old('pic_name') }}" placeholder="Contact Name">
+                            </div>
+                            <div>
+                                <label for="pic_no" class="block text-sm font-semibold text-slate-700 mb-1.5">PIC Contact</label>
+                                <input type="text" id="pic_no" name="pic_no" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" value="{{ old('pic_no') }}" placeholder="Phone / Email">
                             </div>
                         </div>
 
-                        <!-- Right Side -->
-                        <div class="space-y-4">
-                            <div>
-                                <label for="client_name" class="block text-sm font-semibold text-slate-700 mb-1.5">Client Company</label>
-                                <input type="text" id="client_name" name="client_name" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm" value="{{ old('client_name') }}" placeholder="Client Organization Name">
-                            </div>
-
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <label for="pic_name" class="block text-sm font-semibold text-slate-700 mb-1.5">PIC Name</label>
-                                    <input type="text" id="pic_name" name="pic_name" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm" value="{{ old('pic_name') }}" placeholder="Contact Name">
-                                </div>
-                                <div>
-                                    <label for="pic_no" class="block text-sm font-semibold text-slate-700 mb-1.5">PIC Contact</label>
-                                    <input type="text" id="pic_no" name="pic_no" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm" value="{{ old('pic_no') }}" placeholder="Phone / Email">
-                                </div>
-                            </div>
-
-                            <div>
-                                <label for="client_address" class="block text-sm font-semibold text-slate-700 mb-1.5">Client Address</label>
-                                <textarea id="client_address" name="client_address" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm" rows="2" placeholder="Full address for quotations">{{ old('client_address') }}</textarea>
-                            </div>
+                        <div>
+                            <label for="client_address" class="block text-sm font-semibold text-slate-700 mb-1.5">Client Address</label>
+                            <textarea id="client_address" name="client_address" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" rows="3" placeholder="Full address for quotations">{{ old('client_address') }}</textarea>
                         </div>
                     </div>
                 </div>
-                
-                <!-- SECTION 2: DESCRIPTION (Optional) -->
-                <div>
-                    <h2 class="text-base font-bold text-slate-900 mb-4 flex items-center gap-2">
-                        <span class="bg-teal-100 text-teal-700 w-6 h-6 rounded-full flex items-center justify-center text-xs">2</span> 
-                        Additional Details
-                    </h2>
-                    <div>
-                        <label for="description" class="block text-sm font-semibold text-slate-700 mb-1.5">Description</label>
-                        <textarea id="description" name="description" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-teal-500 focus:ring-teal-500 shadow-sm" rows="3" placeholder="Brief project description (optional)">{{ old('description') }}</textarea>
-                    </div>
-                </div>
-                
             </div>
             
             <!-- FORM FOOTER -->
             <div class="bg-slate-50 p-6 md:px-8 border-t border-slate-200 flex justify-end">
-                <button type="submit" class="bg-teal-600 hover:bg-teal-700 text-white px-8 py-2.5 rounded-lg text-sm font-bold transition-all shadow-sm flex items-center gap-2">
+                <button type="submit" class="bg-sky-700 hover:bg-sky-800 text-white px-8 py-2.5 rounded-lg text-sm font-bold transition-all shadow-sm flex items-center gap-2">
                     Create Project <i class="fa-solid fa-arrow-right"></i>
                 </button>
             </div>

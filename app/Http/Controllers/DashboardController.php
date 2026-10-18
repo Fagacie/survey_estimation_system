@@ -6,13 +6,37 @@ use App\Models\Project;
 use App\Models\QtInvoice;
 use Illuminate\View\View;
 use Illuminate\Support\Str;
+use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class DashboardController extends Controller
 {
     /**
      * Display the operational dashboard.
      */
-    public function index(): View
+    public function index(): InertiaResponse
+    {
+        $data = $this->dashboardData();
+        $data['recentProjects'] = $data['recentProjects']->map(fn ($project) => [
+            'id' => $project->project_Id,
+            'number' => $project->number,
+            'name' => $project->name,
+            'client' => $project->client?->company_name,
+            'type' => Project::TYPES[$project->project_type] ?? ($project->project_type ?: 'Not set'),
+            'status' => Str::headline($project->status ?? 'draft'),
+            'updatedAt' => $project->updated_at?->toISOString(),
+        ])->values();
+
+        return Inertia::render('Dashboard', $data);
+    }
+
+    /** Keep the existing Blade dashboard available during the migration. */
+    public function legacy(): View
+    {
+        return view('dashboard.index', $this->dashboardData());
+    }
+
+    private function dashboardData(): array
     {
         $metrics = [
             'total' => Project::count(),
@@ -90,6 +114,8 @@ class DashboardController extends Controller
             ],
         ])->filter(fn ($item) => $item['count'] > 0)->values();
 
-        return view('dashboard.index', compact('metrics', 'recentProjects', 'attentionItems', 'statusBreakdown', 'projectTypeBreakdown', 'quotationStats', 'quotationMonthly'));
+        return compact('metrics', 'recentProjects', 'attentionItems', 'statusBreakdown', 'projectTypeBreakdown', 'quotationStats', 'quotationMonthly') + [
+            'today' => now()->format('d M Y'),
+        ];
     }
 }

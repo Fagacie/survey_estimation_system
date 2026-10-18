@@ -1,8 +1,10 @@
-<x-app-layout containerClass="w-full px-8 py-8 bg-slate-50 relative min-h-screen">
+<x-app-layout>
     <x-slot name="header">Admin - Drone Equipment</x-slot>
 
     
-    <link rel="stylesheet" href="{{ asset('css/drone-equipment.css') }}?v={{ filemtime(public_path('css/drone-equipment.css')) }}">
+    @push('styles')
+        <link rel="stylesheet" href="{{ asset('css/drone-equipment.css') }}?v={{ filemtime(public_path('css/drone-equipment.css')) }}">
+    @endpush
     
     <div class="page-container equipment-page mt-4">
         <div class="mb-5">
@@ -11,14 +13,31 @@
             <div class="equipment-subtitle">Manage the aircraft and cameras available for mapping missions.</div>
         </div>
 
+        <section class="equipment-summary-grid" aria-label="Equipment summary">
+            <article class="equipment-summary-card"><span class="equipment-summary-icon"><i class="fa-solid fa-plane-up" aria-hidden="true"></i></span><div><span>Registered drones</span><strong>{{ $drones->count() }}</strong><small>{{ $drones->where('is_active', true)->count() }} active aircraft</small></div></article>
+            <article class="equipment-summary-card"><span class="equipment-summary-icon equipment-summary-icon-blue"><i class="fa-solid fa-camera" aria-hidden="true"></i></span><div><span>Registered cameras</span><strong>{{ $cameras->count() }}</strong><small>{{ $cameras->where('is_active', true)->count() }} active cameras</small></div></article>
+            <article class="equipment-summary-card"><span class="equipment-summary-icon equipment-summary-icon-violet"><i class="fa-solid fa-crosshairs" aria-hidden="true"></i></span><div><span>Mission readiness</span><strong>{{ $drones->where('is_active', true)->count() + $cameras->where('is_active', true)->count() }}</strong><small>Active equipment records</small></div></article>
+        </section>
+
+        <section class="equipment-filter-panel" aria-label="Equipment filters">
+            <label class="equipment-search"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input type="search" id="equipmentSearch" autocomplete="off" placeholder="Search drone or camera specifications..." /></label>
+            <label class="equipment-status-filter"><span>Status</span><select id="equipmentStatusFilter"><option value="">All statuses</option><option value="active">Active</option><option value="inactive">Inactive</option></select></label>
+            <span class="equipment-filter-count" id="equipmentResultCount">{{ $drones->count() + $cameras->count() }} equipment records</span>
+        </section>
+        <div id="equipmentNoResults" class="equipment-no-results" hidden><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><strong>No matching equipment</strong><span>Adjust the search text or status filter.</span></div>
+
         @if(session('success'))
-            <div class="alert alert-success rounded-0 border-0 bg-light text-success mb-4" style="border-left: 3px solid #10b981 !important;">
-                {{ session('success') }}
+            <div class="alert alert-success border-0 shadow-sm mb-4" style="border-radius: 10px; background: #eaf8f4; color: #0e6245; border-left: 4px solid #10b981 !important;">
+                <i class="fa-solid fa-circle-check me-2 text-success"></i> {{ session('success') }}
             </div>
         @endif
         @if($errors->any())
-            <div class="alert alert-danger rounded-0 border-0 bg-light text-danger mb-4" style="border-left: 3px solid #ef4444 !important;">
-                <ul class="mb-0 ps-3">
+            <div class="alert alert-danger border-0 shadow-sm mb-4" style="border-radius: 10px; background: #fdf2f2; color: #991b1b; border-left: 4px solid #ef4444 !important;">
+                <div class="d-flex align-items-center mb-1">
+                    <i class="fa-solid fa-circle-exclamation me-2 text-danger"></i>
+                    <strong>Please check the errors below:</strong>
+                </div>
+                <ul class="mb-0 ps-4">
                     @foreach($errors->all() as $error)
                         <li>{{ $error }}</li>
                     @endforeach
@@ -31,7 +50,7 @@
             <div class="equipment-register mb-5">
                 <div class="custom-card">
                     <div class="custom-card-header">
-                        <h4 class="custom-card-title"><i class="fa-solid fa-plane-up me-2" style="color:#888;"></i> Drones</h4>
+                        <h4 class="custom-card-title"><i class="fa-solid fa-plane-up me-2"></i> Drones</h4>
                         <button type="button" class="btn-outline-dark-minimal" onclick="openDroneModal()">+ Add Drone</button>
                     </div>
                     <div class="table-responsive">
@@ -46,7 +65,7 @@
                             </thead>
                             <tbody>
                                 @forelse($drones as $drone)
-                                <tr>
+                                <tr data-equipment-row data-status="{{ $drone->is_active ? 'active' : 'inactive' }}">
                                     <td class="fw-medium">{{ $drone->name }}</td>
                                     <td>{{ $drone->usable_flight_time_min }} min</td>
                                     <td>
@@ -80,7 +99,7 @@
             <div class="equipment-register mb-5">
                 <div class="custom-card">
                     <div class="custom-card-header">
-                        <h4 class="custom-card-title"><i class="fa-solid fa-camera me-2" style="color:#888;"></i> Cameras</h4>
+                        <h4 class="custom-card-title"><i class="fa-solid fa-camera me-2"></i> Cameras</h4>
                         <button type="button" class="btn-outline-dark-minimal" onclick="openCameraModal()">+ Add Camera</button>
                     </div>
                     <div class="table-responsive">
@@ -98,7 +117,7 @@
                             </thead>
                             <tbody>
                                 @forelse($cameras as $camera)
-                                <tr>
+                                <tr data-equipment-row data-status="{{ $camera->is_active ? 'active' : 'inactive' }}">
                                     <td class="fw-medium">{{ $camera->name }}</td>
                                     <td>{{ $camera->sensor_width_mm }}x{{ $camera->sensor_height_mm }}</td>
                                     <td>{{ $camera->focal_length_mm }}mm</td>
@@ -232,6 +251,40 @@
 
     @push('scripts')
     <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const search = document.getElementById('equipmentSearch');
+            const status = document.getElementById('equipmentStatusFilter');
+            const count = document.getElementById('equipmentResultCount');
+            const noResults = document.getElementById('equipmentNoResults');
+            const rows = Array.from(document.querySelectorAll('[data-equipment-row]'));
+
+            function filterEquipment() {
+                const query = (search?.value || '').trim().toLowerCase();
+                const statusValue = status?.value || '';
+                let visible = 0;
+
+                rows.forEach(function (row) {
+                    const matchesQuery = row.textContent.toLowerCase().includes(query);
+                    const matchesStatus = !statusValue || row.dataset.status === statusValue;
+                    const show = matchesQuery && matchesStatus;
+                    row.hidden = !show;
+                    if (show) visible += 1;
+                });
+
+                document.querySelectorAll('.equipment-register').forEach(function (section) {
+                    const sectionRows = Array.from(section.querySelectorAll('[data-equipment-row]'));
+                    const sectionVisible = sectionRows.some(row => !row.hidden);
+                    section.hidden = sectionRows.length > 0 && !sectionVisible;
+                });
+
+                if (count) count.textContent = visible + (visible === 1 ? ' equipment record' : ' equipment records');
+                if (noResults) noResults.hidden = visible > 0;
+            }
+
+            search?.addEventListener('input', filterEquipment);
+            status?.addEventListener('change', filterEquipment);
+        });
+
         function openDroneModal(source = null) {
             const form = document.getElementById('droneForm');
             let drone = null;

@@ -379,3 +379,109 @@
         flex: 0 0 auto;
     }
 }
+
+/* Quotation history refinement: structured hierarchy, useful totals and responsive register. */
+.quotation-history-page {
+    --history-blue: #235f8e;
+    --history-blue-soft: #edf4fa;
+    max-width: 1480px;
+}
+.quotation-history-page .history-container { max-width: none; }
+.quotation-history-page .history-heading-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 4px 0 22px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #dfe7ee;
+}
+.quotation-history-page .page-header-wrapper { margin-bottom: 0; }
+.quotation-history-page .page-header-title {
+    margin: 0 0 7px;
+    font-size: clamp(27px, 2.6vw, 35px);
+    font-weight: 700;
+    letter-spacing: -.045em;
+    line-height: 1.15;
+}
+.quotation-history-page .page-header-subtitle { max-width: 680px; font-size: 13px; line-height: 1.65; }
+.quotation-history-page .history-new-quotation {
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 40px;
+    padding: 0 14px;
+    border: 1px solid #235f8e;
+    border-radius: 6px;
+    background: #235f8e;
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background .15s, border-color .15s;
+}
+.quotation-history-page .history-new-quotation:hover { border-color: #17496f; background: #17496f; color: #fff; }
+.quotation-history-page .history-summary-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    margin: 0 0 18px;
+}
+.quotation-history-page .history-summary-card {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    min-width: 0;
+    min-height: 112px;
+    padding: 19px 21px;
+    border: 1px solid #dfe7ee;
+    border-radius: 7px;
+    background: #fff;
+}
+.quotation-history-page .history-summary-icon {
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    border: 1px solid #dce7f0;
+    border-radius: 7px;
+    background: #f0f6fb;
+    color: #286b98;
+    font-size: 16px;
+}
+.quotation-history-page .history-summary-card > div { display: flex; flex-direction: column; min-width: 0; gap: 3px; }
+.quotation-history-page .history-summary-label { color: #66788b; font-size: 10px; font-weight: 750; letter-spacing: .075em; text-transform: uppercase; }
+.quotation-history-page .history-summary-card strong { color: #172d43; font-size: clamp(22px, 2.1vw, 29px); font-weight: 750; letter-spacing: -.04em; line-height: 1.25; font-variant-numeric: tabular-nums; }
+.quotation-history-page .history-summary-card-value strong { font-size: clamp(19px, 1.8vw, 25px); }
+.quotation-history-page .history-summary-card small { color: #8190a0; font-size: 11px; }
+.quotation-history-page .filter-card-custom { margin-bottom: 18px; padding: 18px 20px 13px; border-radius: 7px; }
+.quotation-history-page .filter-input,
+.quotation-history-page .filter-select { border-color: #dfe7ee; border-radius: 5px; background: #fff; }
+.quotation-history-page .filter-input:focus,
+.quotation-history-page .filter-select:focus { border-color: #7da9c7; box-shadow: 0 0 0 3px rgba(35,95,142,.1); }
+.quotation-history-page .table-card { border-radius: 7px; }
+.quotation-history-page .custom-project-table { min-width: 1050px; }
+.quotation-history-page .custom-project-table thead th { padding: 13px 17px; white-space: nowrap; }
+.quotation-history-page .custom-project-table tbody td { padding: 16px 17px; }
+.quotation-history-page .custom-project-table tbody tr:hover td { background: #f7fafc; }
+.quotation-history-page .history-amount { color: #1c3853; font-size: 12px; font-weight: 750; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.quotation-history-page .project-code-text { display: inline-block; padding: 5px 7px; border: 1px solid #dfe9f1; border-radius: 4px; background: #f5f9fc; }
+.quotation-history-page .action-buttons-group { gap: 6px; }
+.quotation-history-page .action-circle-btn { width: 32px; height: 32px; border-radius: 5px; }
+.quotation-history-page .action-circle-btn:focus-visible,
+.quotation-history-page .history-new-quotation:focus-visible { outline: 3px solid rgba(35,95,142,.24); outline-offset: 2px; }
+.quotation-history-page #emptyStateRow td { padding: 58px 20px; color: #718196; }
+@media (max-width: 760px) {
+    .quotation-history-page .history-heading-row { align-items: flex-start; flex-wrap: wrap; gap: 16px; }
+    .quotation-history-page .history-new-quotation { width: 100%; }
+    .quotation-history-page .history-summary-grid { grid-template-columns: 1fr; gap: 10px; }
+    .quotation-history-page .history-summary-card { min-height: 96px; padding: 16px; }
+    .quotation-history-page .filter-card-custom { padding: 15px 14px 12px; }
+    .quotation-history-page .custom-project-table { min-width: 1050px; }
+}
+@media (prefers-reduced-motion: reduce) {
+    .quotation-history-page *, .quotation-history-page *::before, .quotation-history-page *::after { transition-duration: .01ms !important; animation-duration: .01ms !important; }
+}

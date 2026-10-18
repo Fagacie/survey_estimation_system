@@ -10,12 +10,27 @@
     <div class="history-container">
 
         <!-- Page Heading Section -->
-        <div class="page-header-wrapper">
-            <p class="history-eyebrow">Commercial records / quotations</p>
-            <h2 class="page-header-title">Quotation History</h2>
-            <p class="page-header-subtitle">Review estimates, open quotation workspaces, and move approved work into invoicing.</p>
+        <div class="page-header-wrapper history-heading-row">
+            <div>
+                <p class="history-eyebrow">Commercial records / quotations</p>
+                <h2 class="page-header-title">Quotation History</h2>
+                <p class="page-header-subtitle">Review saved estimates, open quotation details, and move approved work into invoicing.</p>
+            </div>
+            <a href="{{ route('quotation.index') }}" class="history-new-quotation"><i class="bi bi-plus-lg" aria-hidden="true"></i> New quotation</a>
         </div>
         
+        <!-- At-a-glance register summary -->
+        <section class="history-summary-grid" aria-label="Quotation history summary">
+            <article class="history-summary-card">
+                <span class="history-summary-icon"><i class="bi bi-files" aria-hidden="true"></i></span>
+                <div><span class="history-summary-label">Saved quotations</span><strong>{{ $quotations->count() }}</strong><small>Records in this register</small></div>
+            </article>
+            <article class="history-summary-card history-summary-card-value">
+                <span class="history-summary-icon"><i class="bi bi-receipt" aria-hidden="true"></i></span>
+                <div><span class="history-summary-label">Combined quotation value</span><strong>RM {{ number_format((float) $quotations->sum('grand_total'), 2) }}</strong><small>Based on saved quotation totals</small></div>
+            </article>
+        </section>
+
         <!-- Search Input and Filter Bar -->
         <div class="filter-card-custom">
             <div class="row g-3">
@@ -103,8 +118,9 @@
                         <th style="width: 180px;">CODE</th>
                         <th>PROJECT DETAILS</th>
                         <th>CLIENT</th>
-                        <th style="width: 140px;">UPDATED</th>
-                        <th class="text-end" style="width: 140px;">ACTIONS</th>
+                        <th style="width: 140px;">CREATED</th>
+                        <th class="text-end" style="width: 170px;">TOTAL VALUE</th>
+                        <th class="text-end" style="width: 150px;">ACTIONS</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -158,6 +174,11 @@
                         <td class="text-secondary font-monospace fs-7">
                             {{ $formattedDate ?: 'N/A' }}
                         </td>
+
+                        <!-- Saved quotation total -->
+                        <td class="text-end">
+                            <span class="history-amount">RM {{ number_format((float) ($item->grand_total ?? 0), 2) }}</span>
+                        </td>
                         
                         <!-- Actions -->
                         <td>
@@ -181,7 +202,7 @@
                     </tr>
                 @empty
                     <tr id="emptyStateRow">
-                        <td colspan="6" class="text-center py-5 text-muted">
+                        <td colspan="7" class="text-center py-5 text-muted">
                             <i class="bi bi-inbox fs-2 d-block mb-2 text-slate-300"></i>
                             No history records found.
                         </td>

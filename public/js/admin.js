@@ -10,30 +10,42 @@ document.addEventListener("DOMContentLoaded", function () {
     function applyFilters() {
         const searchValue = searchInput ? searchInput.value.toLowerCase().trim() : "";
         const moduleValue = moduleFilter ? moduleFilter.value.toLowerCase() : "";
+        const sections = Array.from(document.querySelectorAll(".catalog-page .data-group"));
+        let visibleItems = 0;
 
-        // First, filter modules (sections)
-        const sections = document.querySelectorAll(".data-group");
         sections.forEach(function (section) {
-            const sectionModule = section.dataset.module || "";
-            if (moduleValue === "" || sectionModule === moduleValue) {
-                section.style.display = "";
-            } else {
-                section.style.display = "none";
-            }
+            const sectionModule = (section.dataset.module || "").toLowerCase();
+            const moduleMatches = !moduleValue || sectionModule === moduleValue;
+            const rows = Array.from(section.querySelectorAll(".data-body tr"));
+            let sectionVisibleItems = 0;
+
+            rows.forEach(function (row) {
+                if (row.classList.contains("empty-row")) {
+                    row.style.display = searchValue ? "none" : "";
+                    return;
+                }
+
+                const rowText = row.textContent.toLowerCase();
+                const matches = moduleMatches && rowText.includes(searchValue);
+                row.style.display = matches ? "" : "none";
+                if (matches) {
+                    sectionVisibleItems += 1;
+                    visibleItems += 1;
+                }
+            });
+
+            const showSection = moduleMatches && (!searchValue || sectionVisibleItems > 0);
+            section.style.display = showSection ? "" : "none";
         });
 
-        // Then, filter rows by search text
-        const rows = document.querySelectorAll(".data-body tr");
-        rows.forEach(function (row) {
-            if (row.classList.contains("empty-row")) return;
-
-            const rowText = row.textContent.toLowerCase();
-            if (rowText.includes(searchValue)) {
-                row.style.display = "";
-            } else {
-                row.style.display = "none";
-            }
-        });
+        const resultCount = document.getElementById("catalogResultCount");
+        const noResults = document.getElementById("catalogNoResults");
+        if (resultCount) {
+            resultCount.textContent = visibleItems + (visibleItems === 1 ? " item" : " items");
+        }
+        if (noResults) {
+            noResults.hidden = visibleItems > 0;
+        }
     }
 
     if (searchInput) {

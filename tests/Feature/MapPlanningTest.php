@@ -104,4 +104,33 @@ class MapPlanningTest extends TestCase
             'type' => 'main',
         ]);
     }
+    public function test_map_planning_page_renders_the_new_workspace_shell_and_boot_config(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::create([
+            'created_by' => $user->id,
+            'number' => 'TEST-MAP-UI',
+            'name' => 'Map UI Test',
+            'status' => 'draft',
+        ]);
+        $surveyLocation = SurveyLocation::create([
+            'project_id' => $project->project_Id,
+            'name' => 'Planning Area',
+            'survey_type' => 'sbes',
+        ]);
+
+        $response = $this
+            ->actingAs($user)
+            ->get(route('projects.surveys.map', [$project, $surveyLocation]));
+
+        $response
+            ->assertOk()
+            ->assertSee('map-workspace.css')
+            ->assertSee('js/ises/map-workspace.js')
+            ->assertSee('planning-sidebar')
+            ->assertSee('btn-toggle-planning-panel')
+            ->assertSee('MAP_WORKSPACE_CONFIG')
+            ->assertSee('surveyType: "sbes"', false);
+    }
+
 }

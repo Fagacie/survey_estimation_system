@@ -1,4 +1,4 @@
-<x-app-layout containerClass="w-full px-6 md:px-12 py-6">
+<x-app-layout containerClass="w-full px-4 sm:px-6 xl:px-8 py-6">
     <div class="font-sans text-slate-800 antialiased" x-data="quotationBuilder()" x-cloak>
 
         <!-- ============ PREVIEW SHEET (report style, nothing is saved) ============ -->
@@ -182,7 +182,7 @@
                 <button type="button"
                     @click="applyPreset(preset.id)"
                     :class="activePreset === preset.id
-                        ? 'bg-blue-600 text-white shadow-sm hover:bg-blue-700'
+                        ? 'bg-sky-700 text-white shadow-sm hover:bg-sky-800'
                         : 'bg-white text-slate-700 border border-slate-200/80 hover:bg-slate-100 hover:text-slate-900'"
                     class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150">
                     <span x-text="preset.name"></span>
@@ -208,7 +208,7 @@
                             <div>
                                 <div class="flex items-center justify-between mb-2.5">
                                     <div class="text-xs font-bold uppercase tracking-wider text-slate-400" x-text="group.name"></div>
-                                    <span x-show="group.required" class="text-xs font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full border border-blue-100">Required</span>
+                                    <span x-show="group.required" class="text-xs font-semibold text-sky-700 bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-100">Required</span>
                                 </div>
                                 <div class="space-y-1">
                                     <template x-for="mod in group.modules" :key="mod.id">
@@ -217,7 +217,7 @@
                                                 :checked="isSelected(mod.id)"
                                                 :disabled="mod.required"
                                                 @change="toggle(mod.id)"
-                                                class="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500 transition">
+                                                class="w-4 h-4 text-sky-700 rounded border-slate-300 focus:ring-sky-500 transition">
                                             <span x-text="mod.name"></span>
                                         </label>
                                     </template>
@@ -243,7 +243,7 @@
                                 <span class="text-sm font-bold" style="color:#d97706;" x-text="terms.contingency + '%'"></span>
                             </div>
                             <input type="range" min="0" max="30" step="1" x-model.number="terms.contingency"
-                                style="width:100%; accent-color:#0f766e;">
+                                style="width:100%; accent-color:#1679b8;">
                         </div>
 
                         <!-- SST / Tax -->
@@ -253,7 +253,7 @@
                                 <span class="text-sm font-bold" style="color:#d97706;" x-text="terms.tax + '%'"></span>
                             </div>
                             <input type="range" min="0" max="20" step="1" x-model.number="terms.tax"
-                                style="width:100%; accent-color:#0f766e;">
+                                style="width:100%; accent-color:#1679b8;">
                             <p class="text-xs text-slate-400 mt-1.5">Optional. Leave at 0% for no tax.</p>
                         </div>
                     </div>

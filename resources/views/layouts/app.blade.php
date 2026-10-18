@@ -4,230 +4,138 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="csrf-token" content="{{ csrf_token() }}">
-
         <title>Eco Hydrotech Solutions</title>
-
-        <!-- Google Fonts -->
         <link rel="preconnect" href="https://fonts.googleapis.com">
         <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
         <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
-
-        <!-- Bootstrap 5 CSS (kept for legacy views) -->
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-        
-        <!-- Scripts (Tailwind & JS) -->
-        @vite(['resources/css/app.css', 'resources/js/app.js'])
-        <!-- FontAwesome (Using lighter weight approach) -->
+        @vite(['resources/css/ises.css', 'resources/css/app.css', 'resources/js/app.js'])
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <!-- Leaflet CSS -->
-        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" />
-
-        <!-- Bootstrap JS -->
+        <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" onerror="this.onerror=null;this.href='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css'" />
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css" onerror="this.onerror=null;this.href='https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.css'" />
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        <!-- Leaflet & Draw JS -->
-        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
-        <!-- Turf.js -->
+        <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" onerror="this.onerror=null;this.src='https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js'"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js" onerror="this.onerror=null;this.src='https://unpkg.com/leaflet-draw@1.0.4/dist/leaflet.draw.js'"></script>
         <script src="https://cdn.jsdelivr.net/npm/@turf/turf@6/turf.min.js"></script>
-        <!-- SweetAlert2 -->
         <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-        <!-- Custom CSS -->
         <link rel="stylesheet" href="{{ asset('css/style.css') }}?v={{ filemtime(public_path('css/style.css')) }}">
         <link rel="stylesheet" href="{{ asset('css/ises-redesign.css') }}?v={{ filemtime(public_path('css/ises-redesign.css')) }}">
         <link rel="stylesheet" href="{{ asset('css/ises-page-overrides.css') }}?v={{ filemtime(public_path('css/ises-page-overrides.css')) }}">
         @stack('styles')
         <link rel="stylesheet" href="{{ asset('css/ises-final-overrides.css') }}?v={{ filemtime(public_path('css/ises-final-overrides.css')) }}">
-
         <style>
-            @media print {
-                /* Forcefully hide layout elements bypassing Tailwind cache */
-                .ises-sidebar, 
-                .ises-topbar, 
-                .ises-mobile-overlay {
-                    display: none !important;
-                }
-                
-                /* Reset layout containers to force white backgrounds to override Chrome dark modes */
-                html, body, .ises-app, main, #main-content, .bg-slate-50 {
-                    display: block !important;
-                    height: auto !important;
-                    min-height: auto !important;
-                    overflow: visible !important;
-                    background: #ffffff !important;
-                    background-color: #ffffff !important;
-                    color: #000000 !important;
-                    -webkit-print-color-adjust: exact !important;
-                    print-color-adjust: exact !important;
-                }
-                
-                .page-container, .invoice-slip, .quote-page, .invoice-page-wrap {
-                    box-shadow: none !important;
-                    border: none !important;
-                    margin: 0 !important;
-                    padding: 0 !important;
-                    width: 100% !important;
-                    max-width: 100% !important;
-                }
-                
-                /* Aggressively kill ALL shadows to fix Chrome print shadow bleeding bugs */
-                * {
-                    box-shadow: none !important;
-                }
-            }
+            @media print { .ises-sidebar,.ises-topbar,.no-print { display:none!important; } html,body,.ises-app,.ises-shell,.ises-main,.ises-content,main { display:block!important;height:auto!important;min-height:auto!important;overflow:visible!important;background:#fff!important;color:#000!important;print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important; } .page-container,.invoice-slip,.quote-page,.invoice-page-wrap { box-shadow:none!important;border:0!important;margin:0!important;padding:0!important;width:100%!important;max-width:100%!important; } * { box-shadow:none!important; } }
         </style>
     </head>
-    
-    <body class="ises-app bg-slate-50 antialiased text-slate-800" x-data="{ sidebarOpen: window.innerWidth >= 1024 }">
-        
-        <div class="flex h-screen overflow-hidden print:h-auto print:overflow-visible">
-            
-            <!-- OVERLAY (Mobile) -->
-            <div x-show="sidebarOpen" x-transition.opacity class="ises-mobile-overlay fixed inset-0 z-20 bg-slate-900/50 lg:hidden print:hidden" @click="sidebarOpen = false" style="display: none;"></div>
-
-            <!-- 1. SIDE NAVIGATION -->
+    <body class="ises-app bg-slate-50 antialiased text-slate-800">
+        <div class="ises-shell {{ ($hideSidebar ?? false) ? 'ises-shell--no-sidebar' : '' }} print:block">
             @unless($hideSidebar ?? false)
-                <aside :class="sidebarOpen ? 'translate-x-0 w-64' : '-translate-x-full lg:translate-x-0 lg:w-[4.5rem]'" class="ises-sidebar fixed inset-y-0 left-0 z-30 transition-all duration-300 ease-in-out flex flex-col lg:static relative group print:hidden">
-                    
-                    <!-- Sidebar Header / Logo -->
-                    <div class="ises-sidebar-brand flex items-center h-16 flex-shrink-0" :class="sidebarOpen ? 'px-4 justify-between' : 'justify-center'">
-                        <a href="{{ route('dashboard') }}" class="ises-brand-name overflow-hidden whitespace-nowrap" title="Eco Hydrotech Solutions dashboard">
-                            <span x-show="sidebarOpen" class="ises-brand-full">
-                                <span class="ises-brand-symbol" aria-hidden="true"><i class="fa-solid fa-water"></i></span>
-                                <span class="ises-brand-type"><span><span>Eco</span> <strong>Hydrotech</strong></span><small>Solutions</small></span>
-                            </span>
-                            <span x-show="!sidebarOpen" class="ises-brand-compact" aria-label="Eco Hydrotech Solutions">EH</span>
+                <div id="isesMobileOverlay" class="ises-mobile-overlay" aria-hidden="true"></div>
+                <aside id="isesSidebar" class="ises-sidebar print:hidden" aria-label="Main navigation">
+                    <div class="ises-sidebar-header">
+                        <a href="{{ route('dashboard') }}" class="ises-brand" aria-label="Eco HydroTech home">
+                            <span class="ises-brand-name">Eco HydroTech</span>
+                            <span class="ises-brand-caption">Survey estimation workspace</span>
                         </a>
-                        
-                        <!-- Toggle Button Integrated into Sidebar Header -->
-                        <button @click="sidebarOpen = !sidebarOpen" class="hidden lg:flex items-center justify-center w-6 h-6 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded transition-colors focus:outline-none border-none outline-none" title="Toggle Sidebar">
-                            <i class="fa-solid text-xs" :class="sidebarOpen ? 'fa-chevron-left' : 'fa-chevron-right'"></i>
+                        <button type="button" id="isesMobileCloseBtn" class="ises-mobile-close-btn" aria-label="Close navigation drawer">
+                            <i class="fa-solid fa-xmark"></i>
                         </button>
                     </div>
-
-                    <!-- Sidebar Navigation Links -->
-                    <div class="flex-1 overflow-y-auto py-6 flex flex-col gap-1.5 custom-scrollbar" :class="sidebarOpen ? 'px-3' : 'px-2 items-center'">
-                        
-                        <a href="{{ route('dashboard') }}" title="Dashboard" class="ises-nav-link flex items-center px-3 py-2.5 transition-all group {{ request()->routeIs('dashboard', 'home') ? 'active' : '' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
-                            <i class="fa-solid fa-chart-line w-5 text-center text-sm"></i>
-                            <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Dashboard</span>
-                        </a>
-                        <a href="{{ route('projects.index') }}" title="Survey Projects" class="ises-nav-link flex items-center px-3 py-2.5 transition-all group {{ request()->routeIs('projects.index', 'projects.create', 'projects.show', 'projects.edit') ? 'active' : '' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
-                            <i class="fa-solid fa-map-location-dot w-5 text-center text-sm"></i>
-                            <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Survey Projects</span>
-                        </a>
-                        <a href="{{ route('quotations.history') }}" title="Quotation History" class="ises-nav-link flex items-center px-3 py-2.5 transition-all group {{ request()->routeIs('quotations.*', 'quotation.*') ? 'active' : '' }}" :class="sidebarOpen ? 'gap-3 w-full' : 'justify-center w-full'">
-                            <i class="fa-solid fa-file-invoice-dollar w-5 text-center text-sm"></i>
-                            <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Quotation History</span>
-                        </a>
-
-
-                        <!-- Database Management Navigation Dropdown -->
-                        <div x-data="{ itemsOpen: {{ request()->routeIs('admin.index', 'newItem', 'admin.equipment.*', 'projects.modeling.*') ? 'true' : 'false' }} }" class="w-full">
-                            <button @click="itemsOpen = !itemsOpen" title="Database Management" class="ises-nav-link flex items-center justify-between px-3 py-2.5 transition-all group w-full focus:outline-none border-none outline-none bg-transparent {{ request()->routeIs('admin.index', 'newItem', 'admin.equipment.*') ? 'active' : '' }}" :class="sidebarOpen ? '' : 'justify-center'">
-                                <div class="flex items-center gap-3">
-                                    <i class="fa-solid fa-database w-5 text-center text-sm"></i>
-                                    <span x-show="sidebarOpen" class="text-sm font-medium whitespace-nowrap">Database</span>
-                                </div>
-                                <i x-show="sidebarOpen" class="fa-solid fa-chevron-down text-xs text-slate-400 transition-transform duration-200" :class="itemsOpen ? 'rotate-180' : ''"></i>
-                            </button>
-                            
-                            <!-- Sub-navigation -->
-                            <div x-show="itemsOpen && sidebarOpen" x-transition class="pl-11 pr-3 py-1 space-y-1">
-                                <a href="{{ route('admin.index') }}" class="ises-nav-link block px-3 py-2 text-[11px] font-medium transition-colors {{ request()->routeIs('admin.index', 'newItem', 'projects.modeling.modules.*', 'projects.modeling.items.*', 'projects.modeling.packages.*') ? 'active' : '' }}">
-                                    Item Catalog
-                                </a>
-                                <a href="{{ route('admin.equipment.index') }}" class="ises-nav-link block px-3 py-2 text-[11px] font-medium transition-colors {{ request()->routeIs('admin.equipment.*') ? 'active' : '' }}">
-                                    Drone Mapping Equipment
-                                </a>
-                            </div>
-                        </div>
-
-                    </div>
-
-                    <!-- Sidebar Footer -->
-                    <div class="ises-sidebar-footer flex-shrink-0 flex flex-col">
-                        
-                        <!-- User Info -->
+                    <nav class="ises-nav" aria-label="Workspace pages">
+                        <a href="{{ route('dashboard') }}" class="ises-nav-link {{ request()->routeIs('dashboard', 'home') ? 'is-active' : '' }}" {{ request()->routeIs('dashboard', 'home') ? 'aria-current=page' : '' }}><span class="ises-nav-icon"><i class="fa-solid fa-chart-line" aria-hidden="true"></i></span>Overview</a>
+                        <a href="{{ route('projects.index') }}" class="ises-nav-link {{ request()->routeIs('projects.index', 'projects.create', 'projects.show', 'projects.edit') ? 'is-active' : '' }}" {{ request()->routeIs('projects.index', 'projects.create', 'projects.show', 'projects.edit') ? 'aria-current=page' : '' }}><span class="ises-nav-icon"><i class="fa-solid fa-map-location-dot" aria-hidden="true"></i></span>Projects</a>
+                        <a href="{{ route('quotations.history') }}" class="ises-nav-link {{ request()->routeIs('quotations.*', 'quotation.*') ? 'is-active' : '' }}" {{ request()->routeIs('quotations.*', 'quotation.*') ? 'aria-current=page' : '' }}><span class="ises-nav-icon"><i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i></span>Quotations</a>
+                        <a href="{{ route('admin.index') }}" class="ises-nav-link {{ request()->routeIs('admin.index', 'newItem', 'items.*') ? 'is-active' : '' }}" {{ request()->routeIs('admin.index', 'newItem', 'items.*') ? 'aria-current=page' : '' }}><span class="ises-nav-icon"><i class="fa-solid fa-list-check" aria-hidden="true"></i></span>Admin catalogue</a>
+                        <a href="{{ route('admin.equipment.index') }}" class="ises-nav-link {{ request()->routeIs('admin.equipment.*') ? 'is-active' : '' }}" {{ request()->routeIs('admin.equipment.*') ? 'aria-current=page' : '' }}><span class="ises-nav-icon"><i class="fa-solid fa-camera" aria-hidden="true"></i></span>Drone equipment</a>
+                    </nav>
+                    <div class="ises-sidebar-account" aria-label="Account actions">
                         @auth
-                            <div class="ises-sidebar-user p-3 flex items-center transition-all" :class="sidebarOpen ? '' : 'flex-col gap-2'">
-                                    <a href="{{ route('profile.edit') }}" title="Profile" class="ises-avatar flex items-center justify-center font-semibold text-xs flex-shrink-0 transition-colors">
-                                    {{ substr(auth()->user()->name, 0, 1) }}
-                                </a>
-                                <div x-show="sidebarOpen" class="flex-1 min-w-0 ml-3">
-                                    <div class="text-sm font-semibold text-slate-800 truncate">{{ auth()->user()->name }}</div>
+                            <a class="ises-sidebar-user-card" href="{{ route('profile.edit') }}" aria-label="Profile settings" title="Profile settings">
+                                <span class="ises-avatar" aria-label="Signed-in user">{{ collect(preg_split('/\s+/', auth()->user()->name))->filter()->take(2)->map(fn ($part) => mb_substr($part, 0, 1))->implode('') }}</span>
+                                <div class="ises-sidebar-user-info">
+                                    <span class="ises-sidebar-user-name">{{ auth()->user()->name }}</span>
+                                    <span class="ises-sidebar-user-role">Profile settings</span>
                                 </div>
-                                <form method="POST" action="{{ route('logout') }}" title="Logout" :class="sidebarOpen ? 'ml-2' : ''">
-                                    @csrf
-                                    <button type="submit" class="text-slate-400 hover:text-rose-600 transition-colors p-1.5 rounded hover:bg-rose-50 focus:outline-none border-none outline-none bg-transparent flex items-center justify-center w-8 h-8">
-                                        <i class="fa-solid fa-arrow-right-from-bracket text-sm"></i>
-                                    </button>
-                                </form>
-                            </div>
+                            </a>
+                            <form method="POST" action="{{ route('logout') }}" class="ises-sidebar-logout-form">
+                                @csrf
+                                <button type="submit" class="ises-sidebar-logout-btn" aria-label="Log out" title="Log out">
+                                    <i class="fa-solid fa-arrow-right-from-bracket" aria-hidden="true"></i>
+                                </button>
+                            </form>
                         @endauth
                     </div>
                 </aside>
             @endunless
-
-            <!-- 2. MAIN CONTENT AREA -->
-            <div class="flex-1 flex flex-col min-w-0 overflow-hidden relative bg-white print:overflow-visible">
-                
-                <!-- TOP UTILITY HEADER -->
-                <header class="ises-topbar map-workspace-topbar h-16 flex items-center justify-between px-8 z-10 flex-shrink-0 print:hidden">
-                    <div class="map-topbar-leading flex items-center gap-4 min-w-0">
+            <div class="ises-main">
+                <header class="ises-topbar print:hidden">
+                    <div class="ises-topbar-left">
                         @unless($hideSidebar ?? false)
-                            <button @click="sidebarOpen = true" aria-label="Open navigation" class="text-slate-500 hover:text-slate-800 focus:outline-none p-1.5 rounded hover:bg-slate-100 transition-colors lg:hidden mr-2">
-                                <i class="fa-solid fa-bars"></i>
+                            <button type="button" id="isesMobileNavToggle" class="ises-mobile-nav-toggle" aria-label="Toggle navigation menu" aria-expanded="false">
+                                <i class="fa-solid fa-bars" id="isesMobileNavToggleIcon"></i>
                             </button>
-                        @else
-                            @if(request()->route('project'))
-                                @php
-                                    $project = request()->route('project');
-                                    $projectId = is_object($project) ? $project->project_Id : $project;
-                                @endphp
-                                <a href="{{ route('projects.show', $projectId) }}" class="map-back-project">
-                                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-                                    <span>Back to Project</span>
-                                </a>
-                            @else
-                                <a href="{{ route('dashboard') }}" class="map-back-project">
-                                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-                                    <span>Dashboard</span>
-                                </a>
-                            @endif
-                            <span class="map-topbar-divider" aria-hidden="true"></span>
-                            <div class="map-topbar-context">
-                                <span class="map-topbar-eyebrow">SURVEY WORKSPACE</span>
-                                <span class="map-topbar-section">Survey Planning</span>
-                            </div>
                         @endunless
-
-                        @if(isset($header))
-                            <div class="map-topbar-page-title">{{ $header }}</div>
-                        @endif
+                        <div class="ises-breadcrumb">
+                            @if($hideSidebar ?? false)
+                                @if(request()->route('project'))
+                                    @php $project = request()->route('project'); $projectId = is_object($project) ? $project->project_Id : $project; @endphp
+                                    <a href="{{ route('projects.show', $projectId) }}" class="map-back-project"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Back to Project</a>
+                                @else
+                                    <a href="{{ route('dashboard') }}" class="map-back-project"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i> Dashboard</a>
+                                @endif
+                                <span aria-hidden="true"> / </span><strong>Survey Planning</strong>
+                            @else
+                                <span>Workspace</span><span aria-hidden="true"> / </span><strong>{{ $header ?? 'Workspace' }}</strong>
+                            @endif
+                        </div>
                     </div>
-                    <div class="map-topbar-trailing">
-                        <span class="map-topbar-live-dot" aria-hidden="true"></span>
-                        <span>Map workspace</span>
+                    <div class="ises-topbar-right">
+                        <span class="ises-topbar-date">{{ now()->format('d M Y') }}</span>
+                        @auth
+                            <span class="ises-avatar" aria-label="Signed-in user">{{ collect(preg_split('/\s+/', auth()->user()->name))->filter()->take(2)->map(fn ($part) => mb_substr($part, 0, 1))->implode('') }}</span>
+                            <a class="ises-panel-action" href="{{ route('profile.edit') }}">{{ auth()->user()->name }}</a>
+                        @endauth
                     </div>
                 </header>
-
-                <!-- PAGE CONTENT -->
-                <!-- Removed max-w, using w-full px-8 for full fluid layout -->
-                <main class="flex-1 overflow-y-auto overflow-x-hidden bg-slate-50 {{ $containerClass ?? 'w-full' }} print:overflow-visible print:bg-white text-black">
-                    {{ $slot }}
-                </main>
+                <main class="ises-content {{ $containerClass ?? 'w-full' }} print:overflow-visible print:bg-white">{{ $slot }}</main>
             </div>
         </div>
-
         <style>
-            .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-            .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-            .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #334155; border-radius: 20px; }
-            .custom-scrollbar::-webkit-scrollbar-thumb:hover { background-color: #475569; }
+            @media print { .ises-sidebar,.ises-topbar,.no-print { display:none!important; } html,body,.ises-app,.ises-shell,.ises-main,.ises-content,main { display:block!important;height:auto!important;min-height:auto!important;overflow:visible!important;background:#fff!important;color:#000!important;print-color-adjust:exact!important;-webkit-print-color-adjust:exact!important; } .page-container,.invoice-slip,.quote-page,.invoice-page-wrap { box-shadow:none!important;border:0!important;margin:0!important;padding:0!important;width:100%!important;max-width:100%!important; } * { box-shadow:none!important; } }
         </style>
-        
+        <script>
+            (function() {
+                var toggle = document.getElementById('isesMobileNavToggle');
+                var closeBtn = document.getElementById('isesMobileCloseBtn');
+                var overlay = document.getElementById('isesMobileOverlay');
+                var sidebar = document.getElementById('isesSidebar');
+                if (!sidebar) return;
+
+                function openNav() {
+                    sidebar.classList.add('is-open');
+                    if (overlay) overlay.classList.add('is-visible');
+                    if (toggle) toggle.setAttribute('aria-expanded', 'true');
+                }
+
+                function closeNav() {
+                    sidebar.classList.remove('is-open');
+                    if (overlay) overlay.classList.remove('is-visible');
+                    if (toggle) toggle.setAttribute('aria-expanded', 'false');
+                }
+
+                if (toggle) {
+                    toggle.addEventListener('click', function() {
+                        if (sidebar.classList.contains('is-open')) closeNav();
+                        else openNav();
+                    });
+                }
+                if (closeBtn) closeBtn.addEventListener('click', closeNav);
+                if (overlay) overlay.addEventListener('click', closeNav);
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape' && sidebar.classList.contains('is-open')) closeNav();
+                });
+            })();
+        </script>
         @stack('scripts')
     </body>
 </html>

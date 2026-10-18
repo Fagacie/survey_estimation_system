@@ -1,5 +1,14 @@
-<x-app-layout containerClass="w-full px-8 py-8 bg-slate-50 relative min-h-screen">
+<x-app-layout hideSidebar="true" containerClass="w-full px-8 py-8 bg-slate-50 relative min-h-screen">
     <x-slot name="header">Quotation #{{ $quotation->quotation_no }}</x-slot>
+    <style>
+        .map-workspace-topbar .map-topbar-trailing { display: none; }
+        .map-workspace-topbar { padding-left: 28px !important; }
+        .map-workspace-topbar .map-topbar-context { display: none; }
+        .map-workspace-topbar .map-topbar-divider { display: none; }
+        .map-workspace-topbar .map-back-project { font-size: 13px; }
+        .map-workspace-topbar .map-topbar-page-title { margin-left: 14px; color: #19394d; font-weight: 700; }
+        @media (max-width: 700px) { .map-workspace-topbar { padding: 0 14px !important; } }
+    </style>
 
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">

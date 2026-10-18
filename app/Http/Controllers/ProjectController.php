@@ -4,9 +4,117 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Project;
+use Inertia\Inertia;
+use Inertia\Response as InertiaResponse;
 
 class ProjectController extends Controller
 {
+    /** Render the migrated React project register while preserving the existing query contract. */
+    public function indexReact(Request $request): InertiaResponse
+    {
+        $query = Project::with('client')->latest();
+
+        if ($request->filled('search')) {
+            $search = $request->string('search')->toString();
+            $query->where(function ($builder) use ($search) {
+                $builder->where('name', 'like', "%{$search}%")
+                    ->orWhere('number', 'like', "%{$search}%")
+                    ->orWhereHas('client', fn ($client) => $client->where('company_name', 'like', "%{$search}%"));
+            });
+        }
+
+        if ($request->filled('status')) $query->where('status', $request->input('status'));
+        if ($request->filled('project_type')) $query->where('project_type', $request->input('project_type'));
+        if ($request->filled('location')) $query->where('location', $request->input('location'));
+
+        if ($request->filled('date_range')) {
+            $now = now();
+            switch ($request->input('date_range')) {
+                case 'last_30_days':
+                    $query->where('created_at', '>=', $now->copy()->subDays(30));
+                    break;
+                case 'this_month':
+                    $query->whereMonth('created_at', $now->month)->whereYear('created_at', $now->year);
+                    break;
+                case 'this_year':
+                    $query->whereYear('created_at', $now->year);
+                    break;
+            }
+        }
+
+        if ($request->input('survey_status') === 'Mapped') {
+            $query->whereHas('surveyLocations', fn ($builder) => $builder->where('status', 'Mapped'));
+        }
+        if ($request->input('has_quotation') === '1') $query->has('lineItems');
+        elseif ($request->input('has_quotation') === '0') $query->doesntHave('lineItems');
+
+        $attention = $request->input('attention');
+        if (in_array($attention, ['boundaries', 'lines', 'cost'], true)) {
+            $query->where('status', '!=', 'completed');
+            if ($attention === 'boundaries') $query->doesntHave('boundaries');
+            elseif ($attention === 'lines') $query->has('boundaries')->doesntHave('surveyLines');
+            elseif ($attention === 'cost') $query->doesntHave('lineItems');
+        }
+
+        $projects = $query->paginate(10)->withQueryString();
+        $currentPage = $projects->currentPage();
+        $lastPage = $projects->lastPage();
+        $startPage = max(1, $currentPage - 2);
+        $endPage = min($lastPage, $currentPage + 2);
+        $pageLinks = [];
+
+        if ($startPage > 1) {
+            $pageLinks[] = ['label' => '1', 'url' => $projects->url(1), 'active' => false];
+            if ($startPage > 2) $pageLinks[] = ['label' => '...', 'url' => null, 'active' => false];
+        }
+        for ($page = $startPage; $page <= $endPage; $page++) {
+            $pageLinks[] = ['label' => (string) $page, 'url' => $projects->url($page), 'active' => $page === $currentPage];
+        }
+        if ($endPage < $lastPage) {
+            if ($endPage < $lastPage - 1) $pageLinks[] = ['label' => '...', 'url' => null, 'active' => false];
+            $pageLinks[] = ['label' => (string) $lastPage, 'url' => $projects->url($lastPage), 'active' => false];
+        }
+
+        return Inertia::render('ProjectIndex', [
+            'projects' => [
+                'data' => $projects->getCollection()->map(fn ($project) => [
+                    'id' => $project->project_Id,
+                    'number' => $project->number,
+                    'name' => $project->name,
+                    'period' => $project->period,
+                    'client' => $project->client?->company_name,
+                    'projectTypeCode' => $project->project_type,
+                    'projectType' => Project::TYPES[$project->project_type] ?? ($project->project_type ?: 'Not set'),
+                    'location' => $project->location,
+                    'status' => $project->status ?: 'draft',
+                    'createdAt' => $project->created_at?->format('d M Y'),
+                ])->values(),
+                'currentPage' => $currentPage,
+                'lastPage' => $lastPage,
+                'perPage' => $projects->perPage(),
+                'total' => $projects->total(),
+                'from' => $projects->firstItem(),
+                'to' => $projects->lastItem(),
+                'previousUrl' => $projects->previousPageUrl(),
+                'nextUrl' => $projects->nextPageUrl(),
+                'pageLinks' => $pageLinks,
+            ],
+            'totalProjects' => Project::count(),
+            'statusCounts' => [
+                'draft' => Project::where('status', 'draft')->count(),
+                'planned' => Project::where('status', 'planned')->count(),
+                'completed' => Project::where('status', 'completed')->count(),
+            ],
+            'projectTypes' => Project::TYPES,
+            'locations' => Project::LOCATIONS,
+            'filters' => array_merge([
+                'search' => '', 'status' => '', 'project_type' => '', 'location' => '',
+                'date_range' => '', 'survey_status' => '', 'has_quotation' => '', 'attention' => '',
+            ], $request->only(['search', 'status', 'project_type', 'location', 'date_range', 'survey_status', 'has_quotation', 'attention'])),
+            'today' => now()->format('d M Y'),
+        ]);
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -89,9 +197,46 @@ class ProjectController extends Controller
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
+    /** Render the new React project intake form. */
+    public function createReact(Request $request): InertiaResponse
+    {
+        return Inertia::render('CreateProject', [
+            'projectTypes' => Project::TYPES,
+            'locations' => Project::LOCATIONS,
+            'csrfToken' => csrf_token(),
+            'oldInput' => $request->session()->get('_old_input', []),
+            'today' => now()->format('d M Y'),
+        ]);
+    }
+
+    /** Render the new React project edit form. */
+    public function editReact(Request $request, string $id): InertiaResponse
+    {
+        $project = Project::with('client')->findOrFail($id);
+
+        return Inertia::render('EditProject', [
+            'project' => [
+                'id' => $project->project_Id,
+                'number' => $project->number,
+                'name' => $project->name,
+                'projectType' => $project->project_type,
+                'location' => $project->location,
+                'status' => $project->status,
+                'period' => $project->period,
+                'clientName' => $project->client?->company_name,
+                'clientAddress' => $project->client?->client_address,
+                'picName' => $project->pic_name,
+                'picNo' => $project->pic_no,
+            ],
+            'projectTypes' => Project::TYPES,
+            'locations' => Project::LOCATIONS,
+            'csrfToken' => csrf_token(),
+            'oldInput' => $request->session()->get('_old_input', []),
+            'today' => now()->format('d M Y'),
+        ]);
+    }
+
+    /** Keep the existing Blade form available as a migration fallback. */
     public function create()
     {
         return view('projects.create');
@@ -158,9 +303,46 @@ class ProjectController extends Controller
 
     }
 
-    /**
-     * Display the specified resource.
-     */
+    /** Render the React project workspace while preserving the existing workflow endpoints. */
+    public function showReact(Request $request, string $id): InertiaResponse
+    {
+        $project = Project::with(['client', 'surveyLocations', 'modellingSummary', 'modellingItems'])->findOrFail($id);
+        $summary = $project->modellingSummary;
+
+        return Inertia::render('ProjectOverview', [
+            'project' => [
+                'id' => $project->project_Id,
+                'name' => $project->name,
+                'number' => $project->number,
+                'projectType' => Project::TYPES[$project->project_type] ?? ($project->project_type ?: 'Type not set'),
+                'location' => $project->location,
+                'status' => $project->status ?: 'draft',
+                'period' => $project->period,
+                'createdAt' => $project->created_at?->format('d M Y'),
+                'clientName' => $project->client?->company_name,
+                'weatherDays' => (float) ($project->weather_days ?? 0),
+                'modDemodDays' => (float) ($project->mod_demod_days ?? 0),
+                'patchTestDays' => (float) ($project->patch_test_days ?? 0),
+            ],
+            'surveyLocations' => $project->surveyLocations->map(fn ($location) => [
+                'id' => $location->id,
+                'name' => $location->name,
+                'surveyType' => $location->survey_type === 'drone' ? 'drone' : 'sbes',
+                'status' => $location->status ?: 'Pending',
+                'createdAt' => $location->created_at?->format('d M Y'),
+            ])->values(),
+            'modelling' => $summary ? [
+                'packageName' => $summary->package_name,
+                'grandTotal' => (float) $summary->grand_total,
+                'moduleCount' => $project->modellingItems->pluck('catalog_module_id')->unique()->count(),
+            ] : null,
+            'csrfToken' => csrf_token(),
+            'oldInput' => $request->session()->get('_old_input', []),
+            'today' => now()->format('d M Y'),
+        ]);
+    }
+
+    /** Keep the existing Blade project workspace available during migration. */
     public function show(string $id)
     {
         $project = Project::with([

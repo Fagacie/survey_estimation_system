@@ -16,58 +16,60 @@ Route::get('/', function () {
     return redirect()->route('signin');
 });
 
-// DEV ROUTE: Test Perf
-Route::get('/dev/test-perf', function() {
-    $start = microtime(true);
-    $modules = \App\Models\Module::with(['categories.services.items.unit'])->get();
-    
-    $adminModulesTree = $modules->map(function ($module) {
+// DEV ROUTES: Gated to local/testing environments
+if (app()->environment('local', 'testing')) {
+    Route::get('/dev/test-perf', function() {
+        $start = microtime(true);
+        $modules = \App\Models\Module::with(['categories.services.items.unit'])->get();
+        
+        $adminModulesTree = $modules->map(function ($module) {
+            return [
+                'module_id'   => $module->getKey(),
+                'module_name' => $module->module_name ?? $module->name ?? 'UNKNOWN MODULE',
+                'categories'  => $module->categories->map(function ($cat) {
+                    return [
+                        'category_id'   => $cat->getKey(),
+                        'category_name' => $cat->category_name ?? $cat->name ?? 'N/A',
+                        'services'      => $cat->services->map(function ($serv) {
+                            return [
+                                'service_id'   => $serv->getKey(),
+                                'service_name' => $serv->service_name ?? $serv->name ?? 'N/A',
+                                'items'        => $serv->items->map(function ($item) {
+                                    return [
+                                        'item_id'   => $item->getKey(),
+                                        'item_name' => $item->item_name ?? $item->name ?? 'N/A',
+                                        'rate'      => $item->internal_rate ?? 0,
+                                        'unit'      => $item->unit->unit_name ?? $item->unit_name ?? $item->unit ?? '',
+                                    ];
+                                })->values()->toArray(),
+                            ];
+                        })->values()->toArray(),
+                    ];
+                })->values()->toArray(),
+            ];
+        })->values()->toArray();
+
+        return response()->json([
+            'time' => microtime(true) - $start,
+            'modules' => $modules->count(),
+            'tree' => count($adminModulesTree)
+        ]);
+    });
+
+    Route::get('/dev/ping', function() {
+        return 'pong';
+    });
+
+    Route::get('/dev/counts', function() {
         return [
-            'module_id'   => $module->getKey(),
-            'module_name' => $module->module_name ?? $module->name ?? 'UNKNOWN MODULE',
-            'categories'  => $module->categories->map(function ($cat) {
-                return [
-                    'category_id'   => $cat->getKey(),
-                    'category_name' => $cat->category_name ?? $cat->name ?? 'N/A',
-                    'services'      => $cat->services->map(function ($serv) {
-                        return [
-                            'service_id'   => $serv->getKey(),
-                            'service_name' => $serv->service_name ?? $serv->name ?? 'N/A',
-                            'items'        => $serv->items->map(function ($item) {
-                                return [
-                                    'item_id'   => $item->getKey(),
-                                    'item_name' => $item->item_name ?? $item->name ?? 'N/A',
-                                    'rate'      => $item->internal_rate ?? 0,
-                                    'unit'      => $item->unit->unit_name ?? $item->unit_name ?? $item->unit ?? '',
-                                ];
-                            })->values()->toArray(),
-                        ];
-                    })->values()->toArray(),
-                ];
-            })->values()->toArray(),
+            'modules' => \App\Models\Module::count(),
+            'categories' => \App\Models\Category::count(),
+            'services' => \App\Models\Service::count(),
+            'items' => \App\Models\Item::count(),
+            'units' => \App\Models\Unit::count(),
         ];
-    })->values()->toArray();
-
-    return response()->json([
-        'time' => microtime(true) - $start,
-        'modules' => $modules->count(),
-        'tree' => count($adminModulesTree)
-    ]);
-});
-
-Route::get('/dev/ping', function() {
-    return 'pong';
-});
-
-Route::get('/dev/counts', function() {
-    return [
-        'modules' => \App\Models\Module::count(),
-        'categories' => \App\Models\Category::count(),
-        'services' => \App\Models\Service::count(),
-        'items' => \App\Models\Item::count(),
-        'units' => \App\Models\Unit::count(),
-    ];
-});
+    });
+}
 
 /*
 |--------------------------------------------------------------------------
@@ -116,9 +118,18 @@ Route::middleware('auth')->group(function () {
         Route::delete('/{project}', [ModellingController::class, 'destroyQuote'])->name('destroy');
     });
 
-    Route::resource('projects', App\Http\Controllers\ProjectController::class);
+    Route::get('/projects', [App\Http\Controllers\ProjectController::class, 'indexReact'])->name('projects.index');
+    Route::get('/projects/create', [App\Http\Controllers\ProjectController::class, 'createReact'])->name('projects.create');
+    Route::get('/projects/{project}/edit', [App\Http\Controllers\ProjectController::class, 'editReact'])->name('projects.edit');
+    Route::get('/projects/{project}', [App\Http\Controllers\ProjectController::class, 'showReact'])->name('projects.show');
+    Route::get('/projects-legacy', [App\Http\Controllers\ProjectController::class, 'index'])->name('projects.legacy.index');
+    Route::get('/projects-legacy/create', [App\Http\Controllers\ProjectController::class, 'create'])->name('projects.legacy.create');
+    Route::get('/projects-legacy/{project}/edit', [App\Http\Controllers\ProjectController::class, 'edit'])->name('projects.legacy.edit');
+    Route::get('/projects-legacy/{project}', [App\Http\Controllers\ProjectController::class, 'show'])->name('projects.legacy.show');
+    Route::resource('projects', App\Http\Controllers\ProjectController::class)->except(['index', 'create', 'edit', 'show']);
 
-    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.edit');
+    Route::get('/profile', [App\Http\Controllers\ProfileController::class, 'editReact'])->name('profile.edit');
+    Route::get('/profile-legacy', [App\Http\Controllers\ProfileController::class, 'edit'])->name('profile.legacy.edit');
     Route::patch('/profile', [App\Http\Controllers\ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [App\Http\Controllers\ProfileController::class, 'destroy'])->name('profile.destroy');
 
@@ -140,11 +151,16 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index'])
         ->name('dashboard');
+    Route::get('/dashboard-legacy', [\App\Http\Controllers\DashboardController::class, 'legacy'])
+        ->name('dashboard.legacy');
 
     // 2. Quotation Routes
     Route::get('/quotation', [QuotationController::class, 'index'])->name('quotation.index');
     Route::post('/quotation', [QuotationController::class, 'store'])->name('quotation.store');
+    // The primary history route must return an Inertia response for the React workspace navigation.
     Route::get('/quotations/history', [HistoryController::class, 'index'])->name('quotations.history');
+    Route::get('/quotations/history-react', [HistoryController::class, 'index'])->name('quotations.history.react');
+    Route::get('/quotations-history-legacy', [HistoryController::class, 'legacyIndex'])->name('quotations.history.legacy');
     Route::get('/quotations/{id}', [QuotationController::class, 'show'])->name('quotations.show');
     Route::get('/quotations/{id}/download', [QuotationController::class, 'download'])->name('quotations.download');
     Route::get('/project/next-number', [QuotationController::class, 'nextNumber']);
@@ -154,7 +170,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/signatories', [SignatoryController::class, 'store'])->name('signatories.store');
 
     // 3. History Routes
-    Route::get('/history', [HistoryController::class, 'index'])->name('history');
+    Route::get('/history', fn () => redirect()->route('quotations.history'))->name('history');
     Route::delete('/quotations/{id}', [HistoryController::class, 'destroy'])->name('quotations.destroy');
     
     Route::post('/quotations/{quotationId}/invoices', [InvoiceController::class, 'store']);

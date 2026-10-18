@@ -94,7 +94,7 @@
 }
 
 .table-card tbody tr:hover {
-    background: #f0f8f7;
+    background: #f4f9fd;
 }
 
 .table-card tbody tr.deleting {
@@ -133,11 +133,16 @@
 
 /* Rate Badge */
 .rate-badge {
-    padding: 5px 8px;
-    border-radius: 4px;
-    background: #e9f7f5;
-    color: #087f78;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 5px 9px;
+    border: 1px solid #d4e8f7;
+    border-radius: 6px;
+    background: #eaf5fd;
+    color: #1679b8;
     font-size: 11px;
+    font-weight: 700;
 }
 
 /* Action Buttons (Edit/Delete) */
@@ -145,15 +150,15 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .action-button {
-    width: 26px;
-    height: 26px;
-    border: none;
-    border-radius: 50%;
-    background: transparent;
+    width: 30px;
+    height: 30px;
+    border: 1px solid #dfe7ee;
+    border-radius: 7px;
+    background: #fff;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -161,6 +166,7 @@
     transition:
         background 0.2s ease,
         color 0.2s ease,
+        border-color 0.2s ease,
         transform 0.15s ease;
 }
 
@@ -169,16 +175,19 @@
 }
 
 .edit-button:hover {
-    background: #eef2f6;
-    color: #44515f;
+    background: #eaf5fd;
+    border-color: #b9dcf2;
+    color: #1679b8;
 }
 
 .delete-button {
-    color: #ef6c74;
+    color: #d15151;
 }
 
 .delete-button:hover {
-    background: #fff0f1;
+    background: #fff3f3;
+    border-color: #f6c8c8;
+    color: #b83c35;
 }
 
 .action-button:active,
@@ -241,10 +250,11 @@
 }
 
 .catalog-module .table-card tbody tr:hover {
-    background: #f0f8f7;
+    background: #f4f9fd;
 }
 
 .catalog-module .rate-badge {
-    background: #e9f7f5;
-    color: #087f78;
+    border: 1px solid #d4e8f7;
+    background: #eaf5fd;
+    color: #1679b8;
 }

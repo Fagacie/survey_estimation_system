@@ -1,26 +1,26 @@
 // public/js/drone_mapping/ui.js
 
 const DroneUI = {
-    init: function(containerId, savedParams = null) {
+    init: function (containerId, savedParams = null) {
         this.container = document.getElementById(containerId);
         if (!this.container) return;
 
         this.renderForm();
-        
+
         if (savedParams) {
             this.loadSavedParams(savedParams);
         }
-        
+
         this.bindEvents();
         this.updateCalculations();
     },
 
-    loadSavedParams: function(params) {
+    loadSavedParams: function (params) {
         const setVal = (id, val) => {
             const el = document.getElementById(id);
             if (el && val !== null && val !== undefined) el.value = val;
         };
-        
+
         setVal('drone_model_select', params.drone_model);
         setVal('drone_camera_model', params.camera_model);
         setVal('drone_altitude', params.altitude_m);
@@ -30,7 +30,7 @@ const DroneUI = {
         setVal('drone_speed', params.speed_ms);
         setVal('drone_mapping_margin', params.mapping_margin_m);
         setVal('drone_course_angle', params.course_angle_deg);
-        
+
         if (params.target_gsd_cm > 0 && params.altitude_m == null) {
             const gsdMode = document.getElementById('mode_gsd');
             if (gsdMode) {
@@ -55,14 +55,14 @@ const DroneUI = {
         }
     },
 
-    renderForm: function() {
+    renderForm: function () {
         let cameraOptions = '';
         if (window.DB_CAMERAS) {
             window.DB_CAMERAS.forEach(cam => {
                 cameraOptions += `<option value="${cam.name}">${cam.name}</option>`;
             });
         }
-        
+
         let droneOptions = '';
         if (window.DB_DRONES) {
             window.DB_DRONES.forEach(drone => {
@@ -259,12 +259,12 @@ const DroneUI = {
         this.container.innerHTML = html;
     },
 
-    bindEvents: function() {
+    bindEvents: function () {
         const _this = this;
-        
+
         // Mode toggle logic
         document.querySelectorAll('input[name="calc_mode"]').forEach(radio => {
-            radio.addEventListener('change', function() {
+            radio.addEventListener('change', function () {
                 const altInput = document.getElementById('drone_altitude');
                 const gsdInput = document.getElementById('drone_target_gsd');
                 if (this.value === 'altitude') {
@@ -281,14 +281,14 @@ const DroneUI = {
 
         // Angle mode logic
         document.querySelectorAll('input[name="angle_mode"]').forEach(radio => {
-            radio.addEventListener('change', function() {
+            radio.addEventListener('change', function () {
                 const angleInput = document.getElementById('drone_course_angle');
                 if (this.value === 'auto') {
                     angleInput.disabled = true;
                 } else {
                     angleInput.disabled = false;
                 }
-                
+
                 if (window.drawnItems && window.drawnItems.getLayers().length > 0) {
                     const warning = document.getElementById('drone-stale-warning');
                     if (warning) warning.classList.remove('d-none');
@@ -298,19 +298,19 @@ const DroneUI = {
 
         // Capture mode logic
         document.querySelectorAll('input[name="capture_mode"]').forEach(radio => {
-            radio.addEventListener('change', function() {
+            radio.addEventListener('change', function () {
                 _this.updateCalculations();
             });
         });
 
         const inputs = ['drone_altitude', 'drone_target_gsd', 'drone_speed', 'drone_front_overlap', 'drone_side_overlap', 'drone_course_angle', 'drone_mapping_margin'];
-        
+
         inputs.forEach(id => {
             const el = document.getElementById(id);
-            if(el) {
-                el.addEventListener('input', function() {
+            if (el) {
+                el.addEventListener('input', function () {
                     _this.updateCalculations();
-                    
+
                     // Mark as stale if geometry affects lines
                     if (window.drawnItems && window.drawnItems.getLayers().length > 0) {
                         const warning = document.getElementById('drone-stale-warning');
@@ -324,7 +324,7 @@ const DroneUI = {
         if (camSelect) {
             camSelect.addEventListener('change', () => _this.updateCalculations());
         }
-        
+
         const droneSelect = document.getElementById('drone_model_select');
         if (droneSelect) {
             droneSelect.addEventListener('change', () => _this.updateCalculations()); // Might affect sortie count without generating lines
@@ -338,24 +338,33 @@ const DroneUI = {
                 }
             });
         }
+
+        const btnClear = document.getElementById('btn_clear_drone_lines');
+        if (btnClear) {
+            btnClear.addEventListener('click', () => {
+                if (window.clearDroneLines) {
+                    window.clearDroneLines();
+                }
+            });
+        }
     },
 
-    updateCalculations: function() {
+    updateCalculations: function () {
         const droneName = document.getElementById('drone_model_select').value;
         const camName = document.getElementById('drone_camera_model').value;
         const mode = document.querySelector('input[name="calc_mode"]:checked').value;
         const captureMode = document.querySelector('input[name="capture_mode"]:checked').value;
-        
+
         const altInput = document.getElementById('drone_altitude');
         const gsdInput = document.getElementById('drone_target_gsd');
         const speed = parseFloat(document.getElementById('drone_speed').value) || 10;
         const frontOverlap = parseFloat(document.getElementById('drone_front_overlap').value) || 80;
         const sideOverlap = parseFloat(document.getElementById('drone_side_overlap').value) || 70;
         const margin = parseFloat(document.getElementById('drone_mapping_margin').value) || 0;
-        
+
         const droneSpec = window.DB_DRONES ? window.DB_DRONES.find(d => d.name === droneName) : null;
         const cameraSpec = window.DB_CAMERAS ? window.DB_CAMERAS.find(c => c.name === camName) : null;
-        
+
         if (!cameraSpec || !droneSpec || !window.PhotogrammetryMath) return;
 
         let altitude = parseFloat(altInput.value) || 100;
@@ -365,20 +374,20 @@ const DroneUI = {
         const validationWarningEl = document.getElementById('drone-mission-validation-warning');
         const validationWarningText = document.getElementById('mission-validation-text');
         const intervalWarningEl = document.getElementById('drone-interval-warning');
-        
+
         const showValidationError = (msg) => {
             validationWarningText.innerText = msg;
             validationWarningEl.classList.remove('d-none');
             intervalWarningEl.classList.add('d-none');
-            
+
             document.getElementById('res_gsd').innerText = 'N/A';
             document.getElementById('res_line_spacing').innerText = 'N/A';
             document.getElementById('res_photo_spacing').innerText = 'N/A';
             document.getElementById('res_photo_interval').innerText = 'N/A';
-            
+
             this.currentSettings = { isValid: false };
         };
-        
+
         validationWarningEl.classList.add('d-none');
 
         if (altitude <= 0 || !Number.isFinite(altitude)) return showValidationError('Altitude must be greater than 0.');
@@ -399,29 +408,29 @@ const DroneUI = {
         const footprints = window.PhotogrammetryMath.calculateGroundFootprint(altitude, cameraSpec);
         const lineSpacing = window.PhotogrammetryMath.calculateLineSpacing(footprints.ground_width_m, sideOverlap);
         const shotSpacing = window.PhotogrammetryMath.calculateShotSpacing(footprints.ground_height_m, frontOverlap);
-        
+
         if (lineSpacing <= 0 || !Number.isFinite(lineSpacing)) return showValidationError('Invalid flight line spacing generated.');
         if (shotSpacing <= 0 || !Number.isFinite(shotSpacing)) return showValidationError('Invalid photo spacing generated.');
-        
+
         const photoInterval = speed > 0 ? (shotSpacing / speed) : 0;
 
         // Update basic UI stats
         document.getElementById('res_gsd').innerText = gsd.toFixed(2) + ' cm/pixel';
         document.getElementById('drone_gsd_val').value = gsd.toFixed(2);
-        
+
         document.getElementById('res_line_spacing').innerText = lineSpacing.toFixed(1) + ' m';
         document.getElementById('drone_line_spacing_val').value = lineSpacing.toFixed(2);
-        
+
         document.getElementById('res_photo_spacing').innerText = shotSpacing.toFixed(1) + ' m';
         document.getElementById('drone_photo_spacing_val').value = shotSpacing.toFixed(2);
-        
+
         // Camera Capture Limit Validation
         const intervalWarningText = document.getElementById('interval-warning-text');
-        
+
         if (captureMode === 'timed') {
             document.getElementById('res_photo_interval').innerText = photoInterval.toFixed(1) + ' s';
             document.getElementById('drone_photo_interval_val').value = photoInterval.toFixed(2);
-            
+
             if (cameraSpec.min_photo_interval_sec) {
                 if (photoInterval > 0 && photoInterval < cameraSpec.min_photo_interval_sec) {
                     intervalWarningText.innerText = `Required photo interval (${photoInterval.toFixed(1)}s) is below the selected camera's minimum capture interval (${cameraSpec.min_photo_interval_sec}s).`;
@@ -440,10 +449,10 @@ const DroneUI = {
         }
 
         const gWidthEl = document.getElementById('drone_ground_width_val');
-        if(gWidthEl) gWidthEl.value = footprints.ground_width_m.toFixed(2);
-        
+        if (gWidthEl) gWidthEl.value = footprints.ground_width_m.toFixed(2);
+
         const gHeightEl = document.getElementById('drone_ground_height_val');
-        if(gHeightEl) gHeightEl.value = footprints.ground_height_m.toFixed(2);
+        if (gHeightEl) gHeightEl.value = footprints.ground_height_m.toFixed(2);
 
         this.currentSettings = {
             isValid: true,
@@ -462,7 +471,7 @@ const DroneUI = {
             ground_width_m: footprints.ground_width_m,
             ground_height_m: footprints.ground_height_m
         };
-        
+
         // Re-calculate final metrics if lines already exist
         if (window.surveyCalcVars && window.surveyCalcVars.mainLineLengthsArray) {
             // CRITICAL FIX: Pass totalLength (Main + Turns) to accurately calculate flight duration!
@@ -470,15 +479,15 @@ const DroneUI = {
         }
     },
 
-    updateFinalMetrics: function(totalDistanceMeters, lineLengthsArray) {
+    updateFinalMetrics: function (totalDistanceMeters, lineLengthsArray) {
         if (!this.currentSettings || !window.PhotogrammetryMath) return;
-        
+
         const { droneSpec, speed, shotSpacing } = this.currentSettings;
 
         // 1. Total Images = sum of images per actual flight line segment
         let totalImages = 0;
         let validLinesCount = 0;
-        
+
         if (Array.isArray(lineLengthsArray)) {
             lineLengthsArray.forEach(lineLength => {
                 if (lineLength > 0) {
@@ -500,7 +509,7 @@ const DroneUI = {
         let sortieCount = 0;
         const sortieEl = document.getElementById('res_sorties');
         const usableTimeEl = document.getElementById('res_usable_time');
-        
+
         if (droneSpec && droneSpec.usable_flight_time_min > 0) {
             sortieCount = Math.ceil(durationMinutes / droneSpec.usable_flight_time_min);
             if (sortieEl) sortieEl.innerText = Number.isFinite(sortieCount) && sortieCount >= 0 ? sortieCount.toLocaleString() : 'N/A';
@@ -519,25 +528,25 @@ const DroneUI = {
 
         // Update UI
         document.getElementById('res_flight_lines').innerText = validLinesCount;
-        if(document.getElementById('float-lines')) document.getElementById('float-lines').innerText = validLinesCount;
-        
+        if (document.getElementById('float-lines')) document.getElementById('float-lines').innerText = validLinesCount;
+
         const distStr = isDistanceValid ? Math.round(totalDistanceMeters).toLocaleString() + ' m' : 'N/A';
         document.getElementById('res_distance').innerText = distStr;
-        if(document.getElementById('float-distance')) document.getElementById('float-distance').innerText = distStr;
+        if (document.getElementById('float-distance')) document.getElementById('float-distance').innerText = distStr;
         document.getElementById('drone_total_distance').value = isDistanceValid ? totalDistanceMeters : '';
-        
+
         const durStr = isDurationValid ? `${hours}h ${minutes}m ${seconds}s` : 'N/A';
         document.getElementById('res_duration').innerText = durStr;
-        if(document.getElementById('float-duration')) document.getElementById('float-duration').innerText = durStr;
+        if (document.getElementById('float-duration')) document.getElementById('float-duration').innerText = durStr;
         document.getElementById('drone_duration_hours').value = isDurationValid ? (durationSeconds / 3600) : '';
-        
+
         const imgStr = isImagesValid ? totalImages.toLocaleString() + ' images' : 'N/A';
         document.getElementById('res_images').innerText = imgStr;
-        if(document.getElementById('float-images')) document.getElementById('float-images').innerText = isImagesValid ? totalImages.toLocaleString() : 'N/A';
+        if (document.getElementById('float-images')) document.getElementById('float-images').innerText = isImagesValid ? totalImages.toLocaleString() : 'N/A';
         document.getElementById('drone_total_images').value = isImagesValid ? totalImages : '';
 
         document.getElementById('drone_sortie_count').value = sortieCount;
-        if(document.getElementById('float-sorties')) document.getElementById('float-sorties').innerText = Number.isFinite(sortieCount) && sortieCount >= 0 ? sortieCount.toLocaleString() : 'N/A';
+        if (document.getElementById('float-sorties')) document.getElementById('float-sorties').innerText = Number.isFinite(sortieCount) && sortieCount >= 0 ? sortieCount.toLocaleString() : 'N/A';
         document.getElementById('drone_usable_time_val').value = (droneSpec && droneSpec.usable_flight_time_min > 0) ? droneSpec.usable_flight_time_min : '';
     }
 };
