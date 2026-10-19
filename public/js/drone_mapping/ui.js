@@ -526,28 +526,37 @@ const DroneUI = {
         let isImagesValid = Number.isFinite(totalImages) && totalImages >= 0;
         let isDurationValid = Number.isFinite(durationSeconds) && durationSeconds >= 0;
 
+        const setText = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.innerText = val;
+        };
+        const setVal = (id, val) => {
+            const el = document.getElementById(id);
+            if (el) el.value = val;
+        };
+
         // Update UI
-        document.getElementById('res_flight_lines').innerText = validLinesCount;
-        if (document.getElementById('float-lines')) document.getElementById('float-lines').innerText = validLinesCount;
+        setText('res_flight_lines', validLinesCount);
+        setText('float-lines', validLinesCount);
 
         const distStr = isDistanceValid ? Math.round(totalDistanceMeters).toLocaleString() + ' m' : 'N/A';
-        document.getElementById('res_distance').innerText = distStr;
-        if (document.getElementById('float-distance')) document.getElementById('float-distance').innerText = distStr;
-        document.getElementById('drone_total_distance').value = isDistanceValid ? totalDistanceMeters : '';
+        setText('res_distance', distStr);
+        setText('float-distance', distStr);
+        setVal('drone_total_distance', isDistanceValid ? totalDistanceMeters : '');
 
         const durStr = isDurationValid ? `${hours}h ${minutes}m ${seconds}s` : 'N/A';
-        document.getElementById('res_duration').innerText = durStr;
-        if (document.getElementById('float-duration')) document.getElementById('float-duration').innerText = durStr;
-        document.getElementById('drone_duration_hours').value = isDurationValid ? (durationSeconds / 3600) : '';
+        setText('res_duration', durStr);
+        setText('float-duration', durStr);
+        setVal('drone_duration_hours', isDurationValid ? (durationSeconds / 3600) : '');
 
         const imgStr = isImagesValid ? totalImages.toLocaleString() + ' images' : 'N/A';
-        document.getElementById('res_images').innerText = imgStr;
-        if (document.getElementById('float-images')) document.getElementById('float-images').innerText = isImagesValid ? totalImages.toLocaleString() : 'N/A';
-        document.getElementById('drone_total_images').value = isImagesValid ? totalImages : '';
+        setText('res_images', imgStr);
+        setText('float-images', isImagesValid ? totalImages.toLocaleString() : 'N/A');
+        setVal('drone_total_images', isImagesValid ? totalImages : '');
 
-        document.getElementById('drone_sortie_count').value = sortieCount;
-        if (document.getElementById('float-sorties')) document.getElementById('float-sorties').innerText = Number.isFinite(sortieCount) && sortieCount >= 0 ? sortieCount.toLocaleString() : 'N/A';
-        document.getElementById('drone_usable_time_val').value = (droneSpec && droneSpec.usable_flight_time_min > 0) ? droneSpec.usable_flight_time_min : '';
+        setVal('drone_sortie_count', sortieCount);
+        setText('float-sorties', Number.isFinite(sortieCount) && sortieCount >= 0 ? sortieCount.toLocaleString() : 'N/A');
+        setVal('drone_usable_time_val', (droneSpec && droneSpec.usable_flight_time_min > 0) ? droneSpec.usable_flight_time_min : '');
     }
 };
 

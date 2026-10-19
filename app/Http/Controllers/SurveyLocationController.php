@@ -84,7 +84,7 @@ class SurveyLocationController extends Controller
         \Log::info("saveParameters HIT for location: " . $surveyLocation->id);
         
         $data = $request->validate([
-            'sbes' => 'required|array',
+            'sbes' => 'nullable|array',
             'sbes.survey_speed_knots' => 'nullable|numeric',
             'sbes.working_hours_per_day' => 'nullable|numeric',
             'drone' => 'nullable|array',
@@ -221,7 +221,7 @@ class SurveyLocationController extends Controller
         // Avoid eloquent hydration for performance when returning potentially thousands of lines
         $lines = \Illuminate\Support\Facades\DB::table('survey_lines')
             ->where('survey_location_id', $surveyLocation->id)
-            ->select('geometry', 'type')
+            ->select('geometry', 'type', 'length_meters')
             ->get()
             ->map(function ($line) {
                 $geom = is_string($line->geometry) ? json_decode($line->geometry, true) : $line->geometry;
@@ -245,7 +245,8 @@ class SurveyLocationController extends Controller
                     'type' => 'Feature',
                     'geometry' => $geom,
                     'properties' => [
-                        'line_type' => $lineType
+                        'line_type' => $lineType,
+                        'length' => (float) ($line->length_meters ?? 0),
                     ]
                 ];
             })

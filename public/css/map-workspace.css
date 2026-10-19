@@ -283,28 +283,29 @@
 .map-panel-toggle {
     position: absolute;
     z-index: 1103;
-    top: 13px;
-    left: 383px;
+    top: 14px;
+    left: 14px !important;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
     min-height: 38px;
-    padding: 0 12px;
+    padding: 0 14px;
     border: 1px solid #d7e2e8;
-    border-radius: 7px;
-    background: rgba(255, 255, 255, .97);
-    color: #294c60;
-    box-shadow: 0 2px 9px rgba(21, 48, 65, .10);
-    font-size: 11px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, .98);
+    color: #1e3a5f;
+    box-shadow: 0 4px 14px rgba(21, 48, 65, .12);
+    font-size: 12px;
     font-weight: 750;
     cursor: pointer;
-    transition: background .15s, border-color .15s;
+    transition: background .15s, border-color .15s, box-shadow .15s;
 }
 
 .map-panel-toggle:hover {
-    border-color: #a9c4d2;
+    border-color: #93c5fd;
     background: #fff;
+    box-shadow: 0 6px 18px rgba(21, 48, 65, .16);
 }
 
 .map-panel-toggle:focus-visible {
@@ -313,17 +314,22 @@
 }
 
 .workspace-container.is-panel-collapsed {
-    grid-template-columns: 0 minmax(0, 1fr);
+    grid-template-columns: 0 1fr !important;
 }
 
 .workspace-container.is-panel-collapsed>.workspace-sidebar {
-    visibility: hidden;
+    display: none !important;
+    visibility: hidden !important;
     width: 0 !important;
-    border: 0;
+    min-width: 0 !important;
+    max-width: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    overflow: hidden !important;
 }
 
 .workspace-container.is-panel-collapsed .map-panel-toggle {
-    left: 13px;
+    left: 14px !important;
 }
 
 .map-workspace-topbar {
@@ -452,9 +458,14 @@
     margin-top: 10px !important;
     border: 1px solid #d5e0e7;
     border-radius: 9px;
-    overflow: hidden;
+    overflow: visible !important;
     background: #fff;
     box-shadow: 0 3px 12px rgba(20, 43, 61, .14);
+}
+
+.workspace-container .workspace-map .leaflet-draw-toolbar {
+    border-radius: 8px;
+    overflow: hidden;
 }
 
 .workspace-container .workspace-map .leaflet-draw-toolbar a {
@@ -467,11 +478,49 @@
     background-color: #edf5f8;
 }
 
+.workspace-container .workspace-map .leaflet-draw-actions {
+    position: absolute;
+    left: 38px !important;
+    top: 0 !important;
+    white-space: nowrap;
+    z-index: 1200 !important;
+    background: #193f55 !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.22) !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    list-style: none !important;
+}
+
+.workspace-container .workspace-map .leaflet-draw-actions li {
+    display: inline-block !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
 .workspace-container .workspace-map .leaflet-draw-actions a {
-    background: #193f55;
-    color: #fff;
-    border-bottom-color: rgba(255, 255, 255, .15);
-    font-size: 11px;
+    display: block !important;
+    background: #193f55 !important;
+    color: #ffffff !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    line-height: 34px !important;
+    height: 34px !important;
+    padding: 0 14px !important;
+    text-decoration: none !important;
+    border: none !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.2) !important;
+    transition: background 0.15s ease-in-out !important;
+}
+
+.workspace-container .workspace-map .leaflet-draw-actions li:last-child a {
+    border-right: none !important;
+}
+
+.workspace-container .workspace-map .leaflet-draw-actions a:hover {
+    background: #255d7e !important;
+    color: #ffffff !important;
 }
 
 .workspace-container .workspace-map .leaflet-control-scale-line {
@@ -481,43 +530,121 @@
     font-size: 10px;
 }
 
+:root {
+    --boundary-color: #2563eb;
+    --main-line-color: #f43f5e;
+    --cross-line-color: #f59e0b;
+}
+
+.map-floating-controls-top-right {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none;
+}
+
 .workspace-container .map-basemap-control {
-    gap: 2px;
-    padding: 4px;
+    pointer-events: auto;
+    display: inline-flex;
+    align-self: flex-end;
+    gap: 3px;
+    padding: 3px;
     border: 1px solid #d8e3e9;
-    border-radius: 10px;
+    border-radius: 9px;
+    background: rgba(255, 255, 255, .96);
+    backdrop-filter: blur(8px);
     box-shadow: 0 4px 16px rgba(20, 43, 61, .12);
 }
 
 .workspace-container .map-basemap-btn {
-    min-height: 32px;
-    padding: 6px 10px;
-    border-radius: 7px;
+    min-height: 28px;
+    padding: 4px 9px;
+    border: 1px solid transparent;
+    border-radius: 6px;
+    background: transparent;
+    color: #4b6475;
     font-size: 11px;
     font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+
+.workspace-container .map-basemap-btn:hover {
+    background: #f1f5f9;
+    color: #1e3a5f;
+}
+
+.workspace-container .map-basemap-btn.active {
+    background: #1d5b78;
+    color: #fff;
+    border-color: #1d5b78;
+    box-shadow: 0 1px 4px rgba(29, 91, 120, .3);
 }
 
 .workspace-container .map-layer-control {
-    min-width: 190px;
-    padding: 12px 13px;
+    pointer-events: auto;
+    width: 200px;
+    padding: 10px 12px;
     border: 1px solid #d8e3e9;
     border-radius: 10px;
+    background: rgba(255, 255, 255, .96);
+    backdrop-filter: blur(8px);
     box-shadow: 0 4px 16px rgba(20, 43, 61, .12);
 }
 
 .workspace-container .map-layer-control .layer-title {
     margin-bottom: 8px;
     font-size: 10px;
-    letter-spacing: .1em;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: #64748b;
+    border-bottom: 1px solid #eef2f6;
+    padding-bottom: 5px;
 }
 
 .workspace-container .map-layer-control .form-check {
-    min-height: 28px;
-    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 24px;
+    margin-bottom: 4px;
+    padding-left: 0;
+}
+
+.workspace-container .map-layer-control .form-check-input {
+    cursor: pointer;
+    margin: 0;
+    float: none;
+    width: 28px;
+    height: 16px;
+    border-radius: 10px;
+    accent-color: #1d5b78;
 }
 
 .workspace-container .map-layer-control .form-check-label {
-    font-size: 12px;
+    display: flex;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: #334155;
+    cursor: pointer;
+    user-select: none;
+    margin: 0;
+}
+
+.layer-color-dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    margin-right: 6px;
+    vertical-align: middle;
+    flex-shrink: 0;
 }
 
 .workspace-container .map-coord-bar {

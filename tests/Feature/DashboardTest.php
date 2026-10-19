@@ -15,7 +15,7 @@ class DashboardTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->get(route('dashboard'));
+        $response = $this->actingAs($user)->get(route('dashboard.react'));
 
         $response->assertOk()->assertInertia(fn (Assert $page) => $page
             ->component('Dashboard')
@@ -29,5 +29,8 @@ class DashboardTest extends TestCase
             ->has('attentionItems', 0)
             ->where('auth.user.name', $user->name)
         );
+
+        $bladeResponse = $this->actingAs($user)->get(route('dashboard'));
+        $bladeResponse->assertOk();
     }
 }

@@ -65,7 +65,13 @@ class SurveyWorkflowTest extends TestCase
             'working_hours_per_day' => 8,
         ]);
 
-        $response = $this->actingAs($user)->get(route('projects.report.preview', $project->project_Id));
+        $previewResponse = $this->actingAs($user)->get(route('projects.report.preview', $project->project_Id));
+        $previewResponse->assertOk()->assertSee('HYDROGRAPHIC SURVEY REPORT');
+
+        $response = $this->actingAs($user)->get(route('projects.report.preview', [
+            'project' => $project->project_Id,
+            'raw' => 1,
+        ]));
 
         $response->assertOk()
             ->assertSee('HYDROGRAPHIC SURVEY REPORT')

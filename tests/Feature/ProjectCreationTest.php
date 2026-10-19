@@ -18,6 +18,8 @@ class ProjectCreationTest extends TestCase
 
         $response = $this->actingAs($user)->post(route('projects.store'), [
             'name' => 'Nigerian Boy',
+            'project_type' => 'CP',
+            'location' => 'Terengganu',
             'number' => null,
             'client_name' => 'Fagaci',
             'client_address' => 'No 179 Jaoji Qrts, Court Road, Tarauni LGA Kano',

@@ -45,7 +45,9 @@ document.addEventListener('DOMContentLoaded', function () {
             panelToggle.innerHTML = collapsed
                 ? '<i class="fa-solid fa-sliders" aria-hidden="true"></i><span>Show controls</span>'
                 : '<i class="fa-solid fa-sliders" aria-hidden="true"></i><span>Hide controls</span>';
-            window.setTimeout(function () { if (map) map.invalidateSize({ pan: false }); }, 220);
+            [40, 150, 300].forEach(function (delay) {
+                window.setTimeout(function () { if (map) map.invalidateSize({ pan: false }); }, delay);
+            });
         });
     }
 
@@ -80,6 +82,21 @@ document.addEventListener('DOMContentLoaded', function () {
     activeBaseLayer = baseLayers.osm;
     activeBaseLayer.addTo(map);
 
+    // Basemap selector button clicks
+    document.querySelectorAll('.map-basemap-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var type = this.getAttribute('data-basemap');
+            if (!type || !baseLayers[type]) return;
+            document.querySelectorAll('.map-basemap-btn').forEach(function (b) { b.classList.remove('active'); });
+            this.classList.add('active');
+            if (activeBaseLayer && map.hasLayer(activeBaseLayer)) {
+                map.removeLayer(activeBaseLayer);
+            }
+            activeBaseLayer = baseLayers[type];
+            activeBaseLayer.addTo(map);
+        });
+    });
+
     // Basemap bridge: React owns selection state; Leaflet owns tile-layer lifecycle.
     document.addEventListener('ises:basemap-change', function (event) {
         const key = event.detail && event.detail.basemap;
@@ -87,6 +104,9 @@ document.addEventListener('DOMContentLoaded', function () {
         if (activeBaseLayer && map.hasLayer(activeBaseLayer)) map.removeLayer(activeBaseLayer);
         activeBaseLayer = baseLayers[key];
         activeBaseLayer.addTo(map);
+        document.querySelectorAll('.map-basemap-btn').forEach(function (b) {
+            b.classList.toggle('active', b.getAttribute('data-basemap') === key);
+        });
     });
 
     // 3. Scale bar
@@ -95,14 +115,19 @@ document.addEventListener('DOMContentLoaded', function () {
     // 4. Coordinate display
     map.on('mousemove', function (e) {
         let coordEl = document.getElementById('coord-display');
-        coordEl.innerHTML = 'Lat: <span>' + e.latlng.lat.toFixed(6) + '</span> &nbsp; Lng: <span>' + e.latlng.lng.toFixed(6) + '</span>';
+        if (coordEl) {
+            coordEl.innerHTML = 'Lat: <span>' + e.latlng.lat.toFixed(6) + '</span> &nbsp; Lng: <span>' + e.latlng.lng.toFixed(6) + '</span>';
+        }
     });
 
     // 5. Layer groups
     boundaryLayerGroup.addTo(map);
     mainLineLayerGroup.addTo(map);
     crossLineLayerGroup.addTo(map);
-    labelLayerGroup.addTo(map);
+    var initialLabelsChecked = document.getElementById('layer-labels') ? document.getElementById('layer-labels').checked : false;
+    if (initialLabelsChecked) {
+        labelLayerGroup.addTo(map);
+    }
 
     // 6. Leaflet Draw
     drawnItems = new L.FeatureGroup();
@@ -122,12 +147,33 @@ document.addEventListener('DOMContentLoaded', function () {
     });
     map.addControl(drawControl);
 
+    // Auto-commit deletions when the delete tool is disabled/switched
+    if (typeof L !== 'undefined' && L.EditToolbar && L.EditToolbar.Delete) {
+        var origDeleteDisable = L.EditToolbar.Delete.prototype.disable;
+        L.EditToolbar.Delete.prototype.disable = function () {
+            if (this._enabled && this._deletedLayers && this._deletedLayers.getLayers().length > 0) {
+                this.save();
+            }
+            origDeleteDisable.call(this);
+        };
+    }
+
     window.drawnItems = drawnItems;
     window.drawControl = drawControl;
     window.boundaryLayerGroup = boundaryLayerGroup;
     window.mainLineLayerGroup = mainLineLayerGroup;
     window.crossLineLayerGroup = crossLineLayerGroup;
     window.labelLayerGroup = labelLayerGroup;
+
+    // Drone Mapping UI Initialization (must occur before loadExistingData so DOM targets exist)
+    window.isDroneMode = window.MAP_WORKSPACE_CONFIG && window.MAP_WORKSPACE_CONFIG.surveyType === 'drone';
+    window.EQUIPMENT_DB_URL = window.MAP_WORKSPACE_CONFIG ? window.MAP_WORKSPACE_CONFIG.equipmentUrl : '';
+    if (window.isDroneMode && typeof DroneUI !== 'undefined') {
+        const savedParams = window.MAP_WORKSPACE_CONFIG ? window.MAP_WORKSPACE_CONFIG.droneParameters : null;
+        DroneUI.init('drone-ui-container', savedParams);
+        const droneAcc = document.getElementById('droneMappingAccordionItem');
+        if (droneAcc) droneAcc.style.display = 'block';
+    }
 
     // 7. Load Existing Data
     loadExistingData();
@@ -143,6 +189,37 @@ document.addEventListener('DOMContentLoaded', function () {
     window.setTimeout(refreshMapSize, 800);
 
     // 8. Draw Events
+    map.on(L.Draw.Event.DRAWSTART, function (e) {
+        var type = e.layerType;
+
+        // Auto-save any pending deletion if delete mode has deleted layers
+        try {
+            if (drawControl && drawControl._toolbars && drawControl._toolbars.edit) {
+                var deleteMode = drawControl._toolbars.edit._modes && drawControl._toolbars.edit._modes.remove;
+                var deleteHandler = deleteMode && deleteMode.handler;
+                if (deleteHandler && deleteHandler._deletedLayers && deleteHandler._deletedLayers.getLayers().length > 0) {
+                    deleteHandler.save();
+                }
+            }
+        } catch (err) {
+            console.warn('Error auto-saving delete before draw:', err);
+        }
+
+        // When starting to draw a new polygon boundary, IMMEDIATELY remove any existing boundary polygon
+        if (type === 'polygon') {
+            var oldPolys = [];
+            drawnItems.eachLayer(function (l) {
+                if (l instanceof L.Polygon) oldPolys.push(l);
+            });
+            oldPolys.forEach(function (l) { drawnItems.removeLayer(l); });
+            if (boundaryLayerGroup) boundaryLayerGroup.clearLayers();
+            window.droneEffectiveBoundary = null;
+            window.droneOriginalBoundary = null;
+            boundaryFeatures = [];
+            recalculateAllStats();
+        }
+    });
+
     map.on(L.Draw.Event.CREATED, function (e) {
         var type = e.layerType, layer = e.layer;
         if (!map.hasLayer(drawnItems)) {
@@ -150,6 +227,20 @@ document.addEventListener('DOMContentLoaded', function () {
             var bCheck = document.getElementById('layer-boundaries');
             if (bCheck) bCheck.checked = true;
         }
+
+        // When drawing a new boundary polygon, purge any previously existing boundary polygon
+        if (type === 'polygon') {
+            var oldPolys = [];
+            drawnItems.eachLayer(function (l) {
+                if (l instanceof L.Polygon && l !== layer) oldPolys.push(l);
+            });
+            oldPolys.forEach(function (l) { drawnItems.removeLayer(l); });
+            if (boundaryLayerGroup) boundaryLayerGroup.clearLayers();
+            window.droneEffectiveBoundary = null;
+            window.droneOriginalBoundary = null;
+            boundaryFeatures = [];
+        }
+
         drawnItems.addLayer(layer);
         recalculateAllStats();
     });
@@ -161,10 +252,47 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     map.on(L.Draw.Event.DELETED, function (e) {
+        var remainingPolygons = [];
+        drawnItems.eachLayer(function (l) {
+            if (l instanceof L.Polygon) remainingPolygons.push(l);
+        });
+        if (remainingPolygons.length === 0) {
+            window.droneEffectiveBoundary = null;
+            window.droneOriginalBoundary = null;
+            if (boundaryLayerGroup) boundaryLayerGroup.clearLayers();
+            boundaryFeatures = [];
+        }
         markStale();
         rebuildLayerGroups();
         recalculateAllStats();
     });
+
+    // Clear boundary button
+    var btnClearBoundary = document.getElementById('btn-clear-boundary');
+    if (btnClearBoundary) {
+        btnClearBoundary.addEventListener('click', function () {
+            var toRemove = [];
+            drawnItems.eachLayer(function (layer) {
+                if (layer instanceof L.Polygon) {
+                    toRemove.push(layer);
+                }
+            });
+            toRemove.forEach(function (l) { drawnItems.removeLayer(l); });
+            if (boundaryLayerGroup) boundaryLayerGroup.clearLayers();
+            window.droneEffectiveBoundary = null;
+            window.droneOriginalBoundary = null;
+            boundaryFeatures = [];
+            markStale();
+            recalculateAllStats();
+            Swal.fire({
+                icon: 'info',
+                title: 'Boundary Cleared',
+                text: 'Survey boundary has been removed. You can now draw a new boundary.',
+                timer: 1500,
+                showConfirmButton: false
+            });
+        });
+    }
 
     // 9. Generator buttons
     let btnGenMain = document.getElementById('btn-generate-main');
@@ -184,6 +312,10 @@ document.addEventListener('DOMContentLoaded', function () {
             mainLineLayerGroup.clearLayers();
             crossLineLayerGroup.clearLayers();
             labelLayerGroup.clearLayers();
+            if (window.routeMarkers) {
+                window.routeMarkers.forEach(m => map.removeLayer(m));
+            }
+            window.routeMarkers = [];
             isGeometryStale = false;
             let warningEl = document.getElementById('stale-warning');
             if (warningEl) warningEl.classList.add('d-none');
@@ -201,7 +333,17 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
         document.getElementById('gen-spacing').addEventListener('input', markStale);
-        document.getElementById('gen-angle').addEventListener('input', markStale);
+        var genAngleInput = document.getElementById('gen-angle');
+        if (genAngleInput) {
+            genAngleInput.addEventListener('input', function () {
+                markStale();
+                recalculateAllStats();
+            });
+            genAngleInput.addEventListener('change', function () {
+                markStale();
+                recalculateAllStats();
+            });
+        }
         document.getElementById('gen-cross-spacing').addEventListener('input', markStale);
 
         document.getElementById('gen-cl-spacing').addEventListener('input', markStale);
@@ -265,17 +407,51 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // 12. Time estimation reactivity (handled by inline onchange in HTML)
+    window.renderRouteMarkers = function () {
+        if (window.routeMarkers) {
+            window.routeMarkers.forEach(m => map.removeLayer(m));
+        }
+        window.routeMarkers = [];
 
-    // Drone Mapping UI Initialization
-    window.isDroneMode = window.MAP_WORKSPACE_CONFIG.surveyType === 'drone';
-    window.EQUIPMENT_DB_URL = window.MAP_WORKSPACE_CONFIG.equipmentUrl;
-    if (window.isDroneMode && typeof DroneUI !== 'undefined') {
-        const savedParams = window.MAP_WORKSPACE_CONFIG.droneParameters;
-        DroneUI.init('drone-ui-container', savedParams);
-        const droneAcc = document.getElementById('droneMappingAccordionItem');
-        if (droneAcc) droneAcc.style.display = 'block';
-    }
+        let layers = mainLineLayerGroup.getLayers();
+        if (layers.length > 0) {
+            let firstLineCoords = null;
+            let lastLineCoords = null;
+
+            layers.forEach(layer => {
+                if (layer.getLayers) {
+                    layer.getLayers().forEach(sublayer => {
+                        if (sublayer.feature && sublayer.feature.geometry && sublayer.feature.geometry.type === 'LineString') {
+                            let coords = sublayer.feature.geometry.coordinates;
+                            if (coords.length > 0) {
+                                if (!firstLineCoords) firstLineCoords = coords[0];
+                                lastLineCoords = coords[coords.length - 1];
+                            }
+                        }
+                    });
+                } else if (layer.feature && layer.feature.geometry && layer.feature.geometry.type === 'LineString') {
+                    let coords = layer.feature.geometry.coordinates;
+                    if (coords.length > 0) {
+                        if (!firstLineCoords) firstLineCoords = coords[0];
+                        lastLineCoords = coords[coords.length - 1];
+                    }
+                }
+            });
+
+            if (firstLineCoords && lastLineCoords) {
+                let startMarker = L.circleMarker([firstLineCoords[1], firstLineCoords[0]], {
+                    radius: 6, fillColor: '#22c55e', color: '#fff', weight: 2, fillOpacity: 1
+                }).bindTooltip('Start');
+                let endMarker = L.circleMarker([lastLineCoords[1], lastLineCoords[0]], {
+                    radius: 6, fillColor: '#ef4444', color: '#fff', weight: 2, fillOpacity: 1
+                }).bindTooltip('End');
+
+                startMarker.addTo(map);
+                endMarker.addTo(map);
+                window.routeMarkers.push(startMarker, endMarker);
+            }
+        }
+    };
 
     // Define the global callback for Drone Mapping Line Generation
     window.requestDroneLinesGeneration = function () {
@@ -392,42 +568,8 @@ document.addEventListener('DOMContentLoaded', function () {
         generateLines('main', true, function (totalDistanceMeters, lineLengthsArray) {
             // This callback runs after lines are generated and distance is known
             DroneUI.updateFinalMetrics(totalDistanceMeters, lineLengthsArray);
-
-            // Add Start and End markers
-            let layers = mainLineLayerGroup.getLayers();
-            if (layers.length > 0) {
-                let firstLineCoords = null;
-                let lastLineCoords = null;
-
-                // Because the worker might return multiple features, we need the first and last point
-                // But turf might return one big MultiLineString or multiple LineStrings.
-                // mainLineLayerGroup will have L.geoJSON wrappers.
-                layers.forEach(layer => {
-                    if (layer.getLayers) {
-                        layer.getLayers().forEach(sublayer => {
-                            if (sublayer.feature && sublayer.feature.geometry.type === 'LineString') {
-                                let coords = sublayer.feature.geometry.coordinates;
-                                if (coords.length > 0) {
-                                    if (!firstLineCoords) firstLineCoords = coords[0];
-                                    lastLineCoords = coords[coords.length - 1];
-                                }
-                            }
-                        });
-                    }
-                });
-
-                if (firstLineCoords && lastLineCoords) {
-                    let startMarker = L.circleMarker([firstLineCoords[1], firstLineCoords[0]], {
-                        radius: 6, fillColor: '#22c55e', color: '#fff', weight: 2, fillOpacity: 1
-                    }).bindTooltip('Start');
-                    let endMarker = L.circleMarker([lastLineCoords[1], lastLineCoords[0]], {
-                        radius: 6, fillColor: '#ef4444', color: '#fff', weight: 2, fillOpacity: 1
-                    }).bindTooltip('End');
-
-                    startMarker.addTo(map);
-                    endMarker.addTo(map);
-                    window.routeMarkers.push(startMarker, endMarker);
-                }
+            if (typeof window.renderRouteMarkers === 'function') {
+                window.renderRouteMarkers();
             }
         });
     };
@@ -447,8 +589,15 @@ document.addEventListener('DOMContentLoaded', function () {
             if (boundaryLayerGroup) {
                 isChecked ? boundaryLayerGroup.addTo(map) : map.removeLayer(boundaryLayerGroup);
             }
-        } else if (id === 'layer-main-lines' && mainLineLayerGroup) {
-            isChecked ? mainLineLayerGroup.addTo(map) : map.removeLayer(mainLineLayerGroup);
+        } else if (id === 'layer-main-lines') {
+            if (mainLineLayerGroup) {
+                isChecked ? mainLineLayerGroup.addTo(map) : map.removeLayer(mainLineLayerGroup);
+            }
+            if (window.routeMarkers) {
+                window.routeMarkers.forEach(function (m) {
+                    isChecked ? m.addTo(map) : map.removeLayer(m);
+                });
+            }
         } else if (id === 'layer-cross-lines' && crossLineLayerGroup) {
             isChecked ? crossLineLayerGroup.addTo(map) : map.removeLayer(crossLineLayerGroup);
         } else if (id === 'layer-labels' && labelLayerGroup) {
@@ -525,6 +674,9 @@ function loadExistingData() {
             // Synchronize Drone UI with re-calculated metrics to replace stale saved DB values
             if (window.isDroneMode && typeof DroneUI !== 'undefined' && window.surveyCalcVars && window.surveyCalcVars.mainLineLengthsArray) {
                 DroneUI.updateFinalMetrics(window.surveyCalcVars.totalLength, window.surveyCalcVars.mainLineLengthsArray);
+                if (typeof window.renderRouteMarkers === 'function') {
+                    window.renderRouteMarkers();
+                }
             }
 
             if (drawnItems.getLayers().length > 0) {
@@ -623,9 +775,10 @@ function recalculateAllStats() {
                 isMain = !isCross;
             } else {
                 // For manually drawn lines:
-                if (mode === 'centerline' && !foundCenterline) {
+                if (mode === 'centerline' && (!foundCenterline || layer.isCenterline)) {
                     // The first manually drawn line in centerline mode is the reference line, do not count it!
                     foundCenterline = true;
+                    layer.isCenterline = true;
                     return;
                 } else {
                     // Any other manually drawn line is treated as a custom Tie/Cross line by the surveyor
@@ -711,16 +864,45 @@ function recalculateAllStats() {
             let genAngleEl = document.getElementById('gen-angle');
             let angle = genAngleEl ? (parseFloat(genAngleEl.value) || 0) : 0;
             let fc = turf.featureCollection(boundaryFeatures);
-            let center = turf.center(fc);
 
-            let bounds = window.calculateTrueMetricBounds(fc, angle, turf, map);
+            // 1. Calculate bounding box rotated by -angle (survey line orientation)
+            let rotatedFc = turf.transformRotate(fc, -angle);
+            let rotBbox = turf.bbox(rotatedFc);
 
-            let widthX = bounds.widthX;
-            let heightY = bounds.heightY;
+            let widthX = turf.distance(turf.point([rotBbox[0], rotBbox[1]]), turf.point([rotBbox[2], rotBbox[1]]), { units: 'meters' });
+            let heightY = turf.distance(turf.point([rotBbox[0], rotBbox[1]]), turf.point([rotBbox[0], rotBbox[3]]), { units: 'meters' });
+
+            // 2. If lines are not yet generated, detect the boundary's natural orientation (handles landscape/sloppy coasts)
+            let effectiveW = widthX;
+            let effectiveH = heightY;
+
+            if (mainCount === 0 && boundaryFeatures[0] && boundaryFeatures[0].geometry) {
+                let coords = boundaryFeatures[0].geometry.coordinates;
+                let ring = (coords && coords.length > 0 && Array.isArray(coords[0])) ? coords[0] : coords;
+                let minArea = widthX * heightY;
+
+                if (ring && ring.length >= 3) {
+                    for (let i = 0; i < ring.length - 1; i++) {
+                        let pA = turf.point(ring[i]);
+                        let pB = turf.point(ring[i + 1]);
+                        let edgeBearing = turf.bearing(pA, pB);
+                        let testRot = turf.transformRotate(boundaryFeatures[0], -edgeBearing);
+                        let testBbox = turf.bbox(testRot);
+                        let tW = turf.distance(turf.point([testBbox[0], testBbox[1]]), turf.point([testBbox[2], testBbox[1]]), { units: 'meters' });
+                        let tH = turf.distance(turf.point([testBbox[0], testBbox[1]]), turf.point([testBbox[0], testBbox[3]]), { units: 'meters' });
+                        let area = tW * tH;
+                        if (area > 0 && area < minArea) {
+                            minArea = area;
+                            effectiveW = tW;
+                            effectiveH = tH;
+                        }
+                    }
+                }
+            }
 
             // INOS Required Logic: Survey Width (line length) MUST be the shortest side
-            lineLength = Math.min(widthX, heightY);
-            coverageWidth = Math.max(widthX, heightY);
+            lineLength = Math.min(effectiveW, effectiveH);
+            coverageWidth = Math.max(effectiveW, effectiveH);
 
             if (document.getElementById('stat-survey-width')) {
                 document.getElementById('stat-survey-width').innerText = (lineLength / 1000).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' km';
@@ -731,10 +913,8 @@ function recalculateAllStats() {
             }
         }
 
-        // FORMULA: Main Distance = Number of Main Lines × Survey Width (lineLength)
-        // CRITICAL FIX: For Drone Mapping, use the exact sum of true GIS segment lengths (mainLength), 
-        // NOT the bounding box approximation.
-        let mainLengthMeters = window.isDroneMode ? mainLength : (mainCount * lineLength);
+        // FORMULA: Main Distance = Exact sum of true GIS segment lengths (with theoretical grid fallback)
+        let mainLengthMeters = mainLength > 0 ? mainLength : (mainCount * lineLength);
 
         // Crossline Distance = actual real-world length calculated (crossLength)
         let totalLength = mainLengthMeters + crossLength;
@@ -851,9 +1031,14 @@ function calculateTimeEstimation() {
 
     // FORMULA: Estimated Project Duration = Survey Days + global allowances
     let totalDays = workingDays + weatherDays + mobDays + patchDays;
+    let billingExecutionDays = Math.ceil(workingDays);
+    let totalBillingDays = billingExecutionDays + weatherDays + mobDays + patchDays;
 
     let elWorkingDays = document.getElementById('calc-working-days');
-    if (elWorkingDays) elWorkingDays.innerText = totalDays.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' days';
+    if (elWorkingDays) {
+        let billingNote = (billingExecutionDays !== workingDays && workingDays > 0) ? ` (${totalBillingDays} billing)` : '';
+        elWorkingDays.innerText = totalDays.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' days' + billingNote;
+    }
 
     let msDays = document.getElementById('ms-working-days');
     if (msDays) msDays.innerText = totalDays.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
@@ -883,8 +1068,9 @@ function generateLines(type, isDrone = false, callback = null) {
     if (mode === 'centerline' && type === 'main') {
         drawnItems.eachLayer(function (layer) {
             // Find a drawn polyline that is not a polygon and not generated
-            if (layer instanceof L.Polyline && !(layer instanceof L.Polygon) && !layer.isGenerated) {
+            if (layer instanceof L.Polyline && !(layer instanceof L.Polygon) && !layer.isGenerated && !centerlineFeature) {
                 centerlineFeature = layer.toGeoJSON();
+                layer.isCenterline = true;
             }
         });
 
@@ -964,7 +1150,8 @@ function generateLines(type, isDrone = false, callback = null) {
             let targetBoundary = (isDrone && window.droneEffectiveBoundary) ? window.droneEffectiveBoundary : boundaryFeature;
             let bbox = turf.bbox(targetBoundary);
             let center = turf.center(targetBoundary);
-            let worker = new Worker('/js/gis-worker.js?v=' + (new Date().getTime() + 1000));
+            let workerUrl = (window.MAP_WORKSPACE_CONFIG && window.MAP_WORKSPACE_CONFIG.gisWorkerUrl) ? window.MAP_WORKSPACE_CONFIG.gisWorkerUrl : '/js/gis-worker.js';
+            let worker = new Worker(workerUrl + '?v=' + (new Date().getTime() + 1000));
 
             worker.onmessage = function (e) {
                 if (e.data.success) resolve(e.data.features);
@@ -1104,12 +1291,22 @@ function importGeoJSON(e) {
                     if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
                         return { color: '#3b82f6', weight: 3, fillOpacity: 0.15 };
                     }
-                    return { color: '#f43f5e', weight: 1.5 };
+                    var isMain = !feature.properties || feature.properties.line_type !== 'cross';
+                    return { color: isMain ? '#f43f5e' : '#f59e0b', weight: isMain ? 1.5 : 1, opacity: 0.8, dashArray: isMain ? '' : '6, 8' };
                 },
                 onEachFeature: function (feature, layer) {
-                    drawnItems.addLayer(layer);
-                    if (feature.geometry.type === 'Polygon') {
+                    if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
+                        drawnItems.addLayer(layer);
                         boundaryFeatures.push(layer.toGeoJSON());
+                    } else if (feature.geometry.type === 'LineString' || feature.geometry.type === 'MultiLineString') {
+                        var lineType = (feature.properties && feature.properties.line_type) || 'main';
+                        layer.isGenerated = true;
+                        layer.lineType = lineType;
+                        if (lineType === 'main') {
+                            mainLineLayerGroup.addLayer(layer);
+                        } else {
+                            crossLineLayerGroup.addLayer(layer);
+                        }
                     }
                 }
             });
@@ -1145,11 +1342,16 @@ function saveSurveyPlanning() {
     let lines = { type: 'FeatureCollection', features: [] };
     function collectLine(layer, defaultType) {
         if (layer instanceof L.Polyline && !(layer instanceof L.Polygon)) {
+            let gj = layer.toGeoJSON();
+            let len = (layer.feature && layer.feature.properties && layer.feature.properties.length)
+                ? layer.feature.properties.length
+                : turf.length(gj, { units: 'meters' });
             lines.features.push({
                 type: 'Feature',
-                geometry: layer.toGeoJSON().geometry,
+                geometry: gj.geometry,
                 properties: {
-                    line_type: layer.lineType || defaultType || 'main'
+                    line_type: layer.lineType || defaultType || 'main',
+                    length: len
                 }
             });
         }

@@ -37,23 +37,23 @@ class RouteSmokesTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $this->actingAs($user)->get('/dashboard')
+        $this->actingAs($user)->get('/dashboard-react')
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page->component('Dashboard'));
 
-        $this->actingAs($user)->get('/projects')
+        $this->actingAs($user)->get('/projects-react')
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page->component('ProjectIndex'));
 
-        $this->actingAs($user)->get('/projects/create')
+        $this->actingAs($user)->get('/projects-react/create')
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page->component('CreateProject'));
 
-        $this->actingAs($user)->get('/profile')
+        $this->actingAs($user)->get('/profile-react')
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page->component('ProfileSettings'));
 
-        $this->actingAs($user)->get('/quotations/history')
+        $this->actingAs($user)->get('/quotations/history-react')
             ->assertOk()
             ->assertInertia(fn (Assert $page) => $page->component('QuotationHistory'));
     }
@@ -62,6 +62,11 @@ class RouteSmokesTest extends TestCase
     {
         $user = User::factory()->create();
 
+        $this->actingAs($user)->get('/dashboard')->assertOk();
+        $this->actingAs($user)->get('/projects')->assertOk();
+        $this->actingAs($user)->get('/projects/create')->assertOk();
+        $this->actingAs($user)->get('/profile')->assertOk();
+        $this->actingAs($user)->get('/quotations/history')->assertOk();
         $this->actingAs($user)->get('/quotation')->assertOk();
         $this->actingAs($user)->get('/admin')->assertOk();
         $this->actingAs($user)->get('/newItem')->assertOk();

@@ -153,6 +153,12 @@ Route::middleware('auth')->group(function () {
         ->name('dashboard');
     Route::get('/dashboard-react', [\App\Http\Controllers\DashboardController::class, 'index'])
         ->name('dashboard.react');
+    Route::get('/dashboard-legacy', [\App\Http\Controllers\DashboardController::class, 'legacy'])
+        ->name('dashboard.legacy');
+    Route::get('/projects-legacy', [App\Http\Controllers\ProjectController::class, 'index'])
+        ->name('projects.legacy.index');
+    Route::get('/profile-legacy', [App\Http\Controllers\ProfileController::class, 'edit'])
+        ->name('profile.legacy.edit');
 
     // 2. Quotation Routes
     Route::get('/quotation', [QuotationController::class, 'index'])->name('quotation.index');
