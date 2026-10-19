@@ -1,13 +1,10 @@
-<svg viewBox="0 0 400 100" xmlns="http://www.w3.org/2000/svg" {{ $attributes->merge(['class' => '']) }} style="height: auto; max-height: 100%;">
-    <!-- Subtle wave graphic -->
-    <path d="M 10,60 C 25,40 35,80 50,60 C 65,40 75,80 90,60" fill="transparent" stroke="#3b82f6" stroke-width="4" stroke-linecap="round" />
-    <path d="M 10,75 C 25,55 35,95 50,75 C 65,55 75,95 90,75" fill="transparent" stroke="#10b981" stroke-width="4" stroke-linecap="round" opacity="0.7" />
-    
-    <!-- Text Base -->
-    <text x="110" y="65" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="800" font-size="32" fill="currentColor" letter-spacing="-0.03em">
-        ECO <tspan fill="#3b82f6">HYDROTECH</tspan>
-    </text>
-    <text x="112" y="85" font-family="'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-weight="600" font-size="12" fill="#64748b" letter-spacing="0.2em">
-        SOLUTIONS
-    </text>
-</svg>
+<div {{ $attributes->merge(['class' => 'd-inline-flex align-items-center gap-2']) }} style="text-decoration: none;">
+    <div style="width: 38px; height: 38px; border-radius: 9px; background: #f0f7fb; border: 1px solid #d4e4ee; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;">
+        <img src="{{ asset('images/logo.png') }}" alt="Eco HydroTech Logo" style="width: 30px; height: 30px; object-fit: contain; display: block;">
+    </div>
+    <div style="display: flex; flex-direction: column; text-align: left; line-height: 1.2;">
+        <span style="font-weight: 700; font-size: 1.05rem; letter-spacing: -0.02em; color: currentColor;">Eco HydroTech</span>
+        <span style="font-size: 0.65rem; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; opacity: 0.75; color: currentColor;">Survey Estimation System</span>
+    </div>
+</div>
+

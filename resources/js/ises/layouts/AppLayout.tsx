@@ -50,8 +50,13 @@ export function AppLayout({ children, title = 'Overview' }: PropsWithChildren<{ 
             <aside className={`ises-sidebar ${mobileNavOpen ? 'is-open' : ''}`} aria-label="Main navigation">
                 <div className="ises-sidebar-header">
                     <Link className="ises-brand" href="/dashboard" aria-label="Eco HydroTech home" onClick={() => setMobileNavOpen(false)}>
-                        <span className="ises-brand-name">Eco HydroTech</span>
-                        <span className="ises-brand-caption">Survey estimation workspace</span>
+                        <div className="ises-brand-mark">
+                            <img src="/images/logo.png" alt="Eco HydroTech Logo" className="ises-brand-logo-img" />
+                        </div>
+                        <div className="ises-brand-text">
+                            <span className="ises-brand-name ises-brand-title">Eco HydroTech</span>
+                            <span className="ises-brand-caption ises-brand-subtitle">Survey Estimation System</span>
+                        </div>
                     </Link>
                     <button
                         type="button"

@@ -5,28 +5,31 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="shrink-0 flex items-center">
-                    <a href="{{ route('dashboard') }}" style="display: flex; align-items: center; text-decoration: none;">
-                        <x-application-logo class="block h-12 w-auto" style="color: #0f172a;" />
+                    <a href="{{ route('dashboard') }}" style="display: flex; align-items: center; text-decoration: none; gap: 10px;">
+                        <img src="{{ asset('images/logo.png') }}" alt="Eco HydroTech Logo" style="height: 38px; width: auto; object-fit: contain;">
+                        <div class="d-none d-sm-flex flex-column text-start">
+                            <span style="font-weight: 700; font-size: 1rem; color: #0f2b3c; line-height: 1.1; letter-spacing: -0.02em;">Eco HydroTech</span>
+                            <span style="font-size: 0.65rem; font-weight: 600; color: #64748b; letter-spacing: 0.08em; text-transform: uppercase;">Survey Estimation System</span>
+                        </div>
                     </a>
                 </div>
 
                 <!-- Navigation Links -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                <div class="hidden space-x-2 sm:-my-px sm:ms-8 sm:flex sm:items-center">
                     <x-nav-link :href="route('projects.index')" :active="request()->routeIs('projects.*')" 
-                                style="border-bottom-width: 2px; padding-top: 2px; font-weight: 500; font-size: 0.95rem; color: {{ request()->routeIs('projects.*') ? '#0f172a' : '#64748b' }}; border-color: {{ request()->routeIs('projects.*') ? '#3b82f6' : 'transparent' }};">
+                                style="border: 0; padding: 6px 14px; border-radius: 8px; font-weight: 600; font-size: 0.88rem; text-decoration: none; transition: all 0.15s ease; color: {{ request()->routeIs('projects.*') ? '#0f2b3c' : '#52677b' }}; background: {{ request()->routeIs('projects.*') ? '#e8f1f5' : 'transparent' }};">
                         {{ __('Projects') }}
                     </x-nav-link>
                     
                     <x-nav-link :href="route('admin.index')" :active="request()->routeIs('admin.index') || request()->routeIs('newItem') || request()->routeIs('items.*')" 
-                                style="border-bottom-width: 2px; padding-top: 2px; font-weight: 500; font-size: 0.95rem; color: {{ request()->routeIs('admin.index') || request()->routeIs('newItem') || request()->routeIs('items.*') ? '#0f172a' : '#64748b' }}; border-color: {{ request()->routeIs('admin.index') || request()->routeIs('newItem') || request()->routeIs('items.*') ? '#3b82f6' : 'transparent' }};">
+                                style="border: 0; padding: 6px 14px; border-radius: 8px; font-weight: 600; font-size: 0.88rem; text-decoration: none; transition: all 0.15s ease; color: {{ request()->routeIs('admin.index') || request()->routeIs('newItem') || request()->routeIs('items.*') ? '#0f2b3c' : '#52677b' }}; background: {{ request()->routeIs('admin.index') || request()->routeIs('newItem') || request()->routeIs('items.*') ? '#e8f1f5' : 'transparent' }};">
                         {{ __('Modelling Catalog') }}
                     </x-nav-link>
                     
                     <x-nav-link :href="route('admin.equipment.index')" :active="request()->routeIs('admin.equipment.*')" 
-                                style="border-bottom-width: 2px; padding-top: 2px; font-weight: 500; font-size: 0.95rem; color: {{ request()->routeIs('admin.equipment.*') ? '#0f172a' : '#64748b' }}; border-color: {{ request()->routeIs('admin.equipment.*') ? '#3b82f6' : 'transparent' }};">
+                                style="border: 0; padding: 6px 14px; border-radius: 8px; font-weight: 600; font-size: 0.88rem; text-decoration: none; transition: all 0.15s ease; color: {{ request()->routeIs('admin.equipment.*') ? '#0f2b3c' : '#52677b' }}; background: {{ request()->routeIs('admin.equipment.*') ? '#e8f1f5' : 'transparent' }};">
                         {{ __('Drone Mapping Equipment') }}
                     </x-nav-link>
-
                 </div>
             </div>
 

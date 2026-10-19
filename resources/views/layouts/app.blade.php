@@ -34,8 +34,13 @@
                 <aside id="isesSidebar" class="ises-sidebar print:hidden" aria-label="Main navigation">
                     <div class="ises-sidebar-header">
                         <a href="{{ route('dashboard') }}" class="ises-brand" aria-label="Eco HydroTech home">
-                            <span class="ises-brand-name">Eco HydroTech</span>
-                            <span class="ises-brand-caption">Survey estimation workspace</span>
+                            <div class="ises-brand-mark">
+                                <img src="{{ asset('images/logo.png') }}" alt="Eco HydroTech Logo" class="ises-brand-logo-img">
+                            </div>
+                            <div class="ises-brand-text">
+                                <span class="ises-brand-name ises-brand-title">Eco HydroTech</span>
+                                <span class="ises-brand-caption ises-brand-subtitle">Survey Estimation System</span>
+                            </div>
                         </a>
                         <button type="button" id="isesMobileCloseBtn" class="ises-mobile-close-btn" aria-label="Close navigation drawer">
                             <i class="fa-solid fa-xmark"></i>

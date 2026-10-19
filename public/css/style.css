@@ -121,14 +121,14 @@
     color: var(--ises-muted);
     text-decoration: none;
     border-radius: 8px;
-    border-left: 3px solid transparent;
+    border: 0;
 }
 
 .ises-nav-link:hover,
 .ises-nav-link.active {
     color: var(--ises-teal);
     background: var(--ises-teal-soft);
-    border-left-color: transparent;
+    border: 0;
 }
 
 .ises-nav-link i {

@@ -280,13 +280,13 @@
     color: #356b91 !important;
 }
 .ises-sidebar .ises-nav-link.active {
-    border-color: #d7e5ef !important;
-    background: #e5eff6 !important;
-    color: #17496d !important;
-    box-shadow: inset 3px 0 #4388b5 !important;
+    border-color: transparent !important;
+    background: #e8f1f5 !important;
+    color: #0f2b3c !important;
+    box-shadow: none !important;
 }
 .ises-sidebar .ises-nav-link.active i {
-    color: #2b729f !important;
+    color: #193f55 !important;
 }
 .ises-sidebar .ises-nav-link:focus-visible,
 .ises-sidebar .ises-sidebar-brand a:focus-visible,
@@ -593,13 +593,13 @@
     transition: color .15s, background-color .15s, border-color .15s !important;
 }
 .ises-sidebar .ises-nav-link.active {
-    border-color: #d6e4ef !important;
-    background: #e7f0f6 !important;
-    color: #164a6c !important;
-    box-shadow: inset 3px 0 #377fa9 !important;
+    border-color: transparent !important;
+    background: #e8f1f5 !important;
+    color: #0f2b3c !important;
+    box-shadow: none !important;
 }
 .ises-sidebar .ises-nav-link.active i {
-    color: #286e99 !important;
+    color: #193f55 !important;
 }
 .ises-sidebar .ises-nav-link:hover:not(.active) {
     border-color: #e2eaf0 !important;
@@ -659,38 +659,80 @@
     border-bottom: 1px solid #dce5ee !important;
     background: #ffffff !important;
 }
-.ises-shell .ises-brand {
+.ises-shell .ises-brand,
+.ises-sidebar .ises-brand,
+.ises-brand {
     display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
-    justify-content: center !important;
-    gap: 3px !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 10px !important;
     min-height: 52px !important;
     height: auto !important;
-    padding: 0 10px !important;
+    padding: 0 4px !important;
     border: 0 !important;
     background: transparent !important;
     text-decoration: none !important;
+    width: auto !important;
 }
-.ises-shell .ises-brand-name {
+
+.ises-brand-mark {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    border-radius: 9px !important;
+    background: #f0f7fb !important;
+    border: 1px solid #d4e4ee !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+}
+
+.ises-brand-logo-img {
+    width: 30px !important;
+    height: 30px !important;
+    object-fit: contain !important;
     display: block !important;
     margin: 0 !important;
-    color: #193a56 !important;
-    font-family: 'Space Grotesk', 'DM Sans', sans-serif !important;
-    font-size: 18px !important;
+}
+
+.ises-brand-text {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    gap: 1px !important;
+    min-width: 0 !important;
+}
+
+.ises-shell .ises-brand-name,
+.ises-brand-name,
+.ises-brand-title {
+    display: block !important;
+    margin: 0 !important;
+    color: #0f2b3c !important;
+    font-family: 'Space Grotesk', 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 15px !important;
     font-weight: 700 !important;
-    letter-spacing: -.045em !important;
+    letter-spacing: -.02em !important;
     line-height: 1.2 !important;
+    white-space: nowrap !important;
 }
-.ises-shell .ises-brand-caption {
+
+.ises-shell .ises-brand-caption,
+.ises-brand-caption,
+.ises-brand-subtitle {
     display: block !important;
     margin: 0 !important;
-    color: #6d8496 !important;
+    color: #64748b !important;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
     font-size: 9px !important;
-    font-weight: 700 !important;
-    letter-spacing: .105em !important;
-    line-height: 1.5 !important;
+    font-weight: 600 !important;
+    letter-spacing: .05em !important;
+    line-height: 1.2 !important;
     text-transform: uppercase !important;
+    white-space: nowrap !important;
 }
 .ises-shell .ises-nav {
     display: grid !important;
@@ -744,13 +786,14 @@
 .ises-shell .ises-nav-link:hover .ises-nav-icon { color: #356b91 !important; }
 .ises-shell .ises-nav-link.is-active,
 .ises-shell .ises-nav-link[aria-current="page"] {
-    border-color: #d6e4ef !important;
-    background: #e7f0f6 !important;
-    color: #164a6c !important;
-    box-shadow: inset 3px 0 #377fa9 !important;
+    border-color: transparent !important;
+    background: #e8f1f5 !important;
+    color: #0f2b3c !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
 }
 .ises-shell .ises-nav-link.is-active .ises-nav-icon,
-.ises-shell .ises-nav-link[aria-current="page"] .ises-nav-icon { color: #286e99 !important; }
+.ises-shell .ises-nav-link[aria-current="page"] .ises-nav-icon { color: #193f55 !important; }
 .ises-shell .ises-sidebar-account {
     display: flex !important;
     align-items: center !important;
@@ -925,3 +968,146 @@
     grid-column: 1 / -1 !important;
     width: 100% !important;
 }
+
+/* ============================================================
+   DEFINITIVE NAVIGATION & BRAND HEADER STYLING
+   ============================================================ */
+.ises-sidebar .ises-sidebar-header,
+.ises-shell .ises-sidebar-header,
+.ises-sidebar-header {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    min-height: 44px !important;
+    height: auto !important;
+    padding: 0 !important;
+    margin-bottom: 20px !important;
+    border: 0 !important;
+    border-bottom: 0 !important;
+    background: transparent !important;
+}
+
+.ises-sidebar .ises-brand,
+.ises-shell .ises-brand,
+.ises-brand {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center !important;
+    gap: 10px !important;
+    text-decoration: none !important;
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+}
+
+.ises-brand-mark {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    border-radius: 9px !important;
+    background: #f0f7fb !important;
+    border: 1px solid #d4e4ee !important;
+    overflow: hidden !important;
+    flex-shrink: 0 !important;
+}
+
+.ises-brand-logo-img {
+    width: 30px !important;
+    height: 30px !important;
+    object-fit: contain !important;
+    display: block !important;
+    margin: 0 !important;
+}
+
+.ises-brand-text {
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: center !important;
+    min-width: 0 !important;
+    gap: 1px !important;
+}
+
+.ises-brand-name,
+.ises-brand-title {
+    font-family: 'Space Grotesk', 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 15px !important;
+    font-weight: 700 !important;
+    color: #0f2b3c !important;
+    line-height: 1.2 !important;
+    letter-spacing: -0.02em !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.ises-brand-caption,
+.ises-brand-subtitle {
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 9px !important;
+    font-weight: 600 !important;
+    color: #64748b !important;
+    line-height: 1.2 !important;
+    letter-spacing: 0.05em !important;
+    text-transform: uppercase !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+/* NAVIGATION LINKS: CLEAN SOLID PILL WITHOUT LINES OR INSETS */
+.ises-sidebar .ises-nav-link,
+.ises-shell .ises-nav-link {
+    display: flex !important;
+    align-items: center !important;
+    gap: 11px !important;
+    width: 100% !important;
+    min-height: 42px !important;
+    margin: 0 !important;
+    padding: 0 12px !important;
+    border: 0 !important;
+    border-radius: 8px !important;
+    background: transparent !important;
+    color: #52677b !important;
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif !important;
+    font-size: 13.5px !important;
+    font-weight: 600 !important;
+    line-height: 1.25 !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    transition: all .15s ease !important;
+}
+
+.ises-sidebar .ises-nav-link:hover:not(.is-active):not(.active),
+.ises-shell .ises-nav-link:hover:not(.is-active):not(.active) {
+    background: #f1f5f9 !important;
+    color: #0f2b3c !important;
+    box-shadow: none !important;
+    border: 0 !important;
+}
+
+.ises-sidebar .ises-nav-link.active,
+.ises-sidebar .ises-nav-link.is-active,
+.ises-shell .ises-nav-link.active,
+.ises-shell .ises-nav-link.is-active,
+.ises-shell .ises-nav-link[aria-current="page"] {
+    background: #e8f1f5 !important;
+    color: #0f2b3c !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+    border: 0 !important;
+}
+
+.ises-sidebar .ises-nav-link.active i,
+.ises-sidebar .ises-nav-link.is-active i,
+.ises-sidebar .ises-nav-link.active .ises-nav-icon,
+.ises-sidebar .ises-nav-link.is-active .ises-nav-icon,
+.ises-shell .ises-nav-link.active .ises-nav-icon,
+.ises-shell .ises-nav-link.is-active .ises-nav-icon,
+.ises-shell .ises-nav-link[aria-current="page"] .ises-nav-icon {
+    color: #193f55 !important;
+}
+
