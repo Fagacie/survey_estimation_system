@@ -1673,3 +1673,114 @@ html body .workspace-container .leaflet-container {
         grid-row: 1 !important;
     }
 }
+
+/* ============================================================
+   COORDINATE BOUNDARY INPUT MODAL STYLES
+   ============================================================ */
+.coord-modal-content {
+    border: 1px solid #d8e3ea;
+    border-radius: 12px;
+    box-shadow: 0 16px 40px rgba(15, 43, 60, 0.22);
+    background: #ffffff;
+}
+
+.coord-modal-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    background: #ecfdf5;
+    color: #10b981;
+    font-size: 1rem;
+}
+
+.coord-order-box {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 10px 14px;
+}
+
+.coord-order-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #334155;
+    margin-right: 12px;
+}
+
+.coord-nav-pills .nav-link {
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 6px 14px;
+    border-radius: 7px;
+    color: #475569;
+    background: #f1f5f9;
+    margin-right: 6px;
+    transition: all 0.15s ease-in-out;
+}
+
+.coord-nav-pills .nav-link.active {
+    background: #193f55 !important;
+    color: #ffffff !important;
+}
+
+.coord-textarea {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.82rem;
+    line-height: 1.5;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    resize: vertical;
+}
+
+.coord-textarea:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.coord-table th {
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: #f8fafc;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.coord-table td {
+    padding: 3px 6px;
+}
+
+.coord-table input.form-control-sm {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-size: 0.8rem;
+    padding: 3px 6px;
+    border-radius: 5px;
+}
+
+.coord-alert {
+    padding: 10px 14px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    border: 1px solid transparent;
+}
+
+.coord-alert.alert-valid {
+    background: #ecfdf5;
+    border-color: #a7f3d0;
+    color: #065f46;
+}
+
+.coord-alert.alert-invalid {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: #991b1b;
+}
+
+.coord-alert.alert-warning {
+    background: #fffbeb;
+    border-color: #fde68a;
+    color: #92400e;
+}

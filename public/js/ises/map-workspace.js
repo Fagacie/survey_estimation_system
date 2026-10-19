@@ -294,6 +294,487 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Coordinate Boundary Input Modal Controller
+    initCoordinateBoundaryInput();
+
+    function initCoordinateBoundaryInput() {
+        var modalEl = document.getElementById('coordInputModal');
+        if (!modalEl) return;
+
+        var bulkTextarea = document.getElementById('coord-bulk-input');
+        var tableBody = document.getElementById('coord-table-body');
+        var btnAddRow = document.getElementById('btn-add-coord-row');
+        var btnParseToTable = document.getElementById('btn-parse-to-table');
+        var btnSyncToBulk = document.getElementById('btn-sync-to-bulk');
+        var btnPreview = document.getElementById('btn-coord-preview');
+        var btnApply = document.getElementById('btn-coord-apply');
+        var alertBox = document.getElementById('coord-validation-alert');
+        var alertTitle = document.getElementById('coord-validation-title');
+        var alertMsg = document.getElementById('coord-validation-msg');
+        var alertIcon = document.getElementById('coord-validation-icon');
+        var thCoord1 = document.getElementById('th-coord-1');
+        var thCoord2 = document.getElementById('th-coord-2');
+        var orderRadios = document.querySelectorAll('input[name="coordOrder"]');
+
+        var coordPreviewLayer = null;
+        var activeOrder = 'latlng';
+        var activeTab = 'bulk';
+
+        function getSelectedOrder() {
+            var selected = document.querySelector('input[name="coordOrder"]:checked');
+            return selected ? selected.value : 'latlng';
+        }
+
+        function updateTableHeaders() {
+            activeOrder = getSelectedOrder();
+            if (activeOrder === 'latlng') {
+                if (thCoord1) thCoord1.innerText = 'Latitude (deg)';
+                if (thCoord2) thCoord2.innerText = 'Longitude (deg)';
+            } else {
+                if (thCoord1) thCoord1.innerText = 'Longitude (deg)';
+                if (thCoord2) thCoord2.innerText = 'Latitude (deg)';
+            }
+        }
+
+        orderRadios.forEach(function (radio) {
+            radio.addEventListener('change', function () {
+                updateTableHeaders();
+                validateCurrentInput();
+                if (coordPreviewLayer) {
+                    renderPreview();
+                }
+            });
+        });
+
+        function parseBulkText(text, order) {
+            if (!text || !text.trim()) return { points: [], errors: [] };
+            var lines = text.split(/\r?\n/);
+            var points = [];
+            var errors = [];
+
+            lines.forEach(function (rawLine, idx) {
+                var lineNum = idx + 1;
+                var trimmed = rawLine.trim();
+                if (!trimmed || trimmed.startsWith('#') || trimmed.startsWith('//')) return;
+
+                var cleaned = trimmed.replace(/^[(\[{]+|[)\]}]+$/g, '').trim();
+                var matches = cleaned.match(/-?\d+(?:\.\d+)?/g);
+                if (!matches || matches.length < 2) {
+                    errors.push('Line ' + lineNum + ': "' + trimmed + '" does not contain two valid numbers.');
+                    return;
+                }
+
+                var num1 = parseFloat(matches[0]);
+                var num2 = parseFloat(matches[1]);
+                var lat = order === 'latlng' ? num1 : num2;
+                var lng = order === 'latlng' ? num2 : num1;
+
+                points.push({ lat: lat, lng: lng, lineNum: lineNum, raw: trimmed });
+            });
+
+            return { points: points, errors: errors };
+        }
+
+        function getPointsFromTable(order) {
+            var rows = tableBody.querySelectorAll('tr');
+            var points = [];
+            var errors = [];
+
+            rows.forEach(function (row, idx) {
+                var lineNum = idx + 1;
+                var input1 = row.querySelector('.coord-input-1');
+                var input2 = row.querySelector('.coord-input-2');
+                if (!input1 || !input2) return;
+
+                var v1 = input1.value.trim();
+                var v2 = input2.value.trim();
+                if (v1 === '' && v2 === '') return;
+
+                var n1 = parseFloat(v1);
+                var n2 = parseFloat(v2);
+
+                if (isNaN(n1) || isNaN(n2)) {
+                    errors.push('Point #' + lineNum + ' contains invalid numbers.');
+                    return;
+                }
+
+                var lat = order === 'latlng' ? n1 : n2;
+                var lng = order === 'latlng' ? n2 : n1;
+                points.push({ lat: lat, lng: lng, lineNum: lineNum });
+            });
+
+            return { points: points, errors: errors };
+        }
+
+        function validatePoints(points, parseErrors) {
+            if (parseErrors && parseErrors.length > 0) {
+                return { valid: false, message: parseErrors[0], points: points };
+            }
+
+            if (!points || points.length < 3) {
+                return {
+                    valid: false,
+                    message: 'At least 3 distinct coordinate points are required to define a boundary polygon (currently ' + (points ? points.length : 0) + ').',
+                    points: points || []
+                };
+            }
+
+            for (var i = 0; i < points.length; i++) {
+                var p = points[i];
+                if (p.lat < -90 || p.lat > 90) {
+                    var hint = (p.lng >= -90 && p.lng <= 90)
+                        ? ' Tip: Your coordinates appear to be in Longitude, Latitude order. Select "Longitude, Latitude" above.'
+                        : '';
+                    return {
+                        valid: false,
+                        message: 'Point #' + (i + 1) + ' Latitude (' + p.lat + ') is out of range. Latitude must be between -90 and +90 degrees.' + hint,
+                        points: points
+                    };
+                }
+                if (p.lng < -180 || p.lng > 180) {
+                    return {
+                        valid: false,
+                        message: 'Point #' + (i + 1) + ' Longitude (' + p.lng + ') is out of range. Longitude must be between -180 and +180 degrees.',
+                        points: points
+                    };
+                }
+            }
+
+            var deduped = [];
+            for (var j = 0; j < points.length; j++) {
+                if (j === 0 || Math.abs(points[j].lat - points[j - 1].lat) > 1e-7 || Math.abs(points[j].lng - points[j - 1].lng) > 1e-7) {
+                    deduped.push(points[j]);
+                }
+            }
+
+            if (deduped.length < 3) {
+                return {
+                    valid: false,
+                    message: 'Coordinates contain duplicate vertices. At least 3 distinct non-identical points are required.',
+                    points: points
+                };
+            }
+
+            var ring = deduped.map(function (pt) { return [pt.lng, pt.lat]; });
+            var first = ring[0];
+            var last = ring[ring.length - 1];
+            if (Math.abs(first[0] - last[0]) > 1e-7 || Math.abs(first[1] - last[1]) > 1e-7) {
+                ring.push([first[0], first[1]]);
+            }
+
+            if (ring.length < 4) {
+                return { valid: false, message: 'Invalid polygon geometry.', points: points };
+            }
+
+            try {
+                var turfPoly = turf.polygon([ring]);
+                var area = turf.area(turfPoly);
+                if (area <= 0) {
+                    return {
+                        valid: false,
+                        message: 'Polygon vertices are collinear (zero surface area). Please check your coordinates.',
+                        points: points
+                    };
+                }
+
+                var kinks = turf.kinks(turfPoly);
+                if (kinks && kinks.features && kinks.features.length > 0) {
+                    return {
+                        valid: false,
+                        hasKinks: true,
+                        message: 'Polygon contains ' + kinks.features.length + ' self-intersection(s) (edges cross each other). Please adjust coordinate sequence.',
+                        points: points,
+                        geojson: turfPoly
+                    };
+                }
+
+                var perim = turf.length(turf.polygonToLine(turfPoly), { units: 'meters' });
+                return {
+                    valid: true,
+                    points: deduped,
+                    geojson: turfPoly,
+                    area: area,
+                    perimeter: perim,
+                    message: 'Valid boundary: ' + deduped.length + ' vertices. Area: ' + (area / 1000000).toFixed(3) + ' km², Perimeter: ' + (perim / 1000).toFixed(2) + ' km.'
+                };
+            } catch (err) {
+                return { valid: false, message: 'Geometry calculation error: ' + err.message, points: points };
+            }
+        }
+
+        function renderTable(points) {
+            tableBody.innerHTML = '';
+            var order = getSelectedOrder();
+
+            if (!points || points.length === 0) {
+                for (var k = 0; k < 4; k++) addTableRow('', '');
+                return;
+            }
+
+            points.forEach(function (pt) {
+                var v1 = order === 'latlng' ? pt.lat : pt.lng;
+                var v2 = order === 'latlng' ? pt.lng : pt.lat;
+                addTableRow(v1, v2);
+            });
+        }
+
+        function addTableRow(val1, val2) {
+            var rowIdx = tableBody.querySelectorAll('tr').length + 1;
+            var tr = document.createElement('tr');
+            tr.innerHTML = '<td class="text-center fw-bold text-muted" style="font-size: 0.75rem;">' + rowIdx + '</td>' +
+                '<td><input type="number" step="any" class="form-control form-control-sm coord-input-1" value="' + (val1 !== undefined ? val1 : '') + '"></td>' +
+                '<td><input type="number" step="any" class="form-control form-control-sm coord-input-2" value="' + (val2 !== undefined ? val2 : '') + '"></td>' +
+                '<td class="text-center"><button type="button" class="btn btn-sm btn-link text-danger p-0 btn-del-row" title="Delete Point"><i class="fa-solid fa-trash-can" style="font-size: 0.8rem;"></i></button></td>';
+
+            tr.querySelector('.btn-del-row').addEventListener('click', function () {
+                tr.remove();
+                renumberTableRows();
+                validateCurrentInput();
+            });
+
+            tr.querySelectorAll('input').forEach(function (input) {
+                input.addEventListener('input', function () {
+                    validateCurrentInput();
+                });
+            });
+
+            tableBody.appendChild(tr);
+        }
+
+        function renumberTableRows() {
+            var rows = tableBody.querySelectorAll('tr');
+            rows.forEach(function (row, idx) {
+                var td = row.querySelector('td');
+                if (td) td.innerText = (idx + 1);
+            });
+        }
+
+        function getCurrentPoints() {
+            var order = getSelectedOrder();
+            if (activeTab === 'bulk') {
+                return parseBulkText(bulkTextarea.value, order);
+            } else {
+                return getPointsFromTable(order);
+            }
+        }
+
+        function validateCurrentInput() {
+            var result = getCurrentPoints();
+            var validation = validatePoints(result.points, result.errors);
+
+            if (validation.valid) {
+                alertBox.className = 'coord-alert alert-valid mt-3';
+                alertTitle.innerText = 'Boundary Coordinates Valid';
+                alertMsg.innerText = validation.message;
+                alertIcon.className = 'fa-solid fa-circle-check mt-1';
+                alertBox.classList.remove('d-none');
+                btnApply.disabled = false;
+            } else {
+                alertBox.className = 'coord-alert alert-invalid mt-3';
+                alertTitle.innerText = validation.hasKinks ? 'Self-Intersection Warning' : 'Validation Error';
+                alertMsg.innerText = validation.message;
+                alertIcon.className = 'fa-solid fa-circle-exclamation mt-1';
+                alertBox.classList.remove('d-none');
+                btnApply.disabled = true;
+            }
+
+            return validation;
+        }
+
+        if (btnParseToTable) {
+            btnParseToTable.addEventListener('click', function () {
+                var order = getSelectedOrder();
+                var res = parseBulkText(bulkTextarea.value, order);
+                renderTable(res.points);
+                var tableTabBtn = document.getElementById('tab-table-btn');
+                if (tableTabBtn) {
+                    var tab = new bootstrap.Tab(tableTabBtn);
+                    tab.show();
+                }
+            });
+        }
+
+        if (btnSyncToBulk) {
+            btnSyncToBulk.addEventListener('click', function () {
+                var order = getSelectedOrder();
+                var res = getPointsFromTable(order);
+                var text = res.points.map(function (p) {
+                    return (order === 'latlng')
+                        ? p.lat.toFixed(6) + ', ' + p.lng.toFixed(6)
+                        : p.lng.toFixed(6) + ', ' + p.lat.toFixed(6);
+                }).join('\n');
+                bulkTextarea.value = text;
+                var bulkTabBtn = document.getElementById('tab-bulk-btn');
+                if (bulkTabBtn) {
+                    var tab = new bootstrap.Tab(bulkTabBtn);
+                    tab.show();
+                }
+            });
+        }
+
+        var bulkTabBtn = document.getElementById('tab-bulk-btn');
+        var tableTabBtn = document.getElementById('tab-table-btn');
+        if (bulkTabBtn) {
+            bulkTabBtn.addEventListener('shown.bs.tab', function () {
+                activeTab = 'bulk';
+                validateCurrentInput();
+            });
+        }
+        if (tableTabBtn) {
+            tableTabBtn.addEventListener('shown.bs.tab', function () {
+                activeTab = 'table';
+                if (tableBody.querySelectorAll('tr').length === 0 && bulkTextarea.value.trim()) {
+                    var order = getSelectedOrder();
+                    var res = parseBulkText(bulkTextarea.value, order);
+                    renderTable(res.points);
+                }
+                validateCurrentInput();
+            });
+        }
+
+        if (btnAddRow) {
+            btnAddRow.addEventListener('click', function () {
+                addTableRow('', '');
+                renumberTableRows();
+                validateCurrentInput();
+            });
+        }
+
+        if (bulkTextarea) {
+            bulkTextarea.addEventListener('input', function () {
+                validateCurrentInput();
+            });
+        }
+
+        function renderPreview() {
+            var validation = validateCurrentInput();
+            if (!validation.valid) {
+                Swal.fire('Cannot Preview', validation.message, 'warning');
+                return;
+            }
+
+            if (coordPreviewLayer) {
+                map.removeLayer(coordPreviewLayer);
+                coordPreviewLayer = null;
+            }
+
+            var latlngs = validation.points.map(function (p) { return [p.lat, p.lng]; });
+            coordPreviewLayer = L.polygon(latlngs, {
+                color: '#06b6d4',
+                weight: 2.5,
+                dashArray: '6, 6',
+                fillOpacity: 0.15,
+                interactive: false
+            }).addTo(map);
+
+            map.fitBounds(coordPreviewLayer.getBounds(), { padding: [50, 50] });
+
+            Swal.fire({
+                icon: 'info',
+                title: 'Previewing on Map',
+                text: 'Temporary boundary preview rendered in cyan. Review positioning and click "Apply Boundary" to confirm.',
+                timer: 2000,
+                showConfirmButton: false
+            });
+        }
+
+        if (btnPreview) {
+            btnPreview.addEventListener('click', renderPreview);
+        }
+
+        if (btnApply) {
+            btnApply.addEventListener('click', function () {
+                var validation = validateCurrentInput();
+                if (!validation.valid) {
+                    Swal.fire('Validation Error', validation.message, 'error');
+                    return;
+                }
+
+                var hasExistingBoundary = false;
+                drawnItems.eachLayer(function (l) {
+                    if (l instanceof L.Polygon) hasExistingBoundary = true;
+                });
+                var hasExistingLines = mainLineLayerGroup.getLayers().length > 0 || crossLineLayerGroup.getLayers().length > 0;
+
+                function applyNewBoundary() {
+                    var oldPolys = [];
+                    drawnItems.eachLayer(function (l) {
+                        if (l instanceof L.Polygon) oldPolys.push(l);
+                    });
+                    oldPolys.forEach(function (l) { drawnItems.removeLayer(l); });
+                    if (boundaryLayerGroup) boundaryLayerGroup.clearLayers();
+                    window.droneEffectiveBoundary = null;
+                    window.droneOriginalBoundary = null;
+                    boundaryFeatures = [];
+
+                    if (coordPreviewLayer) {
+                        map.removeLayer(coordPreviewLayer);
+                        coordPreviewLayer = null;
+                    }
+
+                    var latlngs = validation.points.map(function (p) { return [p.lat, p.lng]; });
+                    var newPoly = L.polygon(latlngs, {
+                        color: '#3b82f6',
+                        weight: 3,
+                        fillOpacity: 0.15
+                    });
+                    drawnItems.addLayer(newPoly);
+
+                    if (!map.hasLayer(drawnItems)) {
+                        drawnItems.addTo(map);
+                    }
+                    var bCheck = document.getElementById('layer-boundaries');
+                    if (bCheck) bCheck.checked = true;
+
+                    markStale();
+                    rebuildLayerGroups();
+                    recalculateAllStats();
+                    map.fitBounds(newPoly.getBounds(), { padding: [50, 50] });
+
+                    var bsModal = bootstrap.Modal.getInstance(modalEl);
+                    if (bsModal) bsModal.hide();
+
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Boundary Applied',
+                        text: 'Survey boundary created with ' + validation.points.length + ' vertices. Area: ' + (validation.area / 1000000).toFixed(3) + ' km².',
+                        timer: 2000,
+                        showConfirmButton: false
+                    });
+                }
+
+                if (hasExistingBoundary || hasExistingLines) {
+                    Swal.fire({
+                        title: 'Replace Survey Boundary?',
+                        text: 'An existing boundary or survey lines are present. Applying these coordinates will replace the boundary and mark survey lines as stale.',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#2563eb',
+                        cancelButtonColor: '#64748b',
+                        confirmButtonText: 'Yes, Apply New Boundary'
+                    }).then(function (result) {
+                        if (result.isConfirmed) {
+                            applyNewBoundary();
+                        }
+                    });
+                } else {
+                    applyNewBoundary();
+                }
+            });
+        }
+
+        modalEl.addEventListener('hidden.bs.modal', function () {
+            if (coordPreviewLayer) {
+                map.removeLayer(coordPreviewLayer);
+                coordPreviewLayer = null;
+            }
+        });
+
+        if (tableBody && tableBody.querySelectorAll('tr').length === 0) {
+            renderTable([]);
+        }
+    }
+
     // 9. Generator buttons
     let btnGenMain = document.getElementById('btn-generate-main');
     if (btnGenMain) {

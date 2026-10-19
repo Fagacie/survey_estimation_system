@@ -69,9 +69,14 @@
                                 <p class="mt-2 mb-2" style="font-size: 0.7rem; color: var(--sidebar-muted);">
                                     <i class="fa-solid fa-info-circle"></i> Use the polygon tool on the map to draw the survey boundary.
                                 </p>
-                                <button type="button" id="btn-clear-boundary" class="btn btn-ws btn-ws-outline-danger w-100">
-                                    <i class="fa-solid fa-trash-can"></i> Clear Boundary
-                                </button>
+                                <div class="d-flex flex-column gap-2 mt-2">
+                                    <button type="button" id="btn-open-coord-modal" class="btn btn-ws btn-ws-secondary w-100" data-bs-toggle="modal" data-bs-target="#coordInputModal">
+                                        <i class="fa-solid fa-keyboard me-1"></i> Enter Coordinates
+                                    </button>
+                                    <button type="button" id="btn-clear-boundary" class="btn btn-ws btn-ws-outline-danger w-100">
+                                        <i class="fa-solid fa-trash-can me-1"></i> Clear Boundary
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -366,6 +371,127 @@
             </div>
 
             <div id="map"></div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         COORDINATE BOUNDARY INPUT MODAL
+         ============================================================ -->
+    <div class="modal fade" id="coordInputModal" tabindex="-1" aria-labelledby="coordInputModalLabel" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content coord-modal-content">
+                <div class="modal-header border-0 pb-0">
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="coord-modal-badge"><i class="fa-solid fa-draw-polygon"></i></span>
+                        <div>
+                            <h5 class="modal-title fw-bold" id="coordInputModalLabel" style="font-size: 1.05rem; color: #0f2b3c;">Define Boundary by Coordinates</h5>
+                            <p class="text-muted mb-0" style="font-size: 0.78rem;">Enter or paste latitude/longitude coordinate pairs to define your survey boundary polygon.</p>
+                        </div>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" id="btn-modal-close-x"></button>
+                </div>
+
+                <div class="modal-body pt-3 pb-2">
+                    <!-- Coordinate Order Selection -->
+                    <div class="coord-order-box mb-3">
+                        <span class="coord-order-title"><i class="fa-solid fa-arrow-right-arrow-left me-1"></i> Coordinate Order:</span>
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="form-check form-check-inline mb-0">
+                                <input class="form-check-input" type="radio" name="coordOrder" id="coordOrderLatLng" value="latlng" checked>
+                                <label class="form-check-label fw-semibold" for="coordOrderLatLng" style="font-size: 0.85rem; color: #1e3a5f;">
+                                    Latitude, Longitude <span class="badge bg-secondary-subtle text-secondary" style="font-size: 0.7rem;">Default</span>
+                                </label>
+                            </div>
+                            <div class="form-check form-check-inline mb-0">
+                                <input class="form-check-input" type="radio" name="coordOrder" id="coordOrderLngLat" value="lnglat">
+                                <label class="form-check-label fw-semibold" for="coordOrderLngLat" style="font-size: 0.85rem; color: #1e3a5f;">
+                                    Longitude, Latitude <span class="badge bg-secondary-subtle text-secondary" style="font-size: 0.7rem;">X, Y / GIS</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Nav Tabs: Bulk Paste vs Table Entry -->
+                    <ul class="nav nav-pills coord-nav-pills mb-3" id="coordTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="tab-bulk-btn" data-bs-toggle="pill" data-bs-target="#tab-bulk-content" type="button" role="tab" aria-selected="true">
+                                <i class="fa-solid fa-paste me-1"></i> Bulk Paste
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="tab-table-btn" data-bs-toggle="pill" data-bs-target="#tab-table-content" type="button" role="tab" aria-selected="false">
+                                <i class="fa-solid fa-table-cells me-1"></i> Table Entry
+                            </button>
+                        </li>
+                    </ul>
+
+                    <div class="tab-content" id="coordTabContent">
+                        <!-- Bulk Paste Tab -->
+                        <div class="tab-pane fade show active" id="tab-bulk-content" role="tabpanel">
+                            <label class="form-label fw-semibold text-secondary" style="font-size: 0.8rem;">
+                                Paste Coordinate Pairs (one pair per line, separated by comma, tab, or space):
+                            </label>
+                            <textarea id="coord-bulk-input" class="form-control coord-textarea" rows="7" placeholder="e.g.&#10;4.2105, 101.9758&#10;4.2105, 102.0500&#10;4.1500, 102.0500&#10;4.1500, 101.9758"></textarea>
+                            <div class="d-flex justify-content-between align-items-center mt-1">
+                                <span class="text-muted" style="font-size: 0.72rem;">
+                                    <i class="fa-solid fa-circle-info me-1"></i> Paste directly from Excel, CSV, or text. Minimum 3 distinct vertices required.
+                                </span>
+                                <button type="button" id="btn-parse-to-table" class="btn btn-sm btn-outline-primary" style="font-size: 0.75rem;">
+                                    <i class="fa-solid fa-arrow-down-long me-1"></i> Sync to Table
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Table Entry Tab -->
+                        <div class="tab-pane fade" id="tab-table-content" role="tabpanel">
+                            <div class="table-responsive coord-table-container" style="max-height: 220px; overflow-y: auto;">
+                                <table class="table table-sm table-bordered coord-table mb-0 align-middle">
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 45px;" class="text-center">#</th>
+                                            <th id="th-coord-1">Latitude (deg)</th>
+                                            <th id="th-coord-2">Longitude (deg)</th>
+                                            <th style="width: 50px;" class="text-center">Del</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="coord-table-body">
+                                        <!-- Dynamic Rows -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center mt-2">
+                                <button type="button" id="btn-add-coord-row" class="btn btn-sm btn-outline-secondary" style="font-size: 0.75rem;">
+                                    <i class="fa-solid fa-plus me-1"></i> Add Point
+                                </button>
+                                <button type="button" id="btn-sync-to-bulk" class="btn btn-sm btn-outline-primary" style="font-size: 0.75rem;">
+                                    <i class="fa-solid fa-arrow-up-long me-1"></i> Sync to Bulk Text
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Validation / Status Alert -->
+                    <div id="coord-validation-alert" class="coord-alert d-none mt-3">
+                        <div class="d-flex align-items-start gap-2">
+                            <i id="coord-validation-icon" class="fa-solid fa-circle-exclamation mt-1"></i>
+                            <div>
+                                <div id="coord-validation-title" class="fw-bold" style="font-size: 0.82rem;">Validation Status</div>
+                                <div id="coord-validation-msg" style="font-size: 0.76rem;">Message</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" id="btn-coord-cancel" class="btn btn-sm btn-light border px-3" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" id="btn-coord-preview" class="btn btn-sm btn-outline-info px-3">
+                        <i class="fa-solid fa-eye me-1"></i> Preview on Map
+                    </button>
+                    <button type="button" id="btn-coord-apply" class="btn btn-sm btn-primary px-3" disabled>
+                        <i class="fa-solid fa-check me-1"></i> Apply Boundary
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
