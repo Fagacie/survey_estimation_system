@@ -1,179 +1,814 @@
+/* ISES Modern Minimalistic Dashboard Stylesheet */
+:root {
+    --dash-ink: #0f2438;
+    --dash-ink-secondary: #334b63;
+    --dash-muted: #64748b;
+    --dash-line: #e2e8f0;
+    --dash-line-soft: #edf2f7;
+    --dash-blue: #1d518a;
+    --dash-blue-light: #2463a6;
+    --dash-blue-soft: #f0f7fb;
+    --dash-teal: #0d9488;
+    --dash-teal-soft: #f0fdfa;
+    --dash-amber: #d97706;
+    --dash-amber-soft: #fffbeb;
+    --dash-emerald: #10b981;
+    --dash-emerald-soft: #ecfdf5;
+    --dash-canvas: #f8fafc;
+    --dash-card-bg: #ffffff;
+    --dash-radius: 12px;
+    --dash-radius-sm: 8px;
+    --dash-shadow-sm: 0 1px 3px rgba(15, 36, 56, 0.04);
+    --dash-shadow: 0 4px 16px -2px rgba(15, 36, 56, 0.05), 0 2px 6px -1px rgba(15, 36, 56, 0.03);
+    --dash-shadow-hover: 0 12px 24px -4px rgba(15, 36, 56, 0.08), 0 4px 8px -2px rgba(15, 36, 56, 0.04);
+}
+
 .ises-dashboard {
-    --dash-ink: #14243a;
-    --dash-muted: #68798d;
-    --dash-line: #dce5ee;
-    --dash-blue: #2463a6;
-    --dash-blue-soft: #edf4fb;
     max-width: 1440px;
     margin: 0 auto;
     color: var(--dash-ink);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
-.ises-dashboard * { box-sizing: border-box; }
-.ises-dashboard-header { display:flex; align-items:flex-end; justify-content:space-between; gap:1.5rem; padding:.85rem 0 1.5rem; border-bottom:1px solid var(--dash-line); margin-bottom:1.35rem; }
-.ises-dashboard-eyebrow { margin:0 0 .45rem; color:var(--dash-blue); font-size:.67rem; font-weight:800; letter-spacing:.13em; text-transform:uppercase; }
-.ises-dashboard h1,.ises-dashboard h2,.ises-dashboard h3,.ises-dashboard p { margin-top:0; }
-.ises-dashboard h1 { margin-bottom:.45rem; color:var(--dash-ink); font-family:'Space Grotesk',sans-serif; font-size:clamp(1.8rem,2.6vw,2.4rem); font-weight:700; line-height:1.1; }
-.ises-dashboard-intro { margin-bottom:0; color:var(--dash-muted); font-size:.9rem; }
-.ises-dashboard-header-actions { display:flex; align-items:center; gap:.7rem; flex-shrink:0; }
-.ises-dashboard-date { display:inline-flex; align-items:center; gap:.45rem; padding:.55rem .75rem; border:1px solid var(--dash-line); border-radius:8px; color:var(--dash-muted); background:#fff; font-size:.72rem; font-weight:700; }
-.ises-dashboard-primary,.ises-dashboard-secondary { display:inline-flex; align-items:center; justify-content:center; gap:.5rem; min-height:42px; padding:.65rem .95rem; border:1px solid var(--dash-blue); border-radius:8px; color:#fff; background:var(--dash-blue); font-size:.8rem; font-weight:700; text-decoration:none; transition:background .15s,border-color .15s; }
-.ises-dashboard-primary:hover { color:#fff; border-color:#1d518a; background:#1d518a; }
-.ises-dashboard-secondary { color:#244b73; background:#fff; border-color:var(--dash-line); }
-.ises-dashboard-secondary:hover { color:#174e7b; border-color:#b8cfe1; background:#f8fbfe; }
-.ises-dashboard-feedback { display:flex; gap:.6rem; align-items:center; margin-bottom:1rem; padding:.8rem 1rem; border:1px solid #bfe4d0; border-radius:8px; color:#17603d; background:#f0faf4; font-size:.85rem; }
-.ises-dashboard-metrics { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:.8rem; margin-bottom:1.25rem; }
-.ises-dashboard-metric { display:flex; flex-direction:column; align-items:flex-start; min-width:0; padding:1.1rem 1.15rem; border:1px solid var(--dash-line); border-radius:10px; background:#fff; box-shadow:0 3px 12px rgba(20,43,73,.035); }
-.ises-dashboard-metric-primary { border-top:3px solid var(--dash-blue); padding-top:calc(1.1rem - 2px); }
-.ises-dashboard-metric-label { color:#5d7086; font-size:.68rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; }
-.ises-dashboard-metric strong { margin:.45rem 0 .25rem; color:var(--dash-ink); font-family:'Space Grotesk',sans-serif; font-size:2rem; line-height:1.1; }
-.ises-dashboard-metric-note { color:var(--dash-muted); font-size:.72rem; line-height:1.45; }
-.ises-dashboard-section { margin-bottom:1.25rem; border:1px solid var(--dash-line); border-radius:11px; background:#fff; box-shadow:0 3px 14px rgba(20,43,73,.035); overflow:hidden; }
-.ises-dashboard-section-heading { display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1.15rem 1.25rem; border-bottom:1px solid #edf1f5; }
-.ises-dashboard-section-heading .ises-dashboard-eyebrow { margin-bottom:.3rem; }
-.ises-dashboard-section-heading h2 { margin-bottom:.25rem; color:var(--dash-ink); font-size:1.12rem; font-weight:750; letter-spacing:-.02em; }
-.ises-dashboard-section-heading p:not(.ises-dashboard-eyebrow) { margin-bottom:0; color:var(--dash-muted); font-size:.78rem; }
-.ises-dashboard-count { flex-shrink:0; padding:.45rem .65rem; border:1px solid #f0dfb7; border-radius:7px; color:#85531c; background:#fffaf0; font-size:.72rem; font-weight:750; }
-.ises-dashboard-attention { border-color:#e6e5dc; }
-.ises-dashboard-attention-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.7rem; padding:1rem; }
-.ises-dashboard-attention-card { display:grid; grid-template-columns:36px minmax(0,1fr) auto auto; align-items:center; gap:.65rem; min-width:0; padding:.8rem; border:1px solid var(--dash-line); border-radius:8px; background:#fff; }
-.ises-dashboard-attention-icon,.ises-dashboard-quick-links a > span { display:flex; align-items:center; justify-content:center; width:36px; height:36px; border-radius:8px; color:var(--dash-blue); background:var(--dash-blue-soft); }
-.ises-dashboard-attention-copy { min-width:0; }
-.ises-dashboard-attention-copy h3 { margin-bottom:.25rem; color:var(--dash-ink); font-size:.79rem; font-weight:750; }
-.ises-dashboard-attention-copy p { margin-bottom:0; color:var(--dash-muted); font-size:.68rem; line-height:1.4; }
-.ises-dashboard-attention-card > strong { color:#87541c; font-size:1.15rem; }
-.ises-dashboard-attention-action { display:inline-flex; align-items:center; justify-content:center; gap:.4rem; min-height:32px; padding:.35rem .55rem; border:1px solid #d9e5f1; border-radius:6px; color:#315d88; background:#f8fbfe; font-size:.7rem; font-weight:750; text-decoration:none; white-space:nowrap; }
-.ises-dashboard-attention-action:hover { color:#173f67; border-color:#b8cfe1; background:#edf4fb; }
-.ises-dashboard-attention-action:focus-visible { outline:3px solid rgba(36,99,166,.35); outline-offset:2px; }
-.ises-dashboard-empty-attention { display:flex; align-items:center; gap:.8rem; padding:1.1rem 1.25rem; color:#17603d; }
-.ises-dashboard-empty-attention > i { font-size:1.3rem; }
-.ises-dashboard-empty-attention strong { font-size:.85rem; }
-.ises-dashboard-empty-attention p { margin:.2rem 0 0; color:var(--dash-muted); font-size:.75rem; }
-.ises-dashboard-recent .ises-dashboard-section-heading { border-bottom:0; }
-.ises-dashboard-table-wrap { overflow-x:auto; }
-.ises-dashboard-table { width:100%; border-collapse:collapse; text-align:left; }
-.ises-dashboard-table thead { background:#f6f8fb; }
-.ises-dashboard-table th { padding:.75rem 1.1rem; border-top:1px solid var(--dash-line); border-bottom:1px solid var(--dash-line); color:#63768b; font-size:.65rem; font-weight:800; letter-spacing:.08em; text-transform:uppercase; white-space:nowrap; }
-.ises-dashboard-table td { padding:.85rem 1.1rem; border-bottom:1px solid #edf1f5; color:#465b72; font-size:.78rem; vertical-align:middle; }
-.ises-dashboard-table tbody tr:last-child td { border-bottom:0; }
-.ises-dashboard-table tbody tr:hover { background:#fbfdff; }
-.ises-dashboard-project-name { display:block; margin-bottom:.2rem; color:#172f4b; font-size:.82rem; font-weight:750; text-decoration:none; }
-.ises-dashboard-project-name:hover { color:var(--dash-blue); }
-.ises-dashboard-project-code { display:block; color:#7b8b9d; font-size:.68rem; }
-.ises-dashboard-type { display:inline-block; padding:.35rem .5rem; border:1px solid #d9e5f1; border-radius:6px; color:#2a5d8b; background:#f3f8fd; font-size:.68rem; font-weight:700; }
-.ises-dashboard-status { display:inline-block; padding:.35rem .55rem; border-radius:6px; color:#536579; background:#f0f3f6; font-size:.68rem; font-weight:750; text-transform:capitalize; }
-.ises-dashboard-status-draft { color:#7b5b20; background:#fff7df; }
-.ises-dashboard-status-planned { color:#245d96; background:#edf4fb; }
-.ises-dashboard-status-completed { color:#17603d; background:#eaf7ef; }
-.ises-dashboard-row-action { text-align:right; white-space:nowrap; }
-.ises-dashboard-row-action a { color:#315d88; font-size:.74rem; font-weight:750; text-decoration:none; }
-.ises-dashboard-row-action a:hover { color:#173f67; }
-.ises-dashboard-row-action i { margin-left:.25rem; font-size:.67rem; }
-.ises-dashboard-empty-projects { display:flex; flex-direction:column; align-items:center; padding:2.5rem 1.25rem; text-align:center; }
-.ises-dashboard-empty-icon { display:flex; align-items:center; justify-content:center; width:48px; height:48px; margin-bottom:.8rem; border-radius:12px; color:var(--dash-blue); background:var(--dash-blue-soft); font-size:1.2rem; }
-.ises-dashboard-empty-projects h3 { margin-bottom:.35rem; font-size:1rem; font-weight:750; }
-.ises-dashboard-empty-projects p { max-width:420px; margin-bottom:1rem; color:var(--dash-muted); font-size:.8rem; }
-.ises-dashboard-quick-links { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.8rem; }
-.ises-dashboard-quick-links a { display:flex; align-items:center; gap:.75rem; min-width:0; padding:.85rem; border:1px solid var(--dash-line); border-radius:9px; color:var(--dash-ink); background:#fff; text-decoration:none; transition:border-color .15s,background .15s; }
-.ises-dashboard-quick-links a:hover { border-color:#b8cfe1; background:#f8fbfe; }
-.ises-dashboard-quick-links a > span { flex:0 0 36px; }
-.ises-dashboard-quick-links a div { display:flex; flex:1; flex-direction:column; min-width:0; gap:.2rem; }
-.ises-dashboard-quick-links a strong { font-size:.78rem; font-weight:750; }
-.ises-dashboard-quick-links a small { color:var(--dash-muted); font-size:.68rem; }
-.ises-dashboard-quick-links a > i { color:#8495a8; font-size:.7rem; }
-@media (max-width:1150px) { .ises-dashboard-metrics { grid-template-columns:repeat(3,minmax(0,1fr)); } .ises-dashboard-attention-grid { grid-template-columns:1fr; } }
-@media (max-width:720px) {
- .ises-dashboard-header { align-items:flex-start; flex-direction:column; gap:1rem; }
- .ises-dashboard-header-actions { width:100%; justify-content:space-between; }
- .ises-dashboard-metrics { grid-template-columns:repeat(2,minmax(0,1fr)); gap:.6rem; }
- .ises-dashboard-metric { padding:.85rem; }
- .ises-dashboard-metric strong { font-size:1.7rem; }
- .ises-dashboard-section-heading { align-items:flex-start; flex-direction:column; }
- .ises-dashboard-quick-links { grid-template-columns:1fr; }
- .ises-dashboard-table { min-width:720px; }
+
+.ises-dashboard * {
+    box-sizing: border-box;
 }
-@media (max-width:420px) { .ises-dashboard-metrics { grid-template-columns:1fr 1fr; } .ises-dashboard-date { font-size:.68rem; } }
 
+/* ============================================================
+   1. DASHBOARD HEADER & QUICK ACTIONS
+   ============================================================ */
+.ises-dashboard-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 0.5rem 0 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--dash-line);
+}
 
-/* Interactive dashboard cards and primary quick-access placement. */
-.ises-dashboard-quick-links { margin: 0 0 1rem; }
-.ises-dashboard-metric-link {
-    color: inherit;
+.ises-dashboard-header-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.ises-dashboard-header-title h1 {
+    margin: 0;
+    color: var(--dash-ink);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.6rem, 2.2vw, 2.1rem);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+}
+
+.ises-dashboard-header-title p {
+    margin: 0;
+    color: var(--dash-muted);
+    font-size: 0.88rem;
+    font-weight: 400;
+}
+
+.ises-dashboard-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.ises-dashboard-utility-links {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ises-dashboard-utility-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    height: 38px;
+    padding: 0 0.85rem;
+    border: 1px solid var(--dash-line);
+    border-radius: var(--dash-radius-sm);
+    background: #ffffff;
+    color: var(--dash-ink-secondary);
+    font-size: 0.8rem;
+    font-weight: 600;
     text-decoration: none;
-    cursor: pointer;
-    transition: border-color .16s ease, background-color .16s ease, box-shadow .16s ease, transform .16s ease;
+    transition: all 0.15s ease;
 }
-.ises-dashboard-metric-link:hover {
+
+.ises-dashboard-utility-link:hover {
+    border-color: #b8cfe1;
+    background: var(--dash-blue-soft);
+    color: var(--dash-blue-light);
+    transform: translateY(-1px);
+}
+
+.ises-dashboard-utility-link i {
+    font-size: 0.85rem;
+    color: var(--dash-muted);
+    transition: color 0.15s ease;
+}
+
+.ises-dashboard-utility-link:hover i {
+    color: var(--dash-blue-light);
+}
+
+.ises-dashboard-primary-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    height: 38px;
+    padding: 0 1.15rem;
+    border: 1px solid var(--dash-blue-light);
+    border-radius: var(--dash-radius-sm);
+    background: var(--dash-blue-light);
+    color: #ffffff !important;
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    box-shadow: 0 2px 8px rgba(36, 99, 166, 0.22);
+    transition: all 0.16s ease;
+}
+
+.ises-dashboard-primary-btn:hover {
+    background: var(--dash-blue);
+    border-color: var(--dash-blue);
+    box-shadow: 0 4px 14px rgba(29, 81, 138, 0.32);
+    transform: translateY(-1px);
+}
+
+/* Flash feedback */
+.ises-dashboard-feedback {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    padding: 0.85rem 1.15rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #bbf7d0;
+    border-radius: var(--dash-radius-sm);
+    background: #f0fdf4;
+    color: #166534;
+    font-size: 0.85rem;
+    font-weight: 500;
+}
+
+/* ============================================================
+   2. KPI METRICS CARDS (TOP SUMMARY)
+   ============================================================ */
+.ises-dashboard-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.ises-dashboard-metric {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 128px;
+    padding: 1.25rem 1.35rem;
+    border: 1px solid var(--dash-line) !important;
+    border-radius: var(--dash-radius);
+    background: #ffffff;
+    box-shadow: var(--dash-shadow-sm);
+    text-decoration: none;
     color: inherit;
-    border-color: #a9c5df;
-    background: #f8fbff;
-    box-shadow: 0 5px 16px rgba(20, 43, 73, .08);
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.ises-dashboard-metric:hover {
+    border-color: #cbdbe8 !important;
+    background: #ffffff;
+    box-shadow: var(--dash-shadow-hover);
     transform: translateY(-2px);
 }
-.ises-dashboard-metric-link:focus-visible,
-.ises-dashboard-quick-links a:focus-visible,
-.ises-dashboard-attention-card > a:focus-visible,
-.ises-dashboard-row-action a:focus-visible,
-.ises-dashboard-project-name:focus-visible {
-    outline: 3px solid rgba(36, 99, 166, .35);
-    outline-offset: 3px;
+
+.ises-dashboard-metric-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
 }
-.ises-dashboard-metric-link::after {
-    content: "View projects";
-    margin-top: .55rem;
-    color: var(--dash-blue);
-    font-size: .68rem;
+
+.ises-dashboard-metric-label {
+    color: var(--dash-muted);
+    font-size: 0.72rem;
     font-weight: 700;
-    opacity: .85;
-}
-@media (prefers-reduced-motion: reduce) {
-    .ises-dashboard-metric-link { transition: none; }
-    .ises-dashboard-metric-link:hover { transform: none; }
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
 }
 
-
-/* Interactive portfolio charts */
-.ises-dashboard-charts { display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); gap:1rem; margin-bottom:1.25rem; }
-.ises-dashboard-chart-card { min-width:0; margin:0; }
-.ises-dashboard-chart-card .ises-dashboard-section-heading { min-height:92px; }
-.ises-dashboard-chart-link,.ises-dashboard-chart-note { color:#315d88; font-size:.72rem; font-weight:750; text-decoration:none; white-space:nowrap; }
-.ises-dashboard-chart-link:hover { color:#173f67; }
-.ises-dashboard-chart-body { display:grid; grid-template-columns:minmax(140px,.85fr) minmax(140px,1fr); align-items:center; gap:1rem; padding:1.1rem 1.25rem 1.25rem; }
-.ises-dashboard-chart-canvas { position:relative; height:210px; min-width:0; }
-.ises-dashboard-type-chart-body { grid-template-columns:minmax(0,1fr); }
-.ises-dashboard-type-chart-canvas { position:relative; height:220px; min-width:0; }
-.ises-dashboard-chart-legend { display:flex; flex-direction:column; gap:.2rem; min-width:0; margin:0; padding:0; list-style:none; }
-.ises-dashboard-chart-legend li a { display:flex; align-items:center; justify-content:space-between; gap:.75rem; padding:.45rem .5rem; border-radius:5px; color:#52677d; font-size:.73rem; text-decoration:none; }
-.ises-dashboard-chart-legend li a:hover { color:#1e5689; background:#f3f7fb; }
-.ises-dashboard-chart-legend li strong { color:#14243a; font-size:.75rem; }
-.ises-dashboard-type-legend { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.15rem .6rem; }
-.ises-dashboard-chart-empty { padding:1.5rem; color:var(--dash-muted); font-size:.8rem; }
-@media (max-width:1050px) { .ises-dashboard-charts { grid-template-columns:1fr; } }
-@media (max-width:560px) {
- .ises-dashboard-chart-body { grid-template-columns:minmax(0,1fr); }
- .ises-dashboard-chart-canvas { max-width:260px; width:100%; margin:0 auto; }
- .ises-dashboard-type-legend { grid-template-columns:1fr; }
- .ises-dashboard-chart-card .ises-dashboard-section-heading { min-height:0; }
+.ises-dashboard-metric-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    flex-shrink: 0;
+    transition: transform 0.2s ease;
 }
 
+.ises-dashboard-metric:hover .ises-dashboard-metric-icon {
+    transform: scale(1.08);
+}
 
-/* Quotation value analytics */
-.ises-dashboard-financial { margin-bottom:1.25rem; }
-.ises-dashboard-financial-metrics { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0; border-bottom:1px solid #edf1f5; }
-.ises-dashboard-financial-metric { display:flex; flex-direction:column; align-items:flex-start; gap:.35rem; min-width:0; padding:1.15rem 1.25rem; border-right:1px solid #edf1f5; }
-.ises-dashboard-financial-metric:last-child { border-right:0; }
-.ises-dashboard-financial-metric > span { color:#63768b; font-size:.67rem; font-weight:800; letter-spacing:.07em; text-transform:uppercase; }
-.ises-dashboard-financial-metric > strong { color:#14243a; font-size:clamp(1.1rem,1.8vw,1.55rem); font-weight:750; letter-spacing:-.025em; overflow-wrap:anywhere; }
-.ises-dashboard-financial-metric > small { color:var(--dash-muted); font-size:.72rem; line-height:1.45; }
-.ises-dashboard-quotation-trend { padding:1.1rem 1.25rem 1.25rem; }
-.ises-dashboard-quotation-trend-heading { display:flex; justify-content:space-between; align-items:flex-start; gap:1rem; margin-bottom:.5rem; }
-.ises-dashboard-quotation-trend-heading h3 { margin:0 0 .25rem; color:var(--dash-ink); font-size:.9rem; font-weight:750; }
-.ises-dashboard-quotation-trend-heading p { margin:0; color:var(--dash-muted); font-size:.74rem; }
-.ises-dashboard-quotation-trend-heading > span { color:#63768b; font-size:.68rem; font-weight:800; }
-.ises-dashboard-quotation-chart-wrap { position:relative; height:270px; min-width:0; }
-@media (max-width:720px) {
- .ises-dashboard-financial-metrics { grid-template-columns:1fr; }
- .ises-dashboard-financial-metric { border-right:0; border-bottom:1px solid #edf1f5; padding:.9rem 1rem; }
- .ises-dashboard-financial-metric:last-child { border-bottom:0; }
- .ises-dashboard-quotation-trend { padding:1rem; }
- .ises-dashboard-quotation-chart-wrap { height:240px; }
+.ises-icon-blue { background: #eff6ff; color: #2563eb; }
+.ises-icon-amber { background: #fffbeb; color: #d97706; }
+.ises-icon-teal { background: #f0fdfa; color: #0d9488; }
+.ises-icon-indigo { background: #f5f3ff; color: #6366f1; }
+
+.ises-dashboard-metric strong {
+    display: block;
+    margin: 0.4rem 0 0.2rem;
+    color: var(--dash-ink);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.85rem, 2.2vw, 2.2rem);
+    font-weight: 700;
+    line-height: 1.1;
+    letter-spacing: -0.03em;
+}
+
+.ises-dashboard-metric-bottom {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 0.35rem;
+}
+
+.ises-dashboard-metric-note {
+    color: var(--dash-muted);
+    font-size: 0.76rem;
+    font-weight: 500;
+}
+
+.ises-dashboard-metric-arrow {
+    font-size: 0.72rem;
+    color: var(--dash-muted);
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: all 0.2s ease;
+}
+
+.ises-dashboard-metric:hover .ises-dashboard-metric-arrow {
+    opacity: 1;
+    transform: translateX(0);
+    color: var(--dash-blue-light);
+}
+
+/* ============================================================
+   3. ANALYTICS ROW (PORTFOLIO STATUS & PROJECT MIX)
+   ============================================================ */
+.ises-dashboard-charts {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.ises-dashboard-card {
+    border: 1px solid var(--dash-line);
+    border-radius: var(--dash-radius);
+    background: #ffffff;
+    box-shadow: var(--dash-shadow-sm);
+    overflow: hidden;
+}
+
+.ises-dashboard-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1.15rem 1.35rem;
+    border-bottom: 1px solid var(--dash-line-soft);
+}
+
+.ises-dashboard-card-header h2 {
+    margin: 0;
+    color: var(--dash-ink);
+    font-size: 0.98rem;
+    font-weight: 700;
+    letter-spacing: -0.015em;
+}
+
+.ises-dashboard-card-action {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: var(--dash-blue-light);
+    font-size: 0.76rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+
+.ises-dashboard-card-action:hover {
+    color: var(--dash-blue);
+}
+
+.ises-dashboard-chart-body {
+    display: grid;
+    grid-template-columns: 180px minmax(0, 1fr);
+    align-items: center;
+    gap: 1.5rem;
+    padding: 1.35rem;
+}
+
+.ises-dashboard-chart-canvas-wrap {
+    position: relative;
+    width: 170px;
+    height: 170px;
+    margin: 0 auto;
+}
+
+.ises-donut-center-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    pointer-events: none;
+}
+
+.ises-donut-center-overlay strong {
+    display: block;
+    color: var(--dash-ink);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.55rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.ises-donut-center-overlay span {
+    display: block;
+    margin-top: 2px;
+    color: var(--dash-muted);
+    font-size: 0.65rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.ises-dashboard-status-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.ises-dashboard-status-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.45rem 0.65rem;
+    border-radius: var(--dash-radius-sm);
+    color: var(--dash-ink);
+    font-size: 0.8rem;
+    text-decoration: none;
+    transition: background 0.15s ease;
+}
+
+.ises-dashboard-status-item:hover {
+    background: var(--dash-blue-soft);
+}
+
+.ises-status-dot-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+}
+
+.ises-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+}
+
+.ises-status-count-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ises-status-count-wrap strong {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--dash-ink);
+}
+
+.ises-status-pct {
+    font-size: 0.7rem;
+    color: var(--dash-muted);
+    font-weight: 500;
+}
+
+/* Project Types Progress List */
+.ises-dashboard-type-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    padding: 1.35rem;
+}
+
+.ises-type-row {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    text-decoration: none;
+    color: inherit;
+    padding: 0.35rem 0.5rem;
+    border-radius: var(--dash-radius-sm);
+    transition: background 0.15s ease;
+}
+
+.ises-type-row:hover {
+    background: var(--dash-blue-soft);
+}
+
+.ises-type-row-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8rem;
+}
+
+.ises-type-name {
+    font-weight: 600;
+    color: var(--dash-ink-secondary);
+}
+
+.ises-type-count {
+    font-weight: 700;
+    color: var(--dash-ink);
+}
+
+.ises-type-progress-track {
+    width: 100%;
+    height: 7px;
+    background: #edf2f7;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.ises-type-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #2463a6, #38bdf8);
+    border-radius: 999px;
+    transition: width 0.3s ease;
+}
+
+/* ============================================================
+   4. COMMERCIAL & QUOTATION OVERVIEW
+   ============================================================ */
+.ises-dashboard-financial {
+    margin-bottom: 1.5rem;
+}
+
+.ises-dashboard-financial-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border-bottom: 1px solid var(--dash-line-soft);
+}
+
+.ises-dashboard-financial-chip {
+    display: flex;
+    flex-direction: column;
+    padding: 1.15rem 1.35rem;
+    border-right: 1px solid var(--dash-line-soft);
+}
+
+.ises-dashboard-financial-chip:last-child {
+    border-right: 0;
+}
+
+.ises-dashboard-financial-chip span {
+    color: var(--dash-muted);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.ises-dashboard-financial-chip strong {
+    margin: 0.35rem 0 0.15rem;
+    color: var(--dash-ink);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.15rem, 1.6vw, 1.45rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+}
+
+.ises-dashboard-financial-chip small {
+    color: var(--dash-muted);
+    font-size: 0.74rem;
+}
+
+.ises-dashboard-quotation-chart-container {
+    padding: 1.25rem 1.35rem 1.5rem;
+}
+
+.ises-dashboard-quotation-chart-wrap {
+    position: relative;
+    height: 250px;
+    width: 100%;
+}
+
+/* ============================================================
+   5. BOTTOM TWO-COLUMN: OPERATIONS QUEUE & RECENT PROJECTS
+   ============================================================ */
+.ises-dashboard-bottom-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
+    gap: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Actionable Attention Queue */
+.ises-dashboard-attention-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+    padding: 1.15rem;
+}
+
+.ises-dashboard-attention-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.85rem;
+    padding: 0.85rem 1rem;
+    border: 1px solid var(--dash-line);
+    border-radius: var(--dash-radius-sm);
+    background: #ffffff;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.15s ease;
+}
+
+.ises-dashboard-attention-card:hover {
+    border-color: #b8cfe1;
+    background: var(--dash-blue-soft);
+    transform: translateY(-1px);
+}
+
+.ises-dashboard-attention-left {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    min-width: 0;
+}
+
+.ises-dashboard-attention-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.ises-dashboard-attention-copy {
+    min-width: 0;
+}
+
+.ises-dashboard-attention-copy h3 {
+    margin: 0 0 0.15rem;
+    color: var(--dash-ink);
+    font-size: 0.82rem;
+    font-weight: 650;
+}
+
+.ises-dashboard-attention-copy p {
+    margin: 0;
+    color: var(--dash-muted);
+    font-size: 0.72rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.ises-dashboard-attention-badge {
+    padding: 0.25rem 0.55rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: #f1f5f9;
+    color: #475569;
+    flex-shrink: 0;
+}
+
+.ises-dashboard-attention-badge.has-count {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+/* Empty Attention State */
+.ises-dashboard-empty-attention {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.75rem 1.25rem;
+    color: #15803d;
+    font-size: 0.85rem;
+}
+
+.ises-dashboard-empty-attention i {
+    font-size: 1.2rem;
+}
+
+/* Recent Projects Table */
+.ises-dashboard-table-wrap {
+    overflow-x: auto;
+}
+
+.ises-dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    text-align: left;
+}
+
+.ises-dashboard-table th {
+    padding: 0.75rem 1.15rem;
+    border-bottom: 1px solid var(--dash-line);
+    background: #f8fafc;
+    color: var(--dash-muted);
+    font-size: 0.68rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.ises-dashboard-table td {
+    padding: 0.85rem 1.15rem;
+    border-bottom: 1px solid var(--dash-line-soft);
+    color: var(--dash-ink-secondary);
+    font-size: 0.8rem;
+    vertical-align: middle;
+}
+
+.ises-dashboard-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.ises-dashboard-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.ises-project-cell {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+}
+
+.ises-project-cell a {
+    color: var(--dash-ink);
+    font-weight: 650;
+    text-decoration: none;
+    font-size: 0.82rem;
+}
+
+.ises-project-cell a:hover {
+    color: var(--dash-blue-light);
+}
+
+.ises-project-code {
+    color: var(--dash-muted);
+    font-size: 0.7rem;
+    font-family: monospace;
+}
+
+/* Client avatar badge */
+.ises-client-cell {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.ises-client-avatar {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: #e2e8f0;
+    color: #475569;
+    font-size: 0.62rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* Status Pill with Bullet Dot */
+.ises-status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.ises-status-pill-draft {
+    background: #fef3c7;
+    color: #92400e;
+}
+.ises-status-pill-draft .ises-pill-dot { background: #d97706; }
+
+.ises-status-pill-planned {
+    background: #eff6ff;
+    color: #1e40af;
+}
+.ises-status-pill-planned .ises-pill-dot { background: #3b82f6; }
+
+.ises-status-pill-completed {
+    background: #ecfdf5;
+    color: #065f46;
+}
+.ises-status-pill-completed .ises-pill-dot { background: #10b981; }
+
+.ises-pill-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+}
+
+.ises-table-action-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 6px;
+    border: 1px solid var(--dash-line);
+    background: #ffffff;
+    color: var(--dash-ink-secondary);
+    font-size: 0.74rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease;
+}
+
+.ises-table-action-link:hover {
+    border-color: #b8cfe1;
+    background: var(--dash-blue-soft);
+    color: var(--dash-blue-light);
+}
+
+/* ============================================================
+   RESPONSIVE BREAKPOINTS
+   ============================================================ */
+@media (max-width: 1080px) {
+    .ises-dashboard-metrics {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .ises-dashboard-charts,
+    .ises-dashboard-bottom-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 680px) {
+    .ises-dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .ises-dashboard-header-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+    .ises-dashboard-utility-links {
+        display: none;
+    }
+    .ises-dashboard-metrics {
+        grid-template-columns: 1fr;
+    }
+    .ises-dashboard-chart-body {
+        grid-template-columns: 1fr;
+    }
+    .ises-dashboard-financial-grid {
+        grid-template-columns: 1fr;
+    }
+    .ises-dashboard-financial-chip {
+        border-right: 0;
+        border-bottom: 1px solid var(--dash-line-soft);
+    }
 }

@@ -65,9 +65,8 @@ export default function Dashboard({ metrics, statusBreakdown, projectTypeBreakdo
         <AppLayout title="Overview">
             <section className="ises-page-header">
                 <div>
-                    <p className="ises-eyebrow">Operations / overview</p>
-                    <h1 className="ises-page-title">Survey operations</h1>
-                    <p className="ises-page-description">A working view of project progress, survey planning and saved quotation activity.</p>
+                    <h1 className="ises-page-title">Operations Overview</h1>
+                    <p className="ises-page-description">Real-time status of survey planning, workload progress, and technical estimation.</p>
                 </div>
                 <a className="ises-button" href="/projects/create"><Plus size={16} /> New project</a>
             </section>
@@ -85,7 +84,7 @@ export default function Dashboard({ metrics, statusBreakdown, projectTypeBreakdo
             <section className="ises-grid-main" aria-label="Project analytics">
                 <article className="ises-panel">
                     <header className="ises-panel-header">
-                        <div><h2 className="ises-panel-title">Project status</h2><p className="ises-panel-description">Current portfolio distribution by saved status.</p></div>
+                        <div><h2 className="ises-panel-title">Portfolio Status</h2></div>
                         <a className="ises-panel-action" href="/projects">All projects <ArrowUpRight size={13} style={{ display: 'inline', verticalAlign: 'middle' }} /></a>
                     </header>
                     <div className="ises-panel-body">
@@ -103,7 +102,7 @@ export default function Dashboard({ metrics, statusBreakdown, projectTypeBreakdo
 
                 <article className="ises-panel">
                     <header className="ises-panel-header">
-                        <div><h2 className="ises-panel-title">Project mix</h2><p className="ises-panel-description">How the current portfolio is distributed by type.</p></div>
+                        <div><h2 className="ises-panel-title">Project Mix</h2></div>
                     </header>
                     <div className="ises-panel-body">
                         {projectTypeBreakdown.length ? <div className="ises-project-types">
@@ -123,7 +122,7 @@ export default function Dashboard({ metrics, statusBreakdown, projectTypeBreakdo
 
             <section className="ises-panel" style={{ marginBottom: 18 }} aria-label="Quotation value overview">
                 <header className="ises-panel-header">
-                    <div><p className="ises-eyebrow" style={{ marginBottom: 5 }}>Commercial overview</p><h2 className="ises-panel-title">Quotation activity</h2><p className="ises-panel-description">Saved quotation values, not collected revenue.</p></div>
+                    <div><h2 className="ises-panel-title">Commercial Overview</h2></div>
                     <a className="ises-panel-action" href="/quotations/history">Quotation history <ArrowRight size={13} style={{ display: 'inline', verticalAlign: 'middle' }} /></a>
                 </header>
                 <div className="ises-panel-body">
@@ -152,7 +151,7 @@ export default function Dashboard({ metrics, statusBreakdown, projectTypeBreakdo
 
             <section className="ises-panel" style={{ marginBottom: 18 }} aria-label="Outstanding work">
                 <header className="ises-panel-header">
-                    <div><h2 className="ises-panel-title">Needs attention</h2><p className="ises-panel-description">Planning and estimation steps still outstanding on active projects.</p></div>
+                    <div><h2 className="ises-panel-title">Operational Queue</h2></div>
                     <span className="ises-pill">{number(attentionItems.reduce((sum, item) => sum + item.count, 0))} open checks</span>
                 </header>
                 {attentionItems.length ? <div className="ises-attention-list">
@@ -168,7 +167,7 @@ export default function Dashboard({ metrics, statusBreakdown, projectTypeBreakdo
 
             <section className="ises-panel" aria-label="Recent projects">
                 <header className="ises-panel-header">
-                    <div><h2 className="ises-panel-title">Recent projects</h2><p className="ises-panel-description">Continue work on a recently updated project.</p></div>
+                    <div><h2 className="ises-panel-title">Recent Projects</h2></div>
                     <a className="ises-panel-action" href="/projects">Project register <ArrowRight size={13} style={{ display: 'inline', verticalAlign: 'middle' }} /></a>
                 </header>
                 {recentProjects.length ? <div className="ises-table-wrap">

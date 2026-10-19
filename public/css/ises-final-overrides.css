@@ -436,30 +436,25 @@
     box-shadow: 0 2px 7px rgba(20, 43, 73, .025) !important;
 }
 .ises-dashboard-metric-primary {
-    border-top: 1px solid #cbdbe8 !important;
-    border-left: 3px solid #2463a6 !important;
-    padding-top: 18px !important;
+    border: 1px solid #dce5ee !important;
 }
 .ises-dashboard-metric-label {
-    font-size: 10px !important;
-    letter-spacing: .075em !important;
+    font-size: 11px !important;
+    letter-spacing: .05em !important;
 }
 .ises-dashboard-metric strong {
-    margin: 12px 0 6px !important;
-    font-size: clamp(28px, 2.8vw, 36px) !important;
-    letter-spacing: -.045em;
-    line-height: 1 !important;
+    margin: 10px 0 4px !important;
+    font-size: clamp(26px, 2.5vw, 32px) !important;
+    letter-spacing: -.03em;
+    line-height: 1.1 !important;
 }
 .ises-dashboard-metric-note {
-    font-size: 11px !important;
-    line-height: 1.5 !important;
+    font-size: 11.5px !important;
+    line-height: 1.4 !important;
 }
 .ises-dashboard-metric-link::after {
-    content: "View related projects  →" !important;
-    margin-top: auto !important;
-    padding-top: 12px;
-    font-size: 10px !important;
-    color: #2d6b97 !important;
+    content: none !important;
+    display: none !important;
 }
 .ises-dashboard-metric-link:hover {
     border-color: #a9c5df !important;
