@@ -1,167 +1,493 @@
-/* INOS project intake form. */
+/* ============================================================
+   ISES Modern Minimalistic Create Project Stylesheet
+   Matching Design System: DM Sans + Space Grotesk + Deep Sea Palette
+   ============================================================ */
+
+:root {
+    --cp-ink: #0f2438;
+    --cp-ink-secondary: #334b63;
+    --cp-muted: #64748b;
+    --cp-line: #e2e8f0;
+    --cp-line-soft: #edf2f7;
+    --cp-blue: #1d518a;
+    --cp-blue-light: #2463a6;
+    --cp-blue-soft: #f0f7fb;
+    --cp-blue-hover: #164373;
+    --cp-teal: #0d9488;
+    --cp-teal-soft: #f0fdfa;
+    --cp-amber: #d97706;
+    --cp-amber-soft: #fffbeb;
+    --cp-emerald: #10b981;
+    --cp-emerald-soft: #ecfdf5;
+    --cp-canvas: #f8fafc;
+    --cp-card-bg: #ffffff;
+    --cp-radius: 12px;
+    --cp-radius-sm: 8px;
+    --cp-shadow: 0 4px 16px -2px rgba(15, 36, 56, 0.05), 0 2px 6px -1px rgba(15, 36, 56, 0.03);
+    --cp-shadow-hover: 0 10px 24px -3px rgba(15, 36, 56, 0.07), 0 4px 8px -2px rgba(15, 36, 56, 0.03);
+}
+
 .create-project-page {
-    --create-ink: #122033;
-    --create-muted: #68788b;
-    --create-line: #dfe7ee;
-    --create-canvas: #f4f7f9;
-    --create-blue: #0b5c8e;
-    --create-blue-soft: #edf6fb;
-    max-width: 1120px;
+    max-width: 1200px;
     margin: 0 auto;
+    color: var(--cp-ink);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    box-sizing: border-box;
 }
 
-.create-project-page > .mb-8 { margin-bottom: 1.7rem !important; padding-bottom: 1.3rem; border-bottom-color: var(--create-line); }
-.create-project-eyebrow { margin: 0 0 .55rem; color: var(--create-blue); font-size: .68rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
-.create-project-page h1 { color: var(--create-ink); font-family: 'Space Grotesk', sans-serif; letter-spacing: 0; }
-.create-project-page .max-w-4xl { max-width: none; border: 1px solid var(--create-line); border-radius: 0; box-shadow: none; background: #fff; }
-.create-project-page .max-w-4xl > form > div:first-child { padding: 2rem 2.2rem; }
-.create-project-page h2 { display: flex; align-items: center; gap: .7rem; padding-bottom: .7rem; border-bottom: 1px solid var(--create-line); color: var(--create-ink); font-family: 'Space Grotesk', sans-serif; }
-.create-project-page h2 span { width: 28px; height: 28px; border-radius: 50%; color: var(--create-blue); background: var(--create-blue-soft); }
-.create-project-page label { color: #526579; font-size: .72rem; letter-spacing: .02em; }
-.create-project-page input,
-.create-project-page select,
-.create-project-page textarea { border-color: var(--create-line); border-radius: 0; color: var(--create-ink); background: #fff; box-shadow: none; }
-.create-project-page input:focus,
-.create-project-page select:focus,
-.create-project-page textarea:focus { border-color: #78aec9; box-shadow: 0 0 0 3px rgba(11, 92, 142, .1); outline: 0; }
-.create-project-page input::placeholder,
-.create-project-page textarea::placeholder { color: #9aabb8; }
-.create-project-page .bg-slate-50.p-6 { padding: 1.2rem 2.2rem; border-top-color: var(--create-line); background: #fbfcfd; }
-.create-project-page button[type="submit"] { border: 1px solid var(--create-blue); border-radius: 5px; background: var(--create-blue); box-shadow: none; }
-.create-project-page button[type="submit"]:hover { border-color: #08456b; background: #08456b; }
-.create-project-page a[href*="projects.index"] { border-radius: 5px; border-color: var(--create-line); box-shadow: none; }
-.create-project-page a[href*="projects.index"]:hover { border-color: #78aec9; color: var(--create-blue); background: var(--create-blue-soft); }
-
-@media (max-width: 640px) {
-    .create-project-page .max-w-4xl > form > div:first-child { padding: 1.25rem; }
-    .create-project-page .bg-slate-50.p-6 { padding: 1rem 1.25rem; }
+.create-project-page * {
+    box-sizing: border-box;
 }
 
+/* ============================================================
+   1. BREADCRUMB & HEADER
+   ============================================================ */
+.create-project-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--cp-muted);
+}
 
-/* Create-project form refinement: clear hierarchy, consistent controls, and responsive layout. */
-.create-project-page {
-    --create-ink: #17283f;
-    --create-muted: #68798d;
-    --create-line: #dce5ee;
-    --create-blue: #2463a6;
-    --create-blue-soft: #edf4fb;
-    max-width: 1120px;
-    width: 100%;
+.create-project-breadcrumb a {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: var(--cp-muted);
+    text-decoration: none;
+    transition: color 0.15s ease;
 }
-.create-project-page > .mb-8 {
-    margin-bottom: 1.4rem !important;
-    padding-bottom: 1.25rem;
+
+.create-project-breadcrumb a:hover {
+    color: var(--cp-blue-light);
 }
-.create-project-page .max-w-4xl {
-    max-width: 100%;
+
+.create-project-breadcrumb .breadcrumb-separator {
+    color: #cbd5e1;
+    font-size: 0.75rem;
+}
+
+.create-project-breadcrumb .breadcrumb-current {
+    color: var(--cp-ink);
+    font-weight: 600;
+}
+
+.create-project-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--cp-line);
+}
+
+.create-project-header-info h1 {
+    margin: 0;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(1.6rem, 2.2vw, 2.1rem);
+    font-weight: 700;
+    color: var(--cp-ink);
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+}
+
+.create-project-header-info p {
+    margin: 0.35rem 0 0;
+    color: var(--cp-muted);
+    font-size: 0.88rem;
+    line-height: 1.45;
+}
+
+.create-project-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    flex-shrink: 0;
+}
+
+.create-project-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    height: 38px;
+    padding: 0 0.95rem;
+    border: 1px solid var(--cp-line);
+    border-radius: var(--cp-radius-sm);
+    background: #ffffff;
+    color: var(--cp-ink-secondary);
+    font-size: 0.82rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease;
+    box-shadow: 0 1px 2px rgba(15, 36, 56, 0.04);
+}
+
+.create-project-back-btn:hover {
+    border-color: #b8cfe1;
+    background: var(--cp-blue-soft);
+    color: var(--cp-blue-light);
+    transform: translateY(-1px);
+}
+
+/* ============================================================
+   2. FORM WRAPPER & SECTION CARDS
+   ============================================================ */
+.create-project-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+}
+
+.create-project-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+}
+
+.create-project-card {
+    background: var(--cp-card-bg);
+    border: 1px solid var(--cp-line);
+    border-radius: var(--cp-radius);
+    box-shadow: var(--cp-shadow);
+    display: flex;
+    flex-direction: column;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
     overflow: hidden;
-    border: 1px solid var(--create-line);
-    border-radius: 12px;
-    background: #fff;
-    box-shadow: 0 3px 14px rgba(20,43,73,.05);
 }
-.create-project-page .max-w-4xl > form > div:first-child {
-    padding: clamp(1.25rem, 3vw, 2.1rem);
+
+.create-project-card:hover {
+    border-color: #cbd5e1;
+    box-shadow: var(--cp-shadow-hover);
 }
-.create-project-page .max-w-4xl > form > div:first-child > div {
+
+.create-project-card-header {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--cp-line-soft);
+    background: #fafbfc;
+}
+
+.create-project-card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 38px;
+    height: 38px;
+    border-radius: 9px;
+    background: var(--cp-blue-soft);
+    color: var(--cp-blue-light);
+    font-size: 0.95rem;
+    flex-shrink: 0;
+}
+
+.create-project-card-icon--teal {
+    background: var(--cp-teal-soft);
+    color: var(--cp-teal);
+}
+
+.create-project-card-title {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1rem;
     min-width: 0;
 }
-.create-project-page h2 {
-    margin-bottom: 1.15rem;
-    padding-bottom: .8rem;
-    border-bottom: 1px solid var(--create-line);
-    font-size: 1rem;
+
+.create-project-card-title h2 {
+    margin: 0;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.02rem;
     font-weight: 700;
-    letter-spacing: -.015em;
+    color: var(--cp-ink);
+    letter-spacing: -0.015em;
 }
-.create-project-page h2 span {
-    flex: 0 0 28px;
+
+.create-project-card-title p {
+    margin: 0;
+    font-size: 0.77rem;
+    color: var(--cp-muted);
+}
+
+.create-project-card-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    flex: 1;
+}
+
+/* ============================================================
+   3. FIELD GROUPS & INPUT CONTROLS
+   ============================================================ */
+.cp-field-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.cp-field-row-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.cp-label {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    font-weight: 650;
+    color: var(--cp-ink-secondary);
+    margin: 0;
+}
+
+.cp-label-required {
+    color: #e11d48;
+    font-weight: 700;
+    margin-left: 0.2rem;
+}
+
+.cp-label-hint {
+    font-size: 0.72rem;
+    font-weight: 400;
+    color: var(--cp-muted);
+}
+
+.cp-input,
+.cp-select,
+.cp-textarea {
+    width: 100%;
+    min-height: 42px;
+    padding: 0.65rem 0.85rem;
+    border: 1px solid #cbd5e1;
+    border-radius: var(--cp-radius-sm);
+    background-color: #ffffff;
+    color: var(--cp-ink);
+    font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 0.875rem;
+    line-height: 1.45;
+    outline: none;
+    box-shadow: 0 1px 2px rgba(15, 36, 56, 0.03);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease;
+}
+
+.cp-input::placeholder,
+.cp-textarea::placeholder {
+    color: #94a3b8;
+}
+
+.cp-input:hover,
+.cp-select:hover,
+.cp-textarea:hover {
+    border-color: #94a3b8;
+}
+
+.cp-input:focus,
+.cp-select:focus,
+.cp-textarea:focus {
+    border-color: var(--cp-blue-light);
+    box-shadow: 0 0 0 3px rgba(36, 99, 166, 0.12);
+    background-color: #ffffff;
+}
+
+.cp-input.is-invalid,
+.cp-select.is-invalid,
+.cp-textarea.is-invalid {
+    border-color: #e11d48;
+    box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.1);
+}
+
+.cp-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%2364748b' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
+    padding-right: 2.25rem;
+    cursor: pointer;
+}
+
+.cp-textarea {
+    min-height: 104px;
+    resize: vertical;
+}
+
+.cp-input-icon-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.cp-input-icon {
+    position: absolute;
+    left: 0.85rem;
+    color: var(--cp-muted);
+    font-size: 0.85rem;
+    pointer-events: none;
+    transition: color 0.15s ease;
+}
+
+.cp-input-icon-wrap .cp-input {
+    padding-left: 2.25rem;
+}
+
+.cp-input-icon-wrap:focus-within .cp-input-icon {
+    color: var(--cp-blue-light);
+}
+
+.cp-error-message {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    margin-top: 0.35rem;
+    color: #e11d48;
+    font-size: 0.75rem;
+    font-weight: 500;
+}
+
+/* ============================================================
+   4. FORM FOOTER & ACTION TOOLBAR
+   ============================================================ */
+.create-project-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.25rem;
+    padding: 1.25rem 1.5rem;
+    border: 1px solid var(--cp-line);
+    border-radius: var(--cp-radius);
+    background: #ffffff;
+    box-shadow: var(--cp-shadow);
+}
+
+.create-project-hint {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    font-size: 0.82rem;
+    color: var(--cp-muted);
+}
+
+.create-project-hint i {
+    font-size: 0.95rem;
+}
+
+.create-project-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.create-project-cancel-btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    border-radius: 8px;
-    color: var(--create-blue);
-    background: var(--create-blue-soft);
-    font-weight: 800;
+    height: 42px;
+    padding: 0 1.25rem;
+    border: 1px solid var(--cp-line);
+    border-radius: var(--cp-radius-sm);
+    background: #ffffff;
+    color: var(--cp-ink-secondary);
+    font-size: 0.84rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.15s ease;
 }
-.create-project-page label {
-    display: block;
-    margin-bottom: .4rem;
-    color: #344860;
-    font-size: .78rem;
-    font-weight: 650;
-    letter-spacing: 0;
-}
-.create-project-page label .text-red-500 { color: #c2413b; }
-.create-project-page input:not([type=checkbox]):not([type=radio]),
-.create-project-page select,
-.create-project-page textarea {
-    box-sizing: border-box;
-    width: 100%;
-    min-height: 43px;
-    padding: .65rem .8rem;
-    border: 1px solid #cbd7e3;
-    border-radius: 8px;
-    color: var(--create-ink);
-    background: #fff;
-    font-size: .84rem;
-    line-height: 1.45;
-    box-shadow: none;
-    transition: border-color .15s ease, box-shadow .15s ease;
-}
-.create-project-page textarea {
-    min-height: 86px;
-    resize: vertical;
-}
-.create-project-page input:focus,
-.create-project-page select:focus,
-.create-project-page textarea:focus {
-    border-color: #77a3cd;
-    outline: 0;
-    box-shadow: 0 0 0 3px rgba(36,99,166,.12);
-}
-.create-project-page input::placeholder,
-.create-project-page textarea::placeholder { color: #94a3b4; }
-.create-project-page .space-y-4 > div { min-width: 0; }
-.create-project-page .grid.grid-cols-2 { gap: .85rem; }
-.create-project-page .text-red-500.text-xs { margin-top: .4rem; font-size: .75rem; }
-.create-project-page .bg-slate-50.p-6 {
-    display: flex;
-    justify-content: flex-end;
-    padding: 1rem clamp(1.25rem, 3vw, 2.1rem);
-    border-top: 1px solid var(--create-line);
+
+.create-project-cancel-btn:hover {
+    border-color: #cbd5e1;
     background: #f8fafc;
+    color: var(--cp-ink);
 }
-.create-project-page button[type="submit"] {
-    min-height: 43px;
-    padding: .7rem 1.15rem;
-    border: 1px solid var(--create-blue);
-    border-radius: 8px;
-    color: #fff;
-    background: var(--create-blue);
-    box-shadow: none;
-    font-size: .82rem;
-    font-weight: 700;
-}
-.create-project-page button[type="submit"]:hover {
-    border-color: #1d518a;
-    background: #1d518a;
-}
-.create-project-page a[href*="projects.index"] {
-    min-height: 40px;
+
+.create-project-submit-btn {
+    display: inline-flex;
     align-items: center;
-    border-radius: 8px;
-    border-color: var(--create-line);
-    box-shadow: none;
+    justify-content: center;
+    gap: 0.6rem;
+    height: 42px;
+    padding: 0 1.45rem;
+    border: 1px solid var(--cp-blue);
+    border-radius: var(--cp-radius-sm);
+    background: var(--cp-blue);
+    color: #ffffff;
+    font-size: 0.86rem;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    box-shadow: 0 2px 6px rgba(29, 81, 138, 0.25);
+    transition: all 0.15s ease;
 }
-.create-project-page a[href*="projects.index"]:focus-visible,
-.create-project-page button[type="submit"]:focus-visible {
-    outline: 3px solid rgba(36,99,166,.25);
-    outline-offset: 2px;
+
+.create-project-submit-btn:hover {
+    background: var(--cp-blue-hover);
+    border-color: var(--cp-blue-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(29, 81, 138, 0.32);
 }
-@media (max-width: 767px) {
-    .create-project-page .grid.grid-cols-2 { grid-template-columns: 1fr; }
-    .create-project-page .max-w-4xl > form > div:first-child { padding: 1.1rem; }
-    .create-project-page .bg-slate-50.p-6 { padding: 1rem 1.1rem; }
-    .create-project-page .bg-slate-50.p-6 button { width: 100%; }
+
+.create-project-submit-btn:active {
+    transform: translateY(0);
+}
+
+.create-project-submit-btn i {
+    font-size: 0.8rem;
+    transition: transform 0.15s ease;
+}
+
+.create-project-submit-btn:hover i {
+    transform: translateX(2px);
+}
+
+/* ============================================================
+   5. RESPONSIVE ADAPTATIONS
+   ============================================================ */
+@media (max-width: 900px) {
+    .create-project-grid {
+        grid-template-columns: 1fr;
+    }
+    .create-project-footer {
+        flex-direction: column-reverse;
+        align-items: stretch;
+    }
+    .create-project-actions {
+        width: 100%;
+    }
+    .create-project-actions > * {
+        flex: 1;
+    }
+    .create-project-hint {
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+@media (max-width: 640px) {
+    .create-project-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+    }
+    .create-project-header-actions {
+        width: 100%;
+    }
+    .create-project-back-btn {
+        width: 100%;
+        justify-content: center;
+    }
+    .cp-field-row-2 {
+        grid-template-columns: 1fr;
+    }
+    .create-project-card-header {
+        padding: 1rem 1.15rem;
+    }
+    .create-project-card-body {
+        padding: 1.15rem;
+    }
 }

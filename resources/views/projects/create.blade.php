@@ -1,108 +1,248 @@
-<x-app-layout containerClass="w-full px-8 py-8">
+<x-app-layout containerClass="w-full px-4 py-6 sm:px-8 sm:py-8">
     <link rel="stylesheet" href="{{ asset('css/create-project.css') }}?v={{ filemtime(public_path('css/create-project.css')) }}">
+
     <div class="create-project-page">
-    
-    <!-- HEADER -->
-    <div class="mb-8 border-b border-slate-200 pb-5 flex flex-col md:flex-row justify-between md:items-end gap-4">
-        <div>
-            <p class="create-project-eyebrow">Project intake / setup</p>
-            <h1 class="text-2xl font-bold text-slate-900 tracking-tight">Create New Project</h1>
-            <p class="text-sm font-medium text-slate-500 mt-1">Capture the project context before moving into survey planning and estimation.</p>
-        </div>
-        <div>
-            <a href="{{ route('projects.index') }}" class="inline-flex items-center gap-2 bg-white hover:bg-slate-50 text-slate-600 px-4 py-2 rounded-lg text-sm font-semibold border border-slate-200 transition-colors shadow-sm">
-                <i class="fa-solid fa-arrow-left"></i> Dashboard
+        <!-- BREADCRUMB -->
+        <nav class="create-project-breadcrumb" aria-label="Breadcrumb">
+            <a href="{{ route('projects.index') }}">
+                <i class="fa-solid fa-folder-tree"></i> Projects
             </a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current">New Project</span>
+        </nav>
+
+        <!-- PAGE HEADER -->
+        <div class="create-project-header">
+            <div class="create-project-header-info">
+                <h1>Create Survey Project</h1>
+                <p>Define operational scope, survey type, and client coordinates to initialize the project workspace.</p>
+            </div>
+            <div class="create-project-header-actions">
+                <a href="{{ route('projects.index') }}" class="create-project-back-btn">
+                    <i class="fa-solid fa-arrow-left"></i> Project Register
+                </a>
+            </div>
         </div>
-    </div>
 
-    <!-- FORM CONTAINER -->
-    <div class="max-w-4xl mx-auto bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-        <form action="{{ route('projects.store') }}" method="POST" id="createProjectForm">
+        <!-- FORM WRAPPER -->
+        <form action="{{ route('projects.store') }}" method="POST" id="createProjectForm" class="create-project-form">
             @csrf
-            
-            <div class="p-6 md:p-8">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Left Side: Project details -->
-                    <div class="space-y-4">
-                        <div>
-                            <label for="project_name" class="block text-sm font-semibold text-slate-700 mb-1.5">Project Name <span class="text-red-500">*</span></label>
-                            <input type="text" id="project_name" name="name" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm @error('name') border-red-500 @enderror" value="{{ old('name') }}" placeholder="e.g. Nearshore Hydrographic Survey" required>
-                            @error('name') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                        </div>
 
-                        <div>
-                            <label for="project_type" class="block text-sm font-semibold text-slate-700 mb-1.5">Project Type <span class="text-red-500">*</span></label>
-                            <select id="project_type" name="project_type" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm @error('project_type') border-red-500 @enderror" required>
-                                <option value="" disabled {{ old('project_type') ? '' : 'selected' }}>Choose project type</option>
-                                @foreach(\App\Models\Project::TYPES as $code => $label)
-                                    <option value="{{ $code }}" {{ old('project_type') == $code ? 'selected' : '' }}>{{ $code }} - {{ $label }}</option>
-                                @endforeach
-                            </select>
-                            @error('project_type') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
+            <div class="create-project-grid">
+                <!-- CARD 1: SCOPE & OPERATIONAL PARAMETERS -->
+                <div class="create-project-card">
+                    <div class="create-project-card-header">
+                        <div class="create-project-card-icon">
+                            <i class="fa-solid fa-compass-drafting"></i>
                         </div>
-                        
-                        <div>
-                            <label for="location" class="block text-sm font-semibold text-slate-700 mb-1.5">Location <span class="text-red-500">*</span></label>
-                            <select id="location" name="location" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm @error('location') border-red-500 @enderror" required>
-                                <option value="" disabled {{ old('location') ? '' : 'selected' }}>Choose location</option>
-                                @foreach(\App\Models\Project::LOCATIONS as $loc)
-                                    <option value="{{ $loc }}" {{ old('location') == $loc ? 'selected' : '' }}>{{ $loc }}</option>
-                                @endforeach
-                            </select>
-                            @error('location') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                        </div>
-
-                        <div>
-                            <label for="status" class="block text-sm font-semibold text-slate-700 mb-1.5">Project Status</label>
-                            <select id="status" name="status" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm @error('status') border-red-500 @enderror" required>
-                                <option value="draft" {{ old('status', 'draft') == 'draft' ? 'selected' : '' }}>Draft</option>
-                                <option value="planned" {{ old('status') == 'planned' ? 'selected' : '' }}>Planned (In Progress)</option>
-                                <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Completed</option>
-                            </select>
-                            @error('status') <p class="text-red-500 text-xs mt-1">{{ $message }}</p> @enderror
-                        </div>
-
-                        <div>
-                            <label for="period" class="block text-sm font-semibold text-slate-700 mb-1.5">Estimated Duration</label>
-                            <input type="text" id="period" name="period" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" value="{{ old('period') }}" placeholder="e.g. 5 Days">
+                        <div class="create-project-card-title">
+                            <h2>Project Scope</h2>
+                            <p>Operational categorization and timeline parameters</p>
                         </div>
                     </div>
 
-                    <!-- Right Side: Details of the client -->
-                    <div class="space-y-4">
-                        <div>
-                            <label for="client_name" class="block text-sm font-semibold text-slate-700 mb-1.5">Client Company</label>
-                            <input type="text" id="client_name" name="client_name" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" value="{{ old('client_name') }}" placeholder="Client Organization Name">
+                    <div class="create-project-card-body">
+                        <!-- Project Name -->
+                        <div class="cp-field-group">
+                            <label for="project_name" class="cp-label">
+                                <span>Project Name <span class="cp-label-required">*</span></span>
+                            </label>
+                            <input type="text"
+                                   id="project_name"
+                                   name="name"
+                                   class="cp-input @error('name') is-invalid @enderror"
+                                   value="{{ old('name') }}"
+                                   placeholder="e.g. Terengganu Coastal Bathymetric Survey"
+                                   required>
+                            @error('name')
+                                <div class="cp-error-message">
+                                    <i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
+                                </div>
+                            @enderror
                         </div>
 
-                        <div class="grid grid-cols-2 gap-3">
-                            <div>
-                                <label for="pic_name" class="block text-sm font-semibold text-slate-700 mb-1.5">PIC Name</label>
-                                <input type="text" id="pic_name" name="pic_name" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" value="{{ old('pic_name') }}" placeholder="Contact Name">
+                        <!-- Project Type & Location Grid -->
+                        <div class="cp-field-row-2">
+                            <div class="cp-field-group">
+                                <label for="project_type" class="cp-label">
+                                    <span>Project Type <span class="cp-label-required">*</span></span>
+                                </label>
+                                <select id="project_type"
+                                        name="project_type"
+                                        class="cp-select @error('project_type') is-invalid @enderror"
+                                        required>
+                                    <option value="" disabled {{ old('project_type') ? '' : 'selected' }}>Choose project type</option>
+                                    @foreach(\App\Models\Project::TYPES as $code => $label)
+                                        <option value="{{ $code }}" {{ old('project_type') == $code ? 'selected' : '' }}>
+                                            {{ $code }} · {{ $label }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('project_type')
+                                    <div class="cp-error-message">
+                                        <i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
-                            <div>
-                                <label for="pic_no" class="block text-sm font-semibold text-slate-700 mb-1.5">PIC Contact</label>
-                                <input type="text" id="pic_no" name="pic_no" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" value="{{ old('pic_no') }}" placeholder="Phone / Email">
+
+                            <div class="cp-field-group">
+                                <label for="location" class="cp-label">
+                                    <span>Location <span class="cp-label-required">*</span></span>
+                                </label>
+                                <select id="location"
+                                        name="location"
+                                        class="cp-select @error('location') is-invalid @enderror"
+                                        required>
+                                    <option value="" disabled {{ old('location') ? '' : 'selected' }}>Choose location</option>
+                                    @foreach(\App\Models\Project::LOCATIONS as $loc)
+                                        <option value="{{ $loc }}" {{ old('location') == $loc ? 'selected' : '' }}>
+                                            {{ $loc }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('location')
+                                    <div class="cp-error-message">
+                                        <i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
+                                    </div>
+                                @enderror
                             </div>
                         </div>
 
-                        <div>
-                            <label for="client_address" class="block text-sm font-semibold text-slate-700 mb-1.5">Client Address</label>
-                            <textarea id="client_address" name="client_address" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm" rows="3" placeholder="Full address for quotations">{{ old('client_address') }}</textarea>
+                        <!-- Status & Duration Grid -->
+                        <div class="cp-field-row-2">
+                            <div class="cp-field-group">
+                                <label for="status" class="cp-label">
+                                    <span>Initial Status</span>
+                                </label>
+                                <select id="status"
+                                        name="status"
+                                        class="cp-select @error('status') is-invalid @enderror"
+                                        required>
+                                    <option value="draft" {{ old('status', 'draft') == 'draft' ? 'selected' : '' }}>Draft (New intake)</option>
+                                    <option value="planned" {{ old('status') == 'planned' ? 'selected' : '' }}>Planned (In progress)</option>
+                                    <option value="completed" {{ old('status') == 'completed' ? 'selected' : '' }}>Completed</option>
+                                </select>
+                                @error('status')
+                                    <div class="cp-error-message">
+                                        <i class="fa-solid fa-circle-exclamation"></i> {{ $message }}
+                                    </div>
+                                @enderror
+                            </div>
+
+                            <div class="cp-field-group">
+                                <label for="period" class="cp-label">
+                                    <span>Estimated Duration</span>
+                                    <span class="cp-label-hint">Operational window</span>
+                                </label>
+                                <div class="cp-input-icon-wrap">
+                                    <i class="fa-regular fa-clock cp-input-icon"></i>
+                                    <input type="text"
+                                           id="period"
+                                           name="period"
+                                           class="cp-input"
+                                           value="{{ old('period') }}"
+                                           placeholder="e.g. 5 Days or 2 Weeks">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CARD 2: CLIENT & POINT OF CONTACT -->
+                <div class="create-project-card">
+                    <div class="create-project-card-header">
+                        <div class="create-project-card-icon create-project-card-icon--teal">
+                            <i class="fa-solid fa-building-user"></i>
+                        </div>
+                        <div class="create-project-card-title">
+                            <h2>Client Details</h2>
+                            <p>Billing organization and primary contact coordinates</p>
+                        </div>
+                    </div>
+
+                    <div class="create-project-card-body">
+                        <!-- Client Company -->
+                        <div class="cp-field-group">
+                            <label for="client_name" class="cp-label">
+                                <span>Client Company</span>
+                                <span class="cp-label-hint">For quotations & reports</span>
+                            </label>
+                            <div class="cp-input-icon-wrap">
+                                <i class="fa-regular fa-building cp-input-icon"></i>
+                                <input type="text"
+                                       id="client_name"
+                                       name="client_name"
+                                       class="cp-input"
+                                       value="{{ old('client_name') }}"
+                                       placeholder="e.g. PETRONAS Carigali Sdn Bhd">
+                            </div>
+                        </div>
+
+                        <!-- PIC Name & PIC Contact Grid -->
+                        <div class="cp-field-row-2">
+                            <div class="cp-field-group">
+                                <label for="pic_name" class="cp-label">
+                                    <span>Person In Charge</span>
+                                </label>
+                                <div class="cp-input-icon-wrap">
+                                    <i class="fa-regular fa-user cp-input-icon"></i>
+                                    <input type="text"
+                                           id="pic_name"
+                                           name="pic_name"
+                                           class="cp-input"
+                                           value="{{ old('pic_name') }}"
+                                           placeholder="e.g. Ts. Ahmad Razak">
+                                </div>
+                            </div>
+
+                            <div class="cp-field-group">
+                                <label for="pic_no" class="cp-label">
+                                    <span>PIC Contact</span>
+                                </label>
+                                <div class="cp-input-icon-wrap">
+                                    <i class="fa-solid fa-phone cp-input-icon"></i>
+                                    <input type="text"
+                                           id="pic_no"
+                                           name="pic_no"
+                                           class="cp-input"
+                                           value="{{ old('pic_no') }}"
+                                           placeholder="Phone or email">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Client Address -->
+                        <div class="cp-field-group">
+                            <label for="client_address" class="cp-label">
+                                <span>Billing Address</span>
+                                <span class="cp-label-hint">Official billing location</span>
+                            </label>
+                            <textarea id="client_address"
+                                      name="client_address"
+                                      class="cp-textarea"
+                                      rows="3"
+                                      placeholder="Full corporate address for commercial invoices and quotation headers...">{{ old('client_address') }}</textarea>
                         </div>
                     </div>
                 </div>
             </div>
-            
-            <!-- FORM FOOTER -->
-            <div class="bg-slate-50 p-6 md:px-8 border-t border-slate-200 flex justify-end">
-                <button type="submit" class="bg-sky-700 hover:bg-sky-800 text-white px-8 py-2.5 rounded-lg text-sm font-bold transition-all shadow-sm flex items-center gap-2">
-                    Create Project <i class="fa-solid fa-arrow-right"></i>
-                </button>
+
+            <!-- FORM FOOTER ACTION BAR -->
+            <div class="create-project-footer">
+                <div class="create-project-hint">
+                    <i class="fa-solid fa-circle-check text-emerald-500"></i>
+                    <span>Survey boundaries and runline planning can be configured immediately after workspace initialization.</span>
+                </div>
+                <div class="create-project-actions">
+                    <a href="{{ route('projects.index') }}" class="create-project-cancel-btn">
+                        Cancel
+                    </a>
+                    <button type="submit" class="create-project-submit-btn">
+                        <span>Initialize Workspace</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
             </div>
         </form>
     </div>
-
-</div>
 </x-app-layout>

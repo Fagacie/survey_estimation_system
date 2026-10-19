@@ -1,530 +1,505 @@
-
-<x-app-layout containerClass="w-full px-8 py-8">
+<x-app-layout containerClass="w-full px-4 py-6 sm:px-8 sm:py-8">
     <x-slot name="header">{{ $project->name }}</x-slot>
 
-    <link rel="stylesheet"
-          href="{{ asset('css/project-overview.css') }}?v={{ filemtime(public_path('css/project-overview.css')) }}">
+    <link rel="stylesheet" href="{{ asset('css/project-overview.css') }}?v={{ filemtime(public_path('css/project-overview.css')) }}">
 
     <div class="project-overview-page">
-        <div class="project-overview-content">
+        <!-- BREADCRUMB -->
+        <nav class="pw-breadcrumb" aria-label="Breadcrumb">
+            <a href="{{ route('projects.index') }}">
+                <i class="fa-solid fa-folder-tree"></i> Projects
+            </a>
+            <span class="breadcrumb-separator">/</span>
+            <span class="breadcrumb-current">{{ $project->name }}</span>
+            <span class="breadcrumb-separator">/</span>
+            <span class="text-slate-400 font-medium">Workspace</span>
+        </nav>
 
-            <!-- Breadcrumb -->
-            <div class="project-overview-breadcrumb">
-                <a href="{{ route('projects.index') }}">
-                    <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-                    Back to projects
+        <!-- FLASH NOTIFICATIONS -->
+        @if (session('success'))
+            <div class="bg-emerald-50 text-emerald-800 border border-emerald-200 px-4 py-3 mb-6 flex items-start gap-3 text-sm rounded-lg shadow-sm">
+                <i class="fa-solid fa-circle-check mt-0.5 text-emerald-600"></i>
+                <span class="font-medium">{{ session('success') }}</span>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="bg-red-50 text-red-800 border border-red-200 px-4 py-3 mb-6 flex items-start gap-3 text-sm rounded-lg shadow-sm">
+                <i class="fa-solid fa-triangle-exclamation mt-0.5 text-red-600"></i>
+                <span class="font-medium">{{ session('error') }}</span>
+            </div>
+        @endif
+
+        @php
+            $statusKey = strtolower($project->status ?? 'draft');
+            $summary = $project->modellingSummary;
+            $surveyCount = $project->surveyLocations->count();
+            $mappedCount = $project->surveyLocations->where('status', 'Mapped')->count();
+        @endphp
+
+        <!-- 1. PROJECT HERO CARD -->
+        <header class="pw-hero-card">
+            <div class="pw-hero-top">
+                <div class="pw-hero-identity">
+                    <div class="pw-meta-pills">
+                        <span class="pw-code-tag">
+                            <i class="fa-solid fa-hashtag"></i>
+                            {{ $project->number ?? 'PRJ-' . str_pad($project->project_Id, 4, '0', STR_PAD_LEFT) }}
+                        </span>
+
+                        <span class="pw-status-pill pw-status-pill--{{ $statusKey }}">
+                            <span class="pw-status-dot"></span>
+                            {{ ucfirst($project->status ?? 'draft') }}
+                        </span>
+                    </div>
+
+                    <h1 class="pw-hero-title">{{ $project->name }}</h1>
+
+                    <div class="pw-tags-row">
+                        <span class="pw-tag">
+                            <i class="fa-solid fa-layer-group text-blue-500"></i>
+                            {{ \App\Models\Project::TYPES[$project->project_type] ?? $project->project_type ?? 'Hydrographic' }}
+                        </span>
+
+                        @if ($project->location)
+                            <span class="pw-tag-divider">·</span>
+                            <span class="pw-tag">
+                                <i class="fa-solid fa-location-dot text-rose-500"></i>
+                                {{ $project->location }}
+                            </span>
+                        @endif
+
+                        @if ($project->period)
+                            <span class="pw-tag-divider">·</span>
+                            <span class="pw-tag">
+                                <i class="fa-regular fa-clock text-amber-500"></i>
+                                {{ $project->period }}
+                            </span>
+                        @endif
+
+                        <span class="pw-tag-divider">·</span>
+                        <span class="pw-tag">
+                            <i class="fa-regular fa-calendar text-slate-400"></i>
+                            Created {{ $project->created_at?->format('d M Y') ?? 'N/A' }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="pw-hero-actions">
+                    <a href="{{ route('projects.index') }}" class="pw-btn pw-btn--secondary">
+                        <i class="fa-solid fa-folder-tree"></i>
+                        <span>Project Register</span>
+                    </a>
+
+                    <a href="{{ route('projects.edit', $project->project_Id) }}" class="pw-btn pw-btn--primary">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                        <span>Edit Details</span>
+                    </a>
+                </div>
+            </div>
+        </header>
+
+        <!-- 2. TELEMETRY & KPI METRIC TILES -->
+        <section class="pw-kpi-grid" aria-label="Project Key Indicators">
+            <!-- Client Info Tile -->
+            <div class="pw-kpi-tile">
+                <div class="pw-kpi-icon">
+                    <i class="fa-regular fa-building"></i>
+                </div>
+                <div class="pw-kpi-content">
+                    <span class="pw-kpi-label">Client Entity</span>
+                    <span class="pw-kpi-value" title="{{ $project->client?->company_name ?? 'No client assigned' }}">
+                        {{ $project->client?->company_name ?? 'No client assigned' }}
+                    </span>
+                    <span class="pw-kpi-subtext" title="{{ $project->pic_name ?? 'No PIC specified' }}">
+                        {{ $project->pic_name ? 'PIC: ' . $project->pic_name : 'No PIC assigned' }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- Survey Areas Tile -->
+            <div class="pw-kpi-tile">
+                <div class="pw-kpi-icon pw-kpi-icon--teal">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                </div>
+                <div class="pw-kpi-content">
+                    <span class="pw-kpi-label">Survey Areas</span>
+                    <span class="pw-kpi-value">{{ $surveyCount }}</span>
+                    <span class="pw-kpi-subtext">
+                        {{ $project->surveyLocations->where('survey_type', 'sbes')->count() }} SBES · {{ $project->surveyLocations->where('survey_type', 'drone')->count() }} Drone
+                    </span>
+                </div>
+            </div>
+
+            <!-- Mapping Coverage Tile -->
+            <div class="pw-kpi-tile">
+                <div class="pw-kpi-icon pw-kpi-icon--emerald">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div class="pw-kpi-content">
+                    <span class="pw-kpi-label">Mapped Coverage</span>
+                    <span class="pw-kpi-value">{{ $mappedCount }} of {{ $surveyCount }}</span>
+                    <span class="pw-kpi-subtext">
+                        {{ $surveyCount > 0 ? round(($mappedCount / $surveyCount) * 100) . '% boundaries finalized' : 'No areas added yet' }}
+                    </span>
+                </div>
+            </div>
+
+            <!-- 3D Modelling Tile -->
+            <div class="pw-kpi-tile">
+                <div class="pw-kpi-icon pw-kpi-icon--indigo">
+                    <i class="fa-solid fa-cubes"></i>
+                </div>
+                <div class="pw-kpi-content">
+                    <span class="pw-kpi-label">3D Modelling</span>
+                    <span class="pw-kpi-value">
+                        {{ $summary ? 'RM ' . number_format($summary->grand_total, 2) : 'Not Added' }}
+                    </span>
+                    <span class="pw-kpi-subtext">
+                        {{ $summary ? ($summary->package_name ?? 'Custom Package') : 'Volumetric processing' }}
+                    </span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. WORKFLOW LAUNCHPAD (ADD WORKFLOWS) -->
+        <section class="pw-section" aria-labelledby="launchpad-title">
+            <div class="pw-section-header">
+                <div class="pw-section-title-wrap">
+                    <h2 id="launchpad-title">Survey Modules & Workflows</h2>
+                    <p>Initialize hydrographic soundings, aerial photogrammetry, or 3D volume modelling packages.</p>
+                </div>
+                <a href="{{ url('/admin/equipment') }}" class="pw-btn pw-btn--secondary pw-btn--sm">
+                    <i class="fa-solid fa-database text-slate-400"></i>
+                    <span>Equipment Catalogue</span>
                 </a>
             </div>
 
-            <!-- Success message -->
-            @if (session('success'))
-                <div class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-4 mb-8 flex items-start gap-3 text-sm rounded-md">
-                    <i class="fa-solid fa-circle-check mt-0.5 text-emerald-600"></i>
-                    <span class="font-medium">{{ session('success') }}</span>
-                </div>
-            @endif
-
-            <!-- Error message -->
-            @if (session('error'))
-                <div class="bg-red-50 text-red-800 border border-red-200 p-4 mb-8 flex items-start gap-3 text-sm rounded-md">
-                    <i class="fa-solid fa-triangle-exclamation mt-0.5 text-red-600"></i>
-                    <span class="font-medium">{{ session('error') }}</span>
-                </div>
-            @endif
-
-            <!-- PROJECT HEADER -->
-            <header class="project-overview-hero">
-
-                <div class="project-overview-hero-top">
-                    <div class="project-overview-title-group">
-
-                        <p class="project-overview-eyebrow">
-                            Project workspace
-                            <span aria-hidden="true">/</span>
-                            survey operations
-                        </p>
-
-                        <h1>{{ $project->name }}</h1>
-
-                        <div class="project-overview-code">
-                            <i class="fa-solid fa-hashtag" aria-hidden="true"></i>
-                            {{ $project->number ?? 'Project code not assigned' }}
+            <div class="pw-launchpad-grid">
+                <!-- SBES Bathymetry Card -->
+                <div class="pw-launchpad-card">
+                    <div class="pw-launchpad-card-top">
+                        <div class="pw-launchpad-badge-icon">
+                            <i class="fa-solid fa-water"></i>
                         </div>
-
-                        <div class="project-overview-badges">
-                            <span class="project-overview-status project-overview-status-{{ strtolower($project->status ?? 'draft') }}">
-                                {{ ucfirst($project->status ?? 'draft') }}
-                            </span>
-
-                            <span class="project-overview-type">
-                                {{ \App\Models\Project::TYPES[$project->project_type] ?? $project->project_type ?? 'Type not set' }}
-                            </span>
-
-                            @if ($project->location)
-                                <span class="project-overview-location">
-                                    <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
-                                    {{ $project->location }}
-                                </span>
-                            @endif
+                        <div class="pw-launchpad-info">
+                            <h3>Single Beam (SBES)</h3>
+                            <p>Hydrographic sounding area with bathymetric lines and depth intervals.</p>
                         </div>
                     </div>
-
-                    <div class="project-overview-hero-actions">
-                        <a href="{{ route('projects.index') }}"
-                           class="project-overview-secondary-action">
-                            <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-                            Project register
-                        </a>
-
-                        <a href="{{ route('projects.edit', $project->project_Id) }}"
-                           class="project-overview-primary-action">
-                            <i class="fa-solid fa-pen-to-square" aria-hidden="true"></i>
-                            Edit project
-                        </a>
-                    </div>
-                </div>
-
-                <!-- Project information -->
-                <div class="project-overview-meta-grid">
-                    <div class="project-overview-meta-item">
-                        <span>Client</span>
-                        <strong>{{ $project->client?->company_name ?? 'No client assigned' }}</strong>
-                    </div>
-
-                    <div class="project-overview-meta-item">
-                        <span>Project period</span>
-                        <strong>{{ $project->period ?: 'Not specified' }}</strong>
-                    </div>
-
-                    <div class="project-overview-meta-item">
-                        <span>Created</span>
-                        <strong>{{ $project->created_at?->format('d M Y') ?? 'N/A' }}</strong>
-                    </div>
-                </div>
-
-                <!-- PROJECT WORKFLOW SUMMARY -->
-                <div class="project-overview-summary" aria-label="Project workflow summary">
-
-                    <div class="project-overview-summary-item">
-                        <span class="project-overview-summary-icon">
-                            <i class="fa-solid fa-map-location-dot" aria-hidden="true"></i>
-                        </span>
-
-                        <span>
-                            <small>Survey areas</small>
-                            <strong>{{ $project->surveyLocations->count() }}</strong>
-                        </span>
-                    </div>
-
-                    <div class="project-overview-summary-item">
-                        <span class="project-overview-summary-icon">
-                            <i class="fa-solid fa-circle-check" aria-hidden="true"></i>
-                        </span>
-
-                        <span>
-                            <small>Mapped areas</small>
-                            <strong>{{ $project->surveyLocations->where('status', 'Mapped')->count() }}</strong>
-                        </span>
-                    </div>
-
-                    <div class="project-overview-summary-item">
-                        <span class="project-overview-summary-icon">
-                            <i class="fa-solid fa-cubes" aria-hidden="true"></i>
-                        </span>
-
-                        <span>
-                            <small>Modelling</small>
-                            <strong>{{ $project->modellingSummary ? 'Configured' : 'Not added' }}</strong>
-                        </span>
-                    </div>
-
-                </div>
-            </header>
-
-            @php
-                $summary = $project->modellingSummary;
-            @endphp
-
-            <!-- ADD WORKFLOW -->
-            <section class="project-overview-section project-overview-add mb-8">
-
-                <div class="project-overview-section-heading flex items-center justify-between mb-4">
-                    <div>
-                        <p class="project-overview-section-kicker">Expand this project</p>
-
-                        <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">
-                            Add a Workflow
-                        </h2>
-
-                        <p class="project-overview-section-description">
-                            Add a survey area or configure a modelling package for this project.
-                        </p>
-                    </div>
-
-                    <a href="{{ url('/admin/equipment') }}"
-                       class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-600 hover:text-blue-600 hover:border-blue-200 hover:bg-blue-50 rounded text-[11px] font-bold uppercase tracking-wider transition-colors shadow-sm">
-                        <i class="fa-solid fa-database"></i>
-                        Equipment Database
-                    </a>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-
-                    <!-- Add SBES -->
-                    <button type="button"
-                            onclick="openSurveyModal('sbes')"
-                            class="flex flex-col items-center justify-center p-6 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-teal-400 hover:shadow-md transition-all group">
-
-                        <div class="w-12 h-12 rounded-full bg-teal-50 text-teal-600 flex items-center justify-center mb-3 group-hover:bg-teal-100 transition-colors">
-                            <i class="fa-solid fa-water text-xl"></i>
-                        </div>
-
-                        <div class="font-bold text-slate-800 text-sm mb-1">
-                            Single Beam (SBES)
-                        </div>
-
-                        <div class="text-xs text-slate-500 text-center">
-                            Add a hydrographic survey area.
-                        </div>
+                    <button type="button" onclick="openSurveyModal('sbes')" class="pw-launchpad-btn">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Add SBES Area</span>
                     </button>
-
-                    <!-- Add Drone -->
-                    <button type="button"
-                            onclick="openSurveyModal('drone')"
-                            class="flex flex-col items-center justify-center p-6 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-blue-400 hover:shadow-md transition-all group">
-
-                        <div class="w-12 h-12 rounded-full bg-slate-50 text-slate-500 flex items-center justify-center mb-3 group-hover:bg-blue-50 group-hover:text-blue-600 transition-colors">
-                            <i class="fa-solid fa-plane-up text-xl"></i>
-                        </div>
-
-                        <div class="font-bold text-slate-800 text-sm mb-1">
-                            Drone Mapping
-                        </div>
-
-                        <div class="text-xs text-slate-500 text-center">
-                            Add an aerial survey area.
-                        </div>
-                    </button>
-
-                    <!-- Add Modelling -->
-                    @if (!$summary)
-                        <a href="{{ route('projects.modeling.builder', ['project_id' => $project->project_Id]) }}"
-                           class="flex flex-col items-center justify-center p-6 bg-white border border-slate-200 rounded-lg shadow-sm hover:border-indigo-400 hover:shadow-md transition-all group">
-
-                            <div class="w-12 h-12 rounded-full bg-slate-50 text-slate-500 flex items-center justify-center mb-3 group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
-                                <i class="fa-solid fa-cubes text-xl"></i>
-                            </div>
-
-                            <div class="font-bold text-slate-800 text-sm mb-1">
-                                3D Modelling
-                            </div>
-
-                            <div class="text-xs text-slate-500 text-center">
-                                Configure processing and models.
-                            </div>
-                        </a>
-                    @else
-                        <div class="flex flex-col items-center justify-center p-6 bg-slate-50 border border-slate-200 rounded-lg shadow-sm opacity-60">
-
-                            <div class="w-12 h-12 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mb-3">
-                                <i class="fa-solid fa-cubes text-xl"></i>
-                            </div>
-
-                            <div class="font-bold text-slate-600 text-sm mb-1">
-                                3D Modelling
-                            </div>
-
-                            <div class="text-xs text-slate-500 text-center">
-                                Already added to project.
-                            </div>
-                        </div>
-                    @endif
-
                 </div>
-            </section>
 
-            <!-- ACTIVE WORKFLOWS -->
-            <section class="project-overview-section project-overview-workflows mb-10">
+                <!-- Drone Mapping Card -->
+                <div class="pw-launchpad-card">
+                    <div class="pw-launchpad-card-top">
+                        <div class="pw-launchpad-badge-icon pw-launchpad-badge-icon--blue">
+                            <i class="fa-solid fa-plane-up"></i>
+                        </div>
+                        <div class="pw-launchpad-info">
+                            <h3>Drone Mapping</h3>
+                            <p>Aerial photogrammetry, orthomosaic imaging, and DEM surface mapping.</p>
+                        </div>
+                    </div>
+                    <button type="button" onclick="openSurveyModal('drone')" class="pw-launchpad-btn">
+                        <i class="fa-solid fa-plus"></i>
+                        <span>Add Drone Area</span>
+                    </button>
+                </div>
 
-                <div class="project-overview-section-heading flex items-center justify-between mb-4">
-                    <div>
-                        <p class="project-overview-section-kicker">Survey register</p>
+                <!-- 3D Modelling Card -->
+                @if (!$summary)
+                    <div class="pw-launchpad-card">
+                        <div class="pw-launchpad-card-top">
+                            <div class="pw-launchpad-badge-icon pw-launchpad-badge-icon--indigo">
+                                <i class="fa-solid fa-cubes"></i>
+                            </div>
+                            <div class="pw-launchpad-info">
+                                <h3>3D Processing & Modelling</h3>
+                                <p>Volumetric calculations, mesh reconstruction, and CAD deliverables.</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('projects.modeling.builder', ['project_id' => $project->project_Id]) }}" class="pw-launchpad-btn">
+                            <i class="fa-solid fa-sliders"></i>
+                            <span>Configure Package</span>
+                        </a>
+                    </div>
+                @else
+                    <div class="pw-launchpad-card pw-launchpad-card--configured">
+                        <div class="pw-launchpad-card-top">
+                            <div class="pw-launchpad-badge-icon">
+                                <i class="fa-solid fa-cubes"></i>
+                            </div>
+                            <div class="pw-launchpad-info">
+                                <h3>3D Modelling (Configured)</h3>
+                                <p>Package active: {{ $summary->package_name ?? 'Custom selection' }} (RM {{ number_format($summary->grand_total, 2) }}).</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('projects.modeling.builder', ['project_id' => $project->project_Id]) }}" class="pw-launchpad-btn">
+                            <i class="fa-solid fa-sliders"></i>
+                            <span>Manage Modules</span>
+                        </a>
+                    </div>
+                @endif
+            </div>
+        </section>
 
-                        <h2 class="text-sm font-bold text-slate-800 uppercase tracking-wider">
-                            Active Workflows
-                        </h2>
-
-                        <p class="project-overview-section-description">
-                            Manage survey areas and modelling packages, with each action kept beside its workflow.
-                        </p>
+        <!-- 4. CONFIGURED WORKFLOWS REGISTER -->
+        <section class="pw-section" aria-labelledby="register-title">
+            <div class="pw-register-card">
+                <div class="pw-register-header">
+                    <div class="pw-register-heading">
+                        <h3 id="register-title">Configured Workflows</h3>
+                        <span class="pw-count-badge">
+                            {{ $surveyCount + ($summary ? 1 : 0) }} Active
+                        </span>
                     </div>
 
-                    @if ($project->surveyLocations->count() > 1)
-                        <a href="{{ route('projects.report.preview', $project->project_Id) }}"
-                           class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:text-slate-900 hover:border-slate-300 rounded text-xs font-bold transition-colors shadow-sm">
-                            <i class="fa-solid fa-file-lines text-slate-500"></i>
-                            Full Project Report (All Areas)
+                    @if ($surveyCount > 1)
+                        <a href="{{ route('projects.report.preview', $project->project_Id) }}" class="pw-btn pw-btn--secondary pw-btn--sm">
+                            <i class="fa-solid fa-file-lines text-slate-400"></i>
+                            <span>Full Project Report (All Areas)</span>
                         </a>
                     @endif
                 </div>
 
-                <div class="project-overview-workflow-table">
+                <ul class="pw-workflow-list">
+                    @php $hasAnyModule = false; @endphp
 
-                    <div class="project-overview-workflow-table-head" aria-hidden="true">
-                        <span>Workflow</span>
-                        <span>Actions</span>
-                    </div>
+                    <!-- Survey Areas List -->
+                    @foreach ($project->surveyLocations as $location)
+                        @php $hasAnyModule = true; @endphp
+                        <li class="pw-workflow-item">
+                            <div class="pw-workflow-left">
+                                @if ($location->survey_type === 'drone')
+                                    <div class="pw-workflow-icon pw-workflow-icon--blue">
+                                        <i class="fa-solid fa-plane-up"></i>
+                                    </div>
+                                @else
+                                    <div class="pw-workflow-icon">
+                                        <i class="fa-solid fa-water"></i>
+                                    </div>
+                                @endif
 
-                    <ul class="divide-y divide-slate-100">
-
-                        @php
-                            $hasAnyModule = false;
-                        @endphp
-
-                        <!-- Survey areas -->
-                        @foreach ($project->surveyLocations as $location)
-                            @php
-                                $hasAnyModule = true;
-                            @endphp
-
-                            <li class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
-
-                                <div>
-                                    <div class="flex items-center gap-2.5 mb-1">
-
-                                        @if ($location->survey_type === 'drone')
-                                            <i class="fa-solid fa-plane-up text-slate-500 w-4 text-center"></i>
-
-                                            <div class="font-bold text-slate-800 text-sm">
-                                                Drone Mapping: {{ $location->name }}
-                                            </div>
-                                        @else
-                                            <i class="fa-solid fa-water text-teal-600 w-4 text-center"></i>
-
-                                            <div class="font-bold text-slate-800 text-sm">
-                                                SBES Survey: {{ $location->name }}
-                                            </div>
-                                        @endif
+                                <div class="pw-workflow-details">
+                                    <div class="pw-workflow-name-row">
+                                        <span class="pw-workflow-name">
+                                            {{ $location->survey_type === 'drone' ? 'Drone Mapping' : 'SBES Survey' }}: {{ $location->name }}
+                                        </span>
 
                                         @if ($location->status === 'Mapped')
-                                            <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
-                                                Mapped
+                                            <span class="pw-status-pill pw-status-pill--completed">
+                                                <span class="pw-status-dot"></span> Mapped
                                             </span>
                                         @else
-                                            <span class="bg-slate-100 text-slate-600 border border-slate-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
-                                                Pending
+                                            <span class="pw-status-pill pw-status-pill--draft">
+                                                <span class="pw-status-dot"></span> Pending Planning
                                             </span>
                                         @endif
-
                                     </div>
 
-                                    <div class="text-[11px] text-slate-500 font-medium">
+                                    <span class="pw-workflow-meta">
                                         Added {{ $location->created_at->format('M d, Y') }}
-                                    </div>
+                                    </span>
                                 </div>
+                            </div>
 
-                                <div class="project-overview-row-actions">
+                            <div class="pw-row-actions">
+                                <a href="{{ route('projects.report.preview', ['project' => $project->project_Id, 'location_id' => $location->id]) }}"
+                                   class="pw-action-btn"
+                                   title="Preview Survey Report">
+                                    <i class="fa-regular fa-file-pdf"></i>
+                                    <span>Report</span>
+                                </a>
 
-                                    <a href="{{ route('projects.report.preview', ['project' => $project->project_Id, 'location_id' => $location->id]) }}"
-                                       class="project-overview-action project-overview-action-secondary">
-                                        <i class="fa-regular fa-file-pdf" aria-hidden="true"></i>
-                                        <span>Report</span>
-                                    </a>
+                                <a href="{{ route('projects.surveys.map', [$project->project_Id, $location->id]) }}"
+                                   class="pw-action-btn pw-action-btn--map"
+                                   title="Open Survey Boundary & Planning Map">
+                                    <i class="fa-solid fa-map"></i>
+                                    <span>Planning Map</span>
+                                </a>
 
-                                    <a href="{{ route('projects.surveys.map', [$project->project_Id, $location->id]) }}"
-                                       class="project-overview-action project-overview-action-secondary">
-                                        <i class="fa-solid fa-map" aria-hidden="true"></i>
-                                        <span>Open map</span>
-                                    </a>
+                                <a href="{{ route('quotation.index', ['project_id' => $project->project_Id, 'module' => $location->survey_type, 'location_id' => $location->id]) }}"
+                                   class="pw-action-btn pw-action-btn--quote"
+                                   title="Open Commercial Quotation">
+                                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                                    <span>Quotation</span>
+                                </a>
 
-                                    <a href="{{ route('quotation.index', ['project_id' => $project->project_Id, 'module' => $location->survey_type, 'location_id' => $location->id]) }}"
-                                       class="project-overview-action project-overview-action-primary">
-                                        <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i>
-                                        <span>Quotation</span>
-                                    </a>
+                                <form action="{{ route('projects.surveys.destroy', [$project->project_Id, $location->id]) }}"
+                                      method="POST"
+                                      class="m-0"
+                                      onsubmit="return confirm('Are you sure you want to delete this survey area?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="pw-action-btn pw-action-btn--delete"
+                                            aria-label="Delete survey area {{ $location->name }}"
+                                            title="Delete Survey Area">
+                                        <i class="fa-regular fa-trash-can"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </li>
+                    @endforeach
 
-                                    <form action="{{ route('projects.surveys.destroy', [$project->project_Id, $location->id]) }}"
-                                          method="POST"
-                                          class="m-0"
-                                          onsubmit="return confirm('Delete this survey area?');">
-                                        @csrf
-                                        @method('DELETE')
-
-                                        <button type="submit"
-                                                class="project-overview-action-delete"
-                                                aria-label="Delete survey area {{ $location->name }}"
-                                                title="Delete survey area">
-                                            <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
-                                        </button>
-                                    </form>
-
+                    <!-- 3D Modelling Summary Row -->
+                    @if ($summary)
+                        @php $hasAnyModule = true; @endphp
+                        <li class="pw-workflow-item">
+                            <div class="pw-workflow-left">
+                                <div class="pw-workflow-icon pw-workflow-icon--indigo">
+                                    <i class="fa-solid fa-cubes"></i>
                                 </div>
-                            </li>
-                        @endforeach
-
-                        <!-- 3D Modelling -->
-                        @php
-                            $summary = $project->modellingSummary;
-                        @endphp
-
-                        @if ($summary)
-                            @php
-                                $hasAnyModule = true;
-                            @endphp
-
-                            <li class="p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
-
-                                <div>
-                                    <div class="flex items-center gap-2.5 mb-1">
-                                        <i class="fa-solid fa-cubes text-slate-600 w-4 text-center"></i>
-
-                                        <div class="font-bold text-slate-800 text-sm">
-                                            3D Modelling
-                                        </div>
-
-                                        <span class="bg-emerald-50 text-emerald-700 border border-emerald-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider">
-                                            Saved
+                                <div class="pw-workflow-details">
+                                    <div class="pw-workflow-name-row">
+                                        <span class="pw-workflow-name">
+                                            3D Modelling: {{ $summary->package_name ?? 'Custom Selection' }}
+                                        </span>
+                                        <span class="pw-status-pill pw-status-pill--completed">
+                                            <span class="pw-status-dot"></span> Configured
                                         </span>
                                     </div>
-
-                                    <div class="text-[11px] text-slate-500 font-medium">
-                                        Package: {{ $summary->package_name ?? 'Custom selection' }},
-                                        {{ $project->modellingItems->pluck('catalog_module_id')->unique()->count() }} modules,
-                                        RM {{ number_format($summary->grand_total, 2) }}
-                                    </div>
+                                    <span class="pw-workflow-meta">
+                                        {{ $project->modellingItems->pluck('catalog_module_id')->unique()->count() }} modules active · Total: RM {{ number_format($summary->grand_total, 2) }}
+                                    </span>
                                 </div>
+                            </div>
 
-                                <div class="project-overview-row-actions">
+                            <div class="pw-row-actions">
+                                <a href="{{ route('projects.modeling.builder', ['project_id' => $project->project_Id]) }}"
+                                   class="pw-action-btn"
+                                   title="Edit 3D Modelling Packages">
+                                    <i class="fa-solid fa-sliders"></i>
+                                    <span>Edit Modules</span>
+                                </a>
 
-                                    <a href="{{ route('projects.modeling.builder', ['project_id' => $project->project_Id]) }}"
-                                       class="project-overview-action project-overview-action-secondary">
-                                        <i class="fa-solid fa-sliders" aria-hidden="true"></i>
-                                        <span>Edit modules</span>
-                                    </a>
+                                <a href="{{ route('quotation.index', ['project_id' => $project->project_Id, 'module' => 'modelling']) }}"
+                                   class="pw-action-btn pw-action-btn--quote"
+                                   title="Open Commercial Quotation">
+                                    <i class="fa-solid fa-file-invoice-dollar"></i>
+                                    <span>Quotation</span>
+                                </a>
 
-                                    <a href="{{ route('quotation.index', ['project_id' => $project->project_Id, 'module' => 'modelling']) }}"
-                                       class="project-overview-action project-overview-action-primary">
-                                        <i class="fa-solid fa-file-invoice-dollar" aria-hidden="true"></i>
-                                        <span>Quotation</span>
-                                    </a>
+                                <form action="{{ route('projects.modeling.destroy', $project->project_Id) }}"
+                                      method="POST"
+                                      class="m-0"
+                                      onsubmit="return confirm('Are you sure you want to remove 3D modelling from this project?');">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit"
+                                            class="pw-action-btn pw-action-btn--delete"
+                                            aria-label="Delete 3D Modelling"
+                                            title="Delete Modelling">
+                                        <i class="fa-regular fa-trash-can"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </li>
+                    @endif
 
-                                    <form action="{{ route('projects.modeling.destroy', $project->project_Id) }}"
-                                          method="POST"
-                                          class="m-0"
-                                          onsubmit="return confirm('Remove modelling data for this project?');">
-                                        @csrf
-                                        @method('DELETE')
+                    <!-- Empty State -->
+                    @if (!$hasAnyModule)
+                        <li class="pw-empty-state">
+                            <div class="pw-empty-icon">
+                                <i class="fa-regular fa-folder-open"></i>
+                            </div>
+                            <h4 class="pw-empty-title">No workflows configured yet</h4>
+                            <p class="pw-empty-text">
+                                Get started by adding a Single Beam (SBES) bathymetry polygon, Drone mapping mission, or 3D processing package from the launchpad above.
+                            </p>
+                        </li>
+                    @endif
+                </ul>
+            </div>
+        </section>
 
-                                        <button type="submit"
-                                                class="project-overview-action-delete"
-                                                aria-label="Delete modelling package"
-                                                title="Delete modelling package">
-                                            <i class="fa-regular fa-trash-can" aria-hidden="true"></i>
-                                        </button>
-                                    </form>
-
-                                </div>
-                            </li>
-                        @endif
-
-                        <!-- Empty state -->
-                        @if (!$hasAnyModule)
-                            <li class="p-8 text-center text-slate-500 font-medium text-sm">
-                                <i class="fa-regular fa-folder-open text-3xl text-slate-300 mb-3 block"></i>
-                                No workflows have been added to this project yet.
-                                Choose an option below to get started.
-                            </li>
-                        @endif
-
-                    </ul>
-                </div>
-            </section>
-
-        </div>
-
-        <!-- SURVEY AREA MODAL -->
-        <div class="modal fade" id="newSurveyModal" tabindex="-1" aria-hidden="true">
+        <!-- 5. NEW SURVEY AREA MODAL -->
+        <div class="modal fade" id="newSurveyModal" tabindex="-1" aria-labelledby="modal_title" aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content border-0 rounded-lg shadow-xl overflow-hidden">
-
-                    <form action="{{ route('projects.surveys.store', $project->project_Id) }}"
-                          method="POST">
+                <div class="modal-content pw-modal-content">
+                    <form action="{{ route('projects.surveys.store', $project->project_Id) }}" method="POST">
                         @csrf
+                        <input type="hidden" name="survey_type" id="modal_survey_type" value="sbes">
 
-                        <input type="hidden"
-                               name="survey_type"
-                               id="modal_survey_type"
-                               value="sbes">
-
-                        <div class="px-6 py-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-
-                            <h5 class="text-base font-bold text-slate-800" id="modal_title">
-                                New Survey Area
-                            </h5>
-
-                            <button type="button"
-                                    class="text-slate-400 hover:text-slate-600 transition-colors"
-                                    data-bs-dismiss="modal"
-                                    aria-label="Close">
+                        <div class="pw-modal-header">
+                            <div class="flex items-center gap-2.5">
+                                <div class="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-sm" id="modal_icon_badge">
+                                    <i class="fa-solid fa-water" id="modal_icon"></i>
+                                </div>
+                                <h5 id="modal_title">New Survey Area</h5>
+                            </div>
+                            <button type="button" class="pw-modal-close" data-bs-dismiss="modal" aria-label="Close">
                                 <i class="fa-solid fa-xmark"></i>
                             </button>
                         </div>
 
-                        <div class="p-6 bg-white">
-
-                            <div class="mb-6">
-                                <label for="name"
-                                       class="block text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-2">
-                                    Area Name
+                        <div class="pw-modal-body">
+                            <div>
+                                <label for="name" class="block text-xs font-semibold text-slate-700 uppercase tracking-wider mb-2">
+                                    Area / Polygon Designation <span class="text-rose-500">*</span>
                                 </label>
-
                                 <input type="text"
-                                       class="w-full px-3 py-2 bg-white border border-slate-200 rounded-md text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm transition-shadow"
+                                       class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-lg text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all"
                                        id="name"
                                        name="name"
-                                       placeholder="e.g. Main River, Tributary A"
+                                       placeholder="e.g. Terengganu River Basin, Sector A"
                                        required>
+                                <p class="text-xs text-slate-400 mt-1.5">You will define latitude & longitude coordinates or draw survey boundaries on the map in the next step.</p>
                             </div>
-
-                            <button type="submit"
-                                    class="w-full flex justify-center py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-md text-sm font-bold transition-colors shadow-sm">
-                                Create Module
-                            </button>
                         </div>
 
+                        <div class="pw-modal-footer">
+                            <button type="button" class="pw-btn pw-btn--secondary" data-bs-dismiss="modal">
+                                Cancel
+                            </button>
+                            <button type="submit" class="pw-btn pw-btn--primary">
+                                <span>Create Survey Area</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </button>
+                        </div>
                     </form>
                 </div>
             </div>
         </div>
 
-        <!-- SURVEY MODAL SCRIPT -->
+        <!-- 6. SURVEY MODAL CONTROLLER SCRIPT -->
         <script>
             function openSurveyModal(type) {
                 const hiddenInput = document.getElementById('modal_survey_type');
                 const modalElement = document.getElementById('newSurveyModal');
                 const modalTitle = document.getElementById('modal_title');
+                const modalIcon = document.getElementById('modal_icon');
+                const nameInput = document.getElementById('name');
 
                 if (hiddenInput) {
                     hiddenInput.value = type;
                 }
 
                 if (type === 'drone') {
-                    modalTitle.innerText = 'New Drone Mapping Area';
+                    if (modalTitle) modalTitle.innerText = 'New Drone Mapping Area';
+                    if (modalIcon) modalIcon.className = 'fa-solid fa-plane-up';
+                    if (nameInput) nameInput.placeholder = 'e.g. North Ridge Topography, Sector 1';
                 } else {
-                    modalTitle.innerText = 'New SBES Survey Area';
+                    if (modalTitle) modalTitle.innerText = 'New SBES Survey Area';
+                    if (modalIcon) modalIcon.className = 'fa-solid fa-water';
+                    if (nameInput) nameInput.placeholder = 'e.g. Main Navigation Channel, Sector A';
                 }
 
                 if (modalElement && typeof bootstrap !== 'undefined') {
                     let modal = bootstrap.Modal.getInstance(modalElement);
-
                     if (!modal) {
                         modal = new bootstrap.Modal(modalElement);
                     }
-
                     modal.show();
+                    setTimeout(() => {
+                        if (nameInput) nameInput.focus();
+                    }, 300);
                 }
             }
         </script>
-
     </div>
 </x-app-layout>

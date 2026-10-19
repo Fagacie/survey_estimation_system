@@ -75,6 +75,24 @@ class RouteSmokesTest extends TestCase
         $this->actingAs($user)->get('/projects/modeling/items')->assertOk();
         $this->actingAs($user)->get('/projects/modeling/packages')->assertOk();
         $this->actingAs($user)->get('/projects/modeling/builder')->assertOk();
+
+        $project = \App\Models\Project::create([
+            'name' => 'Workspace Visual Test',
+            'project_type' => 'MBES',
+            'location' => 'Terengganu',
+            'status' => 'planned',
+            'created_by' => $user->id,
+        ]);
+
+        $this->actingAs($user)->get('/projects/' . $project->project_Id)
+            ->assertOk()
+            ->assertSee('pw-hero-card')
+            ->assertSee('Workspace Visual Test');
+
+        $this->actingAs($user)->get('/projects/' . $project->project_Id . '/edit')
+            ->assertOk()
+            ->assertSee('project-edit-card')
+            ->assertSee('Workspace Visual Test');
     }
 
     public function test_authenticated_legacy_routes(): void
