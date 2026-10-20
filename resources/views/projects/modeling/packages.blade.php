@@ -31,7 +31,7 @@
             <div class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-4 mb-6 rounded-lg text-sm">{{ session('success') }}</div>
         @endif
 
-        @if ($errors->any())
+        @if (isset($errors) && $errors->any())
             <div class="bg-red-50 text-red-700 border border-red-200 p-3 mb-4 rounded-lg text-sm">
                 <ul class="list-disc list-inside">
                     @foreach ($errors->all() as $error)

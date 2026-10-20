@@ -38,6 +38,23 @@
         : route('projects.index');
 @endphp
 
+        <div class="mb-4 print:hidden">
+            @if($prefillProject)
+                <x-breadcrumb :items="[
+                    ['label' => 'Dashboard', 'url' => route('dashboard')],
+                    ['label' => 'Projects', 'url' => route('projects.index')],
+                    ['label' => $prefillProject->name, 'url' => route('projects.show', $prefillProject->project_Id)],
+                    ['label' => 'Quotation Builder'],
+                ]" />
+            @else
+                <x-breadcrumb :items="[
+                    ['label' => 'Dashboard', 'url' => route('dashboard')],
+                    ['label' => 'Quotations', 'url' => route('quotations.history')],
+                    ['label' => 'Quotation Builder'],
+                ]" />
+            @endif
+        </div>
+
 <div id="quotationBuilderHeader" class="quotation-builder-heading print:hidden">
     <div class="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center text-sky-700 shadow-sm border border-sky-100">
         <i class="fa-solid fa-file-invoice-dollar text-xl"></i>

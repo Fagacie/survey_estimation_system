@@ -1,195 +1,209 @@
 <x-app-layout containerClass="w-full px-4 sm:px-6 xl:px-8 py-6">
-    <div class="font-sans text-slate-800 antialiased" x-data="quotationBuilder()" x-cloak>
+    <x-slot name="header">Modelling Cost Estimator</x-slot>
 
-        <!-- ============ PREVIEW SHEET (report style, nothing is saved) ============ -->
+    {{-- Fonts & Icons --}}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    {{-- Stylesheet --}}
+    <link rel="stylesheet" href="{{ asset('css/modelling-management.css') }}?v={{ filemtime(public_path('css/modelling-management.css')) }}">
+
+    <div class="mb-builder-shell ises-modelling-page" x-data="quotationBuilder()" x-cloak>
+
+        <!-- ============ PREVIEW SHEET MODAL ============ -->
         <div x-show="showPreview" x-cloak
              @keydown.escape.window="showPreview = false"
              @click.self="showPreview = false"
-             style="position:fixed; top:0; right:0; bottom:0; left:0; z-index:9999; background:rgba(15,23,42,0.55); overflow-y:auto; padding:24px;">
+             class="mb-modal-overlay">
 
-            <style>
-                .mp-sheet { max-width: 900px; margin: 0 auto; background: #fff; border-radius: 8px; padding: 40px 48px; box-shadow: 0 20px 40px rgba(0,0,0,0.25); font-family: Arial, Helvetica, sans-serif; color: #1f2937; }
-                .mp-title { font-size: 1.9rem; font-weight: 800; color: #17496b; margin: 0; }
-                .mp-generated { font-size: 0.8rem; color: #6b7280; margin: 4px 0 16px; }
-                .mp-draft { display: inline-block; font-size: 0.7rem; font-weight: 700; color: #b45309; background: #fef3c7; border: 1px solid #fcd34d; border-radius: 999px; padding: 2px 10px; margin-left: 8px; }
-                .mp-h2 { font-size: 1.15rem; font-weight: 700; color: #17496b; border-bottom: 1px solid #d5dde6; padding-bottom: 6px; margin: 28px 0 14px; }
-                .mp-h3 { font-size: 1rem; font-weight: 700; color: #111827; margin: 18px 0 8px; }
-                .mp-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
-                .mp-table td, .mp-table th { border: 1px solid #cfd8e3; padding: 8px 10px; text-align: left; }
-                .mp-table thead th { background: #eef2f7; font-weight: 700; }
-                .mp-table .lbl { background: #eef2f7; font-weight: 700; width: 18%; }
-                .mp-table .mp-num { text-align: right; white-space: nowrap; }
-                .mp-table .mp-total-row td { background: #f8fafc; font-weight: 700; }
-                .mp-boxes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin-bottom: 8px; }
-                .mp-box { border: 1px solid #cfd8e3; text-align: center; padding: 12px 8px; }
-                .mp-box b { display: block; font-size: 1.35rem; color: #17496b; }
-                .mp-box span { font-size: 0.8rem; color: #4b5563; }
-                .mp-btn { padding: 8px 18px; border: 1px solid #cbd5e1; border-radius: 6px; background: #fff; font-weight: 600; font-size: 0.85rem; color: #1f2937; cursor: pointer; }
-                .mp-btn:hover { background: #f1f5f9; }
-            </style>
-
-            <div class="mp-sheet">
-                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px;">
+            <div class="mb-modal-sheet">
+                <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:16px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #e2e8f0;">
                     <div>
-                        <h1 class="mp-title">MODELLING PREVIEW</h1>
-                        <div class="mp-generated">
-                            Generated <span x-text="generatedAt"></span>
-                            <span class="mp-draft">DRAFT - NOT SAVED YET</span>
+                        <h2 style="font-family:'Space Grotesk',sans-serif; font-size:1.6rem; font-weight:700; color:#0f172a; margin:0 0 4px 0;">
+                            Modelling Cost Preview
+                        </h2>
+                        <div style="font-size:0.8125rem; color:#64748b;">
+                            Generated <span x-text="generatedAt"></span> &bull;
+                            <span style="display:inline-block; font-size:0.7rem; font-weight:700; color:#b45309; background:#fef3c7; border:1px solid rgba(217,119,6,0.3); border-radius:999px; padding:2px 10px; margin-left:4px;">
+                                DRAFT - NOT SAVED YET
+                            </span>
                         </div>
                     </div>
-                    <button type="button" class="mp-btn" @click="showPreview = false">Close</button>
+                    <button type="button" class="btn-mb-preview" style="width:auto; padding:6px 16px; margin:0;" @click="showPreview = false">
+                        <i class="fa-solid fa-xmark"></i> Close
+                    </button>
                 </div>
 
                 <!-- Project info -->
-                <table class="mp-table">
+                <table class="w-full text-sm mb-5" style="border-collapse:separate; border-spacing:0; border:1px solid #e2e8f0; border-radius:8px; overflow:hidden;">
                     <tr>
-                        <td class="lbl">Project</td>
-                        <td x-text="projectInfo.name || '-'"></td>
-                        <td class="lbl">Project No.</td>
-                        <td x-text="projectInfo.number || '-'"></td>
+                        <td style="background:#f8fafc; font-weight:700; color:#475569; padding:8px 14px; width:20%; border-bottom:1px solid #e2e8f0;">Project</td>
+                        <td style="padding:8px 14px; color:#0f172a; border-bottom:1px solid #e2e8f0;" x-text="projectInfo.name || '-'"></td>
+                        <td style="background:#f8fafc; font-weight:700; color:#475569; padding:8px 14px; width:20%; border-bottom:1px solid #e2e8f0;">Project Ref.</td>
+                        <td style="padding:8px 14px; color:#0f172a; border-bottom:1px solid #e2e8f0;" x-text="projectInfo.number || '-'"></td>
                     </tr>
                     <tr>
-                        <td class="lbl">Client</td>
-                        <td x-text="projectInfo.client || '-'"></td>
-                        <td class="lbl">Period</td>
-                        <td x-text="projectInfo.period || '-'"></td>
+                        <td style="background:#f8fafc; font-weight:700; color:#475569; padding:8px 14px;">Client</td>
+                        <td style="padding:8px 14px; color:#0f172a;" x-text="projectInfo.client || '-'"></td>
+                        <td style="background:#f8fafc; font-weight:700; color:#475569; padding:8px 14px;">Period</td>
+                        <td style="padding:8px 14px; color:#0f172a;" x-text="projectInfo.period || '-'"></td>
                     </tr>
                 </table>
 
-                <h2 class="mp-h2">Modelling Summary</h2>
-                <table class="mp-table">
+                <h3 style="font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:700; color:#0f172a; margin:20px 0 10px;">
+                    Modelling Summary
+                </h3>
+                <table class="w-full text-sm mb-6" style="border-collapse:separate; border-spacing:0; border:1px solid #e2e8f0; border-radius:8px; overflow:hidden;">
                     <tr>
-                        <td class="lbl">Package</td>
-                        <td colspan="3" x-text="presetLabel"></td>
+                        <td style="background:#f8fafc; font-weight:700; color:#475569; padding:8px 14px; width:30%; border-bottom:1px solid #e2e8f0;">Selected Package</td>
+                        <td colspan="3" style="padding:8px 14px; font-weight:600; color:#0284c7; border-bottom:1px solid #e2e8f0;" x-text="presetLabel"></td>
                     </tr>
                     <tr>
-                        <td class="lbl">Subtotal (internal)</td>
-                        <td x-text="money(totals.internal)"></td>
-                        <td class="lbl">Subtotal (client)</td>
-                        <td x-text="money(totals.client)"></td>
+                        <td style="background:#f8fafc; font-weight:700; color:#475569; padding:8px 14px; border-bottom:1px solid #e2e8f0;">Subtotal (Internal)</td>
+                        <td style="padding:8px 14px; border-bottom:1px solid #e2e8f0;" x-text="money(totals.internal)"></td>
+                        <td style="background:#f8fafc; font-weight:700; color:#475569; padding:8px 14px; border-bottom:1px solid #e2e8f0;">Subtotal (Client)</td>
+                        <td style="padding:8px 14px; border-bottom:1px solid #e2e8f0;" x-text="money(totals.client)"></td>
                     </tr>
                     <tr>
-                        <td class="lbl" x-text="'Contingency (' + terms.contingency + '%)'"></td>
-                        <td x-text="money(totals.contingency)"></td>
-                        <td class="lbl" x-text="'SST / Tax (' + terms.tax + '%)'"></td>
-                        <td x-text="money(totals.tax)"></td>
+                        <td style="background:#f8fafc; font-weight:700; color:#475569; padding:8px 14px; border-bottom:1px solid #e2e8f0;" x-text="'Contingency (' + terms.contingency + '%)'"></td>
+                        <td style="padding:8px 14px; border-bottom:1px solid #e2e8f0;" x-text="money(totals.contingency)"></td>
+                        <td style="background:#f8fafc; font-weight:700; color:#475569; padding:8px 14px; border-bottom:1px solid #e2e8f0;" x-text="'SST / Tax (' + terms.tax + '%)'"></td>
+                        <td style="padding:8px 14px; border-bottom:1px solid #e2e8f0;" x-text="money(totals.tax)"></td>
                     </tr>
-                    <tr>
-                        <td class="lbl">Grand Total</td>
-                        <td colspan="3" style="font-weight:700;" x-text="money(totals.grandTotal)"></td>
+                    <tr style="background:#f8fafc;">
+                        <td style="font-weight:700; color:#0f172a; padding:10px 14px; font-size:1rem;">Grand Total</td>
+                        <td colspan="3" style="font-family:'Space Grotesk',sans-serif; font-size:1.15rem; font-weight:800; color:#0284c7; padding:10px 14px;" x-text="money(totals.grandTotal)"></td>
                     </tr>
                 </table>
 
                 <!-- Modules and items -->
-                <h2 class="mp-h2" x-text="'Modules & Items - ' + presetLabel"></h2>
+                <h3 style="font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:700; color:#0f172a; margin:20px 0 10px;" x-text="'Modules & Items — ' + presetLabel"></h3>
 
                 <template x-for="mod in activeModules" :key="mod.id">
-                    <div>
-                        <div class="mp-h3">
+                    <div class="mb-4">
+                        <div style="font-weight:700; color:#0f172a; font-size:0.9rem; margin-bottom:6px;">
                             <span x-text="mod.name"></span>
-                            <span style="font-weight:400; color:#6b7280; font-size:0.8rem;" x-text="' - ' + mod.group"></span>
+                            <span style="font-weight:500; color:#64748b; font-size:0.8rem;" x-text="' — ' + mod.group"></span>
                         </div>
-                        <table class="mp-table">
+                        <table class="w-full text-sm mb-3" style="border-collapse:separate; border-spacing:0; border:1px solid #e2e8f0; border-radius:6px; overflow:hidden;">
                             <thead>
-                                <tr>
-                                    <th>Item</th>
-                                    <th style="width:22%;">Work Package</th>
-                                    <th class="mp-num" style="width:20%;">Cost to Client</th>
+                                <tr style="background:#f8fafc;">
+                                    <th style="padding:6px 12px; text-align:left; font-size:0.75rem; text-transform:uppercase; color:#64748b; border-bottom:1px solid #e2e8f0;">Item</th>
+                                    <th style="padding:6px 12px; text-align:left; font-size:0.75rem; text-transform:uppercase; color:#64748b; border-bottom:1px solid #e2e8f0; width:25%;">Work Package</th>
+                                    <th style="padding:6px 12px; text-align:right; font-size:0.75rem; text-transform:uppercase; color:#64748b; border-bottom:1px solid #e2e8f0; width:22%;">Cost to Client</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <template x-for="(sub, i) in mod.items" :key="i">
                                     <tr>
-                                        <td x-text="sub.name"></td>
-                                        <td x-text="sub.work_package"></td>
-                                        <td class="mp-num" x-text="money(sub.client)"></td>
+                                        <td style="padding:6px 12px; border-bottom:1px solid #f1f5f9;" x-text="sub.name"></td>
+                                        <td style="padding:6px 12px; color:#64748b; border-bottom:1px solid #f1f5f9;" x-text="sub.work_package"></td>
+                                        <td style="padding:6px 12px; text-align:right; font-weight:600; border-bottom:1px solid #f1f5f9;" x-text="money(sub.client)"></td>
                                     </tr>
                                 </template>
                                 <tr x-show="mod.items.length === 0">
-                                    <td colspan="3" style="color:#9ca3af;">No items in this module yet.</td>
+                                    <td colspan="3" style="padding:8px 12px; color:#94a3b8; text-align:center;">No items in this module yet.</td>
                                 </tr>
-                                <tr class="mp-total-row">
-                                    <td colspan="2">Module total</td>
-                                    <td class="mp-num" x-text="money(mod.client_total)"></td>
+                                <tr style="background:#f8fafc; font-weight:700;">
+                                    <td colspan="2" style="padding:6px 12px; color:#475569;">Module Total</td>
+                                    <td style="padding:6px 12px; text-align:right; color:#0f172a;" x-text="money(mod.client_total)"></td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </template>
 
-                <p x-show="activeModules.length === 0" style="color:#9ca3af; font-size:0.85rem;">No modules selected.</p>
+                <p x-show="activeModules.length === 0" style="color:#94a3b8; font-size:0.875rem;">No modules selected.</p>
 
-                <p style="margin-top:28px; font-size:0.75rem; color:#6b7280;">
-                    Draft preview for review only. Nothing has been saved to the database yet.
-                </p>
-
+                <div style="margin-top:24px; padding-top:14px; border-top:1px solid #e2e8f0; font-size:0.75rem; color:#64748b; display:flex; justify-content:space-between; align-items:center;">
+                    <span>Draft estimation preview for review only. Nothing is permanently committed until saved.</span>
+                    <button type="button" class="btn-mb-preview" style="width:auto; padding:6px 16px; margin:0;" @click="showPreview = false">Close</button>
+                </div>
             </div>
         </div>
         <!-- ============ END PREVIEW SHEET ============ -->
 
-        @if($project)
-            <a href="{{ route('projects.show', $project->project_Id) }}" class="inline-flex items-center gap-2 text-sm text-slate-500 hover:text-slate-800 transition-colors mb-3">
-                <i class="fa-solid fa-arrow-left text-xs"></i> Back to Project
-            </a>
-        @endif
+        {{-- Breadcrumb Navigation --}}
+        <nav class="mb-breadcrumb" aria-label="Breadcrumb">
+            <a href="{{ route('dashboard') }}"><i class="bi bi-house-door"></i> Dashboard</a>
+            <span class="mb-breadcrumb-sep">/</span>
+            <a href="{{ route('projects.index') }}">Projects</a>
+            <span class="mb-breadcrumb-sep">/</span>
+            @if($project)
+                <a href="{{ route('projects.show', $project->project_Id) }}">{{ Str::limit($project->name, 24) }}</a>
+                <span class="mb-breadcrumb-sep">/</span>
+            @endif
+            <a href="{{ route('projects.modeling.modules.index') }}">Modelling</a>
+            <span class="mb-breadcrumb-sep">/</span>
+            <span class="mb-breadcrumb-current">Cost Estimator</span>
+        </nav>
 
-        <!-- Header Section -->
-        <header class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 mb-4 border-b border-slate-200/60">
+        {{-- Page Header --}}
+        <header class="mb-header-card">
             <div>
-                <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">Modeling Cost Estimator</h1>
-                <p class="text-slate-500 mt-1 text-sm md:text-base">Select modules, adjust costs, and generate a quotation</p>
+                <h1 class="mb-header-title">Modelling Cost Estimator</h1>
+                <p class="mb-header-subtitle">Select simulation modules, adjust commercial terms, and generate accurate modelling estimates.</p>
             </div>
             <div>
                 <x-modeling-nav />
             </div>
         </header>
 
-        <!-- Success Alert Banner -->
-        <div x-show="savedNotification" x-transition class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-4 mb-6 rounded-lg flex items-center justify-between text-sm shadow-sm">
+        {{-- Success Alert Banner --}}
+        <div x-show="savedNotification" x-transition class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-4 mb-5 rounded-xl flex items-center justify-between text-sm shadow-sm">
             <div class="flex items-center gap-3">
                 <i class="fa-solid fa-circle-check text-emerald-600 text-lg"></i>
-                <span class="font-medium">Quotation saved successfully!</span>
+                <span class="font-medium">Modelling quotation snapshot successfully saved to project!</span>
             </div>
             <button @click="savedNotification = false" class="text-emerald-600 hover:text-emerald-800 font-bold ml-4">
                 <i class="fa-solid fa-xmark"></i>
             </button>
         </div>
 
-        <!-- Project Meta Row (read-only, comes from the selected project) -->
-        <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200/80 mb-4">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Project Name</label>
-                    <input type="text" value="{{ $project->name ?? '' }}" readonly placeholder="No project selected"
-                        class="w-full bg-slate-100 border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-700 placeholder-slate-400 cursor-not-allowed focus:outline-none">
+        {{-- Project Meta Row --}}
+        <div class="mb-meta-card">
+            <div class="mb-meta-item">
+                <label>Project Name</label>
+                <div class="mb-meta-val">
+                    <i class="bi bi-folder2 text-sky-600"></i>
+                    <span>{{ $project->name ?? 'No Project Loaded' }}</span>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Client Name</label>
-                    <input type="text" value="{{ $project->client->company_name ?? '' }}" readonly placeholder="No project selected"
-                        class="w-full bg-slate-100 border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-700 placeholder-slate-400 cursor-not-allowed focus:outline-none">
+            </div>
+            <div class="mb-meta-item">
+                <label>Client</label>
+                <div class="mb-meta-val">
+                    <i class="bi bi-building text-sky-600"></i>
+                    <span>{{ $project->client->company_name ?? 'Standard Client' }}</span>
                 </div>
-                <div>
-                    <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 mb-1.5">Project Code</label>
-                    <input type="text" value="{{ $project->number ?? '' }}" readonly placeholder="No project selected"
-                        class="w-full bg-slate-100 border border-slate-200 rounded-lg px-3.5 py-2.5 text-sm text-slate-700 placeholder-slate-400 cursor-not-allowed focus:outline-none">
+            </div>
+            <div class="mb-meta-item">
+                <label>Project Reference</label>
+                <div class="mb-meta-val">
+                    <i class="bi bi-hash text-sky-600"></i>
+                    <span>{{ $project->number ?? 'N/A' }}</span>
                 </div>
             </div>
         </div>
 
-        <!-- Package Presets Pills (from Packages page) -->
-        <div class="flex flex-wrap items-center gap-2 mb-6">
+        {{-- Package Presets Pills --}}
+        <div class="mb-preset-wrap">
+            <span style="font-size:0.8125rem; font-weight:700; text-transform:uppercase; letter-spacing:0.06em; color:#64748b; margin-right:4px;">
+                Preset Packages:
+            </span>
             <template x-for="preset in presets" :key="preset.id">
                 <button type="button"
                     @click="applyPreset(preset.id)"
-                    :class="activePreset === preset.id
-                        ? 'bg-sky-700 text-white shadow-sm hover:bg-sky-800'
-                        : 'bg-white text-slate-700 border border-slate-200/80 hover:bg-slate-100 hover:text-slate-900'"
-                    class="px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150">
+                    :class="activePreset === preset.id ? 'active' : ''"
+                    class="mb-preset-pill">
+                    <i class="fa-solid" :class="activePreset === preset.id ? 'fa-check' : 'fa-box-archive'"></i>
                     <span x-text="preset.name"></span>
                 </button>
             </template>
             <p x-show="presets.length === 0" class="text-sm text-slate-400">
-                No packages available yet. Create a package to quickly load a predefined modelling setup.
+                No preset packages configured. Create a package in Packages to quickly load scopes.
             </p>
         </div>
 
@@ -197,18 +211,21 @@
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
 
             <!-- Column 1: Module Library + Commercial Terms -->
-            <div class="lg:col-span-4 space-y-6">
+            <div class="lg:col-span-4 space-y-5">
 
                 <!-- Module Library (from Modules page) -->
-                <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200/80">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Module Library</h3>
+                <div class="mb-card">
+                    <h3 class="mb-card-title">
+                        <span>Module Library</span>
+                        <span class="text-xs font-semibold text-slate-400" x-text="catalog.length + ' modules'"></span>
+                    </h3>
 
-                    <div class="space-y-6">
+                    <div class="space-y-5">
                         <template x-for="group in groups" :key="group.name">
                             <div>
-                                <div class="flex items-center justify-between mb-2.5">
-                                    <div class="text-xs font-bold uppercase tracking-wider text-slate-400" x-text="group.name"></div>
-                                    <span x-show="group.required" class="text-xs font-semibold text-sky-700 bg-sky-50 px-2.5 py-0.5 rounded-full border border-sky-100">Required</span>
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="text-xs font-bold uppercase tracking-wider text-slate-500" x-text="group.name"></div>
+                                    <span x-show="group.required" class="text-xs font-semibold text-sky-700 bg-sky-50 px-2 py-0.5 rounded-full border border-sky-100">Required</span>
                                 </div>
                                 <div class="space-y-1">
                                     <template x-for="mod in group.modules" :key="mod.id">
@@ -217,7 +234,7 @@
                                                 :checked="isSelected(mod.id)"
                                                 :disabled="mod.required"
                                                 @change="toggle(mod.id)"
-                                                class="w-4 h-4 text-sky-700 rounded border-slate-300 focus:ring-sky-500 transition">
+                                                class="w-4 h-4 text-sky-600 rounded border-slate-300 focus:ring-sky-500 transition">
                                             <span x-text="mod.name"></span>
                                         </label>
                                     </template>
@@ -225,36 +242,36 @@
                             </div>
                         </template>
 
-                        <div x-show="catalog.length === 0" class="py-8 text-center text-slate-400 text-sm">
-                            No modules yet. Add some on the Modules page first.
+                        <div x-show="catalog.length === 0" class="py-6 text-center text-slate-400 text-sm">
+                            No modules found. Add some on the Modules catalogue first.
                         </div>
                     </div>
                 </div>
 
                 <!-- Commercial Terms -->
-                <div class="bg-white rounded-xl p-5 shadow-sm border border-slate-200/80">
-                    <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Commercial Terms</h3>
+                <div class="mb-card">
+                    <h3 class="mb-card-title">
+                        <span>Commercial Terms</span>
+                    </h3>
 
-                    <div class="space-y-6">
+                    <div class="space-y-4">
                         <!-- Contingency -->
-                        <div>
-                            <div class="flex items-center justify-between mb-2.5">
-                                <span class="text-sm font-medium text-slate-700">Contingency</span>
-                                <span class="text-sm font-bold" style="color:#d97706;" x-text="terms.contingency + '%'"></span>
+                        <div class="mb-slider-item">
+                            <div class="mb-slider-top">
+                                <span class="mb-slider-label">Contingency Mark-up</span>
+                                <span class="mb-slider-badge" x-text="terms.contingency + '%'"></span>
                             </div>
-                            <input type="range" min="0" max="30" step="1" x-model.number="terms.contingency"
-                                style="width:100%; accent-color:#1679b8;">
+                            <input type="range" min="0" max="30" step="1" x-model.number="terms.contingency" class="mb-range-slider">
                         </div>
 
                         <!-- SST / Tax -->
-                        <div>
-                            <div class="flex items-center justify-between mb-2.5">
-                                <span class="text-sm font-medium text-slate-700">SST / Tax</span>
-                                <span class="text-sm font-bold" style="color:#d97706;" x-text="terms.tax + '%'"></span>
+                        <div class="mb-slider-item">
+                            <div class="mb-slider-top">
+                                <span class="mb-slider-label">SST / Service Tax</span>
+                                <span class="mb-slider-badge" x-text="terms.tax + '%'"></span>
                             </div>
-                            <input type="range" min="0" max="20" step="1" x-model.number="terms.tax"
-                                style="width:100%; accent-color:#1679b8;">
-                            <p class="text-xs text-slate-400 mt-1.5">Optional. Leave at 0% for no tax.</p>
+                            <input type="range" min="0" max="20" step="1" x-model.number="terms.tax" class="mb-range-slider">
+                            <p class="text-xs text-slate-400 mt-2">Optional service tax. Set to 0% for tax-exempt contracts.</p>
                         </div>
                     </div>
                 </div>
@@ -262,70 +279,78 @@
             </div>
 
             <!-- Column 2: Cost Ladder (from Items page) -->
-            <div class="lg:col-span-5 bg-white rounded-xl p-5 shadow-sm border border-slate-200/80">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-4">Cost Ladder</h3>
+            <div class="lg:col-span-5 mb-card">
+                <h3 class="mb-card-title">
+                    <span>Cost Ladder</span>
+                    <span class="text-xs font-semibold text-slate-400" x-text="activeModules.length + ' modules active'"></span>
+                </h3>
 
-                <div class="space-y-6 divide-y divide-slate-100">
+                <div class="space-y-4">
                     <template x-for="mod in activeModules" :key="mod.id">
-                        <div class="pt-4 first:pt-0">
-                            <div class="flex items-center justify-between mb-3">
-                                <h4 class="font-bold text-slate-900 text-sm md:text-base" x-text="mod.name"></h4>
-                                <span class="font-bold text-slate-900 text-sm md:text-base" x-text="money(mod.client_total)"></span>
+                        <div class="mb-ladder-group">
+                            <div class="mb-ladder-header">
+                                <h4 class="mb-ladder-title" x-text="mod.name"></h4>
+                                <span class="mb-ladder-total" x-text="money(mod.client_total)"></span>
                             </div>
-                            <ul class="space-y-2 pl-1">
+                            <div class="space-y-1">
                                 <template x-for="(sub, i) in mod.items" :key="i">
-                                    <li class="flex items-start justify-between text-xs md:text-sm text-slate-500 gap-4">
-                                        <span class="leading-snug" x-text="sub.name"></span>
-                                        <span class="font-semibold text-slate-600 whitespace-nowrap" x-text="money(sub.client)"></span>
-                                    </li>
+                                    <div class="mb-ladder-item">
+                                        <span x-text="sub.name"></span>
+                                        <span class="font-medium text-slate-700 whitespace-nowrap" x-text="money(sub.client)"></span>
+                                    </div>
                                 </template>
-                            </ul>
-                            <p x-show="mod.items.length === 0" class="text-xs text-slate-400 pl-1">No items in this module yet.</p>
+                            </div>
+                            <p x-show="mod.items.length === 0" class="text-xs text-slate-400 mt-1">No items configured in this module.</p>
                         </div>
                     </template>
 
-                    <div x-show="activeModules.length === 0" class="py-8 text-center text-slate-400 text-sm">
-                        No active modules selected. Select modules from the library to view cost breakdown.
+                    <div x-show="activeModules.length === 0" class="py-12 text-center text-slate-400 text-sm">
+                        <i class="bi bi-diagram-3 fs-3 d-block mb-2 text-slate-300"></i>
+                        No active modules selected. Choose modules from the library to generate cost ladder.
                     </div>
                 </div>
             </div>
 
-            <!-- Column 3: Summary -->
-            <div class="lg:col-span-3 bg-white rounded-xl p-5 shadow-sm border border-slate-200/80 sticky top-6">
-                <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-5">Summary</h3>
+            <!-- Column 3: Summary (Sticky) -->
+            <div class="lg:col-span-3">
+                <div class="mb-summary-card">
+                    <h3 class="mb-card-title">
+                        <span>Commercial Summary</span>
+                    </h3>
 
-                <div class="space-y-3 mb-6 text-sm">
-                    <div class="flex justify-between items-baseline gap-3 text-slate-500">
-                        <span class="leading-snug">Subtotal (internal)</span>
-                        <span class="font-medium text-slate-700 whitespace-nowrap" x-text="money(totals.internal)"></span>
+                    <div class="space-y-2 mb-4">
+                        <div class="mb-summary-row">
+                            <span>Subtotal (Internal)</span>
+                            <span class="mb-summary-val" x-text="money(totals.internal)"></span>
+                        </div>
+                        <div class="mb-summary-row">
+                            <span>Subtotal (Client)</span>
+                            <span class="mb-summary-val" x-text="money(totals.client)"></span>
+                        </div>
+                        <div class="mb-summary-row">
+                            <span x-text="'Contingency (' + terms.contingency + '%)'"></span>
+                            <span class="mb-summary-val" x-text="money(totals.contingency)"></span>
+                        </div>
+                        <div class="mb-summary-row">
+                            <span x-text="'SST / Tax (' + terms.tax + '%)'"></span>
+                            <span class="mb-summary-val" x-text="money(totals.tax)"></span>
+                        </div>
                     </div>
-                    <div class="flex justify-between items-baseline gap-3 text-slate-500">
-                        <span class="leading-snug">Subtotal (client)</span>
-                        <span class="font-medium text-slate-700 whitespace-nowrap" x-text="money(totals.client)"></span>
-                    </div>
-                    <div class="flex justify-between items-baseline gap-3 text-slate-500">
-                        <span class="leading-snug" x-text="'Contingency (' + terms.contingency + '%)'"></span>
-                        <span class="font-medium text-slate-700 whitespace-nowrap" x-text="money(totals.contingency)"></span>
-                    </div>
-                    <div class="flex justify-between items-baseline gap-3 text-slate-500">
-                        <span class="leading-snug" x-text="'SST / Tax (' + terms.tax + '%)'"></span>
-                        <span class="font-medium text-slate-700 whitespace-nowrap" x-text="money(totals.tax)"></span>
-                    </div>
-                </div>
 
-                <div class="pt-4 border-t border-slate-200/80 mb-6">
-                    <span class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Total</span>
-                    <span class="block text-2xl font-black text-slate-900" x-text="money(totals.grandTotal)"></span>
-                </div>
+                    <div class="mb-grand-total-wrap">
+                        <span class="mb-grand-total-label">Grand Total</span>
+                        <span class="mb-grand-total-val" x-text="money(totals.grandTotal)"></span>
+                    </div>
 
-                <div class="space-y-2.5">
-                    <button type="button" @click="openPreview()" class="w-full bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold py-2.5 rounded-lg border border-slate-200 text-sm transition-all duration-150">
-                        Preview
-                    </button>
+                    <div>
+                        <button type="button" @click="openPreview()" class="btn-mb-preview">
+                            <i class="fa-regular fa-eye"></i> Preview Sheet
+                        </button>
 
-                    <button type="button" @click="saveQuote()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg text-sm shadow-sm transition-all duration-150 tracking-wide uppercase">
-                        Save Quote
-                    </button>
+                        <button type="button" @click="saveQuote()" class="btn-mb-save">
+                            <i class="fa-solid fa-floppy-disk"></i> Save Quote
+                        </button>
+                    </div>
                 </div>
             </div>
 

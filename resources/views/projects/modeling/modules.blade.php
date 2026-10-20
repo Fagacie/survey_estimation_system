@@ -4,6 +4,14 @@
 
     <div class="ises-modelling-page modelling-catalog font-sans text-slate-800 antialiased" x-data="{ showModal: false, editing: null, search: '' }" x-cloak>
 
+        <div class="mb-4">
+            <x-breadcrumb :items="[
+                ['label' => 'Dashboard', 'url' => route('dashboard')],
+                ['label' => 'Modelling Workspace', 'url' => route('projects.modeling.builder')],
+                ['label' => 'Module Catalogue'],
+            ]" />
+        </div>
+
         <section class="modelling-page-heading">
             <div class="modelling-heading-copy">
                 <div class="modelling-eyebrow"><span class="modelling-eyebrow-dot"></span> MODELLING WORKSPACE <span class="modelling-eyebrow-divider">/</span> CATALOGUE</div>
@@ -48,6 +56,17 @@
         @if (session('success'))
             <div class="bg-emerald-50 text-emerald-800 border border-emerald-200 p-4 mb-6 rounded-lg text-sm">
                 {{ session('success') }}
+            </div>
+        @endif
+
+        @if (isset($errors) && $errors->any())
+            <div class="bg-rose-50 text-rose-800 border border-rose-200 p-4 mb-6 rounded-lg text-sm">
+                <div class="font-semibold mb-1">Please correct the following errors:</div>
+                <ul class="list-disc list-inside">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
             </div>
         @endif
 

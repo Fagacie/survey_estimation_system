@@ -44,7 +44,7 @@
             <label class="modelling-search" aria-label="Search items"><i class="fa-solid fa-magnifying-glass"></i><input type="search" x-model.debounce.150ms="search" placeholder="Search item or work package..." /></label>
             </div>
 
-        @if ($errors->any())
+        @if (isset($errors) && $errors->any())
             <div class="bg-red-50 text-red-700 border border-red-200 p-3 mb-4 rounded-lg text-sm">
                 <ul class="list-disc list-inside">
                     @foreach ($errors->all() as $error)
