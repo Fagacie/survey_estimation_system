@@ -93,6 +93,54 @@ class RouteSmokesTest extends TestCase
             ->assertOk()
             ->assertSee('project-edit-card')
             ->assertSee('Workspace Visual Test');
+
+        $quotation = \App\Models\QtInvoice::create([
+            'project_Id' => $project->project_Id,
+            'quotation_no' => 'QT-TEST-001',
+            'grand_total' => 10000.00,
+            'survey_total' => 8000.00,
+            'modelling_total' => 2000.00,
+            'created_by' => $user->id,
+        ]);
+
+        $term = \App\Models\PaymentTerm::create([
+            'quotation_Id' => $quotation->quotation_Id,
+            'name' => '1st Payment - Mobilization',
+            'percentage' => 50,
+            'condition' => 'Upon contract signing',
+            'amount' => 5000.00,
+            'created_by' => $user->id,
+        ]);
+
+        $this->actingAs($user)->get('/quotations/' . $quotation->quotation_Id)
+            ->assertOk()
+            ->assertSee('QT-TEST-001');
+
+        $this->actingAs($user)->get('/quotations/' . $quotation->quotation_Id . '/invoice')
+            ->assertOk()
+            ->assertSee('Invoice Milestones')
+            ->assertSee('QT-TEST-001');
+
+        $invoice = \App\Models\Invoice::create([
+            'invoice_number' => 'INV-TEST-001',
+            'quotation_Id' => $quotation->quotation_Id,
+            'status' => 'draft',
+            'created_by' => $user->id,
+        ]);
+
+        \App\Models\PaymentTerm::create([
+            'invoice_Id' => $invoice->invoice_Id,
+            'source_term_id' => $term->id,
+            'name' => $term->name,
+            'percentage' => $term->percentage,
+            'condition' => $term->condition,
+            'amount' => $term->amount,
+            'created_by' => $user->id,
+        ]);
+
+        $this->actingAs($user)->get('/invoices/' . $invoice->invoice_Id)
+            ->assertOk()
+            ->assertSee('INV-TEST-001');
     }
 
     public function test_authenticated_legacy_routes(): void

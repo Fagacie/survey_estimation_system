@@ -40,7 +40,9 @@
             min-height: 297mm;
             margin: 20px auto;
             position: relative;
-            box-shadow: 0 0 10px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 24px -2px rgba(15, 36, 56, 0.08);
+            border-radius: 8px;
+            overflow: hidden;
             padding: 0 !important;
         }
 
@@ -103,65 +105,70 @@
         .quote-title {
             font-size: 1.4rem;
             font-weight: 700;
-            color: #333;
-            letter-spacing: 0.5px;
+            color: #0f2438;
+            font-family: 'Space Grotesk', sans-serif;
+            letter-spacing: -0.015em;
         }
         .quote-meta {
             font-size: 0.85rem;
             line-height: 1.2;
-            color: #333;
+            color: #334b63;
         }
-        .quote-hr { border-top: 2px solid #212529; margin: 10px 0 20px 0; opacity: 1; }
+        .quote-hr { border-top: 2px solid #0f2438; margin: 10px 0 20px 0; opacity: 1; }
 
         .quote-box {
-            background-color: #dfeefc !important;
-            border-radius: 4px;
-            padding: 0.75rem 1rem;
-            line-height: 1.2;
+            background-color: #f0f7fb !important;
+            border: 1px solid #d8e8f5;
+            border-radius: 8px;
+            padding: 0.85rem 1.15rem;
+            line-height: 1.25;
             font-size: 0.85rem;
         }
 
         .quote-box div {
-            line-height: 1.2;
+            line-height: 1.25;
             margin-top: 2px !important;
         }
 
-        .quote-box-light { background-color: #eef6fb !important; }
-        .quote-box-label { font-weight: 700; color: #1c53a0; font-size: 0.85rem; text-transform: uppercase; }
+        .quote-box-light { background-color: #f8fafc !important; border: 1px solid #e2e8f0; }
+        .quote-box-label { font-weight: 700; color: #1d518a; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.04em; }
 
         .quote-table { width: 100%; border-collapse: collapse; }
         .quote-table thead th {
-            background-color: #1c6e7a !important;
+            background-color: #1d518a !important;
             color: #ffffff !important;
-            font-weight: 600;
-            font-size: 0.85rem;
-            padding: 0.4rem 0.75rem;
+            font-weight: 700;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            padding: 0.5rem 0.75rem;
             border: none;
         }
         .quote-table tbody td {
-            background-color: #f5f5f5 !important;
-            padding: 0.35rem 0.75rem;
+            background-color: #f8fafc !important;
+            padding: 0.4rem 0.75rem;
             font-size: 0.85rem;
             line-height: 1.25;
-            border-bottom: none !important;
+            border-bottom: 1px solid #edf2f7 !important;
         }
 
         /* Grouped rows */
         .quote-table tbody td.quote-module-cell {
-            background-color: #d6e9ec !important;
-            color: #1c6e7a;
+            background-color: #e6f1fa !important;
+            color: #1d518a;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             text-transform: uppercase;
-            letter-spacing: 0.3px;
-            padding-top: 0.45rem;
-            padding-bottom: 0.45rem;
+            letter-spacing: 0.03em;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
         }
 
         .quote-table tbody td.quote-service-cell {
             font-weight: 600;
             padding-left: 1.5rem;
-            background-color: #ececec !important;
+            background-color: #edf2f7 !important;
+            color: #334b63;
             padding-top: 0.4rem;
             padding-bottom: 0.4rem;
         }
@@ -177,9 +184,9 @@
         }
 
         .quote-totals-table { width: 280px; font-size: 0.9rem; }
-        .quote-totals-table td { padding: 0.3rem 0.75rem; }
-        .quote-totals-table tr:not(.quote-grand-total-row) td:last-child { background-color: #f0f0f0 !important; }
-        .quote-grand-total-row td { background-color: #1c6e7a !important; color: #ffffff !important; font-weight: 700; }
+        .quote-totals-table td { padding: 0.35rem 0.75rem; }
+        .quote-totals-table tr:not(.quote-grand-total-row) td:last-child { background-color: #f1f5f9 !important; }
+        .quote-grand-total-row td { background-color: #1d518a !important; color: #ffffff !important; font-weight: 700; }
 
                 /* ===== Combined totals bars (Survey + Modelling + Grand Total) ===== */
         /* CHANGE THE FONT SIZES HERE */
@@ -314,14 +321,39 @@
     </style>
 
     <div class="max-w-7xl mx-auto">
-        <!-- ACTION BAR (HIDDEN IN PRINT VIEW) -->
-        <div class="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 mb-6 no-print sticky top-4 z-50">
-            <a href="{{ url('/history') }}" class="px-4 py-2 rounded-lg text-sm font-bold border border-slate-300 hover:bg-slate-50 transition-colors text-slate-700">
-                <i class="fa-solid fa-arrow-left mr-2"></i> BACK TO HISTORY
-            </a>
-            <a href="{{ route('quotations.download', $quotation->quotation_Id) }}" target="_blank" class="px-5 py-2.5 rounded-lg text-sm font-bold bg-teal-600 text-white hover:bg-teal-500 shadow-sm transition-colors inline-block">
-                <i class="fa-solid fa-file-pdf mr-2"></i> DOWNLOAD PDF
-            </a>
+        <!-- MODERN ACTION & NAVIGATION BAR (HIDDEN IN PRINT VIEW) -->
+        <div class="no-print sticky top-4 z-50 mb-6 flex flex-wrap items-center justify-between gap-4 rounded-xl border border-slate-200 bg-white/95 px-5 py-3.5 shadow-sm backdrop-blur-md">
+            <div class="flex items-center gap-3">
+                <a href="{{ route('quotations.history') }}" class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50">
+                    <i class="fa-solid fa-arrow-left text-slate-400"></i>
+                    <span>Back to History</span>
+                </a>
+                <div class="hidden sm:flex items-center gap-2 border-l border-slate-200 pl-3">
+                    <span class="rounded-md bg-slate-100 px-2.5 py-1 font-mono text-xs font-semibold text-slate-700 border border-slate-200">
+                        {{ $quotation->quotation_no }}
+                    </span>
+                    <span class="text-xs text-slate-500 font-medium">
+                        {{ $quotation->project->name ?? 'Survey Project' }}
+                    </span>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2.5">
+                <a href="{{ route('quotations.invoice', $quotation->quotation_Id) }}" class="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3.5 py-2 text-xs font-bold text-emerald-700 shadow-sm transition-all hover:bg-emerald-100 hover:border-emerald-300">
+                    <i class="fa-solid fa-file-invoice-dollar text-emerald-600"></i>
+                    <span>Invoice Milestones</span>
+                </a>
+
+                <button type="button" onclick="window.print()" class="inline-flex items-center gap-2 rounded-lg border border-slate-200 bg-white px-3.5 py-2 text-xs font-bold text-slate-700 shadow-sm transition-all hover:border-slate-300 hover:bg-slate-50">
+                    <i class="fa-solid fa-print text-slate-500"></i>
+                    <span>Print</span>
+                </button>
+
+                <a href="{{ route('quotations.download', $quotation->quotation_Id) }}" target="_blank" class="inline-flex items-center gap-2 rounded-lg border border-[#1d518a] bg-[#1d518a] px-4 py-2 text-xs font-bold text-white shadow-sm transition-all hover:bg-[#164373]">
+                    <i class="fa-solid fa-file-pdf"></i>
+                    <span>Download PDF</span>
+                </a>
+            </div>
         </div>
 
         <!-- A4 PAGE CONTAINER -->

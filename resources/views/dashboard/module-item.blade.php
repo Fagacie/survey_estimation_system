@@ -1,76 +1,93 @@
-<section class="data-group catalog-module" data-module="{{ strtolower($title ?? '') }}">
-    <!-- GROUP HEADER -->
-    <div class="d-flex justify-content-between align-items-center mb-2">
-        <h2>
-            {{ strtoupper($title ?? '') }}
-        </h2>
-    </div>
+<section class="adm-module-card data-group catalog-module" data-module="{{ strtolower($title ?? '') }}">
+    <!-- MODULE HEADER -->
+    <header class="adm-module-header">
+        <div class="adm-module-title-wrap">
+            <div class="adm-module-icon">
+                <i class="fa-solid fa-layer-group"></i>
+            </div>
+            <h2>{{ strtoupper($title ?? 'SURVEY DISCIPLINE') }}</h2>
+            <span class="adm-module-count">
+                {{ count($items ?? []) }} {{ count($items ?? []) === 1 ? 'item' : 'items' }}
+            </span>
+        </div>
+        <div class="d-none d-md-block text-xs font-semibold text-slate-400">
+            Reference Module #{{ $categoryId ?? '-' }}
+        </div>
+    </header>
 
-    <!-- TABLE CARD CONTAINER -->
-    <div class="table-card">
-        <table>
+    <!-- DATA TABLE -->
+    <div class="adm-table-wrap">
+        <table class="adm-table">
             <thead>
                 <tr>
-                    <th class="number-column">#</th>
-                    <th>ITEM</th>
-                    <th>CATEGORY</th>
-                    <th>SERVICES</th>
-                    <th>
-                        INTERNAL RATE
-                        <br>
-                        (MYR)
-                    </th>
-                    <th>REMARK</th>
-                    <th>ACTION</th>
+                    <th style="width: 50px;">#</th>
+                    <th>Item Description</th>
+                    <th style="width: 180px;">Category</th>
+                    <th style="width: 180px;">Service</th>
+                    <th style="width: 170px;">Internal Rate</th>
+                    <th style="width: 200px;">Remark</th>
+                    <th class="text-end" style="width: 100px;">Actions</th>
                 </tr>
             </thead>
-
             <tbody class="data-body">
-                {{-- 1. Display actual items retrieved from database --}}
                 @forelse ($items as $index => $item)
+                    @php
+                        $unitModel = isset($units) ? $units->firstWhere('unit_id', $item['unit_id'] ?? null) : null;
+                        $unitName = $unitModel->unit_name ?? '';
+                    @endphp
                     <tr>
-                        <td class="number-column">{{ $index + 1 }}</td>
-                        <td>{{ $item['name'] ?? $item->name ?? '' }}</td>
-                        <td>{{ $item['category_name'] ?? $item->category_name ?? 'N/A' }}</td>
-                        <td>{{ $item['service'] ?? $item->service ?? 'N/A' }}</td>
+                        <td class="adm-row-num">{{ $index + 1 }}</td>
+                        <td>
+                            <div class="adm-item-name">
+                                {{ $item['name'] ?? $item->name ?? 'Unnamed Item' }}
+                            </div>
+                        </td>
+                        <td>
+                            <span class="adm-tag adm-tag--category">
+                                {{ $item['category_name'] ?? $item->category_name ?? 'General' }}
+                            </span>
+                        </td>
+                        <td>
+                            <span class="adm-tag adm-tag--service">
+                                {{ $item['service'] ?? $item->service ?? 'Standard' }}
+                            </span>
+                        </td>
                         <td>
                             @if(!empty($item['rate'] ?? $item->rate ?? null))
-                                <span class="rate-badge">
-                                    <span class="rate-value">{{  $item['rate'] ?? $item->rate }}</span>
-                                    <span id="rateUnitDisplay">
-                                        @if(isset($units))
-                                            / {{ $units->firstWhere('unit_id', $item['unit_id'] ?? $item['unit_id'])->unit_name ?? '' }}
-                                        @endif
-                                    </span>
-                                </span>
+                                <div class="adm-rate-badge">
+                                    <span>RM {{ $item['rate'] ?? $item->rate }}</span>
+                                    @if($unitName)
+                                        <span class="adm-rate-unit">/ {{ $unitName }}</span>
+                                    @endif
+                                </div>
+                            @else
+                                <span class="text-slate-400 text-xs font-medium">—</span>
                             @endif
                         </td>
-                        <td>{{ $item['description'] ?? $item->description ?? '' }}</td>
                         <td>
-                            <div class="action-buttons">
-                                <!-- EDIT BUTTON: Directs to item edit page with item ID -->
-                                <a 
-                                    href="{{ route('items.edit', $item['id'] ?? $item->id) }}" 
-                                    class="action-button edit-button" 
-                                    title="Edit"
-                                >
+                            <div class="adm-remark" title="{{ $item['description'] ?? $item->description ?? '' }}">
+                                {{ $item['description'] ?? $item->description ?: '—' }}
+                            </div>
+                        </td>
+                        <td class="text-end">
+                            <div class="adm-action-group">
+                                <a href="{{ route('items.edit', $item['id'] ?? $item->id) }}"
+                                   class="adm-action-btn"
+                                   title="Edit Item"
+                                   aria-label="Edit item {{ $item['name'] ?? '' }}">
                                     <i class="fa-solid fa-pen"></i>
                                 </a>
 
-                                <!-- DELETE FORM: Submits DELETE request to Controller.
-                                     The confirmation popup is handled by admin.js -->
-                                <form 
-                                    action="{{ route('items.destroy', $item['id'] ?? $item->id) }}" 
-                                    method="POST" 
-                                    style="display: inline;"
-                                >
+                                <form action="{{ route('items.destroy', $item['id'] ?? $item->id) }}"
+                                      method="POST"
+                                      class="inline-block form-delete-item m-0">
                                     @csrf
                                     @method('DELETE')
-                                    <button 
-                                        type="submit" 
-                                        class="action-button delete-button" 
-                                        title="Delete"
-                                    >
+                                    <button type="button"
+                                            class="adm-action-btn adm-action-btn--delete btn-delete-item"
+                                            title="Delete Item"
+                                            aria-label="Delete item {{ $item['name'] ?? '' }}"
+                                            data-name="{{ $item['name'] ?? 'this item' }}">
                                         <i class="fa-regular fa-trash-can"></i>
                                     </button>
                                 </form>
@@ -78,36 +95,16 @@
                         </td>
                     </tr>
                 @empty
-                    {{-- Rendered when no items exist in this group --}}
-                @endforelse
-
-                {{-- 2. Fill remaining empty rows for consistent table height --}}
-                @php
-                    $minRows = 2;
-                    $filledRows = count($items ?? []);
-                    $emptyRowsNeeded = max(0, $minRows - $filledRows);
-                @endphp
-
-                @for ($i = 0; $i < $emptyRowsNeeded; $i++)
-                    <tr class="empty-row">
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td></td>
-                        <td>
-                            <div class="action-buttons">
-                                <button type="button" class="action-button edit-button" title="Edit" disabled style="opacity: 0.3;">
-                                    <i class="fa-solid fa-pen"></i>
-                                </button>
-                                <button type="button" class="action-button delete-button" title="Delete" disabled style="opacity: 0.3;">
-                                    <i class="fa-regular fa-trash-can"></i>
-                                </button>
+                    <tr>
+                        <td colspan="7" class="p-0">
+                            <div class="adm-empty-state">
+                                <div class="adm-empty-icon"><i class="fa-regular fa-folder-open"></i></div>
+                                <h3 class="adm-empty-title">No items in this module</h3>
+                                <p class="adm-empty-text">No survey items have been catalogued under {{ $title ?? 'this module' }} yet.</p>
                             </div>
                         </td>
                     </tr>
-                @endfor
+                @endforelse
             </tbody>
         </table>
     </div>

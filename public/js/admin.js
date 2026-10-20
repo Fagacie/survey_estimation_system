@@ -44,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function () {
             resultCount.textContent = visibleItems + (visibleItems === 1 ? " item" : " items");
         }
         if (noResults) {
+            noResults.style.display = visibleItems === 0 ? "block" : "none";
             noResults.hidden = visibleItems > 0;
         }
     }

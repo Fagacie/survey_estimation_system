@@ -1,43 +1,49 @@
 <x-app-layout containerClass="w-full px-8 py-8 bg-slate-50 relative min-h-screen">
     <x-slot name="header">{{ isset($item) ? 'Edit Item' : 'Create Item' }}</x-slot>
-    <link rel="stylesheet" href="{{ asset('css/admin.css') }}?v={{ filemtime(public_path('css/admin.css')) }}">
 
-    <div class="item-editor-page max-w-4xl mx-auto pb-12">
+    @push('styles')
+        <link rel="stylesheet" href="{{ asset('css/newItem.css') }}?v={{ filemtime(public_path('css/newItem.css')) }}">
+    @endpush
 
-        <!-- PAGE TITLE & BUTTON -->
-        <div class="flex items-center justify-between mb-6">
-            <h2 class="text-xl font-bold text-slate-800 flex items-center gap-3 tracking-tight">
-                <div class="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center text-sky-700 shadow-sm border border-sky-100">
-                    <i class="fa-solid fa-database text-lg"></i>
-                </div>
-                Item Catalog
-            </h2>
-            <a href="{{ route('admin.index') }}" class="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-slate-600 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-slate-800 transition-colors shadow-sm">
-                <i class="fa-solid fa-arrow-left"></i> Back
-            </a>
-        </div>
+    <div class="item-editor-page pb-12">
+        <!-- Breadcrumb Navigation -->
+        <nav class="item-breadcrumb" aria-label="Breadcrumb">
+            <a href="{{ route('dashboard') }}"><i class="fa-solid fa-house"></i> Dashboard</a>
+            <span class="breadcrumb-separator"><i class="fa-solid fa-chevron-right"></i></span>
+            <a href="{{ route('admin.index') }}">Item Catalog</a>
+            <span class="breadcrumb-separator"><i class="fa-solid fa-chevron-right"></i></span>
+            <span class="breadcrumb-current">{{ isset($item) ? 'Edit Item' : 'Create Item' }}</span>
+        </nav>
 
-        <!-- Dynamic Blue Banner -->
-        <div class="item-editor-hero rounded-xl p-6 mb-8 shadow-sm text-white relative overflow-hidden">
-            <div class="absolute -right-10 -top-10 opacity-10">
-                <i class="fa-solid fa-shapes text-9xl"></i>
+        <!-- Header -->
+        <header class="item-header">
+            <div class="item-header-title-wrap">
+                <h1>{{ isset($item) ? 'Edit Catalog Item' : 'Create New Item' }}</h1>
+                <p>{{ isset($item) ? 'Modify specification, operational classification, or internal cost rates for this item.' : 'Add a new reference survey item to project quotation modules and cost estimates.' }}</p>
             </div>
-            <h2 class="text-2xl font-bold tracking-tight mb-2 relative z-10">{{ isset($item) ? 'Edit Item' : 'Create New Item' }}</h2>
-            <p class="text-slate-300 text-sm relative z-10">{{ isset($item) ? 'Modify the details of this quotation item.' : 'Create a new item that can be added to quotations.' }}</p>
-        </div>
+            <div class="item-header-actions">
+                <a href="{{ route('admin.index') }}" class="item-btn item-btn--secondary">
+                    <i class="fa-solid fa-arrow-left"></i>
+                    <span>Back to Catalog</span>
+                </a>
+            </div>
+        </header>
 
-        <!-- Main Content Area -->
-        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
-            <h3 class="text-sm font-bold text-slate-800 uppercase tracking-wider mb-6 pb-3 border-b border-slate-100"><i class="fa-solid fa-circle-info text-slate-400 mr-2"></i> Item Information</h3>
-
-            <!-- Display Validation Errors -->
-            @if ($errors->any())
-                <div class="bg-rose-50 border-l-4 border-rose-500 text-rose-700 p-4 mb-6 rounded">
-                    <ul class="list-disc ml-5 text-sm">
+        <!-- Form Card Container -->
+        <div class="item-card">
+            <!-- Validation Errors -->
+            @if (isset($errors) && $errors->any())
+                <div class="alert alert-danger alert-dismissible fade show mb-4" role="alert" style="border-radius: var(--item-radius-sm); border: 1px solid #fecaca; background: #fef2f2; color: #991b1b;">
+                    <div class="d-flex align-items-center mb-1 font-bold">
+                        <i class="fa-solid fa-triangle-exclamation me-2"></i>
+                        <span>Please correct the errors below:</span>
+                    </div>
+                    <ul class="mb-0 ps-4 text-xs">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
                         @endforeach
                     </ul>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
 
@@ -48,98 +54,148 @@
                 @endif
                 <input type="hidden" id="itemId" name="item_id" value="{{ $item->item_id ?? '' }}">
 
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <!-- Column 1: Dropdowns & Dynamic Inputs -->
-                    <div class="space-y-5">
-                        
-                        <!-- MODULE SELECT -->
-                        <div>
-                            <label for="chooseModule" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Choose Module</label>
-                            <select id="chooseModule" name="module_id" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors bg-white">
+                <div class="item-grid">
+                    <!-- Column 1: Classification & Hierarchy -->
+                    <div>
+                        <h2 class="item-section-title">
+                            <i class="fa-solid fa-sitemap"></i>
+                            Classification & Hierarchy
+                        </h2>
+
+                        <!-- 1. MODULE SELECT -->
+                        <div class="item-field-group">
+                            <label for="chooseModule" class="item-label">
+                                Module Discipline
+                                <span class="required-star">*</span>
+                            </label>
+                            <select id="chooseModule" name="module_id" class="item-select" required>
                                 <option value="">-- Select Module --</option>
                                 @foreach($modules as $module)
                                     <option value="{{ $module->module_id }}" {{ old('module_id', isset($item) ? ($item->module_id ?? $item->category?->module_id ?? '') : '') == $module->module_id ? 'selected' : '' }}>
                                         {{ strtoupper($module->module_name) }}
                                     </option>
                                 @endforeach
-                                <option value="NEW_MODULE" class="font-bold text-sky-700 bg-sky-50">+ Add New Module</option>
+                                <option value="NEW_MODULE" style="font-weight: 700; color: #1d518a;">+ Add New Module</option>
                             </select>
+
+                            <!-- Hidden New Module Input -->
+                            <div id="newModuleContainer" class="item-dynamic-field d-none" style="display: none;">
+                                <label for="createModule" class="item-dynamic-label">
+                                    <i class="fa-solid fa-plus-circle"></i>
+                                    New Module Name
+                                </label>
+                                <input type="text" id="createModule" name="new_module_name" placeholder="Type new discipline or module name..." class="item-input">
+                            </div>
                         </div>
 
-                        <!-- HIDDEN NEW MODULE INPUT -->
-                        <div id="newModuleContainer" class="hidden">
-                            <label for="createModule" class="block text-xs font-bold text-sky-700 uppercase tracking-wider mb-2">New Module Name</label>
-                            <input type="text" id="createModule" name="new_module_name" placeholder="Type new module name..." class="w-full rounded-lg border-sky-300 bg-sky-50/60 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors">
-                        </div>
-
-                        <!-- CATEGORY SELECT -->
-                        <div>
-                            <label for="chooseCategory" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Choose Category</label>
-                            <select id="chooseCategory" name="category_id" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors bg-white">
+                        <!-- 2. CATEGORY SELECT -->
+                        <div class="item-field-group">
+                            <label for="chooseCategory" class="item-label">
+                                Item Category
+                            </label>
+                            <select id="chooseCategory" name="category_id" class="item-select">
                                 <option value="">-- Select Category First --</option>
-                                <option value="NEW_CATEGORY" class="font-bold text-sky-700 bg-sky-50">+ Add New Category</option>
+                                <option value="NEW_CATEGORY" style="font-weight: 700; color: #1d518a;">+ Add New Category</option>
                             </select>
+
+                            <!-- Hidden New Category Input -->
+                            <div id="newCategoryContainer" class="item-dynamic-field d-none" style="display: none;">
+                                <label for="createCategory" class="item-dynamic-label">
+                                    <i class="fa-solid fa-plus-circle"></i>
+                                    New Category Name
+                                </label>
+                                <input type="text" id="createCategory" name="new_category_name" placeholder="Type new category name..." class="item-input">
+                            </div>
                         </div>
 
-                        <!-- HIDDEN NEW CATEGORY INPUT -->
-                        <div id="newCategoryContainer" class="hidden">
-                            <label for="createCategory" class="block text-xs font-bold text-sky-700 uppercase tracking-wider mb-2">New Category Name</label>
-                            <input type="text" id="createCategory" name="new_category_name" placeholder="Type new category name..." class="w-full rounded-lg border-sky-300 bg-sky-50/60 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors">
-                        </div>
-
-                        <!-- SERVICE SELECT -->
-                        <div>
-                            <label for="chooseService" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Choose Service</label>
-                            <select id="chooseService" name="service_id" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors bg-white">
+                        <!-- 3. SERVICE SELECT -->
+                        <div class="item-field-group">
+                            <label for="chooseService" class="item-label">
+                                Operational Service
+                            </label>
+                            <select id="chooseService" name="service_id" class="item-select">
                                 <option value="">-- Select Service First --</option>
-                                <option value="NEW_SERVICE" class="font-bold text-sky-700 bg-sky-50">+ Add New Service</option>
+                                <option value="NEW_SERVICE" style="font-weight: 700; color: #1d518a;">+ Add New Service</option>
                             </select>
-                        </div>
 
-                        <!-- HIDDEN NEW SERVICE INPUT -->
-                        <div id="newServiceContainer" class="hidden">
-                            <label for="createService" class="block text-xs font-bold text-sky-700 uppercase tracking-wider mb-2">New Service Name</label>
-                            <input type="text" id="createService" name="new_service_name" placeholder="Type new service name..." class="w-full rounded-lg border-sky-300 bg-sky-50/60 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors">
+                            <!-- Hidden New Service Input -->
+                            <div id="newServiceContainer" class="item-dynamic-field d-none" style="display: none;">
+                                <label for="createService" class="item-dynamic-label">
+                                    <i class="fa-solid fa-plus-circle"></i>
+                                    New Service Name
+                                </label>
+                                <input type="text" id="createService" name="new_service_name" placeholder="Type new service name..." class="item-input">
+                            </div>
                         </div>
-
                     </div>
 
-                    <!-- Column 2: Item Details & Rates -->
-                    <div class="space-y-5">
-                        
-                        <!-- ITEM NAME -->
-                        <div>
-                            <label for="itemName" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Item Name <span class="text-rose-500">*</span></label>
-                            <input type="text" id="itemName" name="name" value="{{ old('name', isset($item) ? ($item->item_name ?? '') : '') }}" required class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors" placeholder="e.g. Environmental Engineer">
+                    <!-- Column 2: Specification & Pricing -->
+                    <div>
+                        <h2 class="item-section-title">
+                            <i class="fa-solid fa-tags"></i>
+                            Item Details & Pricing
+                        </h2>
+
+                        <!-- 4. ITEM NAME -->
+                        <div class="item-field-group">
+                            <label for="itemName" class="item-label">
+                                Item Description / Title
+                                <span class="required-star">*</span>
+                            </label>
+                            <input type="text"
+                                   id="itemName"
+                                   name="name"
+                                   value="{{ old('name', isset($item) ? ($item->item_name ?? '') : '') }}"
+                                   required
+                                   class="item-input"
+                                   placeholder="e.g. Environmental Engineer, Side Scan Sonar">
                         </div>
 
-                        <!-- INTERNAL RATE (MYR) & UNIT -->
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label for="internalRate" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Internal Rate (MYR) <span class="text-rose-500">*</span></label>
-                                <input type="number" id="internalRate" name="internal_rate" step="0.01" value="{{ old('internal_rate', isset($item) ? ($item->internal_rate ?? '') : '') }}" required class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors" placeholder="0.00">
+                        <!-- 5. INTERNAL RATE (MYR) & UNIT -->
+                        <div class="item-rate-grid">
+                            <div class="item-field-group">
+                                <label for="internalRate" class="item-label">
+                                    Internal Rate (MYR)
+                                    <span class="required-star">*</span>
+                                </label>
+                                <div class="item-rate-input-wrap">
+                                    <span class="item-rate-prefix">RM</span>
+                                    <input type="number"
+                                           id="internalRate"
+                                           name="internal_rate"
+                                           step="0.01"
+                                           value="{{ old('internal_rate', isset($item) ? ($item->internal_rate ?? '') : '') }}"
+                                           required
+                                           class="item-input item-rate-input"
+                                           placeholder="0.00">
+                                </div>
                             </div>
 
-                            <div class="relative">
+                            <div class="item-field-group">
                                 <div id="unitSelectContainer">
-                                    <label for="chooseUnit" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Unit</label>
-                                    <select id="chooseUnit" name="unit_id" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors bg-white">
+                                    <label for="chooseUnit" class="item-label">
+                                        Billing Unit
+                                    </label>
+                                    <select id="chooseUnit" name="unit_id" class="item-select">
                                         <option value="">-- Unit --</option>
                                         @foreach($units as $unit)
                                             <option value="{{ $unit->unit_id }}" {{ old('unit_id', isset($item) ? ($item->unit_id ?? '') : '') == $unit->unit_id ? 'selected' : '' }}>
                                                 {{ strtoupper($unit->unit_name) }}
                                             </option>
                                         @endforeach
-                                        <option value="NEW_UNIT" class="font-bold text-sky-700 bg-sky-50">+ Add Unit</option>
+                                        <option value="NEW_UNIT" style="font-weight: 700; color: #1d518a;">+ Add Unit</option>
                                     </select>
                                 </div>
 
-                                <!-- NEW UNIT INLINE INPUT -->
-                                <div id="newUnitContainer" class="hidden relative">
-                                    <label for="createUnit" class="block text-xs font-bold text-sky-700 uppercase tracking-wider mb-2">New Unit</label>
-                                    <div class="relative">
-                                        <input type="text" id="createUnit" name="new_unit_name" class="w-full rounded-lg border-sky-300 bg-sky-50/60 py-2.5 pl-3 pr-10 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors" placeholder="e.g. kg, pcs">
-                                        <button type="button" id="cancelNewUnitBtn" class="absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 hover:text-rose-500 transition-colors" title="Back to select">
+                                <!-- Dynamic New Unit Inline Input -->
+                                <div id="newUnitContainer" class="item-dynamic-field d-none" style="display: none; position: relative;">
+                                    <label for="createUnit" class="item-dynamic-label">
+                                        <i class="fa-solid fa-plus-circle"></i>
+                                        New Unit
+                                    </label>
+                                    <div style="position: relative;">
+                                        <input type="text" id="createUnit" name="new_unit_name" class="item-input" style="padding-right: 2.2rem;" placeholder="e.g. km, site, day">
+                                        <button type="button" id="cancelNewUnitBtn" class="item-cancel-unit-btn" title="Back to unit dropdown">
                                             <i class="fa-solid fa-xmark"></i>
                                         </button>
                                     </div>
@@ -147,22 +203,32 @@
                             </div>
                         </div>
 
-                        <!-- DESCRIPTION / REMARK -->
-                        <div>
-                            <label for="description" class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Remark (Optional)</label>
-                            <textarea id="description" name="description" rows="4" class="w-full rounded-lg border-slate-300 py-2.5 px-3 text-sm focus:border-sky-500 focus:ring-sky-500 shadow-sm transition-colors">{{ old('description', isset($item) ? ($item->description ?? '') : '') }}</textarea>
+                        <!-- 6. DESCRIPTION / REMARKS -->
+                        <div class="item-field-group">
+                            <label for="description" class="item-label">
+                                Remarks / Specifications
+                                <span class="text-slate-400 font-normal normal-case">(Optional)</span>
+                            </label>
+                            <textarea id="description"
+                                      name="description"
+                                      class="item-textarea"
+                                      rows="3"
+                                      placeholder="Additional technical details, crew size, or equipment specifications...">{{ old('description', isset($item) ? ($item->description ?? '') : '') }}</textarea>
                         </div>
-
                     </div>
                 </div>
 
-                <!-- Action Buttons -->
-                <div class="mt-10 pt-6 border-t border-slate-100 flex items-center justify-end gap-3">
-                    <a href="{{ route('admin.index') }}" class="px-6 py-2.5 text-sm font-semibold text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors shadow-sm">
-                        CANCEL
+                <!-- Hidden element for live unit preview binding in item.js -->
+                <span id="rateUnitDisplay" style="display: none;"></span>
+
+                <!-- Form Action Buttons -->
+                <div class="item-card-footer">
+                    <a href="{{ route('admin.index') }}" class="item-btn item-btn--secondary">
+                        Cancel
                     </a>
-                    <button type="submit" id="submitBtn" class="px-6 py-2.5 text-sm font-semibold text-white bg-sky-700 border border-transparent rounded-lg hover:bg-sky-800 transition-colors shadow-sm">
-                        {{ isset($item) ? 'UPDATE ITEM' : 'SAVE ITEM' }}
+                    <button type="submit" id="submitBtn" class="item-btn item-btn--primary">
+                        <i class="fa-solid fa-check"></i>
+                        <span>{{ isset($item) ? 'Update Catalog Item' : 'Save Catalog Item' }}</span>
                     </button>
                 </div>
             </form>
@@ -176,14 +242,11 @@
         'module_id'   => old('module_id', isset($item) ? ($item->module_id ?? $item->service?->category?->module_id ?? '') : ''),
         'category_id' => old('category_id', isset($item) ? ($item->category_id ?? $item->service?->category_id ?? '') : ''),
         'service_id'  => old('service_id', isset($item) ? ($item->service_id ?? '') : ''),
-        ]) !!};
+    ]) !!};
 
-    // Full URLs built by Laravel, so they include your project folder
     window.categoriesUrl = "{{ url('/data/modules/__ID__/categories') }}";
     window.servicesUrl   = "{{ url('/data/categories/__ID__/services') }}";
     </script>
-
-    <!-- Load item.js after the variables above are declared -->
     <script src="{{ asset('js/item.js') }}"></script>
     @endpush
 </x-app-layout>

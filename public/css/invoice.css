@@ -1,334 +1,511 @@
+/* ==========================================================================
+   Invoice Slip & Controls (invoice.css)
+   Preserves 100% Exact Print/PDF Layout while Elevating Web UI
+   ========================================================================== */
+
+:root {
+    --inv-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --inv-font-display: 'Space Grotesk', var(--inv-font-sans);
+    --inv-primary: #0284c7;
+    --inv-primary-dark: #0369a1;
+    --inv-primary-light: #e0f2fe;
+    --inv-navy: #1c53a0;
+    --inv-navy-light: #eef6fb;
+    --inv-slate-900: #0f172a;
+    --inv-slate-800: #1e293b;
+    --inv-slate-700: #334155;
+    --inv-slate-600: #475569;
+    --inv-slate-500: #64748b;
+    --inv-slate-400: #94a3b8;
+    --inv-slate-300: #cbd5e1;
+    --inv-slate-200: #e2e8f0;
+    --inv-slate-100: #f1f5f9;
+    --inv-slate-50: #f8fafc;
+}
+
+/* Color adjustment for print fidelity */
+* {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+    color-adjust: exact !important;
+}
+
 /* ==========================================
-           COLOR ADJUSTMENT
-           ========================================== */
-        * {
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-            color-adjust: exact !important;
-        }
+   PAGE CONTAINER & TOP CONTROLS (Screen only)
+   ========================================== */
+.invoice-page-wrap {
+    max-width: 960px;
+    margin: 0 auto;
+    font-family: var(--inv-font-sans);
+}
 
-        /* ==========================================
-           TOP CONTROLS (same style as the other pages)
-           ========================================== */
-        .invoice-page-wrap {
-            max-width: 900px;
-            margin: 0 auto;
-        }
+.invoice-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+    background: #ffffff;
+    border: 1px solid var(--inv-slate-200);
+    border-radius: 16px;
+    padding: 16px 22px;
+    box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.05);
+    margin-bottom: 24px;
+}
 
-        .invoice-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 14px 18px;
-            box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
-            margin-bottom: 20px;
-        }
+.invoice-controls-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
 
-        .invoice-controls-right {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
+.invoice-controls-right {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
 
-        .ctrl-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            border: 1px solid #cbd5e1;
-            background: #ffffff;
-            color: #334155;
-            text-decoration: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
+/* Status Chips in Controls */
+.ctrl-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 9999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
 
-        .ctrl-btn:hover {
-            background: #f1f5f9;
-            color: #0f172a;
-            border-color: #94a3b8;
-        }
+.ctrl-status-badge.draft {
+    background: #fef3c7;
+    color: #b45309;
+    border: 1px solid rgba(217, 119, 6, 0.3);
+}
 
-        .ctrl-btn-primary {
-            background: #0d9488;
-            border-color: #0d9488;
-            color: #ffffff;
-        }
+.ctrl-status-badge.unpaid {
+    background: #fee2e2;
+    color: #b91c1c;
+    border: 1px solid rgba(185, 28, 28, 0.25);
+}
 
-        .ctrl-btn-primary:hover {
-            background: #0f766e;
-            border-color: #0f766e;
-            color: #ffffff;
-        }
+.ctrl-status-badge.paid {
+    background: #ecfdf5;
+    color: #047857;
+    border: 1px solid rgba(16, 185, 129, 0.25);
+}
 
-        .ctrl-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
+/* Control Action Buttons */
+.ctrl-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border-radius: 10px;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: 1px solid var(--inv-slate-300);
+    background: #ffffff;
+    color: var(--inv-slate-700);
+    text-decoration: none;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+}
 
-        .ctrl-btn:disabled:hover {
-            background: #ffffff;
-            color: #334155;
-            border-color: #cbd5e1;
-        }
+.ctrl-btn:hover {
+    background: var(--inv-slate-50);
+    color: var(--inv-slate-900);
+    border-color: var(--inv-slate-400);
+    transform: translateY(-1px);
+}
 
-        /* ==========================================
-           INVOICE SLIP
-           ========================================== */
-        .invoice-slip {
-            background: #ffffff;
-            max-width: 900px;
-            margin: 0 auto;
-            border: 1px solid #d8dde3;
-            border-radius: 4px;
-            position: relative;
-            padding: 0 !important;
-            overflow: hidden;
-            color: #212529;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
+.ctrl-btn-primary {
+    background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+    border-color: rgba(2, 132, 199, 0.3);
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(2, 132, 199, 0.2);
+}
 
-        /* Header & Footer Graphic Banner Containers */
-        .quote-print-header,
-        .quote-print-footer {
-            width: 100%;
-            display: block;
-            line-height: 0;
-            position: relative;
-        }
+.ctrl-btn-primary:hover {
+    background: linear-gradient(135deg, #0369a1 0%, #075985 100%);
+    border-color: #0369a1;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(2, 132, 199, 0.25);
+}
 
-        .quote-header-img,
-        .quote-footer-img {
-            width: 100%;
-            height: auto;
-            display: block;
-        }
+.ctrl-btn-teal {
+    background: linear-gradient(135deg, #0d9488 0%, #0f766e 100%);
+    border-color: rgba(13, 148, 136, 0.3);
+    color: #ffffff;
+    box-shadow: 0 2px 4px rgba(13, 148, 136, 0.2);
+}
 
-        /* Inner Body Area Content Padding */
-        .invoice-body-content {
-            padding: 0 30px 20px 30px;
-        }
+.ctrl-btn-teal:hover {
+    background: linear-gradient(135deg, #0f766e 0%, #115e59 100%);
+    border-color: #0f766e;
+    color: #ffffff;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(13, 148, 136, 0.25);
+}
 
-        /* Logo on Left, Company Details on Right */
-        .quote-header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-top: -20px;
-            position: relative;
-            z-index: 10;
-            margin-bottom: 10px;
-        }
+.ctrl-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none !important;
+    background: #ffffff !important;
+    color: var(--inv-slate-400) !important;
+    border-color: var(--inv-slate-200) !important;
+}
 
-        .quote-logo img {
-            max-height: 100px;
-            width: auto;
-            display: block;
-        }
+/* ==========================================
+   INVOICE SLIP (Screen Preview Presentation)
+   ========================================== */
+.invoice-slip {
+    background: #ffffff;
+    max-width: 900px;
+    margin: 0 auto;
+    border: 1px solid var(--inv-slate-200);
+    border-radius: 12px;
+    position: relative;
+    padding: 0 !important;
+    overflow: hidden;
+    color: #1e293b;
+    font-family: 'Segoe UI', system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+    box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+}
 
-        .quote-company-info {
-            font-size: 0.80rem;
-            line-height: 1.15;
-            color: #212529;
-        }
+/* Header & Footer Graphic Banner Containers */
+.quote-print-header,
+.quote-print-footer {
+    width: 100%;
+    display: block;
+    line-height: 0;
+    position: relative;
+}
 
-        .invoice-slip .quote-title {
-            color: #333333;
-            font-weight: 700;
-            font-size: 1.4rem;
-            letter-spacing: 0.5px;
-        }
+.quote-header-img,
+.quote-footer-img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
 
-        .invoice-slip .quote-meta {
-            font-size: 0.85rem;
-            line-height: 1.2;
-            color: #333333;
-        }
+/* Inner Body Area Content Padding */
+.invoice-body-content {
+    padding: 0 32px 24px 32px;
+}
 
-        .invoice-slip .quote-hr {
-            border-top: 2px solid #1c53a0;
-            margin: 10px 0 20px 0;
-            opacity: 1;
-        }
+/* Logo on Left, Company Details on Right */
+.quote-header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-top: -20px;
+    position: relative;
+    z-index: 10;
+    margin-bottom: 12px;
+}
 
-        .invoice-slip .text-primary {
-            color: #1c53a0 !important;
-            font-weight: 700;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
+.quote-logo img {
+    max-height: 95px;
+    width: auto;
+    display: block;
+}
 
-        .invoice-slip .border {
-            border-color: #d8dde3 !important;
-        }
+.quote-company-info {
+    font-size: 0.8125rem;
+    line-height: 1.25;
+    color: #334155;
+}
 
-        .invoice-slip .row.mb-4 .border {
-            background-color: #ffffff;
-            border-radius: 4px;
-            padding: 0.6rem 0.8rem !important;
-            font-size: 0.9rem;
-            line-height: 1.45;
-        }
+.invoice-slip .quote-title {
+    color: var(--inv-navy);
+    font-family: var(--inv-font-display), sans-serif;
+    font-weight: 700;
+    font-size: 1.5rem;
+    letter-spacing: 0.5px;
+}
 
-        .invoice-slip .info-title {
-            color: #1c53a0 !important;
-            font-weight: 700;
-            font-size: 0.82rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 2px;
-        }
+.invoice-slip .quote-meta {
+    font-size: 0.875rem;
+    line-height: 1.35;
+    color: #334155;
+}
 
-        .invoice-slip table.table-bordered {
-            border-color: #d8dde3;
-        }
+.invoice-slip .quote-hr {
+    border-top: 2px solid var(--inv-navy);
+    margin: 12px 0 20px 0;
+    opacity: 1;
+}
 
-        .invoice-slip table thead.table-primary th {
-            background: #1c53a0 !important;
-            color: #ffffff !important;
-            font-weight: 600;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 0.4px;
-            padding: 0.6rem 0.75rem;
-            border-color: #1c53a0;
-        }
+.invoice-slip .text-primary {
+    color: var(--inv-navy) !important;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
 
-        .invoice-slip table tbody td {
-            vertical-align: top;
-            font-size: 0.9rem;
-        }
+.invoice-slip .border {
+    border-color: #cbd5e1 !important;
+}
 
-        .invoice-slip .table-light td {
-            background: #1c53a0 !important;
-            color: #ffffff !important;
-            font-weight: 700;
-            font-size: 0.95rem;
-        }
+.invoice-slip .row.mb-4 .border {
+    background-color: #ffffff;
+    border-radius: 6px;
+    padding: 0.75rem 1rem !important;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
 
-        .signature-line {
-            border-bottom: 2px dashed #6c757d;
-            margin-bottom: 8px;
-        }
+.invoice-slip .info-title {
+    color: var(--inv-navy) !important;
+    font-weight: 700;
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 3px;
+}
 
-        .invoice-slip .meta-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
+.invoice-slip table.table-bordered {
+    border-color: #cbd5e1;
+    border-radius: 6px;
+    overflow: hidden;
+}
 
-        .invoice-slip .meta-box {
-            background-color: #ffffff;
-            border: 1px solid #d8dde3 !important;
-            border-radius: 4px;
-            padding: 10px 14px !important;
-            font-size: 0.9rem;
-            line-height: 1.45;
-        }
+.invoice-slip table thead.table-primary th {
+    background: var(--inv-navy) !important;
+    color: #ffffff !important;
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 0.75rem 0.85rem;
+    border-color: var(--inv-navy);
+}
 
-        .invoice-slip .project-box {
-            background-color: #eef6fb !important;
-            border: 1px solid #d8dde3 !important;
-            border-radius: 4px;
-            padding: 8px 14px !important;
-            margin-bottom: 16px;
-            font-size: 0.9rem;
-        }
+.invoice-slip table tbody td {
+    vertical-align: top;
+    font-size: 0.875rem;
+    padding: 0.75rem 0.85rem;
+}
 
-        /* Printable Wrapper Table Layout */
-        table.print-wrapper-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+.invoice-slip .table-light td {
+    background: var(--inv-navy) !important;
+    color: #ffffff !important;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
 
-        table.print-wrapper-table td {
-            padding: 0;
-            border: none;
-        }
+.signature-line {
+    border-bottom: 2px dashed #94a3b8;
+    margin-bottom: 8px;
+}
 
-        /* ==========================================
-           PRINT ENGINE OVERRIDES & LAYOUT RULES
-           ========================================== */
-        @page {
-            size: A4 portrait;
-            margin: 0;
-        }
+.invoice-slip .meta-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+}
 
-        @media print {
-            html, body {
-                background: #ffffff !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                width: 100% !important;
-            }
+.invoice-slip .meta-box {
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px;
+    padding: 12px 16px !important;
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
 
-            /* Hide the app layout (sidebar / top bar) when printing */
-            aside, nav, header {
-                display: none !important;
-            }
+.invoice-slip .project-box {
+    background-color: var(--inv-navy-light) !important;
+    border: 1px solid #cbd5e1 !important;
+    border-radius: 6px;
+    padding: 10px 16px !important;
+    margin-bottom: 18px;
+    font-size: 0.875rem;
+}
 
-            .invoice-page-wrap {
-                max-width: 100% !important;
-                width: 100% !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
+/* Printable Wrapper Table Layout */
+table.print-wrapper-table {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-            .invoice-slip {
-                border: none !important;
-                max-width: 100% !important;
-                box-shadow: none !important;
-                padding: 0 !important;
-                margin: 0 !important;
-            }
+table.print-wrapper-table td {
+    padding: 0;
+    border: none;
+}
 
-            .no-print {
-                display: none !important;
-            }
+/* ==========================================
+   MODAL ENHANCEMENTS (#editModal)
+   ========================================== */
+#editModal .modal-content {
+    border: 1px solid var(--inv-slate-200);
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+    font-family: var(--inv-font-sans);
+}
 
-            /* Banner image repeats on every page */
-            thead.repeat-print-header {
-                display: table-header-group !important;
-            }
+#editModal .modal-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid var(--inv-slate-200);
+    background: var(--inv-slate-50);
+    border-top-left-radius: 16px;
+    border-top-right-radius: 16px;
+}
 
-            /* Footer anchored to the bottom of every printed page */
-            .quote-print-footer {
-                position: fixed !important;
-                bottom: 0 !important;
-                left: 0 !important;
-                width: 100% !important;
-                z-index: 1000;
-            }
+#editModal .modal-title {
+    font-family: var(--inv-font-display);
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--inv-slate-900);
+}
 
-            /* Keep content clear of the fixed footer */
-            .invoice-body-content {
-                padding-bottom: 35mm !important;
-            }
+#editModal .modal-body {
+    padding: 24px;
+}
 
-            /* Prevent breaking across pages */
-            .meta-grid,
-            .project-box,
-            .table tr,
-            .row.mb-4,
-            .row.mt-5 {
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
+#editModal .form-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--inv-slate-700);
+    margin-bottom: 6px;
+}
 
-            /* Payment details and signatures go to page 2 */
-            .page-break-before {
-                page-break-before: always !important;
-                break-before: page !important;
-            }
-        }
+#editModal .form-control,
+#editModal .form-select {
+    border: 1px solid var(--inv-slate-300);
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 0.875rem;
+    color: var(--inv-slate-900);
+    transition: all 0.15s ease;
+}
+
+#editModal .form-control:focus,
+#editModal .form-select:focus {
+    border-color: var(--inv-primary);
+    box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+    outline: none;
+}
+
+#editModal .modal-footer {
+    padding: 16px 24px;
+    border-top: 1px solid var(--inv-slate-200);
+    background: var(--inv-slate-50);
+    border-bottom-left-radius: 16px;
+    border-bottom-right-radius: 16px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+#editModal .btn-light {
+    background: #ffffff;
+    border: 1px solid var(--inv-slate-300);
+    color: var(--inv-slate-700);
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 8px 16px;
+}
+
+#editModal .btn-light:hover {
+    background: var(--inv-slate-100);
+    color: var(--inv-slate-900);
+}
+
+#editModal .btn-primary {
+    background: var(--inv-primary);
+    border-color: var(--inv-primary);
+    font-weight: 600;
+    border-radius: 8px;
+    padding: 8px 20px;
+}
+
+#editModal .btn-primary:hover {
+    background: var(--inv-primary-dark);
+    border-color: var(--inv-primary-dark);
+}
+
+/* ==========================================
+   PRINT ENGINE OVERRIDES & LAYOUT RULES
+   ========================================== */
+@page {
+    size: A4 portrait;
+    margin: 0;
+}
+
+@media print {
+    html, body {
+        background: #ffffff !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    /* Hide the app layout (sidebar / top bar) when printing */
+    aside, nav, header {
+        display: none !important;
+    }
+
+    .invoice-page-wrap {
+        max-width: 100% !important;
+        width: 100% !important;
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+
+    .invoice-slip {
+        border: none !important;
+        max-width: 100% !important;
+        box-shadow: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        border-radius: 0 !important;
+    }
+
+    .no-print {
+        display: none !important;
+    }
+
+    /* Banner image repeats on every page */
+    thead.repeat-print-header {
+        display: table-header-group !important;
+    }
+
+    /* Footer anchored to the bottom of every printed page */
+    .quote-print-footer {
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100% !important;
+        z-index: 1000;
+    }
+
+    /* Keep content clear of the fixed footer */
+    .invoice-body-content {
+        padding-bottom: 35mm !important;
+    }
+
+    /* Prevent breaking across pages */
+    .meta-grid,
+    .project-box,
+    .table tr,
+    .row.mb-4,
+    .row.mt-5 {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+    }
+
+    /* Payment details and signatures go to page 2 */
+    .page-break-before {
+        page-break-before: always !important;
+        break-before: page !important;
+    }
+}
