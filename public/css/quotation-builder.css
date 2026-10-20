@@ -12,6 +12,30 @@
     max-width: 1480px;
     color: var(--qb-ink);
 }
+.quotation-builder-page .qb-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8125rem;
+    color: #64748b;
+    margin-bottom: 1.25rem;
+}
+.quotation-builder-page .qb-breadcrumb a {
+    color: #64748b;
+    text-decoration: none;
+    transition: color 0.15s ease;
+}
+.quotation-builder-page .qb-breadcrumb a:hover {
+    color: #0284c7;
+}
+.quotation-builder-page .qb-breadcrumb .breadcrumb-separator {
+    color: #cbd5e1;
+    font-size: 0.75rem;
+}
+.quotation-builder-page .qb-breadcrumb .breadcrumb-current {
+    color: #0f172a;
+    font-weight: 600;
+}
 .quotation-builder-page #quotationBuilderHeader {
     align-items: center;
     gap: 16px;

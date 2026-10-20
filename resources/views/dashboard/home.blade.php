@@ -38,24 +38,24 @@
         : route('projects.index');
 @endphp
 
-        <div class="mb-4 print:hidden">
+        <!-- BREADCRUMB -->
+        <nav class="qb-breadcrumb print:hidden" aria-label="Breadcrumb">
+            <a href="{{ route('dashboard') }}"><i class="fa-solid fa-house me-1"></i> Dashboard</a>
+            <span class="breadcrumb-separator">/</span>
             @if($prefillProject)
-                <x-breadcrumb :items="[
-                    ['label' => 'Dashboard', 'url' => route('dashboard')],
-                    ['label' => 'Projects', 'url' => route('projects.index')],
-                    ['label' => $prefillProject->name, 'url' => route('projects.show', $prefillProject->project_Id)],
-                    ['label' => 'Quotation Builder'],
-                ]" />
+                <a href="{{ route('projects.index') }}">Projects</a>
+                <span class="breadcrumb-separator">/</span>
+                <a href="{{ route('projects.show', $prefillProject->project_Id) }}">{{ $prefillProject->name }}</a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-current">Quotation Builder</span>
             @else
-                <x-breadcrumb :items="[
-                    ['label' => 'Dashboard', 'url' => route('dashboard')],
-                    ['label' => 'Quotations', 'url' => route('quotations.history')],
-                    ['label' => 'Quotation Builder'],
-                ]" />
+                <a href="{{ route('quotations.history') }}">Quotations</a>
+                <span class="breadcrumb-separator">/</span>
+                <span class="breadcrumb-current">Quotation Builder</span>
             @endif
-        </div>
+        </nav>
 
-<div id="quotationBuilderHeader" class="quotation-builder-heading print:hidden">
+        <div id="quotationBuilderHeader" class="quotation-builder-heading print:hidden">
     <div class="w-10 h-10 rounded-xl bg-sky-50 flex items-center justify-center text-sky-700 shadow-sm border border-sky-100">
         <i class="fa-solid fa-file-invoice-dollar text-xl"></i>
     </div>
