@@ -373,9 +373,10 @@
 
                     <div id="paymentTermsList" class="space-y-3 mb-4"></div>
 
-                    <button type="button" id="addPaymentTermBtn" class="self-start text-sm font-semibold text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
+                    <button type="button" id="addPaymentTermBtn" class="self-start text-sm font-semibold text-teal-600 hover:text-teal-700 bg-teal-50 hover:bg-teal-100 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-teal-50 px-4 py-2 rounded-lg transition-colors flex items-center gap-2">
                         <i class="fa-solid fa-plus"></i> Add Payment Term
                     </button>
+                    <p id="paymentTermsLimitMessage" class="text-xs text-slate-500 mt-2 hidden"></p>
 
                     <input type="hidden" id="paymentTermsValue" name="payment_terms">
 
@@ -554,7 +555,12 @@
 
                 <!-- DAYS -->
                 <div class="col-6 col-md-3 col-lg-2">
-                    <label class="form-label fw-bold text-uppercase">DAYS</label>
+                    <label class="form-label fw-bold text-uppercase">DAY / SAMPLE</label>
+                    <select class="form-select form-select-sm mb-1 item-days-source">
+                        <option value="default" selected>Default (1)</option>
+                        <option value="execution">Execution days</option>
+                        <option value="total">Total duration</option>
+                    </select>
                     <input type="number" name="items[__INDEX__][days]" class="form-control form-control-sm item-days input-days" value="1" min="1">
                 </div>
 
@@ -617,6 +623,6 @@
         <script>
             window.quotationStoreUrl = "{{ route('quotation.store') }}";
         </script>
-        <script src="{{ asset('js/home.js') }}?v=v6_final"></script>
+        <script src="{{ asset('js/home.js') }}?v=v8_drone_snapshot"></script>
     @endpush
 </x-app-layout>

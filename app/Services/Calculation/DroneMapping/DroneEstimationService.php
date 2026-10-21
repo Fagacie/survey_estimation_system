@@ -40,7 +40,7 @@ class DroneEstimationService
             // If the duration was already calculated and saved from the frontend, use it.
             // Otherwise, calculate it: duration in hours = (distance / speed) / 3600
             $durationHours = $parameters->estimated_duration_hours;
-            if ($durationHours === null) {
+            if ($durationHours === null || (float) $durationHours <= 0) {
                 $durationHours = $speed > 0 ? ($distance / $speed) / 3600 : 0.0;
             }
 

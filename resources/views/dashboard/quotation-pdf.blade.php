@@ -246,6 +246,7 @@
                 </td>
                 <td style="width: 60%; vertical-align: top; font-size: 11px; line-height: 1.2; color: #212529;" class="text-end">
                     <strong>ECO HYDROTECH SOLUTIONS SDN. BHD. (1688434-T)</strong><br>
+                    TH3, Level 2, TELIPOTS HUB<br>
                     Institute of Oceanography and Environment<br>
                     Universiti Malaysia Terengganu<br>
                     21030, Kuala Nerus, Terengganu<br>

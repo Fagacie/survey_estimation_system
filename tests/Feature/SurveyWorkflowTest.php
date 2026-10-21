@@ -130,4 +130,31 @@ class SurveyWorkflowTest extends TestCase
             ->assertDontSee('Pantai UMT')
             ->assertDontSee('Sounding Distance');
     }
+
+    public function test_drone_estimation_calculates_duration_when_saved_duration_is_zero(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::create([
+            'created_by' => $user->id,
+            'number' => 'DRONE-DURATION',
+            'name' => 'Drone Duration Test',
+            'status' => 'draft',
+        ]);
+        $location = SurveyLocation::create([
+            'project_id' => $project->project_Id,
+            'name' => 'Drone Area',
+            'survey_type' => 'drone',
+        ]);
+        \App\Models\DroneMappingParameter::create([
+            'survey_location_id' => $location->id,
+            'speed_ms' => 10,
+            'total_flight_distance_m' => 12397,
+            'estimated_duration_hours' => 0,
+        ]);
+
+        $estimation = app(\App\Services\Calculation\ProjectEstimationService::class)
+            ->calculate($project->fresh());
+
+        $this->assertSame(1.0, (float) $estimation['drone_total_days']);
+    }
 }

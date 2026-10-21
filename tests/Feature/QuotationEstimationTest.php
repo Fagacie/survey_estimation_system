@@ -65,10 +65,18 @@ class QuotationEstimationTest extends TestCase
                 'unit_qty' => 1,
                 'mark_up' => 0,
             ]],
-            'payment_terms' => [],
+            'payment_terms' => [
+                ['percentage' => '40%', 'condition' => 'Upon acceptance'],
+                ['percentage' => '40%', 'condition' => 'Upon draft'],
+                ['percentage' => '20%', 'condition' => 'Upon final report'],
+            ],
         ]);
 
         $response->assertOk()->assertJsonPath('success', true);
+        $this->assertSame(
+            100.0,
+            (float) \App\Models\PaymentTerm::where('quotation_Id', $response->json('quotation_id'))->sum('percentage')
+        );
 
         $this->assertDatabaseHas('qt_invoice', [
             'project_Id' => $project->project_Id,
@@ -82,5 +90,27 @@ class QuotationEstimationTest extends TestCase
             'daily_rate' => 100,
             'line_total' => 200,
         ]);
+    }
+
+    public function test_quotation_rejects_payment_terms_that_total_more_than_one_hundred_percent(): void
+    {
+        $user = User::factory()->create();
+        $project = Project::create([
+            'created_by' => $user->id,
+            'number' => 'TEST-OVERPAYMENT-TERMS',
+            'name' => 'Over-limit Payment Terms Test',
+            'status' => 'draft',
+        ]);
+
+        $response = $this->actingAs($user)->postJson(route('quotation.store'), [
+            'project_id' => $project->project_Id,
+            'payment_terms' => [
+                ['percentage' => '60%', 'condition' => 'First payment'],
+                ['percentage' => '41%', 'condition' => 'Second payment'],
+            ],
+        ]);
+
+        $response->assertUnprocessable()
+            ->assertJsonValidationErrors('payment_terms');
     }
 }

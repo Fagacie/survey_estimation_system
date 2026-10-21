@@ -150,11 +150,50 @@ function renderPaymentTerms() {
     });
 
     syncPaymentTermsValue();
+    updateAddPaymentTermButton();
 }
 
 function syncPaymentTermsValue() {
     const paymentTermsHidden = document.getElementById('paymentTermsValue');
     if (paymentTermsHidden) paymentTermsHidden.value = JSON.stringify(paymentTerms);
+}
+
+function getPaymentTermsPercentageTotal() {
+    let total = 0;
+
+    for (const term of paymentTerms) {
+        const value = String(term.percentage ?? '').trim().replace(/%$/, '');
+        if (value === '') continue;
+        if (!/^(?:\d+(?:\.\d*)?|\.\d+)$/.test(value)) return NaN;
+
+        total += Number(value);
+    }
+
+    return total;
+}
+
+function updateAddPaymentTermButton() {
+    const addPaymentTermBtn = document.getElementById('addPaymentTermBtn');
+    const limitMessage = document.getElementById('paymentTermsLimitMessage');
+    if (!addPaymentTermBtn) return;
+
+    const total = getPaymentTermsPercentageTotal();
+    const atLimit = !Number.isFinite(total) || total >= 100;
+    addPaymentTermBtn.disabled = atLimit;
+    addPaymentTermBtn.title = atLimit
+        ? 'Edit existing payment terms to make room for another term.'
+        : '';
+
+    if (limitMessage) {
+        limitMessage.classList.toggle('hidden', !atLimit);
+        if (!Number.isFinite(total)) {
+            limitMessage.textContent = 'Enter valid percentages before adding another term.';
+        } else if (total > 100) {
+            limitMessage.textContent = 'Payment terms exceed 100%. Edit existing percentages before adding another term.';
+        } else {
+            limitMessage.textContent = 'Payment terms total 100%. Edit an existing percentage to make room for another term.';
+        }
+    }
 }
 
 // ==================================================================
@@ -671,11 +710,23 @@ document.addEventListener('DOMContentLoaded', function () {
             if (index === undefined) return;
 
             if (e.target.classList.contains('term-percentage')) {
+                const previousTotal = getPaymentTermsPercentageTotal();
+                const previousPercentage = paymentTerms[index].percentage;
                 paymentTerms[index].percentage = e.target.value;
+                const updatedTotal = getPaymentTermsPercentageTotal();
+
+                if (updatedTotal > 100 && previousTotal <= 100) {
+                    paymentTerms[index].percentage = previousPercentage;
+                    e.target.value = previousPercentage;
+                    window.alert(`Payment terms total ${updatedTotal}%. The total cannot exceed 100%. Please edit the percentages.`);
+                    updateAddPaymentTermButton();
+                    return;
+                }
             } else if (e.target.classList.contains('term-condition')) {
                 paymentTerms[index].condition = e.target.value;
             }
             syncPaymentTermsValue();
+            updateAddPaymentTermButton();
             updateLastSavedTimestamp();
         });
 
@@ -689,6 +740,9 @@ document.addEventListener('DOMContentLoaded', function () {
         });
 
         addPaymentTermBtn.addEventListener('click', () => {
+            const total = getPaymentTermsPercentageTotal();
+            if (!Number.isFinite(total) || total >= 100) return;
+
             paymentTerms.push({ percentage: '', condition: '' });
             renderPaymentTerms();
             updateLastSavedTimestamp();
@@ -902,15 +956,22 @@ function createItemCard(module_Id, category_Id) {
     // Assign a unique ID to the card for easier debugging if needed
     card.dataset.uniqueId = 'item_' + uniqueIndex;
 
-    // Show the rounded numbers in the dropdown labels (DAYS itself starts at 1)
+    // Show the rounded numbers from the current module's estimation.
     const est = window.projectEstimation || {};
+    const droneModule = isDroneMappingModule(module_Id);
+    const executionDays = droneModule
+        ? Number(est.drone_total_days || 0)
+        : Number(est.execution_days || 0);
+    const totalDays = droneModule
+        ? Number(est.drone_total_days || 0)
+        : Number(est.total_days || 0);
     const execOpt = card.querySelector('.item-days-source option[value="execution"]');
     const totalOpt = card.querySelector('.item-days-source option[value="total"]');
-    if (execOpt && Number(est.execution_days) > 0) {
-        execOpt.textContent = `Execution days (${Math.max(1, Math.ceil(est.execution_days))})`;
+    if (execOpt && executionDays > 0) {
+        execOpt.textContent = `Execution days (${Math.max(1, Math.ceil(executionDays))})`;
     }
-    if (totalOpt && Number(est.total_days) > 0) {
-        totalOpt.textContent = `Total duration (${Math.max(1, Math.ceil(est.total_days))})`;
+    if (totalOpt && totalDays > 0) {
+        totalOpt.textContent = `Total duration (${Math.max(1, Math.ceil(totalDays))})`;
     }
 
     populateServicesDropdown(card, module_Id, category_Id);
@@ -1067,6 +1128,18 @@ function handleItemSelectChange(itemSelect) {
     }
 }
 
+function isDroneMappingModule(moduleId) {
+    const surveyType = String(document.querySelector('[name="module"]')?.value || '').toLowerCase();
+    if (surveyType === 'drone' || surveyType === 'drone_mapping') return true;
+
+    const modules = Array.isArray(window.adminModulesTree)
+        ? window.adminModulesTree
+        : Object.values(window.adminModulesTree || {});
+    const module = modules.find(item => String(item.module_id ?? '').trim() === String(moduleId ?? '').trim());
+
+    return String(module?.module_name ?? '').toLowerCase().includes('drone mapping');
+}
+
 function applyDaysSource(selectEl) {
     const card = selectEl.closest('.quotation-item-card');
     if (!card) return;
@@ -1075,12 +1148,19 @@ function applyDaysSource(selectEl) {
     if (!daysInput) return;
 
     const est = window.projectEstimation || {};
+    const droneModule = isDroneMappingModule(card.querySelector('.input-module-id')?.value);
+    const executionDays = droneModule
+        ? Number(est.drone_total_days || 0)
+        : Number(est.execution_days || 0);
+    const totalDays = droneModule
+        ? Number(est.drone_total_days || 0)
+        : Number(est.total_days || 0);
     let days = 1; // "default"
 
     if (selectEl.value === 'execution') {
-        days = Math.ceil(Number(est.execution_days || 0));
+        days = Math.ceil(executionDays);
     } else if (selectEl.value === 'total') {
-        days = Math.ceil(Number(est.total_days || 0));
+        days = Math.ceil(totalDays);
     }
 
     daysInput.value = Math.max(1, days);

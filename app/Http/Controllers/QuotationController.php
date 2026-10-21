@@ -144,7 +144,7 @@ class QuotationController extends Controller
             'pic'                 => 'nullable|string',
             'pic_no'           => 'nullable|string|max:255',
             'payment_terms'               => 'nullable|array',
-            'payment_terms.*.percentage'  => 'required_with:payment_terms|string',
+            'payment_terms.*.percentage'  => ['required_with:payment_terms', 'string', 'regex:/^[0-9]+(?:\.[0-9]+)?%?$/'],
             'payment_terms.*.condition'   => 'nullable|string|max:255',
             'additional_notes' => 'nullable|string',
             'signatory_id'        => 'nullable|integer|exists:signatories,id',   // Signed by
@@ -158,6 +158,15 @@ class QuotationController extends Controller
             'items.*.daily_rate'  => 'nullable|numeric|min:0',
             'items.*.mark_up'     => 'nullable|numeric|min:0',
         ]);
+
+        $paymentTermsTotal = collect($validated['payment_terms'] ?? [])
+            ->sum(fn ($term) => (float) str_replace('%', '', $term['percentage']));
+
+        if ($paymentTermsTotal > 100) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'payment_terms' => 'Payment term percentages cannot total more than 100%.',
+            ]);
+        }
 
         try {
             $result = DB::transaction(function () use ($validated, $request) {
